@@ -28,6 +28,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private val contactHost = configuration.get[String]("contact-frontend.host")
   private val contactFormServiceIdentifier = "play26frontend"
 
+  val citizenDetailsHost: String = configuration.get[Service]("microservice.services.citizen-details").baseUrl
+
   val analyticsToken: String = configuration.get[String](s"google-analytics.token")
   val analyticsHost: String = configuration.get[String](s"google-analytics.host")
   val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
@@ -38,6 +40,16 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val authUrl: String = configuration.get[Service]("auth").baseUrl
   lazy val loginUrl: String = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
+  lazy val p87DigitalFormUrl: String = configuration.get[String]("urls.p87DigitalForm")
+  lazy val personalDetailsUrl: String = configuration.get[String]("urls.personalDetails")
+  lazy val ivUpliftUrl: String = configuration.get[String]("urls.ivUplift")
+  lazy val ivCompletionUrl: String = configuration.get[String]("urls.ivCompletion")
+  lazy val ivFailureUrl: String = configuration.get[String]("urls.ivFailure")
+  lazy val feedbackSurvey: String = configuration.get[String]("urls.feedbackSurvey")
+
+  lazy val timeoutDialogEnabled: Boolean = configuration.get[Boolean]("timeoutDialog.enabled")
+  lazy val timeoutDialogTimeout: Int = configuration.get[Int]("timeoutDialog.timeout")
+  lazy val timeoutDialogTimeoutCountdown: Int = configuration.get[Int]("timeoutDialog.timeoutCountdown")
 
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("microservice.services.features.welsh-translation")

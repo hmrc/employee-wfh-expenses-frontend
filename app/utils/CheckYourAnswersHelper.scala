@@ -28,6 +28,15 @@ import CheckYourAnswersHelper._
 
 class CheckYourAnswersHelper(userAnswers: UserAnswers)(implicit messages: Messages) {
 
+  def whenDidYouFirstStartWorkingFromHome: Option[AnswerRow] = userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) map {
+    x =>
+      AnswerRow(
+        HtmlFormat.escape(messages("whenDidYouFirstStartWorkingFromHome.checkYourAnswersLabel")),
+        HtmlFormat.escape(x.format(dateFormatter)),
+        routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url
+      )
+  }
+
   private def yesOrNo(answer: Boolean)(implicit messages: Messages): Html =
     if (answer) {
       HtmlFormat.escape(messages("site.yes"))

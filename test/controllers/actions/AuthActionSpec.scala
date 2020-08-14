@@ -1,3 +1,19 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package controllers.actions
 
 import base.SpecBase
@@ -77,7 +93,7 @@ class AuthActionSpec extends SpecBase {
 
     "the user doesn't have sufficient confidence level" must {
 
-      "redirect the user to the unauthorised page" in {
+      "redirect the user to IVUplift" in {
 
         val application = applicationBuilder(userAnswers = None).build()
 
@@ -89,7 +105,15 @@ class AuthActionSpec extends SpecBase {
 
         status(result) mustBe SEE_OTHER
 
-        redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+        redirectLocation(result) mustBe Some(
+          "http://localhost:9948/iv-stub/uplift?" +
+            "origin=EEWFH&" +
+            "confidenceLevel=200&" +
+            "completionURL=http://localhost:9336/employee-working-from-home-expenses&" +
+            "failureURL=http://localhost:9336/employee-working-from-home-expenses/unauthorised"
+        )
+
+        application.stop()
       }
     }
 
@@ -144,6 +168,26 @@ class AuthActionSpec extends SpecBase {
         status(result) mustBe SEE_OTHER
 
         redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+      }
+    }
+
+    "any other exception" must {
+
+      "redirect the user to the Technical Difficulties page" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+
+        val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new Exception), frontendAppConfig, bodyParsers)
+        val controller = new Harness(authAction)
+        val result = controller.onPageLoad()(fakeRequest)
+
+        status(result) mustBe SEE_OTHER
+
+        redirectLocation(result) mustBe Some(routes.TechnicalDifficultiesController.onPageLoad().url)
+
+        application.stop()
       }
     }
   }

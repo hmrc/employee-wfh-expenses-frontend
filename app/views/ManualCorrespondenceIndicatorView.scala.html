@@ -1,0 +1,50 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@this(
+    main_template: MainTemplate
+)
+
+@()(implicit request: Request[_], messages: Messages)
+
+@main_template(
+    title = messages("manualCorrespondenceIndicator.title")
+    ) {
+
+    @components.back_link()
+
+    @components.heading("manualCorrespondenceIndicator.heading")
+
+    <p>We need to talk to you about an MCI error before you can continue.</p>
+
+    <h2 class="heading-medium">How to contact us</h2>
+    <div id="component-bullet-list">
+        <ul class="list list-bullet">
+            <li id="bullet-1">Telephone: 0300 200 3300</li>
+            <li id="bullet-2">Textphone: 0300 200 3319</li>
+            <li id="bullet-3">Outside UK: +44 135 535 9022</li>
+        </ul>
+    </div>
+
+    <p>Phone line are open:</p>
+    <div id="component-bullet-list">
+        <ul class="list list-bullet">
+            <li id="bullet-1">8am to 8pm, Monday to friday</li>
+            <li id="bullet-2">8am to 4pm Saturdays</li>
+            <li id="bullet-3">9am to 5pm Sundays</li>
+        </ul>
+    </div>
+}

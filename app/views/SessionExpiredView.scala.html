@@ -27,4 +27,6 @@
     @components.heading("session_expired.heading")
 
     <p>@messages("session_expired.guidance")</p>
+
+    @components.button_link("site.startAgain", routes.IndexController.onPageLoad().url)
 }

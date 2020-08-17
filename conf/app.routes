@@ -8,6 +8,19 @@ GET        /language/:lang                              controllers.LanguageSwit
 
 GET        /this-service-has-been-reset                 controllers.SessionExpiredController.onPageLoad
 
-GET        /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad
-
 GET        /unauthorised                                controllers.UnauthorisedController.onPageLoad
+
+GET        /technical-difficulties                      controllers.TechnicalDifficultiesController.onPageLoad
+
+GET        /disclaimer                                  controllers.DisclaimerController.onPageLoad()
+POST       /disclaimer                                  controllers.DisclaimerController.onSubmit()
+
+GET        /start-date                                  controllers.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+POST       /start-date                                  controllers.WhenDidYouFirstStartWorkingFromHomeController.onSubmit()
+
+GET        /cannot-claim-using-this-service             controllers.CannotClaimUsingThisServiceController.onPageLoad()
+
+GET        /your-tax-relief                             controllers.YourTaxReliefController.onPageLoad()
+POST       /your-tax-relief                             controllers.YourTaxReliefController.onSubmit()
+
+GET        /confirmation                                controllers.ConfirmationController.onPageLoad()

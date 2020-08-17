@@ -1,6 +1,15 @@
-checkYourAnswers.title = Check Your Answers
-checkYourAnswers.heading = Check Your Answers
-checkYourAnswers.guidance = Guidance for check your answers
+month.1 = January
+month.2 = February
+month.3 = March
+month.4 = April
+month.5 = May
+month.6 = June
+month.7 = July
+month.8 = August
+month.9 = September
+month.10 = October
+month.11 = November
+month.12 = December
 
 date.day = Day
 date.month = Month
@@ -37,8 +46,63 @@ site.hidden-edit = Change {0}
 site.no = No
 site.yes = Yes
 site.continue = Continue
-site.service_name = employee-wfh-expenses-frontend
+site.service_name = Claim tax relief on expenses for working from home
 site.textarea.char_limit = (Limit is {0} characters)
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+
+disclaimer.title = You must read the following before making a claim
+disclaimer.heading = You must read the following before making a claim
+disclaimer.paragraph.one = This service will adjust your tax code / personal allowance if you have been working from home because of coronavirus (COVID-19).
+disclaimer.list = disclaimerList
+disclaimer.list.text = To claim expenses:
+disclaimer.list.item1 = your employee must not be paying for your expenses
+disclaimer.list.item2 = you have been made to work from home by government guidelines or your employer
+disclaimer.list.item3 = You have incurred additional costs as a result of working from home (e.g. if you are a student living at home and someone else is paying the bills) you cannot claim.
+disclaimer.list.item4 = You must have paid tax
+disclaimer.warning =
+disclaimer.prosecuted = You may be prosecuted if you deliberately give incorrect or misleading information.
+
+whenDidYouFirstStartWorkingFromHome.title = When did you start working from home?
+whenDidYouFirstStartWorkingFromHome.heading = When did you start working from home?
+whenDidYouFirstStartWorkingFromHome.hinttext = For example, 15 3 2020
+whenDidYouFirstStartWorkingFromHome.checkYourAnswersLabel = WhenDidYouFirstStartWorkingFromHome
+whenDidYouFirstStartWorkingFromHome.error.required.all = Enter a date for when you started working from home, include a day, month and year
+whenDidYouFirstStartWorkingFromHome.error.required.two = The date for when you started working from home must include both the {0} and {1}
+whenDidYouFirstStartWorkingFromHome.error.required = The date for when you started working from home must include the {0}
+whenDidYouFirstStartWorkingFromHome.error.invalid = Enter a date for when you started working from home, include a day, month and year
+
+cannotClaimUsingThisService.title = You cannot claim using this service
+cannotClaimUsingThisService.heading = You cannot claim using this service
+cannotClaimUsingThisService.reason = You can only use this service to claim for the current tax year (6 April 2020 to 5 April 2021) and the previous tax year (6 April 2019 to 5 April 2020).
+cannotClaimUsingThisService.options.text = You can:
+cannotClaimUsingThisService.alternative = {0} if you need to claim for a different tax year.
+cannotClaimUsingThisService.alternative.href.text = use this service
+cannotClaimUsingThisService.changeDate = {0} you started working from home
+cannotClaimUsingThisService.changeDate.href.text = go back and change the date
+
+yourTaxRelief.title = Your tax relief
+yourTaxRelief.heading = Your tax relief
+yourTaxRelief.inset.text = You started working from home on {0}.
+yourTaxRelief.changeThisDate.href.text = Change this date
+yourTaxRelief.list =
+yourTaxRelief.list.text = Therefore your tax-free Personal allowance will change in the following way:
+yourTaxRelief.list.item1 = it will increase by £4 a week for the 2 weeks you worked from home in the previous tax year, £8 in total
+yourTaxRelief.list.item2 = it will increase by £6 a week for this whole tax year (it does not matter how many weeks you worked from home), £312 total
+yourTaxRelief.list.finalText = The amount you save will depend on the rate of tax you pay. For example if you are a basic rate (20%) taxpayer an increase of £6 a week to your Personal allowance will mean you pay £1.20 less in a tax week (you save £62 in that year).
+yourTaxRelief.sendYourApplication.heading = Now send your application
+yourTaxRelief.disclaimer = By submitting this application you are confirming that, to the best of your knowledge, the details you are providing are correct.
+yourTaxRelief.submit.button.text = Accept and send
+
+confirmation.title = Confirmation
+confirmation.heading = Claim complete
+confirmation.text = Your tax-free Personal Allowance will be increased
+confirmation.whatHappensNext.heading = What happens next
+confirmation.whatHappensNext.paragraph.1 = Your tax-free Personal Allowance for this year will be adjusted to include tax relief for expenses for working from home. You should be able to see this update within your Personal Tax Account within 2 working days.
+confirmation.whatHappensNext.paragraph.2 = You will receive confirmation of your tax code change either via email or post.
+confirmation.checkYourAddress.heading = Check your address is correct
+confirmation.checkYourAddress.paragraph.1 = We will be sending your letters to the address shown.
+confirmation.checkYourAddress.paragraph.2 = If it is not correct, you must update it in your Personal Tax Account. Otherwise HMRC will not be able to send you any letters or amounts due.
+confirmation.updateYourAddress.href.text = Leave this service and update your address in your Personal Tax Account (opens in a new window or tab)
+

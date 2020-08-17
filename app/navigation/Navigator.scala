@@ -16,8 +16,9 @@
 
 package navigation
 
-import javax.inject.{Inject, Singleton}
+import java.time.LocalDate
 
+import javax.inject.{Inject, Singleton}
 import play.api.mvc.Call
 import controllers.routes
 import pages._
@@ -27,17 +28,27 @@ import models._
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
+    case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
     case _ => _ => routes.IndexController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Call = {
-    case _ => _ => routes.CheckYourAnswersController.onPageLoad()
+    case _ => _ => routes.IndexController.onPageLoad()
   }
 
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
-    case NormalMode =>
-      normalRoutes(page)(userAnswers)
-    case CheckMode =>
-      checkRouteMap(page)(userAnswers)
+  def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
+
+  def checkStartWorkingFromHomeDate(userAnswers: UserAnswers) = {
+    val earliestStartDate = LocalDate.of(2019,4,6)
+
+    userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
+      case Some(startDate) =>
+        startDate.isBefore(earliestStartDate) match {
+          case true   => routes.CannotClaimUsingThisServiceController.onPageLoad()
+          case false  => routes.YourTaxReliefController.onPageLoad()
+        }
+      case None => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+    }
+
   }
 }

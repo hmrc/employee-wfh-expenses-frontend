@@ -29,6 +29,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private val contactFormServiceIdentifier = "play26frontend"
 
   val citizenDetailsHost: String = configuration.get[Service]("microservice.services.citizen-details").baseUrl
+  val taiHost: String = configuration.get[Service]("microservice.services.tai").baseUrl
 
   val analyticsToken: String = configuration.get[String](s"google-analytics.token")
   val analyticsHost: String = configuration.get[String](s"google-analytics.host")
@@ -46,6 +47,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   lazy val ivCompletionUrl: String = configuration.get[String]("urls.ivCompletion")
   lazy val ivFailureUrl: String = configuration.get[String]("urls.ivFailure")
   lazy val feedbackSurvey: String = configuration.get[String]("urls.feedbackSurvey")
+
+  lazy val otherExpensesId: Int = configuration.get[Int]("otherExpensesId")
 
   lazy val timeoutDialogEnabled: Boolean = configuration.get[Boolean]("timeoutDialog.enabled")
   lazy val timeoutDialogTimeout: Int = configuration.get[Int]("timeoutDialog.timeout")

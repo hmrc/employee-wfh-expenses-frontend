@@ -73,4 +73,24 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
        |}
      """.stripMargin
   )
+
+  lazy val invalidJson: JsValue = Json.parse("""{ "invalid" : "json" }""")
+
+  def validIabdJson(grossAmount: Option[Int]): JsValue = Json.parse(
+    s"""
+       |[{
+       |    "nino": "$fakeNino",
+       |    "sequenceNumber": 201600003,
+       |    "taxYear": 2019,
+       |    "type": 59,
+       |    "source": 26,
+       |    "grossAmount": ${grossAmount.getOrElse("null")},
+       |    "receiptDate": null,
+       |    "captureDate": null,
+       |    "typeDescription": "Other Expenses",
+       |    "netAmount": null
+       |}]
+       |""".stripMargin
+  )
+
 }

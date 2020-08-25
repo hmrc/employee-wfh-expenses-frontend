@@ -20,11 +20,9 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@main_template(
-    title = messages("index.title")
-    ) {
+@main_template(title = messages("index.title")) {
 
-    @components.heading("index.heading")
+    <h1 class="govuk-heading-xl">@messages("index.heading")</h1>
 
     <p>@messages("index.guidance")</p>
 }

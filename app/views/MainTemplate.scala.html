@@ -15,38 +15,80 @@
  *@
 
 @import config.FrontendAppConfig
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
 
 @this(
-    appConfig: FrontendAppConfig,
-    govuk_wrapper: GovukWrapper,
-    article: Article,
-    sidebar: Sidebar
+        govukLayout: GovukLayout,
+        govukFooter: GovukFooter,
+        hmrcHeader: GovukHeader,
+        link: components.link,
+        appConfig: FrontendAppConfig
 )
 
-@(title: String,
-  sidebarLinks: Option[Html] = None,
-  contentHeader: Option[Html] = None,
-  bodyClasses: Option[String] = None,
-  mainClass: Option[String] = None,
-  scriptElem: Option[Html] = None)(mainContent: Html)(implicit request : Request[_], messages: Messages)
 
-@import uk.gov.hmrc.play.views.html.layouts
+@(title: String, beforeContentBlock: Option[Html] = None)(mainContent: Html)(implicit request : Request[_], messages: Messages)
 
-@serviceInfoContent = {}
-
-@sidebarContent = {
-    @if(sidebarLinks.isDefined) {
-        @sidebar(sidebarLinks.get, Some("sidebar"))
-    }
+@head() = {
+    <!--[if lte IE 8]><link href='@controllers.routes.Assets.versioned("stylesheets/employeewfhexpensesfrontend-app.css")' rel="stylesheet" type="text/css" /><![endif]-->
+    <!--[if gt IE 8]><!--><link href='@controllers.routes.Assets.versioned("stylesheets/employeewfhexpensesfrontend-app.css")' media="screen" rel="stylesheet" type="text/css" /><!--<![endif]-->
 }
 
-@govuk_wrapper(appConfig = appConfig,
-               title = title,
-               mainClass = mainClass,
-               bodyClasses = bodyClasses,
-               sidebar = sidebarContent,
-               contentHeader = contentHeader,
-               mainContent = article(mainContent),
-               serviceInfoContent = serviceInfoContent,
-               scriptElem = scriptElem
-)
+@scripts = {
+    <script src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
+    <script src='@controllers.routes.Assets.versioned("javascripts/application.min.js")'></script>
+    <script>window.GOVUKFrontend.initAll();</script>
+}
+
+@header() = {
+    @hmrcHeader(Header(
+        homepageUrl = Some(controllers.routes.IndexController.onPageLoad().url),
+        serviceName = Some(messages("service.name")),
+        serviceUrl = Some(controllers.routes.IndexController.onPageLoad().url),
+        containerClasses = Some("govuk-width-container")
+    ))
+}
+
+@content = {
+    <div class="govuk-!-margin-bottom-6">
+        @mainContent
+    </div>
+
+    <div class="govuk-body">
+        @link(appConfig.reportAProblemNonJSUrl, "site.getHelpWithThisPage")
+    </div>
+}
+
+@footerBlock = {
+    @govukFooter()
+}
+
+@footerItems() = @{
+    Seq(
+        FooterItem(
+            href = Some("https://www.tax.service.gov.uk/help/cookies"),
+            text = Some(messages("site.footer.cookies"))
+        ),
+        FooterItem(
+            href = Some("https://www.tax.service.gov.uk/help/privacy"),
+            text = Some(messages("site.footer.privacyPolicy"))
+        ),
+        FooterItem(
+            href = Some("https://www.tax.service.gov.uk/help/terms-and-conditions"),
+            text = Some(messages("site.footer.termsAndConditions"))
+        ),
+        FooterItem(
+            href = Some("https://www.gov.uk/help"),
+            text = Some(messages("site.footer.helpUsingGovUk"))
+        )
+    )
+}
+
+@govukLayout(
+    pageTitle = Some(title),
+    headBlock = Some(head()),
+    headerBlock = Some(header()),
+    beforeContentBlock = beforeContentBlock,
+    bodyEndBlock = None,
+    scriptsBlock = Some(scripts),
+    footerItems = footerItems()
+)(content)

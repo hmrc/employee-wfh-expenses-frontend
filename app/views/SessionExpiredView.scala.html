@@ -20,13 +20,12 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@main_template(
-    title = messages("session_expired.title")
-    ) {
+@main_template(title = messages("session_expired.title")) {
 
-    @components.heading("session_expired.heading")
+    <h1 class="govuk-heading-xl">@messages("session_expired.heading")</h1>
+    <p class="govuk-body">@messages("session_expired.guidance")</p>
 
-    <p>@messages("session_expired.guidance")</p>
-
-    @components.button_link("site.startAgain", routes.IndexController.onPageLoad().url)
+    <p class="govuk-body">
+        <a href="@routes.IndexController.onPageLoad().url" class="govuk-link">@messages("site.startAgain")</a>
+    </p>
 }

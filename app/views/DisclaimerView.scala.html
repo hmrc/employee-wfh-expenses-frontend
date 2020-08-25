@@ -14,43 +14,37 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+
 @this(
-        main_template:  MainTemplate,
-        formHelper:     FormWithCSRF
+        main_template: MainTemplate,
+        formHelper: FormWithCSRF,
+        button: GovukButton,
+        govukWarningText : GovukWarningText
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@()( implicit request: Request[_], messages: Messages)
 
-@main_template(
-    title = messages("disclaimer.title")
-    ) {
+@main_template(title = messages("disclaimer.heading")) {
+    @formHelper(action = routes.DisclaimerController.onSubmit(), 'autoComplete -> "off") {
 
-    @formHelper(action = DisclaimerController.onSubmit(), 'autoComplete -> "off") {
-        @components.back_link()
+     <h1 class="govuk-heading-xl">@messages("disclaimer.heading")</h1>
 
-        @components.heading("disclaimer.heading")
+     <p class="govuk-body">@messages("disclaimer.paragraph.one")</p>
 
-        <p>@messages("disclaimer.paragraph.one")</p>
+     <p class="govuk-body">@messages("disclaimer.list.text")</p>
+     <ul class="govuk-list govuk-list--bullet">
+      <li>@messages("disclaimer.list.item1")</li>
+      <li>@messages("disclaimer.list.item2")</li>
+      <li>@messages("disclaimer.list.item3")</li>
+      <li>@messages("disclaimer.list.item4")</li>
+     </ul>
 
-        @components.list(
-            pageKey = Some("disclaimer.list"),
-            listText = Some("disclaimer.list.text"),
-            bulletList = Seq(
-                "item1",
-                "item2",
-                "item3",
-                "item4"
-            )
-        )
+     @govukWarningText(WarningText(
+      iconFallbackText = messages("disclaimer.warning"),
+      content = Text(messages("disclaimer.prosecuted"))
+     ))
 
-        <div class="notice">
-            <i class="icon icon-important">
-                <span class="visually-hidden">@messages("disclaimer.warning")</span>
-            </i>
-            <strong class="bold-small">@messages("disclaimer.prosecuted")</strong>
-        </div>
-
-        <p>@components.submit_button("Accept and continue")</p>
+     @button(Button(content = Text("Accept and continue")))
     }
-
 }

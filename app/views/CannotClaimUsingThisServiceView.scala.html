@@ -18,7 +18,8 @@
 
 @this(
         main_template: MainTemplate,
-        frontendAppConfig: FrontendAppConfig
+        frontendAppConfig: FrontendAppConfig,
+        backLink: GovukBackLink
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -26,21 +27,20 @@
     @linkToChangeDate = {<a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("cannotClaimUsingThisService.changeDate.href.text")</a>}
     @linkToP87 = {<a href=@frontendAppConfig.p87DigitalFormUrl>@messages("cannotClaimUsingThisService.alternative.href.text")</a>}
 
-@main_template(title = messages("cannotClaimUsingThisService.title")) {
-    @components.back_link()
+@main_template(
+    title = messages("cannotClaimUsingThisService.title"),
+    beforeContentBlock = Some(backLink(BackLink(
+        href = routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url,
+        content = Text(messages("site.back")),
+        attributes = Map("id" -> "back-link")
+    )))
+) {
 
-    @components.heading("cannotClaimUsingThisService.heading")
-
-    <p>@messages("cannotClaimUsingThisService.reason")</p>
-
-    <p>@messages("cannotClaimUsingThisService.options.text")</p>
-    <ul class="list list-bullet">
-        <li id="bullet-changedate">
-            @Html(messages("cannotClaimUsingThisService.changeDate", linkToChangeDate))
-        </li>
-
-        <li id="bullet-changedate">
-            @Html(messages("cannotClaimUsingThisService.alternative", linkToP87))
-        </li>
+    <h1 class="govuk-heading-xl">@messages("cannotClaimUsingThisService.heading")</h1>
+    <p class="govuk-body">@messages("cannotClaimUsingThisService.reason")</p>
+    <p class="govuk-body">@messages("cannotClaimUsingThisService.options.text")</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@Html(messages("cannotClaimUsingThisService.changeDate", linkToChangeDate))</li>
+        <li>@Html(messages("cannotClaimUsingThisService.alternative", linkToP87))</li>
     </ul>
 }

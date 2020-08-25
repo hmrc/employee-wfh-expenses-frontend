@@ -31,7 +31,5 @@ class ConfirmationViewSpec extends ViewBehaviours {
     val applyView = view.apply(fakeCitizenAddress)(fakeRequest, messages)
 
     behave like normalPage(applyView, "confirmation")
-
-    behave like pageWithBackLink(applyView)
   }
 }

@@ -28,7 +28,5 @@ class DisclaimerViewSpec extends ViewBehaviours {
     val applyView = view.apply()(fakeRequest, messages)
 
     behave like normalPage(applyView, "disclaimer")
-
-    behave like pageWithBackLink(applyView)
   }
 }

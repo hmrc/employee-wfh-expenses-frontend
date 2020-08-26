@@ -14,8 +14,11 @@
  * limitations under the License.
  *@
 
-@(messageKey: String = "site.continue")(implicit messages: Messages)
+@this()
 
-<div class="section">
- <button id="submit" class="button">@messages(messageKey)</button>
-</div>
+@(link: String,
+        messageKey: String,
+        attrTarget: Boolean = false,
+        id: Option[String] = None)(implicit messages: Messages)
+
+<a href="@link" class="govuk-link" @id.map(x => s"id=$x") @if(attrTarget) { target="_blank" rel="noopener noreferrer" }>@messages(messageKey)</a>

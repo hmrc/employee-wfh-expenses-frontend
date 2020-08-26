@@ -14,48 +14,55 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 @import java.time.LocalDate
 
 @this(
-        main_template: MainTemplate,
-        formHelper:     FormWithCSRF
+        main_template:      MainTemplate,
+        formHelper:         FormWithCSRF,
+        backLink:           GovukBackLink,
+        govukInsetText:     GovukInsetText,
+        button:             GovukButton
 )
 
 @(startedWorkingFromHome: LocalDate)(implicit request: Request[_], messages: Messages)
 
-@linkToChangeDate = {
+@readableDate(date:LocalDate) = {@{date.getDayOfMonth} @{messages(s"month.${date.getMonthValue}")} @{date.getYear}}
+
+@insetHtml() = {
+    @messages("yourTaxRelief.inset.text", readableDate(startedWorkingFromHome))
+    <br>
     <a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("yourTaxRelief.changeThisDate.href.text")</a>
 }
 
-@readableDate(date:LocalDate) = {@{date.getDayOfMonth} @{messages(s"month.${date.getMonthValue}")} @{date.getYear}}
-
 @main_template(
-    title = messages("yourTaxRelief.title")
-    ) {
+    title = messages("yourTaxRelief.title"),
+    beforeContentBlock = Some(backLink(BackLink(
+        href = routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url,
+        content = Text(messages("site.back")),
+        attributes = Map("id" -> "back-link")
+    )))
+) {
 
-    @components.back_link()
+    <h1 class="govuk-heading-xl">@messages("yourTaxRelief.heading")</h1>
 
-    @components.heading("yourTaxRelief.heading")
+    @govukInsetText(InsetText(
+        content = HtmlContent(insetHtml())
+    ))
 
-    <div class="panel panel-border-wide">
-        @messages("yourTaxRelief.inset.text", readableDate(startedWorkingFromHome))
-        <br/>
-        @linkToChangeDate
-    </div>
-
-    <p>@messages("yourTaxRelief.list.text")</p>
-    <ul class="list list-bullet">
+    <p class="govuk-body">@messages("yourTaxRelief.list.text")</p>
+    <ul class="govuk-list govuk-list--bullet">
         <li id="bullet-changedate">@messages("yourTaxRelief.list.item1")</li>
         <li id="bullet-changedate">@messages("yourTaxRelief.list.item2")</li>
     </ul>
 
-    <p>@messages("yourTaxRelief.list.finalText")</p>
+    <p class="govuk-body">@messages("yourTaxRelief.list.finalText")</p>
 
-    <h2 class="heading-medium">@messages("yourTaxRelief.sendYourApplication.heading")</h2>
+    <h2 class="govuk-heading-l">@messages("yourTaxRelief.sendYourApplication.heading")</h2>
 
-    <p>@messages("yourTaxRelief.disclaimer")</p>
+    <p class="govuk-body">@messages("yourTaxRelief.disclaimer")</p>
 
     @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
-        @components.submit_button(messages("yourTaxRelief.submit.button.text"))
+        @button(Button(content = Text(messages("yourTaxRelief.submit.button.text"))))
     }
 }

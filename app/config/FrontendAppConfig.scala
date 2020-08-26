@@ -26,7 +26,7 @@ import play.api.mvc.Call
 class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   private val contactHost = configuration.get[String]("contact-frontend.host")
-  private val contactFormServiceIdentifier = "play26frontend"
+  private val contactFormServiceIdentifier = "EEWFH"
 
   val citizenDetailsHost: String = configuration.get[Service]("microservice.services.citizen-details").baseUrl
   val taiHost: String = configuration.get[Service]("microservice.services.tai").baseUrl

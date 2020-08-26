@@ -20,37 +20,40 @@
 
 @this(
         main_template: MainTemplate,
-        frontendAppConfig: FrontendAppConfig
+        frontendAppConfig: FrontendAppConfig,
+        backLink: GovukBackLink,
+        govukPanel: GovukPanel,
+        govukInsetText: GovukInsetText
 )
 
 @(citizenAddress: Address)(implicit request: Request[_], messages: Messages)
 
 @linkToChangeAddress = {<a href=@frontendAppConfig.personalDetailsUrl>@messages("confirmation.updateYourAddress.href.text")</a>}
 
-@main_template(
-    title = messages("confirmation.title")
-    ) {
-
-    @components.back_link()
-
-    <div class="govuk-box-highlight">
-        <h1 class="heading-xlarge">@messages("confirmation.heading")</h1>
-        <p class="font-large">@messages("confirmation.text")</p>
-    </div>
-
-    <h2 class="heading-medium">@messages("confirmation.whatHappensNext.heading")</h2>
-    <p>@messages("confirmation.whatHappensNext.paragraph.1")</p>
-    <p>@messages("confirmation.whatHappensNext.paragraph.2")</p>
-
-    <h2 class="heading-medium">@messages("confirmation.checkYourAddress.heading")</h2>
-    <p>@messages("confirmation.checkYourAddress.paragraph.1")</p>
-    <p>@messages("confirmation.checkYourAddress.paragraph.2")</p>
-
-    <div class="panel panel-border-wide">
+@formattedAddress() = {
     @for(line <- answeredLines(citizenAddress)) {
         @{line}<br/>
     }
-    </div>
+}
 
-    <p>@linkToChangeAddress</p>
+@main_template(title = messages("confirmation.title")) {
+
+    @govukPanel(Panel(
+        title = Text(messages("confirmation.heading")),
+        content = HtmlContent(messages("confirmation.text"))
+    ))
+
+    <h2 class="govuk-heading-m">@messages("confirmation.whatHappensNext.heading")</h2>
+    <p class="govuk-body">@messages("confirmation.whatHappensNext.paragraph.1")</p>
+    <p class="govuk-body">@messages("confirmation.whatHappensNext.paragraph.2")</p>
+
+    <h2 class="govuk-heading-m">@messages("confirmation.checkYourAddress.heading")</h2>
+    <p class="govuk-body">@messages("confirmation.checkYourAddress.paragraph.1")</p>
+    <p class="govuk-body">@messages("confirmation.checkYourAddress.paragraph.2")</p>
+
+    @govukInsetText(InsetText(
+        content = HtmlContent(formattedAddress())
+    ))
+
+    <p class="govuk-link">@linkToChangeAddress</p>
 }

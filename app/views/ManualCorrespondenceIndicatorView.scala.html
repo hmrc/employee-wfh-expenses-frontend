@@ -15,36 +15,37 @@
  *@
 
 @this(
-    main_template: MainTemplate
+        main_template: MainTemplate,
+        backLink:           GovukBackLink
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
-@main_template(
-    title = messages("manualCorrespondenceIndicator.title")
+    @main_template(
+        title = messages("manualCorrespondenceIndicator.title"),
+        beforeContentBlock = Some(backLink(BackLink(
+            href = routes.IndexController.onPageLoad().url,
+            content = Text(messages("site.back")),
+            attributes = Map("id" -> "back-link")
+        )))
     ) {
 
-    @components.back_link()
+    <h1 class="govuk-heading-xl">@messages("manualCorrespondenceIndicator.heading")</h1>
 
-    @components.heading("manualCorrespondenceIndicator.heading")
+    <p class="govuk-body">We need to talk to you about an MCI error before you can continue.</p>
 
-    <p>We need to talk to you about an MCI error before you can continue.</p>
+    <h2 class="govuk-heading-m">How to contact us</h2>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>Telephone: 0300 200 3300</li>
+        <li>Textphone: 0300 200 3319</li>
+        <li>Outside UK: +44 135 535 9022</li>
+    </ul>
 
-    <h2 class="heading-medium">How to contact us</h2>
-    <div id="component-bullet-list">
-        <ul class="list list-bullet">
-            <li id="bullet-1">Telephone: 0300 200 3300</li>
-            <li id="bullet-2">Textphone: 0300 200 3319</li>
-            <li id="bullet-3">Outside UK: +44 135 535 9022</li>
-        </ul>
-    </div>
+    <h2 class="govuk-heading-m">Phone lines are open:</h2>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>8am to 8pm, Monday to friday</li>
+        <li>8am to 4pm Saturdays</li>
+        <li>9am to 5pm Sundays</li>
+    </ul>
 
-    <p>Phone line are open:</p>
-    <div id="component-bullet-list">
-        <ul class="list list-bullet">
-            <li id="bullet-1">8am to 8pm, Monday to friday</li>
-            <li id="bullet-2">8am to 4pm Saturdays</li>
-            <li id="bullet-3">9am to 5pm Sundays</li>
-        </ul>
-    </div>
 }

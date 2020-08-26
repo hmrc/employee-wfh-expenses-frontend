@@ -25,18 +25,13 @@ import play.api.mvc.Call
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration) {
 
-  private val contactHost = configuration.get[String]("contact-frontend.host")
-  private val contactFormServiceIdentifier = "EEWFH"
+  val contactFormServiceIdentifier = "EEWFH"
 
   val citizenDetailsHost: String = configuration.get[Service]("microservice.services.citizen-details").baseUrl
   val taiHost: String = configuration.get[Service]("microservice.services.tai").baseUrl
 
   val analyticsToken: String = configuration.get[String](s"google-analytics.token")
   val analyticsHost: String = configuration.get[String](s"google-analytics.host")
-  val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
-  val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
-  val betaFeedbackUrl = s"$contactHost/contact/beta-feedback"
-  val betaFeedbackUnauthenticatedUrl = s"$contactHost/contact/beta-feedback-unauthenticated"
 
   lazy val authUrl: String = configuration.get[Service]("auth").baseUrl
   lazy val loginUrl: String = configuration.get[String]("urls.login")

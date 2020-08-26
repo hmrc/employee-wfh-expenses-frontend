@@ -32,6 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ConfirmationController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
+                                       checkAlreadyClaimed: CheckAlreadyClaimedAction,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        val controllerComponents: MessagesControllerComponents,
@@ -39,7 +40,7 @@ class ConfirmationController @Inject()(
                                        citizenDetailsConnector: CitizenDetailsConnector
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onPageLoad: Action[AnyContent] = (identify andThen checkAlreadyClaimed andThen getData andThen requireData).async {
     implicit request =>
 
       citizenDetailsConnector.getAddress(request.nino).flatMap {

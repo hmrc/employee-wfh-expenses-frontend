@@ -31,12 +31,13 @@ class DisclaimerController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        sessionRepository: SessionRepository,
                                        identify: IdentifierAction,
+                                       checkAlreadyClaimed: CheckAlreadyClaimedAction,
                                        getData: DataRetrievalAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: DisclaimerView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData) {
+  def onPageLoad(): Action[AnyContent] = (identify andThen checkAlreadyClaimed andThen getData) {
     implicit request =>
 
       if (request.userAnswers.isEmpty) {

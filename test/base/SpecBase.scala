@@ -36,6 +36,8 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
 
   val userAnswersId = "id"
 
+  val p87RedirectUrl = "p87-redirect-url"
+
   def emptyUserAnswers = UserAnswers(userAnswersId, Json.obj())
 
   def injector: Injector = app.injector
@@ -53,7 +55,8 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
-        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
+        bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
+        bind[CheckAlreadyClaimedAction].to[FakeCheckAlreadyClaimedAction]
       )
 
   lazy val fakeNino = "AB123456A"
@@ -84,7 +87,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
        |    "taxYear": 2019,
        |    "type": 59,
        |    "source": 26,
-       |    "grossAmount": ${grossAmount.getOrElse("null")},
+       |    "grossAmount": ${grossAmount.getOrElse(0)},
        |    "receiptDate": null,
        |    "captureDate": null,
        |    "typeDescription": "Other Expenses",

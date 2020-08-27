@@ -15,13 +15,13 @@
  *@
 
 @import config.FrontendAppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
+@import uk.gov.hmrc.hmrcfrontend.views.Aliases.ReportTechnicalIssue
 
 @this(
         govukLayout: GovukLayout,
         govukFooter: GovukFooter,
         hmrcHeader: GovukHeader,
-        link: components.link,
+        hmrcReportTechnicalIssue: hmrcComponents.HmrcReportTechnicalIssue,
         appConfig: FrontendAppConfig
 )
 
@@ -53,9 +53,11 @@
         @mainContent
     </div>
 
-    <div class="govuk-body">
-        @link(appConfig.reportAProblemNonJSUrl, "site.getHelpWithThisPage")
-    </div>
+    @hmrcReportTechnicalIssue(ReportTechnicalIssue(
+        serviceCode = appConfig.contactFormServiceIdentifier,
+        language = Some(messages.lang.code),
+        classList = None
+    ))
 }
 
 @footerBlock = {

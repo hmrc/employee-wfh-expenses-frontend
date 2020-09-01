@@ -29,13 +29,14 @@ import scala.concurrent.ExecutionContext
 class YourTaxReliefController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
+                                       checkAlreadyClaimed: CheckAlreadyClaimedAction,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: YourTaxReliefView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad: Action[AnyContent] = (identify andThen checkAlreadyClaimed andThen getData andThen requireData) {
     implicit request =>
       request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
         case None =>

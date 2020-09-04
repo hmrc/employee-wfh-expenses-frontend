@@ -62,13 +62,12 @@ unauthorised.heading = You can’t access this service with this account
 
 disclaimer.title = You must read the following before making a claim
 disclaimer.heading = You must read the following before making a claim
-disclaimer.paragraph.one = This service will adjust your tax code / personal allowance if you have been working from home because of coronavirus (COVID-19).
+disclaimer.paragraph.one = You can use this service to claim tax relief on expenses for working from home because of coronavirus (COVID-19).
 disclaimer.list = disclaimerList
-disclaimer.list.text = To claim expenses:
-disclaimer.list.item1 = your employee must not be paying for your expenses
-disclaimer.list.item2 = you have been made to work from home by government guidelines or your employer
-disclaimer.list.item3 = You have incurred additional costs as a result of working from home (e.g. if you are a student living at home and someone else is paying the bills) you cannot claim.
-disclaimer.list.item4 = You must have paid tax
+disclaimer.list.text = You can claim if:
+disclaimer.list.item1 = your employer has not already paid your expenses
+disclaimer.list.item2 = you have been forced to work from home by government guidelines or your employer
+disclaimer.list.item3 = you have incurred additional costs as a result of working from home
 disclaimer.warning =
 disclaimer.prosecuted = You may be prosecuted if you deliberately give incorrect or misleading information.
 

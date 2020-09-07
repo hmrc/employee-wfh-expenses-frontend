@@ -74,12 +74,15 @@ disclaimer.prosecuted = You may be prosecuted if you deliberately give incorrect
 
 whenDidYouFirstStartWorkingFromHome.title = When did you start working from home?
 whenDidYouFirstStartWorkingFromHome.heading = When did you start working from home?
-whenDidYouFirstStartWorkingFromHome.hinttext = For example, 15 3 2020
+whenDidYouFirstStartWorkingFromHome.hinttext = For example, 23 3 2020
 whenDidYouFirstStartWorkingFromHome.checkYourAnswersLabel = WhenDidYouFirstStartWorkingFromHome
 whenDidYouFirstStartWorkingFromHome.error.required.all = Enter a date for when you started working from home, include a day, month and year
 whenDidYouFirstStartWorkingFromHome.error.required.two = The date for when you started working from home must include both the {0} and {1}
 whenDidYouFirstStartWorkingFromHome.error.required = The date for when you started working from home must include the {0}
 whenDidYouFirstStartWorkingFromHome.error.invalid = Enter a date for when you started working from home, include a day, month and year
+whenDidYouFirstStartWorkingFromHome.info.weekinfo=We will use this date to determine when you became eligible for this additional tax-free allowance. It will be:
+whenDidYouFirstStartWorkingFromHome.info.weekinfo1=£4 a week for the previous tax year (for the weeks you worked from home)
+whenDidYouFirstStartWorkingFromHome.info.weekinfo2=£6 a week for the whole of the current tax year (whether you have or have not worked from home yet)
 
 cannotClaimUsingThisService.title = You cannot claim using this service
 cannotClaimUsingThisService.heading = You cannot claim using this service

@@ -92,16 +92,20 @@ cannotClaimUsingThisService.changeDate.href.text = go back and change the date
 
 yourTaxRelief.title = Your tax relief
 yourTaxRelief.heading = Your tax relief
-yourTaxRelief.inset.text = You started working from home on {0}.
+yourTaxRelief.inset.text = You started working from home on
 yourTaxRelief.changeThisDate.href.text = Change this date
-yourTaxRelief.list =
-yourTaxRelief.list.text = Therefore your tax-free Personal allowance will change in the following way:
-yourTaxRelief.list.item1 = it will increase by £4 a week for the 2 weeks you worked from home in the previous tax year, £8 in total
-yourTaxRelief.list.item2 = it will increase by £6 a week for this whole tax year (it does not matter how many weeks you worked from home), £312 total
-yourTaxRelief.list.finalText = The amount you save will depend on the rate of tax you pay. For example if you are a basic rate (20%) taxpayer an increase of £6 a week to your Personal allowance will mean you pay £1.20 less in a tax week (you save £62 in that year).
+yourTaxRelief.currentTaxYear.paragraph.one = Therefore your additional tax-free allowance will increase by £6 a week for all of the current tax year, 2020 to 2021.
+yourTaxRelief.currentTaxYear.paragraph.two = This will change the amount of tax you pay. The amount of tax you save will depend on your rate of tax, for example:
+yourTaxRelief.currentTaxYear.paragraph.three = If you are a basic rate (20%) taxpayer an increase of £6 a week to your tax-free allowance will mean you pay £1.20 less in tax a week (you save £62 a year).
+yourTaxRelief.previousTaxYear.list =
+yourTaxRelief.previousTaxYear.list.text = Therefore your additional tax-free allowance will increase by:
+yourTaxRelief.previousTaxYear.list.item1 = £4 a week for 2 weeks of the previous tax year (April 2019 to April 2020)
+yourTaxRelief.previousTaxYear.list.item2 = £6 a week for all of the current tax year (April 2020 to April 2021)
+yourTaxRelief.previousTaxYear.list.finalText.one = This will change the amount of tax you pay. The amount of tax you save will depend on your rate of tax, for example:
+yourTaxRelief.previousTaxYear.list.finalText.two = If you are a basic rate (20%) taxpayer an increase of £6 a week to your tax-free allowance will mean you pay £1.20 less in tax a week (you save £62 a year).
 yourTaxRelief.sendYourApplication.heading = Now send your application
 yourTaxRelief.disclaimer = By submitting this application you are confirming that, to the best of your knowledge, the details you are providing are correct.
-yourTaxRelief.submit.button.text = Accept and send
+yourTaxRelief.submit.button.text = Continue
 
 confirmation.title = Confirmation
 confirmation.heading = Claim complete

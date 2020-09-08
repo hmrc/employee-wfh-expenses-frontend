@@ -30,7 +30,8 @@
 @readableDate(date:LocalDate) = {@{date.getDayOfMonth} @{messages(s"month.${date.getMonthValue}")} @{date.getYear}}
 
 @insetHtml() = {
-    @messages("yourTaxRelief.inset.text", readableDate(startedWorkingFromHome))
+    @messages("yourTaxRelief.inset.text")
+    <b>@readableDate(startedWorkingFromHome)</b>
     <br>
     <a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("yourTaxRelief.changeThisDate.href.text")</a>
 }
@@ -48,21 +49,25 @@
 
     @govukInsetText(InsetText(
         content = HtmlContent(insetHtml())
-    ))
+        ))
 
-    <p class="govuk-body">@messages("yourTaxRelief.list.text")</p>
-    <ul class="govuk-list govuk-list--bullet">
-        <li id="bullet-changedate">@messages("yourTaxRelief.list.item1")</li>
-        <li id="bullet-changedate">@messages("yourTaxRelief.list.item2")</li>
-    </ul>
+    @if(startedWorkingFromHome.isAfter(LocalDate.of(2020,4,5))){
+        <p class="govuk-body">@messages("yourTaxRelief.currentTaxYear.paragraph.one")</p>
+        <p class="govuk-body">@messages("yourTaxRelief.currentTaxYear.paragraph.two")</p>
+        <p class="govuk-body">@messages("yourTaxRelief.currentTaxYear.paragraph.three")</p>
+    } else {
+        <p class="govuk-body">@messages("yourTaxRelief.previousTaxYear.list.text")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li id="bullet-changedate">@messages("yourTaxRelief.previousTaxYear.list.item1")</li>
+            <li id="bullet-changedate">@messages("yourTaxRelief.previousTaxYear.list.item2")</li>
+        </ul>
 
-    <p class="govuk-body">@messages("yourTaxRelief.list.finalText")</p>
-
-    <h2 class="govuk-heading-l">@messages("yourTaxRelief.sendYourApplication.heading")</h2>
-
-    <p class="govuk-body">@messages("yourTaxRelief.disclaimer")</p>
+        <p class="govuk-body">@messages("yourTaxRelief.previousTaxYear.list.finalText.one")</p>
+        <p class="govuk-body">@messages("yourTaxRelief.previousTaxYear.list.finalText.two")</p>
+    }
 
     @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
-        @button(Button(content = Text(messages("yourTaxRelief.submit.button.text"))))
+    @button(Button(content = Text(messages("yourTaxRelief.submit.button.text"))))
     }
+
 }

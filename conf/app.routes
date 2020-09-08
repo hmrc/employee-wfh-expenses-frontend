@@ -26,6 +26,9 @@ GET        /cannot-claim-using-this-service             controllers.CannotClaimU
 GET        /your-tax-relief                             controllers.YourTaxReliefController.onPageLoad()
 POST       /your-tax-relief                             controllers.YourTaxReliefController.onSubmit()
 
+GET        /submit-your-claim                           controllers.SubmitYourClaimController.onPageLoad()
+POST       /submit-your-claim                           controllers.SubmitYourClaimController.onSubmit()
+
 GET        /confirmation                                controllers.ConfirmationController.onPageLoad()
 
 GET        /contact-us                                  controllers.ManualCorrespondenceIndicatorController.onPageLoad()

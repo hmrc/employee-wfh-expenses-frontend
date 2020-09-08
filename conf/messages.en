@@ -123,3 +123,12 @@ manualCorrespondenceIndicator.heading = You cannot make a claim right now
 technicalDifficulties.title = Sorry, there is a problem with the service
 technicalDifficulties.heading = Sorry, there is a problem with the service
 technicalDifficulties.message = Try again in a few minutes. We did not save your answers.
+
+submitYourClaim.title = Submit your claim
+submitYourClaim.heading = Submit your claim
+submitYourClaim.list = submitYourClaimList
+submitYourClaim.list.text = By submitting this claim for tax relief you are confirming the following:
+submitYourClaim.list.item1 = your employer has not already paid your expenses
+submitYourClaim.list.item2 = you have been forced to work from home by government guidelines or your employer
+submitYourClaim.list.item3 = you have incurred additional costs as a result of working from home
+submitYourClaim.list.item4 = the information you have provided is correct, to the best of your knowledge

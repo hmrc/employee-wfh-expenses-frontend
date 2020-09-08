@@ -45,6 +45,14 @@
             @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
         }
 
+        <h1 class="govuk-heading-xl">@messages("whenDidYouFirstStartWorkingFromHome.heading")</h1>
+
+        <p class="govuk-body">@messages("whenDidYouFirstStartWorkingFromHome.info.weekinfo")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li id="bullet-changedate">@messages("whenDidYouFirstStartWorkingFromHome.info.weekinfo1")</li>
+            <li id="bullet-changedate">@messages("whenDidYouFirstStartWorkingFromHome.info.weekinfo2")</li>
+        </ul>
+
         @govukDateInput(DateInput(
             id = "value",
             errorMessage = form.errors.asTextErrorMessageForField(fieldKey = "value"),
@@ -70,14 +78,7 @@
                     label = Some(messages("date.year")),
                     value = form(s"value.year").value
                 )
-            ),
-            fieldset = Some(Fieldset(
-                legend = Some(Legend(
-                    content = Text(messages("whenDidYouFirstStartWorkingFromHome.heading")),
-                    classes = "govuk-fieldset__legend--l",
-                    isPageHeading = true
-                ))
-            ))
+            )
         ))
 
         @button(Button(content = Text(messages("site.continue"))))

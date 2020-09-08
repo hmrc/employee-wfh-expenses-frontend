@@ -18,37 +18,30 @@ package controllers
 
 import controllers.actions._
 import javax.inject.Inject
-import pages.WhenDidYouFirstStartWorkingFromHomePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
-import views.html.YourTaxReliefView
+import views.html.SubmitYourClaimView
 
 import scala.concurrent.ExecutionContext
 
-class YourTaxReliefController @Inject()(
+class SubmitYourClaimController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
                                        checkAlreadyClaimed: CheckAlreadyClaimedAction,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        val controllerComponents: MessagesControllerComponents,
-                                       view: YourTaxReliefView
+                                       view: SubmitYourClaimView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen checkAlreadyClaimed andThen getData andThen requireData) {
     implicit request =>
-      request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
-        case None =>
-          Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
-        case Some(startedWorkingFromHomeDate) =>
-          Ok(view(startedWorkingFromHomeDate))
-      }
+      Ok(view())
   }
 
   def onSubmit(): Action[AnyContent] = Action {
     implicit request =>
-      Redirect(routes.SubmitYourClaimController.onPageLoad())
+      Redirect(routes.ConfirmationController.onPageLoad())
   }
-
-  }
+}

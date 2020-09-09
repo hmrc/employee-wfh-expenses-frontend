@@ -21,14 +21,20 @@ import config.FrontendAppConfig
 import javax.inject.Singleton
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CitizenDetailsConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClient) {
+class CitizenDetailsConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClient) extends HttpResponseHelper {
 
   def getAddress(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val designatoryDetailsUrl: String = s"${appConfig.citizenDetailsHost}/citizen-details/$nino/designatory-details"
     httpClient.GET[HttpResponse](designatoryDetailsUrl)
+  }
+
+  def getETag(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+    val eTagUrl: String = s"${appConfig.citizenDetailsHost}/citizen-details/$nino/etag"
+    httpClient.GET(eTagUrl)
   }
 }

@@ -77,6 +77,14 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
      """.stripMargin
   )
 
+  lazy val validETagJson: JsValue = Json.parse(
+    s"""
+       |{
+       |  "etag":"115"
+       |}
+     """.stripMargin
+  )
+
   lazy val invalidJson: JsValue = Json.parse("""{ "invalid" : "json" }""")
 
   def validIabdJson(grossAmount: Option[Int]): JsValue = Json.parse(

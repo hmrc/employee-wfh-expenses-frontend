@@ -18,10 +18,11 @@ package connectors
 
 import config.FrontendAppConfig
 import javax.inject.{Inject, Singleton}
-import models.OtherExpense
+import utils.HttpResponseHelper
+import models.{OtherExpense, ETag}
 import play.api.Logger
 import play.api.http.Status.OK
-import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, Reads}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
@@ -29,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 
 @Singleton
-class TaiConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClient) {
+class TaiConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClient) extends HttpResponseHelper {
 
   private def withDefaultToEmptySeq[T: ClassTag](response: HttpResponse)
                                         (implicit reads: Reads[Seq[T]]): Seq[T] = {
@@ -51,5 +52,11 @@ class TaiConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClien
   def getIabdData(nino: String, year: Int)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[OtherExpense]] = {
     val taiUrl = s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/employee-expenses/${appConfig.otherExpensesId}"
     httpClient.GET(taiUrl).map(withDefaultToEmptySeq[OtherExpense])
+  }
+
+  def postIabdData(nino: String, year: Int, grossAmount: Int, eTag: ETag)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+    val taiUrl = s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/employee-expenses/${appConfig.otherExpensesId}"
+    val body = Json.obj("version" -> eTag.version, "grossAmount" -> grossAmount)
+    httpClient.POST[JsValue, HttpResponse](taiUrl, body)
   }
 }

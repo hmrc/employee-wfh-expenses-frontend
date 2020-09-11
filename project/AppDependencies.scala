@@ -12,7 +12,8 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "bootstrap-play-26"              % "1.14.0",
     "uk.gov.hmrc"       %% "play-whitelist-filter"          % "3.4.0-play-26",
     "uk.gov.hmrc"       %% "play-frontend-govuk"            % "0.50.0-play-26",
-    "uk.gov.hmrc"       %% "play-frontend-hmrc"             % "0.18.0-play-26"
+    "uk.gov.hmrc"       %% "play-frontend-hmrc"             % "0.18.0-play-26",
+    "uk.gov.hmrc"       %% "play-partials"                  % "6.11.0-play-26"
   )
 
   val test = Seq(

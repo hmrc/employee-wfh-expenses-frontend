@@ -17,15 +17,16 @@
 package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, urlEqualTo}
 import config.FrontendAppConfig
-import models.OtherExpense
+import models.{OtherExpense, ETag}
+import utils.WireMockHelper
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
-import play.api.http.Status.{OK, NO_CONTENT}
+import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
-import utils.WireMockHelper
+import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -42,7 +43,8 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
   private lazy val taiConnector: TaiConnector = app.injector.instanceOf[TaiConnector]
   private lazy val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
   private val testTaxYear = 2019
-  private val grossAmount = 120
+  private val testGrossAmount = 120
+  private val testETag = ETag(version = "115")
 
   "getIabdData" must {
     "return valid IABD data for a 200 response with a valid response body" in {
@@ -51,7 +53,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withBody(validIabdJson(Some(grossAmount)).toString)
+              .withBody(validIabdJson(Some(testGrossAmount)).toString)
           )
       )
 
@@ -60,7 +62,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
       whenReady(result) {
         res =>
           res mustBe a[Seq[_]]
-          res.headOption mustBe Some(OtherExpense(grossAmount))
+          res.headOption mustBe Some(OtherExpense(testGrossAmount))
       }
     }
 
@@ -103,4 +105,65 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
     }
 
   }
+
+  "postIabdData" must {
+    "return a 200 response" in {
+      server.stubFor(
+        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody("")
+          )
+      )
+
+      val result = taiConnector.postIabdData(fakeNino, testTaxYear, testGrossAmount, testETag)
+
+      whenReady(result) {
+        res =>
+          res mustBe a[HttpResponse]
+          res.status mustBe 200
+          res.body mustBe ""
+      }
+    }
+
+    "return a 401 response" in {
+      server.stubFor(
+        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(UNAUTHORIZED)
+          )
+      )
+
+      val result = taiConnector.postIabdData(fakeNino, testTaxYear, testGrossAmount, testETag)
+
+      whenReady(result) {
+        res =>
+          res mustBe a[HttpResponse]
+          res.status mustBe 401
+          res.body mustBe ""
+      }
+    }
+
+    "return a 404 response" in {
+      server.stubFor(
+        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+          )
+      )
+
+      val result = taiConnector.postIabdData(fakeNino, testTaxYear, testGrossAmount, testETag)
+
+      whenReady(result) {
+        res =>
+          res mustBe a[HttpResponse]
+          res.status mustBe 404
+          res.body mustBe ""
+      }
+    }
+  }
+
 }

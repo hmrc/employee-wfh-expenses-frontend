@@ -46,6 +46,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
 
   lazy val otherExpensesId: Int = configuration.get[Int]("otherExpensesId")
 
+  lazy val taxReliefPerWeek2019: Int = configuration.getOptional[Int]("taxRelief.2019.poundsPerWeek").getOrElse(4)
+  lazy val taxReliefPerWeek2020: Int = configuration.getOptional[Int]("taxRelief.2020.poundsPerWeek").getOrElse(6)
+  lazy val taxReliefMaxPerYear2019: Int = configuration.getOptional[Int]("taxRelief.2019.maxPerYear").getOrElse(212)
+  lazy val taxReliefMaxPerYear2020: Int = configuration.getOptional[Int]("taxRelief.2020.maxPerYear").getOrElse(312)
+
   lazy val timeoutDialogEnabled: Boolean = configuration.get[Boolean]("timeoutDialog.enabled")
   lazy val timeoutDialogTimeout: Int = configuration.get[Int]("timeoutDialog.timeout")
   lazy val timeoutDialogTimeoutCountdown: Int = configuration.get[Int]("timeoutDialog.timeoutCountdown")

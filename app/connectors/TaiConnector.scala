@@ -19,11 +19,11 @@ package connectors
 import config.FrontendAppConfig
 import javax.inject.{Inject, Singleton}
 import utils.HttpResponseHelper
-import models.{OtherExpense, ETag}
+import models.{ETag, OtherExpense}
 import play.api.Logger
-import play.api.http.Status.OK
+import play.api.http.Status.{OK, isSuccessful}
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, Reads}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -54,9 +54,14 @@ class TaiConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClien
     httpClient.GET(taiUrl).map(withDefaultToEmptySeq[OtherExpense])
   }
 
-  def postIabdData(nino: String, year: Int, grossAmount: Int, eTag: ETag)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def postIabdData(nino: String, year: Int, grossAmount: Int, eTag: ETag)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
     val taiUrl = s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/employee-expenses/${appConfig.otherExpensesId}"
     val body = Json.obj("version" -> eTag.version, "grossAmount" -> grossAmount)
-    httpClient.POST[JsValue, HttpResponse](taiUrl, body)
+    httpClient.POST[JsValue, HttpResponse](taiUrl, body) map {
+      response => response.status match {
+        case code if isSuccessful(code) => ()
+        case code => throw UpstreamErrorResponse.apply(response.body, code)
+      }
+    }
   }
 }

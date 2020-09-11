@@ -19,14 +19,14 @@ package connectors
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, urlEqualTo}
 import config.FrontendAppConfig
-import models.{OtherExpense, ETag}
+import models.{ETag, OtherExpense}
 import utils.WireMockHelper
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse, UpstreamErrorResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -44,7 +44,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
   private lazy val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
   private val testTaxYear = 2019
   private val testGrossAmount = 120
-  private val testETag = ETag(version = "115")
+  private val testETag = ETag(version = etag)
 
   "getIabdData" must {
     "return valid IABD data for a 200 response with a valid response body" in {
@@ -121,9 +121,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       whenReady(result) {
         res =>
-          res mustBe a[HttpResponse]
-          res.status mustBe 200
-          res.body mustBe ""
+          whenReady(result) {_ => succeed}
       }
     }
 
@@ -138,11 +136,9 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.postIabdData(fakeNino, testTaxYear, testGrossAmount, testETag)
 
-      whenReady(result) {
-        res =>
-          res mustBe a[HttpResponse]
-          res.status mustBe 401
-          res.body mustBe ""
+      whenReady(result.failed) {ex =>
+        ex mustBe an[UpstreamErrorResponse]
+        ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe UNAUTHORIZED
       }
     }
 
@@ -157,11 +153,9 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.postIabdData(fakeNino, testTaxYear, testGrossAmount, testETag)
 
-      whenReady(result) {
-        res =>
-          res mustBe a[HttpResponse]
-          res.status mustBe 404
-          res.body mustBe ""
+      whenReady(result.failed) {ex =>
+        ex mustBe an[UpstreamErrorResponse]
+        ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe NOT_FOUND
       }
     }
   }

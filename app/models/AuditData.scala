@@ -16,20 +16,10 @@
 
 package models
 
-import play.api.libs.json.{Format, Json, JsonValidationError, OFormat, Reads, Writes, __}
+import play.api.libs.json.{Format, JsObject, Json}
 
-import scala.util.{Success, Try}
+case class AuditData(nino: String, userAnswers: JsObject, flatRateItems: Option[Seq[FlatRateItem]] = None, submissionError: Option[String] = None)
 
-case class ETag(version: Int)
-
-object ETag {
-  implicit lazy val reads: Reads[ETag] = (__ \ "etag").read[String]
-    .map(x => Try(ETag(x.toInt)))
-    .collect(JsonValidationError("parse error")) {
-      case Success(value) => value
-    }
-
-  implicit lazy val writes: Writes[ETag] = (__ \ "etag").write[ETag]
-
-  implicit val format: Format[ETag] = Format(reads, writes)
+object AuditData {
+  implicit lazy val format: Format[AuditData] = Json.format[AuditData]
 }

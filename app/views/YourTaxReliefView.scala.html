@@ -51,20 +51,12 @@
         content = HtmlContent(insetHtml())
         ))
 
-    @if(startedWorkingFromHome.isAfter(LocalDate.of(2020,4,5))){
-        <p class="govuk-body">@messages("yourTaxRelief.currentTaxYear.paragraph.one")</p>
-        <p class="govuk-body">@messages("yourTaxRelief.currentTaxYear.paragraph.two")</p>
-        <p class="govuk-body">@messages("yourTaxRelief.currentTaxYear.paragraph.three")</p>
-    } else {
-        <p class="govuk-body">@messages("yourTaxRelief.previousTaxYear.list.text")</p>
-        <ul class="govuk-list govuk-list--bullet">
-            <li id="bullet-changedate">@messages("yourTaxRelief.previousTaxYear.list.item1")</li>
-            <li id="bullet-changedate">@messages("yourTaxRelief.previousTaxYear.list.item2")</li>
-        </ul>
+    <p class="govuk-body">@messages("yourTaxRelief.paragraph.one")</p>
+    <p class="govuk-body">@messages("yourTaxRelief.paragraph.two")</p>
 
-        <p class="govuk-body">@messages("yourTaxRelief.previousTaxYear.list.finalText.one")</p>
-        <p class="govuk-body">@messages("yourTaxRelief.previousTaxYear.list.finalText.two")</p>
-    }
+    <h2 class="govuk-heading-m">@messages("yourTaxRelief.submitYourClaim.heading")</h2>
+
+    <p class="govuk-body">@messages("yourTaxRelief.disclaimer")</p>
 
     @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
     @button(Button(content = Text(messages("yourTaxRelief.submit.button.text"))))

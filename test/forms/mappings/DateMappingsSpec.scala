@@ -17,6 +17,7 @@
 package forms.mappings
 
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 import generators.Generators
 import org.scalacheck.Gen
@@ -32,13 +33,14 @@ class DateMappingsSpec extends FreeSpec with MustMatchers with ScalaCheckPropert
       requiredKey    = "error.required",
       allRequiredKey = "error.required.all",
       twoRequiredKey = "error.required.two",
-      invalidKey     = "error.invalid"
+      invalidKey     = "error.invalid",
+      futureDateKey  = "error.future.date"
     )
   )
 
   val validData = datesBetween(
-    min = LocalDate.of(2000, 1, 1),
-    max = LocalDate.of(3000, 1, 1)
+    min = LocalDate.of(2018, 1, 1),
+    max = LocalDate.of(2020, 1, 1)
   )
 
   val invalidField: Gen[String] = Gen.alphaStr.suchThat(_.nonEmpty)
@@ -344,6 +346,23 @@ class DateMappingsSpec extends FreeSpec with MustMatchers with ScalaCheckPropert
 
     result.errors must contain(
       FormError("value", "error.invalid", List.empty)
+    )
+  }
+
+  "fail to bind an date in the future" in {
+
+    val tomorrow = LocalDate.now().plus(1,ChronoUnit.DAYS)
+
+    val data = Map(
+      "value.day" -> tomorrow.getDayOfMonth.toString,
+      "value.month" -> tomorrow.getMonthValue.toString,
+      "value.year" -> tomorrow.getYear.toString
+    )
+
+    val result = form.bind(data)
+
+    result.errors must contain(
+      FormError("value", "error.future.date", List.empty)
     )
   }
 

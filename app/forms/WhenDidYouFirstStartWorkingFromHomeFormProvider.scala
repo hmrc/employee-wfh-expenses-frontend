@@ -30,7 +30,8 @@ class WhenDidYouFirstStartWorkingFromHomeFormProvider @Inject() extends Mappings
         invalidKey     = "whenDidYouFirstStartWorkingFromHome.error.invalid",
         allRequiredKey = "whenDidYouFirstStartWorkingFromHome.error.required.all",
         twoRequiredKey = "whenDidYouFirstStartWorkingFromHome.error.required.two",
-        requiredKey    = "whenDidYouFirstStartWorkingFromHome.error.required"
+        requiredKey    = "whenDidYouFirstStartWorkingFromHome.error.required",
+        futureDateKey  = "whenDidYouFirstStartWorkingFromHome.error.futureDateNotAllowed"
       )
     )
 }

@@ -1,4 +1,4 @@
-/*
+@*
  * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *@
 
-package views
+@import config.FrontendAppConfig
 
-import views.behaviours.ViewBehaviours
-import views.html.SubmitYourClaimView
+@this(
+        main_template: MainTemplate,
+        appConfig: FrontendAppConfig
+)
 
-class SubmitYourClaimViewSpec extends ViewBehaviours {
+@()(implicit request: Request[_], messages: Messages)
 
-  "SubmitYourClaim view" must {
-
-    val view = viewFor[SubmitYourClaimView](Some(emptyUserAnswers))
-
-    val applyView = view.apply()(fakeRequest, messages)
-
-    behave like normalPage(applyView, "submitYourClaim")
-
-    behave like pageWithBackLink(applyView)
-  }
+@main_template(title = messages("disclaimer.heading")) {
+ <h1 class="govuk-heading-xl">@messages("technicalDifficulties.heading")</h1>
+ <p class="govuk-body">@messages("technicalDifficulties.message")</p>
 }

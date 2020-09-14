@@ -85,6 +85,26 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
      """.stripMargin
   )
 
+  lazy val validPaperlessPreferences: JsValue = Json.parse(
+    s"""
+       |{
+       |  "termsAndConditions": {
+       |    "generic": {
+       |      "accepted": true
+       |    },
+       |    "taxCredits": {
+       |      "accepted": true
+       |    }
+       |  },
+       |  "email": {
+       |    "email": "test@example.com",
+       |    "isVerified": true,
+       |    "hasBounces": false
+       |  }
+       |}
+     """.stripMargin
+  )
+
   lazy val invalidJson: JsValue = Json.parse("""{ "invalid" : "json" }""")
 
   def validIabdJson(grossAmount: Option[Int]): JsValue = Json.parse(

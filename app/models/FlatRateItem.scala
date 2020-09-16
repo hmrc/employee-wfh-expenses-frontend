@@ -16,20 +16,13 @@
 
 package models
 
-import play.api.libs.json.{Format, Json, JsonValidationError, OFormat, Reads, Writes, __}
+import play.api.libs.json.Json
 
-import scala.util.{Success, Try}
+case class FlatRateItem(year:Int, amount:Int)
 
-case class ETag(version: Int)
+object FlatRateItem {
 
-object ETag {
-  implicit lazy val reads: Reads[ETag] = (__ \ "etag").read[String]
-    .map(x => Try(ETag(x.toInt)))
-    .collect(JsonValidationError("parse error")) {
-      case Success(value) => value
-    }
+  implicit val flatRateItemReads = Json.reads[FlatRateItem]
+  implicit val flatRateItemWrtes = Json.writes[FlatRateItem]
 
-  implicit lazy val writes: Writes[ETag] = (__ \ "etag").write[ETag]
-
-  implicit val format: Format[ETag] = Format(reads, writes)
 }

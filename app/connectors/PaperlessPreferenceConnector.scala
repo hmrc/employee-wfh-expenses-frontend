@@ -46,7 +46,7 @@ class PaperlessPreferenceConnector @Inject()(appConfig: FrontendAppConfig,
 
     val preferencesUrl = s"${appConfig.preferencesFrontendHost}/preferences-frontend/paperless/preferences"
 
-    httpClient.GET(preferencesUrl).map(responseHandler).recover {
+    httpClient.GET[HttpResponse](preferencesUrl).map(responseHandler).recover {
       case _: BadRequestException =>
         // Expected from service if a Preference is not found. No need for logging.
         None

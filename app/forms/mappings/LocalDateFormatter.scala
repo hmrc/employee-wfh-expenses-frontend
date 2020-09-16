@@ -28,6 +28,7 @@ private[mappings] class LocalDateFormatter(
                                             allRequiredKey: String,
                                             twoRequiredKey: String,
                                             requiredKey: String,
+                                            futureDateKey: String,
                                             args: Seq[String] = Seq.empty
                                           ) extends Formatter[LocalDate] with Formatters {
 
@@ -36,7 +37,11 @@ private[mappings] class LocalDateFormatter(
   private def toDate(key: String, day: Int, month: Int, year: Int): Either[Seq[FormError], LocalDate] =
     Try(LocalDate.of(year, month, day)) match {
       case Success(date) =>
-        Right(date)
+        if (date.isAfter(LocalDate.now())) {
+          Left(Seq(FormError(key, futureDateKey, args)))
+        } else {
+          Right(date)
+        }
       case Failure(_) =>
         Left(Seq(FormError(key, invalidKey, args)))
     }

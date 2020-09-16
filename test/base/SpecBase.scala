@@ -77,10 +77,11 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
      """.stripMargin
   )
 
+  lazy val etag: Int = 123
   lazy val validETagJson: JsValue = Json.parse(
     s"""
        |{
-       |  "etag":"115"
+       |  "etag":"$etag"
        |}
      """.stripMargin
   )

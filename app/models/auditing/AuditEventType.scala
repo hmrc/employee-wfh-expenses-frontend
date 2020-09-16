@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package models
+package models.auditing
 
-import play.api.libs.json.{Format, Json, JsonValidationError, OFormat, Reads, Writes, __}
+import models.WithName
 
-import scala.util.{Success, Try}
+sealed trait AuditEventType
 
-case class ETag(version: Int)
+object AuditEventType {
 
-object ETag {
-  implicit lazy val reads: Reads[ETag] = (__ \ "etag").read[String]
-    .map(x => Try(ETag(x.toInt)))
-    .collect(JsonValidationError("parse error")) {
-      case Success(value) => value
-    }
+  object UpdateWorkingFromHomeFlatRateSuccess extends WithName("UpdateWorkingFromHomeFlatRateSuccess") with AuditEventType
 
-  implicit lazy val writes: Writes[ETag] = (__ \ "etag").write[ETag]
+  object UpdateWorkingFromHomeFlatRateFailure extends WithName("UpdateWorkingFromHomeFlatRateFailure") with AuditEventType
 
-  implicit val format: Format[ETag] = Format(reads, writes)
 }
+

@@ -18,13 +18,17 @@ package controllers
 
 import controllers.actions._
 import javax.inject.Inject
+import models.UserAnswers
 import pages.WhenDidYouFirstStartWorkingFromHomePage
+import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
 import views.html.YourTaxReliefView
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class YourTaxReliefController @Inject()(
                                        override val messagesApi: MessagesApi,
@@ -32,6 +36,8 @@ class YourTaxReliefController @Inject()(
                                        checkAlreadyClaimed: CheckAlreadyClaimedAction,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
+                                       submissionService: SubmissionService,
+                                       sessionRepository: SessionRepository,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: YourTaxReliefView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
@@ -40,15 +46,32 @@ class YourTaxReliefController @Inject()(
     implicit request =>
       request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
         case None =>
-          Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
+          Redirect(routes.DisclaimerController.onPageLoad())
         case Some(startedWorkingFromHomeDate) =>
           Ok(view(startedWorkingFromHomeDate))
       }
   }
 
-  def onSubmit(): Action[AnyContent] = Action {
+  def onSubmit(): Action[AnyContent] = (identify andThen checkAlreadyClaimed andThen getData andThen requireData).async {
     implicit request =>
-      Redirect(routes.SubmitYourClaimController.onPageLoad())
+
+      request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
+
+        case None =>
+          Logger.error(s"[SubmitYourClaimController][onSubmit] - Start date is missing")
+          Future.successful( Redirect(routes.TechnicalDifficultiesController.onPageLoad()) )
+
+        case Some(startDate) =>
+          submissionService.submitExpenses(startDate) map {
+
+            case Right(_) =>
+              sessionRepository.set(UserAnswers(request.internalId))
+              Redirect(routes.ConfirmationController.onPageLoad())
+
+            case Left(_) =>
+              Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+          }
+      }
   }
 
-  }
+}

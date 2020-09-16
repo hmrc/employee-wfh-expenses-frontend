@@ -19,7 +19,8 @@ package connectors
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import javax.inject.Singleton
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import models.ETag
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, NotFoundException, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import utils.HttpResponseHelper
 
@@ -33,8 +34,9 @@ class CitizenDetailsConnector @Inject()(appConfig: FrontendAppConfig, httpClient
     httpClient.GET[HttpResponse](designatoryDetailsUrl)
   }
 
-  def getETag(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def getETag(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ETag] = {
     val eTagUrl: String = s"${appConfig.citizenDetailsHost}/citizen-details/$nino/etag"
-    httpClient.GET(eTagUrl)
+    httpClient.GET[ETag](eTagUrl)
   }
+
 }

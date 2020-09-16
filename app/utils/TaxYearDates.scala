@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package models
+package utils
 
-import play.api.libs.json.{Format, Json, JsonValidationError, OFormat, Reads, Writes, __}
+import java.time.LocalDate
 
-import scala.util.{Success, Try}
+object TaxYearDates {
 
-case class ETag(version: Int)
+  // scalastyle:off magic.number
+  val TAX_YEAR_2019_START_DATE: LocalDate = LocalDate.of(2019, 4, 6)
 
-object ETag {
-  implicit lazy val reads: Reads[ETag] = (__ \ "etag").read[String]
-    .map(x => Try(ETag(x.toInt)))
-    .collect(JsonValidationError("parse error")) {
-      case Success(value) => value
-    }
+  val TAX_YEAR_2019_END_DATE: LocalDate = LocalDate.of(2020, 4, 5)
 
-  implicit lazy val writes: Writes[ETag] = (__ \ "etag").write[ETag]
+  val TAX_YEAR_2020_START_DATE: LocalDate = LocalDate.of(2020, 4, 6)
 
-  implicit val format: Format[ETag] = Format(reads, writes)
+  val TAX_YEAR_2020_END_DATE: LocalDate = LocalDate.of(2021, 4, 5)
+  // scalastyle:on magic.number
+
 }
+

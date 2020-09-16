@@ -45,7 +45,7 @@ class YourTaxReliefControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[YourTaxReliefView]
 
         status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.DisclaimerController.onPageLoad().url
 
         application.stop()
       }

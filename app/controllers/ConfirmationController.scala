@@ -36,9 +36,9 @@ class ConfirmationController @Inject()(
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        val controllerComponents: MessagesControllerComponents,
-                                       view: ConfirmationView,
-                                       citizenDetailsConnector: CitizenDetailsConnector
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                       citizenDetailsConnector: CitizenDetailsConnector,
+                                       view: ConfirmationView)
+                                      (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen checkAlreadyClaimed andThen getData andThen requireData).async {
     implicit request =>
@@ -48,7 +48,7 @@ class ConfirmationController @Inject()(
           response.status match {
             case OK =>
               Json.parse(response.body).validate[Address] match {
-                case JsSuccess(address, _) => Future.successful(Ok(view(address)))
+                case JsSuccess(address, _) => Future.successful(Ok(view()))
               }
             case LOCKED =>
               Future.successful(Redirect(routes.ManualCorrespondenceIndicatorController.onPageLoad()))

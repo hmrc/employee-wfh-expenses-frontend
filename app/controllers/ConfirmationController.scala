@@ -19,14 +19,11 @@ package controllers
 import connectors.PaperlessPreferenceConnector
 import controllers.actions._
 import javax.inject.Inject
-import models.UserAnswers
-import pages.WhenDidYouFirstStartWorkingFromHomePage
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
 import views.html.ConfirmationView
-
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationController @Inject()(
@@ -54,5 +51,4 @@ class ConfirmationController @Inject()(
           Future.successful(Redirect(routes.TechnicalDifficultiesController.onPageLoad()))
       }
   }
-
 }

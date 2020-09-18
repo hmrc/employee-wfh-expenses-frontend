@@ -29,18 +29,18 @@ import scala.concurrent.Future
 
 class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
-  val paperlessPreferenceConnector = mock[PaperlessPreferenceConnector]
+  private val paperlessPreferenceConnector = mock[PaperlessPreferenceConnector]
 
   "Confirmation Controller" must {
-    "return OK and the correct view for a GET with paper preferences available" in {
-      confirmationInvocation(true)
+    "return OK and the correct view with paper preferences available" in {
+      paperlessControllerTest(true)
     }
-    "return OK and the correct view for a GET with paper preferences unavailable" in {
-      confirmationInvocation(false)
+    "return OK and the correct view with paper preferences unavailable" in {
+      paperlessControllerTest(false)
     }
   }
 
-  private def confirmationInvocation(paperlessAvailable: Boolean): Future[_] = {
+  private def paperlessControllerTest(paperlessAvailable: Boolean): Future[_] = {
 
     val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
       .overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))

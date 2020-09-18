@@ -48,7 +48,7 @@ class ConfirmationController @Inject()(
           response.status match {
             case OK =>
               Json.parse(response.body).validate[Address] match {
-                case JsSuccess(address, _) => Future.successful(Ok(view()))
+                case JsSuccess(address, _) => Future.successful(Ok(view(true)))
               }
             case LOCKED =>
               Future.successful(Redirect(routes.ManualCorrespondenceIndicatorController.onPageLoad()))

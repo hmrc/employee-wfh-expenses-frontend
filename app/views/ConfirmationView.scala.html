@@ -23,10 +23,11 @@
         frontendAppConfig: FrontendAppConfig,
         backLink: GovukBackLink,
         govukPanel: GovukPanel,
-        govukInsetText: GovukInsetText
+        govukInsetText: GovukInsetText,
+        button: GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(paperLessAvailable: Boolean)(implicit request: Request[_], messages: Messages)
 
 @linkToFeedbackForm = {<a href=@frontendAppConfig.personalDetailsUrl>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
@@ -44,4 +45,9 @@
 
     <p class="govuk-link">@linkToFeedbackForm</p><p class="govuk-body">@messages("confirmation.linkToFeedbackForm.href.postfix")</p>
 
+    @if(paperLessAvailable) {
+        <h2 class="govuk-heading-m">@messages("confirmation.paperless.header")</h2>
+        <p class="govuk-body">@messages("confirmation.paperless.paragraph.1")</p>
+        @button(Button(content = Text(messages("confirmation.paperless.button.text"))))
+    }
 }

@@ -21,6 +21,7 @@
 @this(
         main_template: MainTemplate,
         frontendAppConfig: FrontendAppConfig,
+        formHelper: FormWithCSRF,
         backLink: GovukBackLink,
         govukPanel: GovukPanel,
         govukInsetText: GovukInsetText,
@@ -45,9 +46,12 @@
 
     <p class="govuk-link">@linkToFeedbackForm</p><p class="govuk-body">@messages("confirmation.linkToFeedbackForm.href.postfix")</p>
 
-    @if(paperLessAvailable) {
+    @if(!paperLessAvailable) {
         <h2 class="govuk-heading-m">@messages("confirmation.paperless.header")</h2>
         <p class="govuk-body">@messages("confirmation.paperless.paragraph.1")</p>
-        @button(Button(content = Text(messages("confirmation.paperless.button.text"))))
+
+           @button(Button(content = Text(messages("confirmation.paperless.button.text"))))
+           button_link(s"xxxx", "xxxxxxxx", Some("claim"))
+           <p class="govuk-link">http://localhost:9024/preferences-frontend/paperless/preferences</p><p class="govuk-body">@messages("confirmation.paperless.button.text")</p>
     }
 }

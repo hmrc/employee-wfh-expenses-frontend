@@ -40,7 +40,7 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
     }
   }
 
-  private def confirmationInvocation(paperlessAvailable: Boolean) = {
+  private def confirmationInvocation(paperlessAvailable: Boolean): Future[_] = {
 
     val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
       .overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))

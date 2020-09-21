@@ -21,14 +21,15 @@ import config.FrontendAppConfig
 import javax.inject.Singleton
 import play.api.Logger
 import play.api.http.Status.OK
+import play.api.http.Status.NO_CONTENT
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PaperlessPreferenceConnector @Inject()(appConfig: FrontendAppConfig,
-                                             httpClient: HttpClient) extends HeaderCarrierForPartialsConverter {
+class PaperlessPreferenceConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClient)
+  extends HeaderCarrierForPartialsConverter {
 
   override def crypto: String => String = cookie => cookie
 
@@ -38,13 +39,14 @@ class PaperlessPreferenceConnector @Inject()(appConfig: FrontendAppConfig,
   private def responseHandler(response: HttpResponse): Option[Boolean] = {
     response.status match {
       case OK => Some(true)
+      case NO_CONTENT => Some(false)
       case _ => None
     }
   }
 
   def getPaperlessPreference()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Boolean]] = {
 
-    val preferencesUrl = s"${appConfig.preferencesFrontendHost}/preferences-frontend/paperless/preferences"
+    val preferencesUrl = s"${appConfig.preferencesFrontendHost}/preferences-frontend/paperless/personal-account"
 
     httpClient.GET[HttpResponse](preferencesUrl).map(responseHandler).recover {
       case _: BadRequestException =>

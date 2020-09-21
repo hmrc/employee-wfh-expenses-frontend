@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -25,17 +26,19 @@ import views.html.ConfirmationView
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConfirmationController @Inject()(
+class ConfirmationPaperlessController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        val controllerComponents: MessagesControllerComponents,
+                                       appConfig: FrontendAppConfig,
                                        view: ConfirmationView)
-                                      (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                               (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      Future.successful(Ok(view(true, None)))
+      val preferencesUrl: String = s"${appConfig.preferencesFrontendHost}/preferences-frontend/paperless/preferences"
+      Future.successful(Ok(view(false, Some(preferencesUrl))))
   }
 }

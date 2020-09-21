@@ -21,20 +21,16 @@
 @this(
         main_template: MainTemplate,
         frontendAppConfig: FrontendAppConfig,
+        formHelper: FormWithCSRF,
         backLink: GovukBackLink,
         govukPanel: GovukPanel,
-        govukInsetText: GovukInsetText
+        govukInsetText: GovukInsetText,
+        button: GovukButton
 )
 
-@(citizenAddress: Address)(implicit request: Request[_], messages: Messages)
+@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String])(implicit request: Request[_], messages: Messages)
 
-@linkToChangeAddress = {<a href=@frontendAppConfig.personalDetailsUrl>@messages("confirmation.updateYourAddress.href.text")</a>}
-
-@formattedAddress() = {
-    @for(line <- answeredLines(citizenAddress)) {
-        @{line}<br/>
-    }
-}
+@linkToFeedbackForm = {<a href=@frontendAppConfig.personalDetailsUrl>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
 @main_template(title = messages("confirmation.title")) {
 
@@ -42,18 +38,21 @@
         title = Text(messages("confirmation.heading")),
         content = HtmlContent(messages("confirmation.text"))
     ))
+    <p class="govuk-body">@messages("confirmation.text.footer")</p>
 
     <h2 class="govuk-heading-m">@messages("confirmation.whatHappensNext.heading")</h2>
     <p class="govuk-body">@messages("confirmation.whatHappensNext.paragraph.1")</p>
     <p class="govuk-body">@messages("confirmation.whatHappensNext.paragraph.2")</p>
 
-    <h2 class="govuk-heading-m">@messages("confirmation.checkYourAddress.heading")</h2>
-    <p class="govuk-body">@messages("confirmation.checkYourAddress.paragraph.1")</p>
-    <p class="govuk-body">@messages("confirmation.checkYourAddress.paragraph.2")</p>
+    <p class="govuk-link">@linkToFeedbackForm</p><p class="govuk-body">@messages("confirmation.linkToFeedbackForm.href.postfix")</p>
 
-    @govukInsetText(InsetText(
-        content = HtmlContent(formattedAddress())
-    ))
+    @if(!paperLessAvailable) {
+        <h2 class="govuk-heading-m">@messages("confirmation.paperless.header")</h2>
+        <p class="govuk-body">@messages("confirmation.paperless.paragraph.1")</p>
 
-    <p class="govuk-link">@linkToChangeAddress</p>
+            @button(Button(
+                href = Some(paperlessSignupUrl.get),
+                content = Text(messages("confirmation.paperless.button.text"))
+            ))
+    }
 }

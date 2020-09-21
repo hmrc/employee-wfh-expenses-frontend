@@ -18,17 +18,26 @@ package controllers
 
 import java.time.{LocalDate, ZoneOffset}
 
-import base.SpecBase
 import models.UserAnswers
 import pages.WhenDidYouFirstStartWorkingFromHomePage
-import play.api.libs.json.Json
+import base.SpecBase
+import connectors.PaperlessPreferenceConnector
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
+import play.api.inject.bind
+import views.html.{ConfirmationView, TechnicalErrorView, YourTaxReliefView}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.YourTaxReliefView
+import services.SubmissionService
 
-class YourTaxReliefControllerSpec extends SpecBase {
+import scala.concurrent.Future
 
-  val workingFromHomeDate = LocalDate.of(2019,4,6)
+class YourTaxReliefControllerSpec extends SpecBase with MockitoSugar{
+
+  val workingFromHomeDate = LocalDate.of(2019, 4, 6)
+  private val paperlessPreferenceConnector = mock[PaperlessPreferenceConnector]
+  private val submissionService = mock[SubmissionService]
 
   "YourTaxRelief Controller" must {
 
@@ -70,8 +79,84 @@ class YourTaxReliefControllerSpec extends SpecBase {
 
         application.stop()
       }
-
     }
 
+    "for a POST" must {
+      "return OK and the correct view with submission and paper preferences available" in {
+        val workingFromHomeDate = LocalDate.now(ZoneOffset.UTC)
+
+        val userAnswers = UserAnswers(userAnswersId).set(WhenDidYouFirstStartWorkingFromHomePage, workingFromHomeDate).success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))
+          .overrides(bind[SubmissionService].toInstance(submissionService))
+          .build()
+
+        when(paperlessPreferenceConnector.getPaperlessPreference()(any(), any())) thenReturn
+          Future.successful(Some(true))
+        when(submissionService.submitExpenses(any())(any(),any(), any())) thenReturn
+          Future.successful(Right())
+
+        val request = FakeRequest(POST, routes.YourTaxReliefController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        redirectLocation(result).value mustEqual routes.ConfirmationPaperlessController.onPageLoad().url
+
+        application.stop()
+      }
+
+      "return failure page when submission failed but with preferences available" in {
+        val userAnswers = UserAnswers(userAnswersId).set(WhenDidYouFirstStartWorkingFromHomePage, workingFromHomeDate).success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))
+          .build()
+
+        when(paperlessPreferenceConnector.getPaperlessPreference()(any(), any())) thenReturn
+          Future.successful(Some(true))
+
+        val request = FakeRequest(POST, routes.YourTaxReliefController.onSubmit().url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[TechnicalErrorView]
+
+        status(result) mustEqual SEE_OTHER
+
+        contentAsString(result) mustEqual
+          view()(fakeRequest, messages).toString
+
+        application.stop()
+      }
+
+      "return OK and the correct view with paper preferences unavailable" in {
+        paperlessControllerTest(false)
+      }
+    }}
+
+    def paperlessControllerTest(paperlessAvailable: Boolean): Future[_] = {
+
+      val userAnswers = UserAnswers(userAnswersId).set(WhenDidYouFirstStartWorkingFromHomePage, workingFromHomeDate).success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswers))
+        .overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))
+        .build()
+
+      when(paperlessPreferenceConnector.getPaperlessPreference()(any(), any())) thenReturn
+        Future.successful(Some(paperlessAvailable))
+
+      val request = FakeRequest(POST, routes.YourTaxReliefController.onSubmit().url)
+
+      val result = route(application, request).value
+
+      val view = application.injector.instanceOf[ConfirmationView]
+
+      status(result) mustEqual OK
+
+      contentAsString(result) mustEqual
+        view(paperlessAvailable, None)(fakeRequest, messages).toString
+
+      application.stop()
+    }
   }
-}

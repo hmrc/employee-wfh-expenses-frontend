@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import connectors.PaperlessPreferenceConnector
 import controllers.actions._
 import javax.inject.Inject
@@ -24,6 +25,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
 import views.html.ConfirmationView
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationController @Inject()(
@@ -33,17 +35,20 @@ class ConfirmationController @Inject()(
                                        requireData: DataRequiredAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        val paperlessPreferenceConnector: PaperlessPreferenceConnector,
+                                       appConfig: FrontendAppConfig,
                                        view: ConfirmationView)
                                       (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
+      val preferencesUrl: String = s"${appConfig.preferencesFrontendHost}/preferences-frontend/paperless/preferences"
+
       paperlessPreferenceConnector.getPaperlessPreference().flatMap {
         response =>
           response.getOrElse(false) match {
-            case true => Future.successful(Ok(view(true)))
-            case false => Future.successful(Ok(view(false)))
+            case true => Future.successful(Ok(view(true, None)))
+            case false => Future.successful(Ok(view(false, Some(preferencesUrl))))
           }
       }.recoverWith {
         case e =>

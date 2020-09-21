@@ -28,7 +28,7 @@
         button: GovukButton
 )
 
-@(paperLessAvailable: Boolean)(implicit request: Request[_], messages: Messages)
+@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String])(implicit request: Request[_], messages: Messages)
 
 @linkToFeedbackForm = {<a href=@frontendAppConfig.personalDetailsUrl>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
@@ -50,8 +50,9 @@
         <h2 class="govuk-heading-m">@messages("confirmation.paperless.header")</h2>
         <p class="govuk-body">@messages("confirmation.paperless.paragraph.1")</p>
 
-           @button(Button(content = Text(messages("confirmation.paperless.button.text"))))
-           button_link(s"xxxx", "xxxxxxxx", Some("claim"))
-           <p class="govuk-link">http://localhost:9024/preferences-frontend/paperless/preferences</p><p class="govuk-body">@messages("confirmation.paperless.button.text")</p>
+            @button(Button(
+                href = Some(paperlessSignupUrl.get),
+                content = Text(messages("confirmation.paperless.button.text"))
+            ))
     }
 }

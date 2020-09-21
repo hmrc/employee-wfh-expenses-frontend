@@ -27,6 +27,7 @@ GET        /your-tax-relief                             controllers.YourTaxRelie
 POST       /your-tax-relief                             controllers.YourTaxReliefController.onSubmit()
 
 GET        /confirmation                                controllers.ConfirmationController.onPageLoad()
+GET        /confirmation-paperless                      controllers.ConfirmationController.onPageLoad()
 
 GET        /contact-us                                  controllers.ManualCorrespondenceIndicatorController.onPageLoad()
 

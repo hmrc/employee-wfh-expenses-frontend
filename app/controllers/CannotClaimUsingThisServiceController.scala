@@ -29,13 +29,14 @@ class CannotClaimUsingThisServiceController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
                                        checkAlreadyClaimed: CheckAlreadyClaimedAction,
+                                       citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: CannotClaimUsingThisServiceView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen checkAlreadyClaimed andThen getData andThen requireData) {
+  def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData) {
     implicit request =>
       Ok(view())
   }

@@ -31,15 +31,17 @@
 @head() = {
     <!--[if lte IE 8]><link href='@controllers.routes.Assets.versioned("stylesheets/employeewfhexpensesfrontend-app.css")' rel="stylesheet" type="text/css" /><![endif]-->
     <!--[if gt IE 8]><!--><link href='@controllers.routes.Assets.versioned("stylesheets/employeewfhexpensesfrontend-app.css")' media="screen" rel="stylesheet" type="text/css" /><!--<![endif]-->
+    <script src='@controllers.routes.Assets.versioned("javascripts/gtm.js")'></script>
 }
 
 @scripts = {
     <script src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
-    <script src='@controllers.routes.Assets.versioned("javascripts/application.min.js")'></script>
     <script>window.GOVUKFrontend.initAll();</script>
 }
 
 @header() = {
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NDJKHWK" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
     @hmrcHeader(Header(
         homepageUrl = Some(controllers.routes.IndexController.onPageLoad().url),
         serviceName = Some(messages("service.name")),

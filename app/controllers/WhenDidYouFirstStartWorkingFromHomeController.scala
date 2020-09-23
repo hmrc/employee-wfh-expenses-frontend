@@ -36,6 +36,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
                                         navigator: Navigator,
                                         identify: IdentifierAction,
                                         checkAlreadyClaimed: CheckAlreadyClaimedAction,
+                                        citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         formProvider: WhenDidYouFirstStartWorkingFromHomeFormProvider,
@@ -45,7 +46,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen checkAlreadyClaimed andThen getData andThen requireData) {
+  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
@@ -56,7 +57,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
       Ok(view(preparedForm))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen checkAlreadyClaimed andThen getData andThen requireData).async {
+  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
     implicit request =>
 
       form.bindFromRequest().fold(

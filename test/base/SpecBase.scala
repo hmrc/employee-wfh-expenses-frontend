@@ -56,7 +56,8 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-        bind[CheckAlreadyClaimedAction].to[FakeCheckAlreadyClaimedAction]
+        bind[CheckAlreadyClaimedAction].to[FakeCheckAlreadyClaimedAction],
+        bind[ManualCorrespondenceIndicatorAction].to[FakeManualCorrespondenceIndicatorAction]
       )
 
   lazy val fakeNino = "AB123456A"

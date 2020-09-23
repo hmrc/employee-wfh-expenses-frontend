@@ -42,92 +42,6 @@ class CitizenDetailsConnectorSpec extends SpecBase with MockitoSugar with WireMo
 
   private lazy val citizenDetailsConnector: CitizenDetailsConnector = app.injector.instanceOf[CitizenDetailsConnector]
 
-  "getAddress" must {
-    "return an address on success" in {
-      server.stubFor(
-        get(urlEqualTo(s"/citizen-details/$fakeNino/designatory-details"))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withBody(validAddressJson.toString)
-          )
-      )
-
-      val result = citizenDetailsConnector.getAddress(fakeNino)
-
-      whenReady(result) {
-        res =>
-          res mustBe a[HttpResponse]
-          res.status mustBe 200
-          res.body mustBe validAddressJson.toString
-      }
-
-    }
-
-    "return a 400 on failure" in {
-      server.stubFor(
-        get(urlEqualTo(s"/citizen-details/$fakeNino/designatory-details"))
-          .willReturn(
-            aResponse()
-              .withStatus(BAD_REQUEST)
-              .withBody(validAddressJson.toString)
-          )
-      )
-
-      val result = citizenDetailsConnector.getAddress(fakeNino)
-
-      whenReady(result) {
-        res =>
-          res mustBe a[HttpResponse]
-          res.status mustBe 400
-          res.body mustBe validAddressJson.toString
-      }
-
-    }
-
-    "return a 404 on failure" in {
-      server.stubFor(
-        get(urlEqualTo(s"/citizen-details/$fakeNino/designatory-details"))
-          .willReturn(
-            aResponse()
-              .withStatus(NOT_FOUND)
-              .withBody(validAddressJson.toString)
-          )
-      )
-
-      val result = citizenDetailsConnector.getAddress(fakeNino)
-
-      whenReady(result) {
-        res =>
-          res mustBe a[HttpResponse]
-          res.status mustBe 404
-          res.body mustBe validAddressJson.toString
-      }
-
-    }
-
-    "return a 500 on failure" in {
-      server.stubFor(
-        get(urlEqualTo(s"/citizen-details/$fakeNino/designatory-details"))
-          .willReturn(
-            aResponse()
-              .withStatus(INTERNAL_SERVER_ERROR)
-              .withBody(validAddressJson.toString)
-          )
-      )
-
-      val result = citizenDetailsConnector.getAddress(fakeNino)
-
-      whenReady(result) {
-        res =>
-          res mustBe a[HttpResponse]
-          res.status mustBe 500
-          res.body mustBe validAddressJson.toString
-      }
-
-    }
-  }
-
   "getETag" must {
     "return an etag on success" in {
       server.stubFor(
@@ -139,7 +53,9 @@ class CitizenDetailsConnectorSpec extends SpecBase with MockitoSugar with WireMo
           )
       )
 
-      whenReady(citizenDetailsConnector.getETag(fakeNino)) { _ mustBe ETag(etag) }
+      whenReady(citizenDetailsConnector.getETag(fakeNino)) {
+        _ mustBe ETag(etag)
+      }
     }
 
     "return 500 on failure" in {

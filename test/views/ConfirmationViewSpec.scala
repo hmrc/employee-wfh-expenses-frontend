@@ -16,20 +16,21 @@
 
 package views
 
-import models.Address
 import views.behaviours.ViewBehaviours
 import views.html.ConfirmationView
 
 class ConfirmationViewSpec extends ViewBehaviours {
 
-  val fakeCitizenAddress = Address(Some("line 1"), Some("line 2"), Some("line 3"), Some("line 4"),Some("line 5"),Some("post code"), Some("country"))
+  private val Confirmation = "confirmation"
 
-  "Confirmation view" must {
-
+  "Confirmation view with paperless settings enabled" must {
     val view = viewFor[ConfirmationView](Some(emptyUserAnswers))
-
-    val applyView = view.apply(fakeCitizenAddress)(fakeRequest, messages)
-
-    behave like normalPage(applyView, "confirmation")
+    behave like normalPage(view.apply(true, None)(fakeRequest, messages), Confirmation)
   }
+
+  "Confirmation view with paperless settings not enabled" must {
+    val view = viewFor[ConfirmationView](Some(emptyUserAnswers))
+    behave like normalPage(view.apply(false, Some("url-string"))(fakeRequest, messages), Confirmation)
+  }
+
 }

@@ -31,9 +31,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val preferencesFrontendHost: String = configuration.get[Service]("microservice.services.preferences-frontend").baseUrl
   val taiHost: String = configuration.get[Service]("microservice.services.tai").baseUrl
 
-  val analyticsToken: String = configuration.get[String](s"google-analytics.token")
-  val analyticsHost: String = configuration.get[String](s"google-analytics.host")
-
   lazy val authUrl: String = configuration.get[Service]("auth").baseUrl
   lazy val loginUrl: String = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")

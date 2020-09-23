@@ -30,6 +30,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val citizenDetailsHost: String = configuration.get[Service]("microservice.services.citizen-details").baseUrl
   val preferencesFrontendHost: String = configuration.get[Service]("microservice.services.preferences-frontend").baseUrl
   val taiHost: String = configuration.get[Service]("microservice.services.tai").baseUrl
+  val pertaxFrontendHost: String = configuration.get[Service]("microservice.services.pertax-frontend").baseUrl
 
   val analyticsToken: String = configuration.get[String](s"google-analytics.token")
   val analyticsHost: String = configuration.get[String](s"google-analytics.host")

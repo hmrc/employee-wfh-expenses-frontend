@@ -102,17 +102,19 @@ yourTaxRelief.paragraph.two = At the end of this tax year, the tax relief will s
 yourTaxRelief.submitYourClaim.heading = Now submit your claim
 yourTaxRelief.disclaimer = By submitting you are confirming that, to the best of your knowledge, the details you are providing are correct.
 yourTaxRelief.submit.button.text = Confirm and submit
+confirmation.paperless.button.text = Sign up for paperless notifications
 
 confirmation.title = Confirmation
 confirmation.heading = Claim complete
-confirmation.text = Your tax-free Personal Allowance will be increased
+confirmation.text = We will adjust your tax code
+confirmation.text.footer = You will receive notification of your tax code adjustment by email.
 confirmation.whatHappensNext.heading = What happens next
-confirmation.whatHappensNext.paragraph.1 = Your tax-free Personal Allowance for this year will be adjusted to include tax relief for expenses for working from home. You should be able to see this update within your Personal Tax Account within 2 working days.
-confirmation.whatHappensNext.paragraph.2 = You will receive confirmation of your tax code change either via email or post.
-confirmation.checkYourAddress.heading = Check your address is correct
-confirmation.checkYourAddress.paragraph.1 = We will be sending your letters to the address shown.
-confirmation.checkYourAddress.paragraph.2 = If it is not correct, you must update it in your Personal Tax Account. Otherwise HMRC will not be able to send you any letters or amounts due.
-confirmation.updateYourAddress.href.text = Leave this service and update your address in your Personal Tax Account (opens in a new window or tab)
+confirmation.whatHappensNext.paragraph.1 = Your tax-free amount for the current tax year will be increased to include tax relief on your expenses for working from home. Your tax code decides how much tax you pay and will be adjusted to reflect this tax-free amount. This adjustment will also include any tax relief from the previous tax year (6 April 2019 to 5 April 2020).
+confirmation.whatHappensNext.paragraph.2 = You should be able to see changes to your tax code in your Personal Tax Account within 2 working days.
+confirmation.linkToFeedbackForm.href.text = What did you think of this service? (opens in new tab)
+confirmation.linkToFeedbackForm.href.postfix = (takes 30 seconds)
+confirmation.paperless.header = Go paperless
+confirmation.paperless.paragraph.1 = You can choose to get some of your tax documents and information sent through your HMRC online account instead of by post.
 
 manualCorrespondenceIndicator.title = You cannot make a claim right now
 manualCorrespondenceIndicator.heading = You cannot make a claim right now

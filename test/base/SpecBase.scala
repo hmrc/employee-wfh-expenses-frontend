@@ -61,23 +61,8 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
 
   lazy val fakeNino = "AB123456A"
 
-  lazy val validAddressJson: JsValue = Json.parse(
-    s"""
-       |{
-       |  "address":{
-       |    "line1":"6 Howsell Road",
-       |    "line2":"Llanddew",
-       |    "line3":"Line 3",
-       |    "line4":"Line 4",
-       |    "line5":"Line 5",
-       |    "postcode":"DN16 3FB",
-       |    "country":"GREAT BRITAIN"
-       |  }
-       |}
-     """.stripMargin
-  )
-
   lazy val etag: Int = 123
+
   lazy val validETagJson: JsValue = Json.parse(
     s"""
        |{

@@ -17,47 +17,57 @@
 package controllers
 
 import base.SpecBase
-import connectors.CitizenDetailsConnector
-import models.Address
+import config.FrontendAppConfig
+import connectors.PaperlessPreferenceConnector
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpResponse
 import views.html.ConfirmationView
 
 import scala.concurrent.Future
 
 class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
-  val mockCitizenDetailsConnector: CitizenDetailsConnector = mock[CitizenDetailsConnector]
+  private val paperlessPreferenceConnector = mock[PaperlessPreferenceConnector]
 
   "Confirmation Controller" must {
-
-    "return OK and the correct view for a GET" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-        .overrides(bind[CitizenDetailsConnector].toInstance(mockCitizenDetailsConnector))
-        .build()
-
-      when(mockCitizenDetailsConnector.getAddress(any())(any(), any())) thenReturn
-        Future.successful(HttpResponse(200, json = Json.toJson(validAddressJson), Map.empty))
-
-      val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
-
-      val result = route(application, request).value
-
-      val view = application.injector.instanceOf[ConfirmationView]
-
-      status(result) mustEqual OK
-
-      contentAsString(result) mustEqual
-        view(validAddressJson.as[Address])(fakeRequest, messages).toString
-
-      application.stop()
+    "return OK and the correct view with paper preferences available" in {
+      paperlessControllerTest(true)
     }
+    "return OK and the correct view with paper preferences unavailable" in {
+      paperlessControllerTest(false)
+    }
+}
+
+  private def paperlessControllerTest(paperlessAvailable: Boolean): Future[_] = {
+
+    val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+      .overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))
+      .build()
+
+    when(paperlessPreferenceConnector.getPaperlessPreference()(any(), any())) thenReturn
+      Future.successful(Some(paperlessAvailable))
+
+    val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
+
+    val result = route(application, request).value
+
+    val view = application.injector.instanceOf[ConfirmationView]
+    val appConfig = application.injector.instanceOf[FrontendAppConfig]
+
+    status(result) mustEqual OK
+
+    val paperlessUrl = paperlessAvailable match {
+      case true => None
+      case false => Some(s"${appConfig.pertaxFrontendHost}/personal-account")
+    }
+
+    contentAsString(result) mustEqual
+      view(paperlessAvailable, paperlessUrl)(fakeRequest, messages).toString
+
+    application.stop()
   }
 }

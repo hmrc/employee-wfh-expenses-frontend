@@ -16,21 +16,17 @@
 
 package controllers
 
-import java.time.{LocalDate, ZoneOffset}
-
 import base.SpecBase
 import models.UserAnswers
 import pages.WhenDidYouFirstStartWorkingFromHomePage
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.YourTaxReliefView
+import utils.TaxYearDates._
+import views.html.{YourTaxRelief2019And2020View, YourTaxRelief2020OnlyView}
 
 class YourTaxReliefControllerSpec extends SpecBase {
 
-  val workingFromHomeDate = LocalDate.of(2019,4,6)
-
-  "YourTaxRelief Controller" must {
+  "YourTaxReliefController" must {
 
     "for a GET" must {
 
@@ -42,16 +38,14 @@ class YourTaxReliefControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[YourTaxReliefView]
-
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.DisclaimerController.onPageLoad().url
 
         application.stop()
       }
 
-      "return OK and the correct view when a working from home date is present" in {
-        val workingFromHomeDate = LocalDate.now(ZoneOffset.UTC)
+      "return OK and the correct view when a working from home start date is in the 2020-21 tax year" in {
+        val workingFromHomeDate = TAX_YEAR_2020_START_DATE
 
         val userAnswers = UserAnswers(userAnswersId).set(WhenDidYouFirstStartWorkingFromHomePage, workingFromHomeDate).success.value
 
@@ -61,12 +55,33 @@ class YourTaxReliefControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[YourTaxReliefView]
+        val view = application.injector.instanceOf[YourTaxRelief2020OnlyView]
 
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(workingFromHomeDate)(fakeRequest, messages).toString
+          view(workingFromHomeDate)(request, messages).toString
+
+        application.stop()
+      }
+
+      "return OK and the correct view when a working from home start date is in the 2019-20 tax year" in {
+        val workingFromHomeDate = TAX_YEAR_2019_START_DATE
+
+        val userAnswers = UserAnswers(userAnswersId).set(WhenDidYouFirstStartWorkingFromHomePage, workingFromHomeDate).success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+        val request = FakeRequest(GET, routes.YourTaxReliefController.onPageLoad().url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[YourTaxRelief2019And2020View]
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual
+          view(workingFromHomeDate, 53)(request, messages).toString
 
         application.stop()
       }

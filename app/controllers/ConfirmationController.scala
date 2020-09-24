@@ -18,10 +18,11 @@ package controllers
 
 import config.FrontendAppConfig
 import connectors.PaperlessPreferenceConnector
+import controllers.PaperlessAuditConst._
 import controllers.actions._
 import javax.inject.Inject
+import models.auditing.AuditEventType._
 import models.requests.DataRequest
-import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -29,12 +30,12 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
 import views.html.ConfirmationView
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 private object PaperlessAuditConst {
-  val AuditReference = "PaperlessPreferenceAudit"
   val NinoReference = "nino"
   val Enabled = "paperlessEnabled"
+  val FailureReason = "reasonForFailure"
 }
 
 class ConfirmationController @Inject()(
@@ -53,33 +54,42 @@ class ConfirmationController @Inject()(
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      val preferencesSelfServiceUrl = s"${appConfig.pertaxFrontendHost}/personal-account"
+      val paperlessReturnUrl = s"${appConfig.pertaxFrontendHost}/personal-account"
 
-      paperlessPreferenceConnector.getPaperlessPreference().flatMap {
-        response =>
-          response.getOrElse(false) match {
-            case true => {
-              auditPaperlessPreferences(true)
-              Future.successful(Ok(view(true, None)))
-            }
-            case false => {
-              auditPaperlessPreferences(false)
-              Future.successful(Ok(view(false, Some(preferencesSelfServiceUrl))))
-            }
-          }
-      }.recoverWith {
-        case e =>
-          Logger.error(s"[ConfirmationController][onPageLoad] failed: $e")
-          Future.successful(Redirect(routes.TechnicalDifficultiesController.onPageLoad()))
+      paperlessPreferenceConnector.getPaperlessStatus(paperlessReturnUrl) map {
+
+        case Right(status) if status.isPaperlessCustomer =>
+          auditPaperlessPreferencesCheckSuccess(paperlessEnabled = true)
+          Ok(view(paperLessAvailable = true, None))
+
+        case Right(status) =>
+          auditPaperlessPreferencesCheckSuccess(paperlessEnabled = false)
+          Ok(view(paperLessAvailable = false, Some(status.url.link)))
+
+        case Left(error) =>
+          auditPaperlessPreferencesCheckFailure(error)
+          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
       }
   }
 
-  private def auditPaperlessPreferences(paperlessEnabled: Boolean)
-                                       (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext) = {
-    import PaperlessAuditConst._
+  private def auditPaperlessPreferencesCheckSuccess(paperlessEnabled:Boolean)
+                                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+    auditConnector.sendExplicitAudit(
+      PaperlessPreferenceCheckSuccess.toString,
+      Map(
+        NinoReference -> dataRequest.nino,
+        Enabled       -> paperlessEnabled.toString
+      )
+    )
 
-    val dataToAudit = Map(NinoReference -> dataRequest.nino, Enabled -> paperlessEnabled.toString)
+  private def auditPaperlessPreferencesCheckFailure(error: String)
+                                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+    auditConnector.sendExplicitAudit(
+      PaperlessPreferenceCheckFailure.toString,
+      Map(
+        NinoReference -> dataRequest.nino,
+        FailureReason -> error
+      )
+    )
 
-    auditConnector.sendExplicitAudit(AuditReference, dataToAudit)
-  }
 }

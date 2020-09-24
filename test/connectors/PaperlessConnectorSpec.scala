@@ -17,14 +17,14 @@
 package connectors
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
+import com.github.tomakehurst.wiremock.client.WireMock._
+import org.scalatest.Matchers.convertToAnyShouldWrapper
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
-import play.api.http.Status.OK
-import play.api.http.Status.BAD_REQUEST
-import play.api.http.Status.INTERNAL_SERVER_ERROR
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import utils.WireMockHelper
@@ -51,66 +51,70 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
 
   private lazy val paperlessPreferenceConnector = app.injector.instanceOf[PaperlessPreferenceConnector]
 
+  val someReturnUrl = "/go/somewhere"
+
+  def stubForPaperlessStatus(response: ResponseDefinitionBuilder) = {
+    server.stubFor(
+      get(urlPathMatching(s"/paperless/status"))
+        .withQueryParam("returnUrl", matching(".*"))
+        .withQueryParam("returnLinkText", matching(".*"))
+        .willReturn(
+          response
+        )
+    )
+  }
+
   "getPaperlessPreference" must {
-    "return an preferences on success" in {
-      server.stubFor(
-        get(urlEqualTo(s"/paperless/preferences"))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withBody(validPaperlessPreferences.toString)
-          )
-      )
 
-      val result = paperlessPreferenceConnector.getPaperlessPreference()
+    "handle http 200 as a paperless customer" in {
+      stubForPaperlessStatus(response = aResponse().withStatus(OK).withBody(paperlessCustomer.toString))
 
-      whenReady(result) {
+      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
         res =>
-          res mustBe a[Option[_]]
-          res mustBe expectedValidPreference
+          res.isRight mustBe true
+          res.right.get.isPaperlessCustomer mustBe true
       }
     }
 
-    "return an preferences on success but missing preference" in {
-      server.stubFor(
-        get(urlEqualTo(s"/paperless/preferences"))
-          .willReturn(
-            aResponse()
-              .withStatus(BAD_REQUEST)
-          )
-      )
+    "handle http 200 as a paper/post customer" in {
+      stubForPaperlessStatus(response = aResponse().withStatus(OK).withBody(paperCustomer.toString))
 
-      val errorResponse = paperlessPreferenceConnector.getPaperlessPreference()
+      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
+        res =>
+          res.isRight mustBe true
+          res.right.get.isPaperlessCustomer mustBe false
+      }
+    }
 
-      whenReady(errorResponse)(_ mustBe None)
+    "handle http 200 with invalid JSON" in {
+      stubForPaperlessStatus(response = aResponse().withStatus(OK).withBody("""{"field":"not expected"}"""))
+
+      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
+        res =>
+          res.isLeft mustBe true
+          res.left.get should include("returned invalid json")
+      }
+    }
+
+    "handle http 400 correctly" in {
+      stubForPaperlessStatus(response = aResponse().withStatus(BAD_REQUEST))
+
+      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
+        response =>
+          response.isLeft mustBe true
+          response.left.get should include("returned 400")
+      }
     }
 
     "handle http 500 correctly" in {
-      server.stubFor(
-        get(urlEqualTo(s"/paperless/preferences"))
-          .willReturn(
-            aResponse()
-              .withStatus(INTERNAL_SERVER_ERROR)
-          )
-      )
+      stubForPaperlessStatus(response = aResponse().withStatus(INTERNAL_SERVER_ERROR))
 
-      val errorResponse = paperlessPreferenceConnector.getPaperlessPreference()
-
-      whenReady(errorResponse)(_ mustBe None)
+      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
+        response =>
+          response.isLeft mustBe true
+          response.left.get should include("returned 500")
+      }
     }
 
-    "handle http Exception correctly" in {
-      server.stubFor(
-        get(urlEqualTo(s"/paperless/preferences"))
-          .willReturn(
-            aResponse()
-              .withStatus(INTERNAL_SERVER_ERROR)
-          )
-      )
-
-      val errorResponse = paperlessPreferenceConnector.getPaperlessPreference()
-
-      whenReady(errorResponse)(_ mustBe None)
-    }
   }
 }

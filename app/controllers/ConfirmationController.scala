@@ -20,41 +20,66 @@ import config.FrontendAppConfig
 import connectors.PaperlessPreferenceConnector
 import controllers.actions._
 import javax.inject.Inject
+import models.requests.DataRequest
 import play.api.Logger
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
 import views.html.ConfirmationView
 
 import scala.concurrent.{ExecutionContext, Future}
 
+private object PaperlessAuditConst {
+  val AuditReference = "PaperlessPreferenceAudit"
+  val NinoReference = "nino"
+  val Enabled = "paperlessEnabled"
+}
+
 class ConfirmationController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       val paperlessPreferenceConnector: PaperlessPreferenceConnector,
-                                       appConfig: FrontendAppConfig,
-                                       view: ConfirmationView)
+                                        override val messagesApi: MessagesApi,
+                                        identify: IdentifierAction,
+                                        getData: DataRetrievalAction,
+                                        requireData: DataRequiredAction,
+                                        val controllerComponents: MessagesControllerComponents,
+                                        val paperlessPreferenceConnector: PaperlessPreferenceConnector,
+                                        auditConnector: AuditConnector,
+                                        appConfig: FrontendAppConfig,
+                                        view: ConfirmationView)
                                       (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
+
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      val preferencesSelfServiceUrl: String = s"${appConfig.pertaxFrontendHost}/personal-account"
+      val preferencesSelfServiceUrl = s"${appConfig.pertaxFrontendHost}/personal-account"
 
       paperlessPreferenceConnector.getPaperlessPreference().flatMap {
         response =>
           response.getOrElse(false) match {
-            case true => Future.successful(Ok(view(true, None)))
-            case false => Future.successful(Ok(view(false, Some(preferencesSelfServiceUrl))))
+            case true => {
+              auditPaperlessPreferences(true)
+              Future.successful(Ok(view(true, None)))
+            }
+            case false => {
+              auditPaperlessPreferences(false)
+              Future.successful(Ok(view(false, Some(preferencesSelfServiceUrl))))
+            }
           }
       }.recoverWith {
         case e =>
           Logger.error(s"[ConfirmationController][onPageLoad] failed: $e")
           Future.successful(Redirect(routes.TechnicalDifficultiesController.onPageLoad()))
       }
+  }
+
+  private def auditPaperlessPreferences(paperlessEnabled: Boolean)
+                                       (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext) = {
+    import PaperlessAuditConst._
+
+    val dataToAudit = Map(NinoReference -> dataRequest.nino, Enabled -> paperlessEnabled.toString)
+
+    auditConnector.sendExplicitAudit(AuditReference, dataToAudit)
   }
 }

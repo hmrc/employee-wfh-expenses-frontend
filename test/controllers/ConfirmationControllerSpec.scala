@@ -19,19 +19,19 @@ package controllers
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.PaperlessPreferenceConnector
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import controllers.PaperlessAuditConst.{Enabled, NinoReference}
+import org.mockito.Matchers.{any, eq => eqm}
+import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import views.html.ConfirmationView
 
 import scala.concurrent.Future
 
 class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
-
-  private val paperlessPreferenceConnector = mock[PaperlessPreferenceConnector]
 
   "Confirmation Controller" must {
     "return OK and the correct view with paper preferences available" in {
@@ -44,8 +44,12 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
   private def paperlessControllerTest(paperlessAvailable: Boolean): Future[_] = {
 
+    val paperlessPreferenceConnector = mock[PaperlessPreferenceConnector]
+    val auditConnector = mock[AuditConnector]
+
     val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
       .overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))
+      .overrides(bind[AuditConnector].toInstance(auditConnector))
       .build()
 
     when(paperlessPreferenceConnector.getPaperlessPreference()(any(), any())) thenReturn
@@ -67,6 +71,10 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
     contentAsString(result) mustEqual
       view(paperlessAvailable, paperlessUrl)(fakeRequest, messages).toString
+
+    val dataToAudit = Map(NinoReference -> fakeNino, Enabled -> paperlessAvailable.toString)
+    verify(auditConnector, times(1))
+    .sendExplicitAudit(eqm("PaperlessPreferenceAudit"), eqm(dataToAudit))(any(), any())
 
     application.stop()
   }

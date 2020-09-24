@@ -16,20 +16,19 @@
 
 package connectors
 
-import com.google.inject.Inject
+import com.google.inject.{ImplementedBy, Inject}
 import config.FrontendAppConfig
-import javax.inject.Singleton
 import play.api.Logger
 import play.api.http.Status.OK
 import play.api.http.Status.NO_CONTENT
+import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
-class PaperlessPreferenceConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClient)
-  extends HeaderCarrierForPartialsConverter {
+class PaperlessPreferenceConnectorImpl @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClient)
+  extends PaperlessPreferenceConnector with HeaderCarrierForPartialsConverter {
 
   override def crypto: String => String = cookie => cookie
 
@@ -44,17 +43,20 @@ class PaperlessPreferenceConnector @Inject()(appConfig: FrontendAppConfig, httpC
     }
   }
 
-  def getPaperlessPreference()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Boolean]] = {
-
-    val preferencesUrl = s"${appConfig.preferencesFrontendHost}/preferences-frontend/paperless/preferences"
-
+  def getPaperlessPreference()(implicit request: Request[AnyContent], ec: ExecutionContext): Future[Option[Boolean]] = {
+    val preferencesUrl = s"${appConfig.preferencesFrontendHost}/paperless/preferences"
     httpClient.GET[HttpResponse](preferencesUrl).map(responseHandler).recover {
       case _: BadRequestException =>
         // Expected from service if a Preference is not found. No need for logging.
         None
       case ex: Throwable =>
-        Logger.error(s"PaperlessPreferenceConnector: Unexpected Error during REST call: ${ex.getCause}")
+        Logger.error(s"PaperlessPreferenceConnector: Unexpected Error during REST call: ${ex.getMessage}")
         None
     }
   }
+}
+
+@ImplementedBy(classOf[PaperlessPreferenceConnectorImpl])
+trait PaperlessPreferenceConnector {
+  def getPaperlessPreference()(implicit request: Request[AnyContent], ec: ExecutionContext): Future[Option[Boolean]]
 }

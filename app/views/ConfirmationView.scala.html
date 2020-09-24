@@ -38,10 +38,14 @@
         title = Text(messages("confirmation.heading")),
         content = HtmlContent(messages("confirmation.text"))
     ))
-    <p class="govuk-body">@messages("confirmation.text.footer")</p>
 
+    @if(!paperLessAvailable) {
+        <p class="govuk-body">@messages("confirmation.text.footer.post")</p>
+    } else {
+        <p class="govuk-body">@messages("confirmation.text.footer.mail")</p>
+    }
     <h2 class="govuk-heading-m">@messages("confirmation.whatHappensNext.heading")</h2>
-    <p class="govuk-body">@messages("confirmation.whatHappensNext.paragraph.1")</p>
+    <p class="govuk-body ">@messages("confirmation.whatHappensNext.paragraph.1")</p>
     <p class="govuk-body">@messages("confirmation.whatHappensNext.paragraph.2")</p>
 
     <span class="govuk-link">@linkToFeedbackForm</span><span class="govuk-body"> @messages("confirmation.linkToFeedbackForm.href.postfix")</span>

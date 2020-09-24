@@ -23,14 +23,18 @@ import play.api.i18n.Lang
 import play.api.mvc.Call
 
 @Singleton
-class FrontendAppConfig @Inject() (configuration: Configuration) {
+class FrontendAppConfig @Inject()(configuration: Configuration) {
 
   val contactFormServiceIdentifier = "EEWFH"
 
-  val citizenDetailsHost: String = configuration.get[Service]("microservice.services.citizen-details").baseUrl
+  val platformHost: Option[String] = configuration.getOptional[String]("platform.frontend.host")
+
+  val pertaxFrontendHost: String =
+    platformHost.orElse(Some(configuration.get[Service]("microservice.services.pertax-frontend").baseUrl)).get
+
   val preferencesFrontendHost: String = configuration.get[Service]("microservice.services.preferences-frontend").baseUrl
+  val citizenDetailsHost: String = configuration.get[Service]("microservice.services.citizen-details").baseUrl
   val taiHost: String = configuration.get[Service]("microservice.services.tai").baseUrl
-  val pertaxFrontendHost: String = configuration.get[Service]("microservice.services.pertax-frontend").baseUrl
 
   lazy val authUrl: String = configuration.get[Service]("auth").baseUrl
   lazy val loginUrl: String = configuration.get[String]("urls.login")

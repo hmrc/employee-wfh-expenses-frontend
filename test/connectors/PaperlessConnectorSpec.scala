@@ -26,6 +26,7 @@ import play.api.http.Status.OK
 import play.api.http.Status.BAD_REQUEST
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.FakeRequest
 import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,6 +40,8 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
   with ScalaFutures with IntegrationPatience
   with ExpectedResults {
 
+  override implicit val fakeRequest = FakeRequest()
+
   override implicit lazy val app: Application =
     new GuiceApplicationBuilder()
       .configure(
@@ -46,12 +49,12 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
       )
       .build()
 
-  private lazy val paperlessPreferenceConnector: PaperlessPreferenceConnector = app.injector.instanceOf[PaperlessPreferenceConnector]
+  private lazy val paperlessPreferenceConnector = app.injector.instanceOf[PaperlessPreferenceConnector]
 
   "getPaperlessPreference" must {
     "return an preferences on success" in {
       server.stubFor(
-        get(urlEqualTo(s"/preferences-frontend/paperless/preferences"))
+        get(urlEqualTo(s"/paperless/preferences"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -70,7 +73,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
 
     "return an preferences on success but missing preference" in {
       server.stubFor(
-        get(urlEqualTo(s"/preferences-frontend/paperless/preferences"))
+        get(urlEqualTo(s"/paperless/preferences"))
           .willReturn(
             aResponse()
               .withStatus(BAD_REQUEST)
@@ -84,7 +87,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
 
     "handle http 500 correctly" in {
       server.stubFor(
-        get(urlEqualTo(s"/preferences-frontend/paperless/preferences"))
+        get(urlEqualTo(s"/paperless/preferences"))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -98,7 +101,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
 
     "handle http Exception correctly" in {
       server.stubFor(
-        get(urlEqualTo(s"/preferences-frontend/paperless/preferences"))
+        get(urlEqualTo(s"/paperless/preferences"))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)

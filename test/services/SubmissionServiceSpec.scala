@@ -61,36 +61,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector)
   }
 
-  "calculateWeeks" when {
-    "rounding up the days to the next whole week" should {
-      val tests = Seq(
-        (TAX_YEAR_2019_END_DATE.minus(1, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 1),
-        (TAX_YEAR_2019_END_DATE.minus(2, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 1),
-        (TAX_YEAR_2019_END_DATE.minus(3, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 1),
-        (TAX_YEAR_2019_END_DATE.minus(4, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 1),
-        (TAX_YEAR_2019_END_DATE.minus(5, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 1),
-        (TAX_YEAR_2019_END_DATE.minus(6, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 1),
-        (TAX_YEAR_2019_END_DATE.minus(7, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 1),
-        (TAX_YEAR_2019_END_DATE.minus(8, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 2),
-        (TAX_YEAR_2019_END_DATE.minus(9, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 2),
-        (TAX_YEAR_2019_END_DATE.minus(10, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 2),
-        (TAX_YEAR_2019_END_DATE.minus(11, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 2),
-        (TAX_YEAR_2019_END_DATE.minus(12, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 2),
-        (TAX_YEAR_2019_END_DATE.minus(13, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 2),
-        (TAX_YEAR_2019_END_DATE.minus(14, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 2),
-        (TAX_YEAR_2019_END_DATE.minus(15, ChronoUnit.DAYS), TAX_YEAR_2019_END_DATE, 3),
-        (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE, 52),
-        (TAX_YEAR_2019_START_DATE, TAX_YEAR_2019_END_DATE, 53)
-      )
-
-      for ( (startDate, endDate, numOfWeeks) <- tests) {
-        s"calculate $numOfWeeks as the number of weeks between $startDate and $endDate" in new Setup {
-          serviceUnderTest.numberOfWeeks(startDate,endDate) shouldBe numOfWeeks
-        }
-      }
-    }
-  }
-
   "calculate2019FlatRate" should {
 
     "calculate the total rate as £4" when {

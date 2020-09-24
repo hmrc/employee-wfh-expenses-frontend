@@ -41,8 +41,10 @@ class ManualCorrespondenceIndicatorActionImpl @Inject()(
           case OK =>
             None
           case LOCKED =>
+            Logger.info(s"[ManualCorrespondenceIndicatorAction][filter] - Locked status code")
             Some(Redirect(routes.ManualCorrespondenceIndicatorController.onPageLoad().url))
-          case _ =>
+          case statusCode =>
+            Logger.warn(s"[ManualCorrespondenceIndicatorAction][filter] - Unexpected status code: $statusCode ")
             Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad().url))
         }
     }.recoverWith {

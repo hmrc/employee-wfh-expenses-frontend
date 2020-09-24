@@ -26,7 +26,8 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
-import views.html.YourTaxReliefView
+import utils.TaxYearDates._
+import views.html.{YourTaxRelief2019And2020View, YourTaxRelief2020OnlyView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,16 +41,30 @@ class YourTaxReliefController @Inject()(
                                        submissionService: SubmissionService,
                                        sessionRepository: SessionRepository,
                                        val controllerComponents: MessagesControllerComponents,
-                                       view: YourTaxReliefView
+                                       yourTaxRelief2019And2020View: YourTaxRelief2019And2020View,
+                                       yourTaxRelief2020OnlyView: YourTaxRelief2020OnlyView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData) {
     implicit request =>
       request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
+
         case None =>
           Redirect(routes.DisclaimerController.onPageLoad())
-        case Some(startedWorkingFromHomeDate) =>
-          Ok(view(startedWorkingFromHomeDate))
+
+        case Some(date) if isIn2019TaxYear(date) =>
+          Ok(
+            yourTaxRelief2019And2020View(date, numberOfWeeks(date, TAX_YEAR_2019_END_DATE))
+          )
+
+        case Some(date) if isIn2020TaxYear(date) =>
+          Ok(
+            yourTaxRelief2020OnlyView(date)
+          )
+
+        case Some(date) =>
+          Logger.error(s"[YourTaxReliefController][onPageLoad] Received an unexpected date : $date")
+          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
       }
   }
 

@@ -17,6 +17,7 @@
 package utils
 
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 object TaxYearDates {
 
@@ -28,7 +29,36 @@ object TaxYearDates {
   val TAX_YEAR_2020_START_DATE: LocalDate = LocalDate.of(2020, 4, 6)
 
   val TAX_YEAR_2020_END_DATE: LocalDate = LocalDate.of(2021, 4, 5)
+
+  val ONE_WEEK  = 1
   // scalastyle:on magic.number
 
+
+  def numberOfWeeks(startDate:LocalDate, endDate:LocalDate): Long = {
+    if (startDate.equals(endDate)) {
+      ONE_WEEK
+    } else {
+      val numberOfDays: Long = ChronoUnit.DAYS.between(startDate, endDate).abs
+      (numberOfDays + 6) / 7
+    }
+  }
+
+  def isIn2019TaxYear(date: LocalDate) =
+    if (
+        (date.isEqual(TAX_YEAR_2019_START_DATE) || date.isAfter(TAX_YEAR_2019_START_DATE)) &&
+        (date.isEqual(TAX_YEAR_2019_END_DATE) || date.isBefore(TAX_YEAR_2019_END_DATE))) {
+      true
+    } else {
+      false
+    }
+
+  def isIn2020TaxYear(date: LocalDate) =
+    if (
+      (date.isEqual(TAX_YEAR_2020_START_DATE) || date.isAfter(TAX_YEAR_2020_START_DATE)) &&
+        (date.isEqual(TAX_YEAR_2020_END_DATE) || date.isBefore(TAX_YEAR_2020_END_DATE))) {
+      true
+    } else {
+      false
+    }
 }
 

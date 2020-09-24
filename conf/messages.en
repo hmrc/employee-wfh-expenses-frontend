@@ -15,6 +15,9 @@ date.day = Day
 date.month = Month
 date.year = Year
 
+number.of.weeks.plural = {0} weeks
+number.of.weeks.singular = {0} week
+
 site.startAgain = Restart your expenses claim
 
 error.browser.title.prefix = Error:
@@ -97,8 +100,10 @@ yourTaxRelief.title = Check your claim
 yourTaxRelief.heading = Check your claim
 yourTaxRelief.inset.text = You started working from home on
 yourTaxRelief.changeThisDate.href.text = Change this date
-yourTaxRelief.paragraph.one = You will receive tax relief on your expenses for working from home for 2 weeks of the previous tax year (6 April 2019 to 5 April 2020). You will also receive tax relief for the whole of the current tax year (6 April 2020 to 5 April 2021), however long you worked or are working from home.
-yourTaxRelief.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2021, you will need to claim again.
+yourTaxRelief.2020.paragraph.one = You will receive tax relief on your expenses for working from home for the whole of the current tax year (6 April 2020 to 5 April 2021), however long you worked or are working from home.
+yourTaxRelief.2020.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2021, you will need to claim again.
+yourTaxRelief.2019And2020.paragraph.one = You will receive tax relief on your expenses for working from home for {0} of the previous tax year (6 April 2019 to 5 April 2020). You will also receive tax relief for the whole of the current tax year (6 April 2020 to 5 April 2021), however long you worked or are working from home.
+yourTaxRelief.2019And2020.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2021, you will need to claim again.
 yourTaxRelief.submitYourClaim.heading = Now submit your claim
 yourTaxRelief.disclaimer = By submitting you are confirming that, to the best of your knowledge, the details you are providing are correct.
 yourTaxRelief.submit.button.text = Confirm and submit

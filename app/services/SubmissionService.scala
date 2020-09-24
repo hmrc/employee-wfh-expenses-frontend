@@ -17,7 +17,6 @@
 package services
 
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 import config.FrontendAppConfig
 import connectors.{CitizenDetailsConnector, TaiConnector}
@@ -44,7 +43,6 @@ class SubmissionService @Inject()
   appConfig:                FrontendAppConfig
 ) {
 
-  val ONE_WEEK  = 1
   val ZERO      = 0
 
 
@@ -93,16 +91,6 @@ class SubmissionService @Inject()
       submittedDetails => Right(submittedDetails)
     } recover {
       case e => Left(e.getMessage)
-    }
-  }
-
-
-  def numberOfWeeks(startDate:LocalDate, endDate:LocalDate): Long = {
-    if (startDate.equals(endDate)) {
-      ONE_WEEK
-    } else {
-      val numberOfDays: Long = ChronoUnit.DAYS.between(startDate, endDate).abs
-      (((numberOfDays + 7 - 1) / 7) * 7) / 7
     }
   }
 

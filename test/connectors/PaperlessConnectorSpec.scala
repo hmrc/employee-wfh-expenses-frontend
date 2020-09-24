@@ -26,6 +26,7 @@ import play.api.http.Status.OK
 import play.api.http.Status.BAD_REQUEST
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.FakeRequest
 import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,6 +40,8 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
   with ScalaFutures with IntegrationPatience
   with ExpectedResults {
 
+  override implicit val fakeRequest = FakeRequest()
+
   override implicit lazy val app: Application =
     new GuiceApplicationBuilder()
       .configure(
@@ -46,7 +49,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
       )
       .build()
 
-  private lazy val paperlessPreferenceConnector: PaperlessPreferenceConnector = app.injector.instanceOf[PaperlessPreferenceConnector]
+  private lazy val paperlessPreferenceConnector = app.injector.instanceOf[PaperlessPreferenceConnector]
 
   "getPaperlessPreference" must {
     "return an preferences on success" in {

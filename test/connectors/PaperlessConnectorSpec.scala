@@ -51,7 +51,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
   "getPaperlessPreference" must {
     "return an preferences on success" in {
       server.stubFor(
-        get(urlEqualTo(s"/preferences-frontend/paperless/preferences"))
+        get(urlEqualTo(s"/paperless/preferences"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -70,7 +70,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
 
     "return an preferences on success but missing preference" in {
       server.stubFor(
-        get(urlEqualTo(s"/preferences-frontend/paperless/preferences"))
+        get(urlEqualTo(s"/paperless/preferences"))
           .willReturn(
             aResponse()
               .withStatus(BAD_REQUEST)
@@ -84,7 +84,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
 
     "handle http 500 correctly" in {
       server.stubFor(
-        get(urlEqualTo(s"/preferences-frontend/paperless/preferences"))
+        get(urlEqualTo(s"/paperless/preferences"))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)
@@ -98,7 +98,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
 
     "handle http Exception correctly" in {
       server.stubFor(
-        get(urlEqualTo(s"/preferences-frontend/paperless/preferences"))
+        get(urlEqualTo(s"/paperless/preferences"))
           .willReturn(
             aResponse()
               .withStatus(INTERNAL_SERVER_ERROR)

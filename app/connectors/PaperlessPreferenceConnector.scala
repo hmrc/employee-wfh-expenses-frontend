@@ -46,7 +46,7 @@ class PaperlessPreferenceConnector @Inject()(appConfig: FrontendAppConfig, httpC
 
   def getPaperlessPreference()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[Boolean]] = {
 
-    val preferencesUrl = s"${appConfig.preferencesFrontendHost}/preferences-frontend/paperless/preferences"
+    val preferencesUrl = s"${appConfig.preferencesFrontendHost}/paperless/preferences"
 
     httpClient.GET[HttpResponse](preferencesUrl).map(responseHandler).recover {
       case _: BadRequestException =>

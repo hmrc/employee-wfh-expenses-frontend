@@ -14,21 +14,36 @@
  * limitations under the License.
  */
 
-package models.auditing
+package models.paperless
 
-import models.WithName
+import play.api.libs.json.Json
 
-sealed trait AuditEventType
+case class PaperlessStatus(
+  name:     String,
+  category: String,
+  text:     String
+)
 
-object AuditEventType {
-
-  object UpdateWorkingFromHomeFlatRateSuccess extends WithName("UpdateWorkingFromHomeFlatRateSuccess") with AuditEventType
-
-  object UpdateWorkingFromHomeFlatRateFailure extends WithName("UpdateWorkingFromHomeFlatRateFailure") with AuditEventType
-
-  object PaperlessPreferenceCheckSuccess extends WithName("PaperlessPreferenceCheckSuccess") with AuditEventType
-
-  object PaperlessPreferenceCheckFailure extends WithName("PaperlessPreferenceCheckFailure") with AuditEventType
-
+object PaperlessStatus{
+  implicit val format = Json.format[PaperlessStatus]
 }
 
+case class Url(
+  link: String,
+  text: String
+)
+
+object Url{
+  implicit val format = Json.format[Url]
+}
+
+case class PaperlessStatusResponse(
+  status: PaperlessStatus,
+  url:    Url
+) {
+  def isPaperlessCustomer: Boolean = status.name == "ALRIGHT"
+}
+
+object PaperlessStatusResponse{
+  implicit val format = Json.format[PaperlessStatusResponse]
+}

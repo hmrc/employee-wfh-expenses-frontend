@@ -17,9 +17,8 @@
 package controllers
 
 import base.SpecBase
-import config.FrontendAppConfig
 import connectors.PaperlessPreferenceConnector
-import controllers.PaperlessAuditConst.{Enabled, NinoReference}
+import models.paperless.{PaperlessStatus, PaperlessStatusResponse, Url}
 import org.mockito.Matchers.{any, eq => eqm}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -28,10 +27,14 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import views.html.ConfirmationView
+import PaperlessAuditConst._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
+
+  val somePreferencesUrl = "/change/preferences"
 
   "Confirmation Controller" must {
     "return OK and the correct view with paper preferences available" in {
@@ -52,29 +55,38 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
       .overrides(bind[AuditConnector].toInstance(auditConnector))
       .build()
 
-    when(paperlessPreferenceConnector.getPaperlessPreference()(any(), any())) thenReturn
-      Future.successful(Some(paperlessAvailable))
+    if (paperlessAvailable) {
+      when(paperlessPreferenceConnector.getPaperlessStatus(any())(any(), any())) thenReturn
+        Future(
+          Right(PaperlessStatusResponse(PaperlessStatus("ALRIGHT","",""), Url("","")))
+        )
+    } else {
+      when(paperlessPreferenceConnector.getPaperlessStatus(any())(any(), any())) thenReturn
+        Future(
+          Right(PaperlessStatusResponse(PaperlessStatus("PAPER","",""), Url(somePreferencesUrl,"")))
+        )
+    }
 
     val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
 
     val result = route(application, request).value
 
     val view = application.injector.instanceOf[ConfirmationView]
-    val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
     status(result) mustEqual OK
 
     val paperlessUrl = paperlessAvailable match {
       case true => None
-      case false => Some(s"${appConfig.pertaxFrontendHost}/personal-account")
+      case false => Some(somePreferencesUrl)
     }
 
     contentAsString(result) mustEqual
       view(paperlessAvailable, paperlessUrl)(fakeRequest, messages).toString
 
     val dataToAudit = Map(NinoReference -> fakeNino, Enabled -> paperlessAvailable.toString)
+
     verify(auditConnector, times(1))
-    .sendExplicitAudit(eqm("PaperlessPreferenceAudit"), eqm(dataToAudit))(any(), any())
+    .sendExplicitAudit(eqm("PaperlessPreferenceCheckSuccess"), eqm(dataToAudit))(any(), any())
 
     application.stop()
   }

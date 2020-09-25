@@ -20,13 +20,13 @@ import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, urlEqualTo}
 import config.FrontendAppConfig
 import models.{ETag, OtherExpense}
-import utils.WireMockHelper
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse, UpstreamErrorResponse}
+import uk.gov.hmrc.http.UpstreamErrorResponse
+import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -109,7 +109,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
   "postIabdData" must {
     "return a 200 response" in {
       server.stubFor(
-        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"))
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -127,7 +127,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
     "return a 401 response" in {
       server.stubFor(
-        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"))
           .willReturn(
             aResponse()
               .withStatus(UNAUTHORIZED)
@@ -144,7 +144,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
     "return a 404 response" in {
       server.stubFor(
-        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"))
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)

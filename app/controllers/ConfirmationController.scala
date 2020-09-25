@@ -23,11 +23,14 @@ import controllers.actions._
 import javax.inject.Inject
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
+import pages.WhenDidYouFirstStartWorkingFromHomePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
+import uk.gov.hmrc.time.TaxYear
+import uk.gov.hmrc.time.TaxYear.taxYearFor
 import views.html.ConfirmationView
 
 import scala.concurrent.ExecutionContext
@@ -54,23 +57,30 @@ class ConfirmationController @Inject()(
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
-      val paperlessReturnUrl = s"${appConfig.pertaxFrontendHost}/personal-account"
+      val taxYearStartedWorkingFromHome: Option[TaxYear] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).map(taxYearFor)
 
-      paperlessPreferenceConnector.getPaperlessStatus(paperlessReturnUrl) map {
+      paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account") map {
 
         case Right(status) if status.isPaperlessCustomer =>
           auditPaperlessPreferencesCheckSuccess(paperlessEnabled = true)
-          Ok(view(paperLessAvailable = true, None))
+          Ok(view(
+            paperLessAvailable  = true,
+            paperlessSignupUrl  = None,
+            startedInTaxYear    = taxYearStartedWorkingFromHome))
 
         case Right(status) =>
           auditPaperlessPreferencesCheckSuccess(paperlessEnabled = false)
-          Ok(view(paperLessAvailable = false, Some(status.url.link)))
+          Ok(view(
+            paperLessAvailable  = false,
+            paperlessSignupUrl  = Some(status.url.link),
+            startedInTaxYear    = taxYearStartedWorkingFromHome))
 
         case Left(error) =>
           auditPaperlessPreferencesCheckFailure(error)
           Redirect(routes.TechnicalDifficultiesController.onPageLoad())
       }
   }
+
 
   private def auditPaperlessPreferencesCheckSuccess(paperlessEnabled:Boolean)
                                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =

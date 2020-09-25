@@ -16,6 +16,8 @@
 
 package controllers
 
+import java.time.LocalDate
+
 import base.SpecBase
 import connectors.PaperlessPreferenceConnector
 import models.paperless.{PaperlessStatus, PaperlessStatusResponse, Url}
@@ -28,10 +30,15 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import views.html.ConfirmationView
 import PaperlessAuditConst._
+import models.UserAnswers
+import play.api.libs.json.Json
+import uk.gov.hmrc.time.TaxYear
+import uk.gov.hmrc.time.CurrentTaxYear
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+// scalastyle:off magic.number
 class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
   val somePreferencesUrl = "/change/preferences"
@@ -43,15 +50,22 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
     "return OK and the correct view with paper preferences unavailable" in {
       paperlessControllerTest(false)
     }
+    "return OK and the correct view with a 2019 tax year start date" in {
+      paperlessControllerTest(true, TaxYear(2019))
+    }
+    "return OK and the correct view with a 2020 tax year start date" in {
+      paperlessControllerTest(true, TaxYear(2020))
+    }
 }
 
-  private def paperlessControllerTest(paperlessAvailable: Boolean): Future[_] = {
+  private def paperlessControllerTest(paperlessAvailable: Boolean, taxYear:TaxYear = TaxYear(2019)): Future[_] = {
 
     val paperlessPreferenceConnector = mock[PaperlessPreferenceConnector]
     val auditConnector = mock[AuditConnector]
 
-    val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-      .overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))
+    val application = applicationBuilder(userAnswers = Some(
+      UserAnswers(userAnswersId, Json.obj("whenDidYouFirstStartWorkingFromHome" -> taxYear.starts.toString)))
+    ).overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))
       .overrides(bind[AuditConnector].toInstance(auditConnector))
       .build()
 
@@ -81,7 +95,7 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
     }
 
     contentAsString(result) mustEqual
-      view(paperlessAvailable, paperlessUrl)(fakeRequest, messages).toString
+      view(paperlessAvailable, paperlessUrl, Some(taxYear))(fakeRequest, messages).toString
 
     val dataToAudit = Map(NinoReference -> fakeNino, Enabled -> paperlessAvailable.toString)
 

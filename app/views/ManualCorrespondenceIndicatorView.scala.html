@@ -14,9 +14,12 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
+
 @this(
+        appConfig:     FrontendAppConfig,
         main_template: MainTemplate,
-        backLink:           GovukBackLink
+        backLink:      GovukBackLink
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -32,20 +35,25 @@
 
     <h1 class="govuk-heading-xl">@messages("manualCorrespondenceIndicator.heading")</h1>
 
-    <p class="govuk-body">We need to talk to you about an MCI error before you can continue.</p>
+    <p class="govuk-body">@messages("manualCorrespondenceIndicator.paragraph.one")</p>
 
-    <h2 class="govuk-heading-m">How to contact us</h2>
+    <h2 class="govuk-heading-m">@messages("manualCorrespondenceIndicator.how.to.contact")</h2>
     <ul class="govuk-list govuk-list--bullet">
-        <li>Telephone: 0300 200 3300</li>
-        <li>Textphone: 0300 200 3319</li>
-        <li>Outside UK: +44 135 535 9022</li>
+        <li>@messages("manualCorrespondenceIndicator.how.to.contact.telephone")</li>
+        <li>@messages("manualCorrespondenceIndicator.how.to.contact.textphone")</li>
+        <li>@messages("manualCorrespondenceIndicator.how.to.contact.outsideUK")</li>
     </ul>
 
-    <h2 class="govuk-heading-m">Phone lines are open:</h2>
+    <h2 class="govuk-heading-m">@messages("manualCorrespondenceIndicator.phoneLines")</h2>
     <ul class="govuk-list govuk-list--bullet">
-        <li>8am to 8pm, Monday to friday</li>
-        <li>8am to 4pm Saturdays</li>
-        <li>9am to 5pm Sundays</li>
+        <li>@messages("manualCorrespondenceIndicator.phoneLines.one")</li>
+        <li>@messages("manualCorrespondenceIndicator.phoneLines.two")</li>
+        <li>@messages("manualCorrespondenceIndicator.phoneLines.three")</li>
     </ul>
 
+    <p class="govuk-body">@messages("manualCorrespondenceIndicator.closedBankHolidays")</p>
+
+    <p class="govuk-body">
+        <a class="govuk-link" target="_blank" href="@appConfig.hmrcCallChargesUrl">@messages("manualCorrespondenceIndicator.callCharges")</a>
+    </p>
 }

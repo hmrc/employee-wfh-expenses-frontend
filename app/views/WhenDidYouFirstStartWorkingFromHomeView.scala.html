@@ -46,12 +46,7 @@
         }
 
         <h1 class="govuk-heading-xl">@messages("whenDidYouFirstStartWorkingFromHome.heading")</h1>
-
-        <p class="govuk-body">@messages("whenDidYouFirstStartWorkingFromHome.info.weekinfo")</p>
-        <ul class="govuk-list govuk-list--bullet">
-            <li id="bullet-changedate">@messages("whenDidYouFirstStartWorkingFromHome.info.weekinfo1")</li>
-            <li id="bullet-changedate">@messages("whenDidYouFirstStartWorkingFromHome.info.weekinfo2")</li>
-        </ul>
+        <p class="govuk-body">@messages("whenDidYouFirstStartWorkingFromHome.paragraph.one")</p>
 
         @govukDateInput(DateInput(
             id = "value",

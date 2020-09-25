@@ -16,21 +16,52 @@
 
 package views
 
+import uk.gov.hmrc.time.TaxYear
 import views.behaviours.ViewBehaviours
 import views.html.ConfirmationView
 
+// scalastyle:off magic.number
 class ConfirmationViewSpec extends ViewBehaviours {
 
   private val Confirmation = "confirmation"
 
-  "Confirmation view with paperless settings enabled" must {
+  "Confirmation view" should {
     val view = viewFor[ConfirmationView](Some(emptyUserAnswers))
-    behave like normalPage(view.apply(true, None)(fakeRequest, messages), Confirmation)
-  }
 
-  "Confirmation view with paperless settings not enabled" must {
-    val view = viewFor[ConfirmationView](Some(emptyUserAnswers))
-    behave like normalPage(view.apply(false, Some("url-string"))(fakeRequest, messages), Confirmation)
-  }
+    "show 2019 content" when {
+      "when a started to work from home date is in the 2019 tax year" in {
+        val doc = asDocument(view.apply(true, None, Some(TaxYear(2019)))(fakeRequest, messages))
+        assert(doc.toString.contains(messages("confirmation.whatHappensNext.paragraph.1.for.2019")))
+      }
+    }
 
+    "not show 2019 content" when {
+      "when a started to work from home date is in the 2020 tax year" in {
+        val doc = asDocument(view.apply(true, None, Some(TaxYear(2020)))(fakeRequest, messages))
+        assert(!doc.toString.contains(messages("confirmation.whatHappensNext.paragraph.1.for.2019")))
+      }
+    }
+
+    "show go paperless content" when {
+      "when the user is not already paperless" in {
+        val doc = asDocument(view.apply(false, Some("url-string"), Some(TaxYear(2020)))(fakeRequest, messages))
+        assert(doc.toString.contains(messages("confirmation.paperless.header")))
+        assert(doc.toString.contains(messages("confirmation.paperless.button.text")))
+      }
+    }
+
+    "not show go paperless content" when {
+      "when the user is already paperless" in {
+        val doc = asDocument(view.apply(true, None, Some(TaxYear(2020)))(fakeRequest, messages))
+        assert(!doc.toString.contains(messages("confirmation.paperless.header")))
+        assert(!doc.toString.contains(messages("confirmation.paperless.button.text")))
+      }
+    }
+
+    "behave like a normal page" when {
+      behave like normalPage(view.apply(true, None, None)(fakeRequest, messages), Confirmation)
+    }
+
+  }
+  
 }

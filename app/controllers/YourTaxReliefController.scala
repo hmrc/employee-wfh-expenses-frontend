@@ -26,6 +26,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.controller.FrontendBaseController
+import uk.gov.hmrc.time.TaxYear
 import utils.TaxYearDates._
 import views.html.{YourTaxRelief2019And2020View, YourTaxRelief2020OnlyView}
 
@@ -52,12 +53,12 @@ class YourTaxReliefController @Inject()(
         case None =>
           Redirect(routes.DisclaimerController.onPageLoad())
 
-        case Some(date) if isIn2019TaxYear(date) =>
+        case Some(date) if TaxYear(2019).contains(date) =>
           Ok(
             yourTaxRelief2019And2020View(date, numberOfWeeks(date, TAX_YEAR_2019_END_DATE))
           )
 
-        case Some(date) if isIn2020TaxYear(date) =>
+        case Some(date) if TaxYear(2020).contains(date) =>
           Ok(
             yourTaxRelief2020OnlyView(date)
           )
@@ -81,7 +82,6 @@ class YourTaxReliefController @Inject()(
           submissionService.submitExpenses(startDate) map {
 
             case Right(_) =>
-              sessionRepository.set(UserAnswers(request.internalId))
               Redirect(routes.ConfirmationController.onPageLoad())
 
             case Left(_) =>

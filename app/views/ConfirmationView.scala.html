@@ -15,8 +15,7 @@
  *@
 
 @import config.FrontendAppConfig
-@import models.Address
-@import models.Address.answeredLines
+@import uk.gov.hmrc.time.TaxYear
 
 @this(
         main_template: MainTemplate,
@@ -28,9 +27,9 @@
         button: GovukButton
 )
 
-@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String])(implicit request: Request[_], messages: Messages)
+@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String], startedInTaxYear: Option[TaxYear])(implicit request: Request[_], messages: Messages)
 
-@linkToFeedbackForm = {<a href=@frontendAppConfig.personalDetailsUrl>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
+@linkToFeedbackForm = {<a href="https://www.tax.service.gov.uk/feedback/employee-expenses-wfh">@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
 @main_template(title = messages("confirmation.title")) {
 
@@ -45,11 +44,19 @@
         <p class="govuk-body">@messages("confirmation.text.footer.mail")</p>
     }
     <h2 class="govuk-heading-m">@messages("confirmation.whatHappensNext.heading")</h2>
-    <p class="govuk-body ">@messages("confirmation.whatHappensNext.paragraph.1")</p>
+
+    <p class="govuk-body">
+        @messages("confirmation.whatHappensNext.paragraph.1")
+        @{startedInTaxYear match {
+            case Some(TaxYear(2019)) => messages("confirmation.whatHappensNext.paragraph.1.for.2019")
+            case _ =>
+        }}
+    </p>
+
     <p class="govuk-body">@messages("confirmation.whatHappensNext.paragraph.2")</p>
 
-    <span class="govuk-link">@linkToFeedbackForm</span><span class="govuk-body"> @messages("confirmation.linkToFeedbackForm.href.postfix")</span>
-    </p>
+    <span class="govuk-link">@linkToFeedbackForm</span>
+    <span class="govuk-body">@messages("confirmation.linkToFeedbackForm.href.postfix")</span>
 
     @if(!paperLessAvailable) {
         <h2 class="govuk-heading-m">@messages("confirmation.paperless.header")</h2>

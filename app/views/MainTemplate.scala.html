@@ -15,6 +15,7 @@
  *@
 
 @import config.FrontendAppConfig
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcTimeoutDialog
 @import uk.gov.hmrc.hmrcfrontend.views.Aliases.ReportTechnicalIssue
 
 @this(
@@ -22,21 +23,36 @@
         govukFooter: GovukFooter,
         hmrcHeader: GovukHeader,
         hmrcReportTechnicalIssue: hmrcComponents.HmrcReportTechnicalIssue,
-        appConfig: FrontendAppConfig
+        appConfig: FrontendAppConfig,
+        hmrcTimeoutDialog: HmrcTimeoutDialog
 )
 
-
-@(title: String, beforeContentBlock: Option[Html] = None)(mainContent: Html)(implicit request : Request[_], messages: Messages)
+@(title: String, beforeContentBlock: Option[Html] = None, hasTimeout:Boolean = true)(mainContent: Html)(implicit request : Request[_], messages: Messages)
 
 @head() = {
     <!--[if lte IE 8]><link href='@controllers.routes.Assets.versioned("stylesheets/employeewfhexpensesfrontend-app.css")' rel="stylesheet" type="text/css" /><![endif]-->
     <!--[if gt IE 8]><!--><link href='@controllers.routes.Assets.versioned("stylesheets/employeewfhexpensesfrontend-app.css")' media="screen" rel="stylesheet" type="text/css" /><!--<![endif]-->
+    @if(hasTimeout) {
+        @if(appConfig.timeoutDialogEnabled) {
+                @hmrcTimeoutDialog(hmrcComponents.TimeoutDialog(
+                    name="TimeoutDialog",
+                    timeout= Some(appConfig.timeoutDialogTimeout),
+                    countdown= Some(appConfig.timeoutDialogTimeoutCountdown),
+                    keepAliveUrl= Some(routes.KeepAliveController.keepAlive().url),
+                    signOutUrl= Some(routes.SignedOutController.signedOut().url),
+                    language= Some("en")
+                ))
+         }
+    }
     <script src='@controllers.routes.Assets.versioned("javascripts/gtm.js")'></script>
 }
 
 @scripts = {
     <script src='@controllers.routes.Assets.versioned("lib/govuk-frontend/govuk/all.js")'></script>
+    <script src='@controllers.routes.Assets.versioned("lib/hmrc-frontend/hmrc/all.js")'></script>
+    <script src='@controllers.routes.Assets.versioned("javascripts/application.min.js")'></script>
     <script>window.GOVUKFrontend.initAll();</script>
+    <script>window.HMRCFrontend.initAll();</script>
 }
 
 @header() = {

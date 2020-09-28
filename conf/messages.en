@@ -142,6 +142,12 @@ manualCorrespondenceIndicator.phoneLines.two = 8am to 4pm Saturdays
 manualCorrespondenceIndicator.phoneLines.three = 9am to 5pm Sundays
 manualCorrespondenceIndicator.closedBankHolidays = Closed bank holidays
 manualCorrespondenceIndicator.callCharges = Find out about call charges (opens in a new window)
+signoutpage.title = For your security, we signed you out
+signoutpage.heading = For your security, we signed you out
+signoutpage.start-again.text = Sign in
+
+manualCorrespondenceIndicator.title = You cannot make a claim right now
+manualCorrespondenceIndicator.heading = You cannot make a claim right now
 
 technicalDifficulties.title = Sorry, there is a problem with the service
 technicalDifficulties.heading = Sorry, there is a problem with the service

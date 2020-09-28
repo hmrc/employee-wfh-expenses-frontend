@@ -17,15 +17,17 @@
 @import config.FrontendAppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcTimeoutDialog
 @import uk.gov.hmrc.hmrcfrontend.views.Aliases.ReportTechnicalIssue
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcFooter
 
 @this(
         govukLayout: GovukLayout,
-        govukFooter: GovukFooter,
+        hmrcFooter: HmrcFooter,
         hmrcHeader: GovukHeader,
         hmrcReportTechnicalIssue: hmrcComponents.HmrcReportTechnicalIssue,
         appConfig: FrontendAppConfig,
         hmrcTimeoutDialog: HmrcTimeoutDialog
 )
+
 
 @(title: String, beforeContentBlock: Option[Html] = None, hasTimeout:Boolean = true)(mainContent: Html)(implicit request : Request[_], messages: Messages)
 
@@ -78,31 +80,6 @@
     ))
 }
 
-@footerBlock = {
-    @govukFooter()
-}
-
-@footerItems() = @{
-    Seq(
-        FooterItem(
-            href = Some("https://www.tax.service.gov.uk/help/cookies"),
-            text = Some(messages("site.footer.cookies"))
-        ),
-        FooterItem(
-            href = Some("https://www.tax.service.gov.uk/help/privacy"),
-            text = Some(messages("site.footer.privacyPolicy"))
-        ),
-        FooterItem(
-            href = Some("https://www.tax.service.gov.uk/help/terms-and-conditions"),
-            text = Some(messages("site.footer.termsAndConditions"))
-        ),
-        FooterItem(
-            href = Some("https://www.gov.uk/help"),
-            text = Some(messages("site.footer.helpUsingGovUk"))
-        )
-    )
-}
-
 @govukLayout(
     pageTitle = Some(title),
     headBlock = Some(head()),
@@ -110,5 +87,5 @@
     beforeContentBlock = beforeContentBlock,
     bodyEndBlock = None,
     scriptsBlock = Some(scripts),
-    footerItems = footerItems()
+    footerBlock = Some(hmrcFooter())
 )(content)

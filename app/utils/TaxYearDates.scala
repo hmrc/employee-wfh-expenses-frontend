@@ -43,22 +43,5 @@ object TaxYearDates {
     }
   }
 
-  def isIn2019TaxYear(date: LocalDate) =
-    if (
-        (date.isEqual(TAX_YEAR_2019_START_DATE) || date.isAfter(TAX_YEAR_2019_START_DATE)) &&
-        (date.isEqual(TAX_YEAR_2019_END_DATE) || date.isBefore(TAX_YEAR_2019_END_DATE))) {
-      true
-    } else {
-      false
-    }
-
-  def isIn2020TaxYear(date: LocalDate) =
-    if (
-      (date.isEqual(TAX_YEAR_2020_START_DATE) || date.isAfter(TAX_YEAR_2020_START_DATE)) &&
-        (date.isEqual(TAX_YEAR_2020_END_DATE) || date.isBefore(TAX_YEAR_2020_END_DATE))) {
-      true
-    } else {
-      false
-    }
 }
 

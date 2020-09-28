@@ -14,8 +14,11 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
+
 @this(
-    main_template: MainTemplate
+    main_template:  MainTemplate,
+    appConfig:      FrontendAppConfig
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -23,4 +26,9 @@
 @main_template(title = messages("unauthorised.title")) {
 
   <h1 class="govuk-heading-xl">@messages("unauthorised.heading")</h1>
+  <p class="govuk-body">@messages("unauthorised.paragraph.one")</p>
+  <p class="govuk-body">
+   @messages("unauthorised.paragraph.two")
+   <a href="@{appConfig.loginUrl}?continue=@{appConfig.loginContinueUrl}">@messages("unauthorised.signIn.text")</a>
+  </p>
 }

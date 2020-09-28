@@ -15,12 +15,14 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import config.FrontendAppConfig
 
 @this(
         main_template: MainTemplate,
         formHelper: FormWithCSRF,
         button: GovukButton,
-        govukWarningText : GovukWarningText
+        govukWarningText : GovukWarningText,
+        frontendAppConfig: FrontendAppConfig
 )
 
 @()( implicit request: Request[_], messages: Messages)
@@ -31,6 +33,12 @@
      <h1 class="govuk-heading-xl">@messages("disclaimer.heading")</h1>
 
      <p class="govuk-body">@messages("disclaimer.paragraph.one")</p>
+     <p class="govuk-body">@messages("disclaimer.paragraph.two")</p>
+     <p class="govuk-body">
+      @messages("disclaimer.paragraph.three.a")
+      <a href=@frontendAppConfig.p87DigitalFormUrl>@messages("disclaimer.paragraph.three.b")</a>
+      @messages("disclaimer.paragraph.three.c")
+     </p>
 
      <p class="govuk-body">@messages("disclaimer.list.text")</p>
      <ul class="govuk-list govuk-list--bullet">
@@ -44,6 +52,6 @@
       content = Text(messages("disclaimer.prosecuted"))
      ))
 
-     @button(Button(content = Text("Accept and continue")))
+     @button(Button(content = Text(messages("disclaimer.submit.button"))))
     }
 }

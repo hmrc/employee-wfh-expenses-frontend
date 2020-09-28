@@ -55,7 +55,7 @@ class TaiConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClien
   }
 
   def postIabdData(nino: String, year: Int, grossAmount: Int, eTag: ETag)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
-    val taiUrl = s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/employee-expenses/${appConfig.otherExpensesId}"
+    val taiUrl = s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"
     val body = Json.obj("version" -> eTag.version, "grossAmount" -> grossAmount)
     httpClient.POST[JsValue, HttpResponse](taiUrl, body) map {
       response => response.status match {

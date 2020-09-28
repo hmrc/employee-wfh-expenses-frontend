@@ -18,11 +18,12 @@
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcTimeoutDialog
 @import uk.gov.hmrc.hmrcfrontend.views.Aliases.ReportTechnicalIssue
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcFooter
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
 
 @this(
         govukLayout: GovukLayout,
         hmrcFooter: HmrcFooter,
-        hmrcHeader: GovukHeader,
+        hmrcHeader: HmrcHeader,
         hmrcReportTechnicalIssue: hmrcComponents.HmrcReportTechnicalIssue,
         appConfig: FrontendAppConfig,
         hmrcTimeoutDialog: HmrcTimeoutDialog
@@ -60,11 +61,12 @@
 @header() = {
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NDJKHWK" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-    @hmrcHeader(Header(
-        homepageUrl = Some(controllers.routes.IndexController.onPageLoad().url),
+    @hmrcHeader(hmrcComponents.Header(
+        homepageUrl = controllers.routes.IndexController.onPageLoad().url,
         serviceName = Some(messages("service.name")),
-        serviceUrl = Some(controllers.routes.IndexController.onPageLoad().url),
-        containerClasses = Some("govuk-width-container")
+        serviceUrl = controllers.routes.IndexController.onPageLoad().url,
+        containerClasses = "govuk-width-container",
+        signOutHref = Some(routes.SignedOutController.signOutToExitSurvey().url)
     ))
 }
 

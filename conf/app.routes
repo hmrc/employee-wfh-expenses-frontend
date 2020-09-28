@@ -7,6 +7,7 @@ GET        /                                            controllers.IndexControl
 
 GET        /keepAlive                                   controllers.KeepAliveController.keepAlive
 GET        /signed-out-and-saved                        controllers.SignedOutController.signedOut
+GET        /sign-out-to-survey                          controllers.SignedOutController.signOutToExitSurvey
 
 GET        /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
 

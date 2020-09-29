@@ -55,6 +55,11 @@ service.name = Claim tax relief on expenses for working from home
 site.textarea.char_limit = (Limit is {0} characters)
 site.getHelpWithThisPage = Get help with this page
 
+site.footer.cookies = Cookies
+site.footer.privacyPolicy = Privacy policy
+site.footer.termsAndConditions = Terms and conditions
+site.footer.helpUsingGovUk = Help using GOV.UK
+
 unauthorised.title = You cannot use this Government Gateway user ID to claim tax relief on your expenses
 unauthorised.heading = You cannot use this Government Gateway user ID to claim tax relief on your expenses
 unauthorised.paragraph.one = This is because you have signed in with your business or agent Government Gateway user ID.

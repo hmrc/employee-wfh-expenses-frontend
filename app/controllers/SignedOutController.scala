@@ -26,11 +26,18 @@ import views.html.WeSignedYouOutPageView
 import scala.concurrent.Future
 
 class SignedOutController @Inject()(val controllerComponents: ControllerComponents,
-                                    implicit val frontendAppConfig: FrontendAppConfig,
+                                    val frontendAppConfig: FrontendAppConfig,
                                     val weSignedYouOutSavedTemplate: WeSignedYouOutPageView)
   extends BackendBaseController with I18nSupport {
 
   def signedOut: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(weSignedYouOutSavedTemplate()))
+    Future.successful(Ok(weSignedYouOutSavedTemplate()).withNewSession)
   }
+
+  def signOutToExitSurvey: Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(
+      Redirect(frontendAppConfig.feedbackSurvey).withNewSession
+    )
+  }
+
 }

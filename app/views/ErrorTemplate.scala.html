@@ -17,23 +17,13 @@
 @import config.FrontendAppConfig
 
 @this(
-        govukLayout: GovukLayout,
+        mainTemplate: MainTemplate,
         appConfig: FrontendAppConfig
 )
 
 @(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: Messages)
 
-@contentHeader = {
-  <h1 class="govuk-heading-xl">@heading</h1>
+@mainTemplate(title = heading) {
+<h1 class="govuk-heading-xl">@heading</h1>
+<p class="govuk-body">@messages(message)</p>
 }
-
-@mainContent = {
-  <p>@messages(message)</p>
-}
-
- @govukLayout(
-  pageTitle = Some(pageTitle),
-  headBlock = Some(contentHeader),
-  beforeContentBlock = None,
-  footerItems = Seq(),
-  bodyEndBlock = None)(mainContent)

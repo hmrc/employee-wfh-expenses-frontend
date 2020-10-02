@@ -42,11 +42,6 @@ lazy val root = (project in file("."))
       Resolver.bintrayRepo("hmrc", "releases"),
       Resolver.jcenterRepo
     ),
-    // concatenate js
-    Concat.groups := Seq(
-      "javascripts/employeewfhexpensesfrontend-app.js" ->
-        group(Seq("javascripts/show-hide-content.js", "javascripts/employeewfhexpensesfrontend.js"))
-    ),
     // prevent removal of unused code which generates warning errors due to use of third-party libs
     uglifyCompressOptions := Seq("unused=false", "dead_code=false"),
     pipelineStages := Seq(digest),

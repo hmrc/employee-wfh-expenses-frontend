@@ -68,7 +68,12 @@
     <p class="govuk-body">@messages("yourTaxRelief.disclaimer")</p>
 
     @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
-    @button(Button(content = Text(messages("yourTaxRelief.submit.button.text"))))
+        @button(
+            Button(
+                content             = Text(messages("yourTaxRelief.submit.button.text")),
+                preventDoubleClick  = true
+            )
+        )
     }
 
 }

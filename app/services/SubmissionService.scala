@@ -81,6 +81,8 @@ class SubmissionService @Inject()
           } yield futureSeq :+ future
       )
 
+    Logger.info("[SubmissionService][submit] Submitting")
+
     futureSequence(flatRateItems) {
       item: FlatRateItem =>
         for {

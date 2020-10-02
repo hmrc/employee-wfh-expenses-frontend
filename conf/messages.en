@@ -61,6 +61,18 @@ unauthorised.paragraph.one = This is because you have signed in with your busine
 unauthorised.paragraph.two = To use this service you need to
 unauthorised.signIn.text = sign in with an individual Government Gateway user ID.
 
+ivfailed.title = We cannot confirm your identity
+ivfailed.heading = We cannot confirm your identity
+ivFailed.paragraph.one = We have been unable to confirm your identity, so you cannot continue claiming these expenses online.
+ivFailed.list.text = You can make your claim:
+ivFailed.list.item1 = by post, using the {0}
+ivFailed.list.item2 = by phone, by calling the {0}
+ivFailed.paragraph.two = If you want to claim online, you must {0}.
+ivfailed.postalForm.href.text = print and post form
+ivfailed.helpline.href.text = Income Tax: general enquiries helpline
+ivfailed.tryAgain.href.text = confirm your identity
+
+
 disclaimer.title = You must read the following before making a claim
 disclaimer.heading = You must read the following before making a claim
 disclaimer.paragraph.one = You can use this service to claim tax relief on the extra expenses of working from home because of coronavirus (COVID-19).

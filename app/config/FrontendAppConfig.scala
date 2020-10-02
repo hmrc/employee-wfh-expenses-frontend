@@ -40,11 +40,13 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
   lazy val loginUrl: String = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
   lazy val p87DigitalFormUrl: String = configuration.get[String]("urls.p87DigitalForm")
+  lazy val p87PostalFormUrl: String = configuration.get[String]("urls.p87PostalForm")
   lazy val ivUpliftUrl: String = configuration.get[String]("urls.ivUplift")
   lazy val ivCompletionUrl: String = configuration.get[String]("urls.ivCompletion")
   lazy val ivFailureUrl: String = configuration.get[String]("urls.ivFailure")
   lazy val feedbackSurvey: String = configuration.get[String]("urls.feedbackSurvey")
   lazy val hmrcCallChargesUrl: String = configuration.get[String]("urls.hmrcCallCharges")
+  lazy val incomeTaxGeneralEnquiriesUrl: String = configuration.get[String]("urls.incomeTaxGeneralEnquiries")
 
   lazy val otherExpensesId: Int = configuration.get[Int]("otherExpensesId")
 

@@ -110,7 +110,7 @@ class AuthActionSpec extends SpecBase {
             "origin=EEWFH&" +
             "confidenceLevel=200&" +
             "completionURL=http://localhost:9336/employee-working-from-home-expenses&" +
-            "failureURL=http://localhost:9336/employee-working-from-home-expenses/unauthorised"
+            "failureURL=http://localhost:9336/employee-working-from-home-expenses/identity-failed"
         )
 
         application.stop()

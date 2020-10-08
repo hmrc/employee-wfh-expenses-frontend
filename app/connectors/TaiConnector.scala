@@ -18,40 +18,29 @@ package connectors
 
 import config.FrontendAppConfig
 import javax.inject.{Inject, Singleton}
-import utils.HttpResponseHelper
-import models.{ETag, OtherExpense}
-import play.api.Logger
-import play.api.http.Status.{OK, isSuccessful}
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, Reads}
+import models.{ETag, IABDExpense}
+import play.api.http.Status.isSuccessful
+import play.api.libs.json._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, UpstreamErrorResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
+import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.reflect.ClassTag
 
 @Singleton
 class TaiConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClient) extends HttpResponseHelper {
 
-  private def withDefaultToEmptySeq[T: ClassTag](response: HttpResponse)
-                                        (implicit reads: Reads[Seq[T]]): Seq[T] = {
-    response.status match {
-      case OK =>
-        Json.parse(response.body).validate[Seq[T]] match {
-          case JsSuccess(records, _) =>
-            records
-          case JsError(e) =>
-            val typeName: String = implicitly[ClassTag[T]].runtimeClass.getCanonicalName
-            Logger.error(s"[TaiConnector][$typeName][Json.parse] failed $e")
-            Seq.empty
-        }
-      case _ =>
-        Seq.empty
-    }
+  def getOtherExpensesData(nino: String, year: Int)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[IABDExpense]] = {
+    getIabdData(nino, year, appConfig.otherExpensesId)
   }
 
-  def getIabdData(nino: String, year: Int)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[OtherExpense]] = {
-    val taiUrl = s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/employee-expenses/${appConfig.otherExpensesId}"
-    httpClient.GET(taiUrl).map(withDefaultToEmptySeq[OtherExpense])
+  def getJobExpensesData(nino: String, year: Int)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[IABDExpense]] = {
+    getIabdData(nino, year, appConfig.jobExpenseId)
+  }
+
+  private def getIabdData(nino: String, year: Int, iabd: Int)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[IABDExpense]] = {
+    val taiUrl = s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/employee-expenses/$iabd"
+    httpClient.GET[Seq[IABDExpense]](taiUrl)
   }
 
   def postIabdData(nino: String, year: Int, grossAmount: Int, eTag: ETag)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {

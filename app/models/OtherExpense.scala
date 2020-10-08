@@ -18,8 +18,8 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class OtherExpense(grossAmount: Int)
+case class IABDExpense(grossAmount: Int)
 
-object OtherExpense {
-  implicit val formats: OFormat[OtherExpense] = Json.format[OtherExpense]
+object IABDExpense {
+  implicit val formats: OFormat[IABDExpense] = Json.format[IABDExpense]
 }

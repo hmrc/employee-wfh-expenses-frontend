@@ -51,6 +51,7 @@ class CheckAlreadyClaimedActionSpec extends SpecBase with WireMockHelper with Sc
     .configure(
       conf = "microservice.services.tai.port" -> server.port,
       "otherExpensesId" -> 59,
+      "jobExpenseId" -> 55,
       "urls.p87DigitalForm" -> p87RedirectUrl
     ).build()
 
@@ -66,7 +67,16 @@ class CheckAlreadyClaimedActionSpec extends SpecBase with WireMockHelper with Sc
           .willReturn(
             aResponse()
               .withStatus(OK)
-              .withBody(validIabdJson(None).toString)
+              .withBody(validIabdJson(Some(0)).toString)
+          )
+      )
+
+      server.stubFor(
+        get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.jobExpenseId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(validIabdJson(Some(0)).toString)
           )
       )
 
@@ -74,22 +84,89 @@ class CheckAlreadyClaimedActionSpec extends SpecBase with WireMockHelper with Sc
       status(result) mustBe OK
     }
 
-    "redirect claimants that have already claimed for expenses to p87" in {
-      server.stubFor(
-        get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}"))
-          .willReturn(
-            aResponse()
-              .withStatus(OK)
-              .withBody(validIabdJson(Some(grossAmount)).toString)
-          )
-      )
+    "redirect claimants that have already claimed for expenses to p87" when {
+      "IABD 59 (other expenses) is greater than zero" in {
+        server.stubFor(
+          get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(validIabdJson(Some(grossAmount)).toString)
+            )
+        )
 
-      val result = checkAlreadyClaimedAction.invokeBlock(identifierRequest, checkIdentifierRequest)
-      status(result) mustBe SEE_OTHER
+        server.stubFor(
+          get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.jobExpenseId}"))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(validIabdJson(Some(0)).toString)
+            )
+        )
 
-      whenReady(result) {
-        res =>
-          res.header.headers(LOCATION) mustBe p87RedirectUrl
+        val result = checkAlreadyClaimedAction.invokeBlock(identifierRequest, checkIdentifierRequest)
+        status(result) mustBe SEE_OTHER
+
+        whenReady(result) {
+          res =>
+            res.header.headers(LOCATION) mustBe p87RedirectUrl
+        }
+      }
+
+      "IABD 55 (job expenses) is greater than zero" in {
+        server.stubFor(
+          get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(validIabdJson(Some(0)).toString)
+            )
+        )
+
+        server.stubFor(
+          get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.jobExpenseId}"))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(validIabdJson(Some(grossAmount)).toString)
+            )
+        )
+
+        val result = checkAlreadyClaimedAction.invokeBlock(identifierRequest, checkIdentifierRequest)
+        status(result) mustBe SEE_OTHER
+
+        whenReady(result) {
+          res =>
+            res.header.headers(LOCATION) mustBe p87RedirectUrl
+        }
+      }
+
+      "Both IABD 55 and IABD 59 is greater than zero" in {
+        server.stubFor(
+          get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(validIabdJson(Some(grossAmount)).toString)
+            )
+        )
+
+        server.stubFor(
+          get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.jobExpenseId}"))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(validIabdJson(Some(grossAmount)).toString)
+            )
+        )
+
+        val result = checkAlreadyClaimedAction.invokeBlock(identifierRequest, checkIdentifierRequest)
+        status(result) mustBe SEE_OTHER
+
+        whenReady(result) {
+          res =>
+            res.header.headers(LOCATION) mustBe p87RedirectUrl
+        }
       }
     }
   }

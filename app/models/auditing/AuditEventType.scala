@@ -30,5 +30,6 @@ object AuditEventType {
 
   object PaperlessPreferenceCheckFailure extends WithName("PaperlessPreferenceCheckFailure") with AuditEventType
 
+  object AlreadyClaimedExpenses extends WithName("AlreadyClaimedExpenses") with AuditEventType
 }
 

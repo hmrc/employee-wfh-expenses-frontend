@@ -49,6 +49,7 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
   lazy val incomeTaxGeneralEnquiriesUrl: String = configuration.get[String]("urls.incomeTaxGeneralEnquiries")
 
   lazy val otherExpensesId: Int = configuration.get[Int]("otherExpensesId")
+  lazy val jobExpenseId: Int = configuration.get[Int]("jobExpenseId")
 
   lazy val timeoutDialogEnabled: Boolean = configuration.getOptional[Boolean]("timeoutDialog.enabled").getOrElse(true)
   lazy val timeoutDialogTimeout: Int = configuration.getOptional[Int]("timeoutDialog.timeout").getOrElse(900)

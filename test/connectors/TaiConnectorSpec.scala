@@ -19,13 +19,13 @@ package connectors
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, urlEqualTo}
 import config.FrontendAppConfig
-import models.{ETag, OtherExpense}
+import models.{ETag, IABDExpense}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.Status._
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.http.UpstreamErrorResponse
+import uk.gov.hmrc.http.{JsValidationException, NotFoundException, UpstreamErrorResponse}
 import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -36,7 +36,8 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
     new GuiceApplicationBuilder()
       .configure(
         conf = "microservice.services.tai.port" -> server.port,
-        "otherExpensesId" -> 59
+        "otherExpensesId" -> 59,
+        "jobExpenseId" -> 55
       )
       .build()
 
@@ -46,8 +47,9 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
   private val testGrossAmount = 120
   private val testETag = ETag(version = etag)
 
-  "getIabdData" must {
-    "return valid IABD data for a 200 response with a valid response body" in {
+  "getOtherExpensesData [IABD 59]" must {
+    "return valid data for a 200 response with a valid response body" in {
+
       server.stubFor(
         get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
           .willReturn(
@@ -57,16 +59,16 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
           )
       )
 
-      val result = taiConnector.getIabdData(fakeNino, testTaxYear)
+      val result = taiConnector.getOtherExpensesData(fakeNino, testTaxYear)
 
       whenReady(result) {
         res =>
           res mustBe a[Seq[_]]
-          res.headOption mustBe Some(OtherExpense(testGrossAmount))
+          res.headOption mustBe Some(IABDExpense(testGrossAmount))
       }
     }
 
-    "return an empty list for a 200 response with an invalid response body" in {
+    "return a JsValidationException for a 200 response with an unexpected response body" in {
       server.stubFor(
         get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
           .willReturn(
@@ -76,34 +78,121 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
           )
       )
 
-      val result = taiConnector.getIabdData(fakeNino, testTaxYear)
+      val result = taiConnector.getOtherExpensesData(fakeNino, testTaxYear)
 
-      whenReady(result) {
-        res =>
-          res mustBe a[Seq[_]]
-          res.headOption mustBe None
+      whenReady(result.failed) {ex =>
+        ex mustBe an[JsValidationException]
       }
     }
 
-    "return an empty list for a non-200 response" in {
+    "return an UpstreamErrorResponse for a 5xx response" in {
       server.stubFor(
         get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
           .willReturn(
             aResponse()
-              .withStatus(NO_CONTENT)
+              .withStatus(SERVICE_UNAVAILABLE)
               .withBody("")
           )
       )
 
-      val result = taiConnector.getIabdData(fakeNino, testTaxYear)
+      val result = taiConnector.getOtherExpensesData(fakeNino, testTaxYear)
+
+      whenReady(result.failed) {ex =>
+        ex mustBe an[UpstreamErrorResponse]
+        ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe SERVICE_UNAVAILABLE
+      }
+    }
+
+    "return an NotFoundException for a 404 response" in {
+      server.stubFor(
+        get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+              .withBody("")
+          )
+      )
+
+      val result = taiConnector.getOtherExpensesData(fakeNino, testTaxYear)
+
+      whenReady(result.failed) {ex =>
+        ex mustBe an[NotFoundException]
+      }
+    }
+  }
+
+  "getJobExpensesData [IABD 55]" must {
+    "return valid data for a 200 response with a valid response body" in {
+
+      server.stubFor(
+        get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.jobExpenseId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(validIabdJson(Some(testGrossAmount)).toString)
+          )
+      )
+
+      val result = taiConnector.getJobExpensesData(fakeNino, testTaxYear)
 
       whenReady(result) {
         res =>
           res mustBe a[Seq[_]]
-          res.headOption mustBe None
+          res.headOption mustBe Some(IABDExpense(testGrossAmount))
       }
     }
 
+    "return a JsValidationException for a 200 response with an unexpected response body" in {
+      server.stubFor(
+        get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.jobExpenseId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(OK)
+              .withBody(invalidJson.toString)
+          )
+      )
+
+      val result = taiConnector.getJobExpensesData(fakeNino, testTaxYear)
+
+      whenReady(result.failed) {ex =>
+        ex mustBe an[JsValidationException]
+      }
+    }
+
+    "return an UpstreamErrorResponse for a 5xx response" in {
+      server.stubFor(
+        get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.jobExpenseId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(SERVICE_UNAVAILABLE)
+              .withBody("")
+          )
+      )
+
+      val result = taiConnector.getJobExpensesData(fakeNino, testTaxYear)
+
+      whenReady(result.failed) {ex =>
+        ex mustBe an[UpstreamErrorResponse]
+        ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe SERVICE_UNAVAILABLE
+      }
+    }
+
+    "return an NotFoundException for a 404 response" in {
+      server.stubFor(
+        get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.jobExpenseId}"))
+          .willReturn(
+            aResponse()
+              .withStatus(NOT_FOUND)
+              .withBody("")
+          )
+      )
+
+      val result = taiConnector.getJobExpensesData(fakeNino, testTaxYear)
+
+      whenReady(result.failed) {ex =>
+        ex mustBe an[NotFoundException]
+      }
+    }
   }
 
   "postIabdData" must {

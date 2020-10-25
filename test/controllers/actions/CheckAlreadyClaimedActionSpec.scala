@@ -17,7 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock.{status => _, _}
 import config.FrontendAppConfig
 import models.requests.IdentifierRequest
 import org.scalatest.concurrent.ScalaFutures
@@ -52,7 +52,8 @@ class CheckAlreadyClaimedActionSpec extends SpecBase with WireMockHelper with Sc
       conf = "microservice.services.tai.port" -> server.port,
       "otherExpensesId" -> 59,
       "jobExpenseId" -> 55,
-      "urls.p87DigitalForm" -> p87RedirectUrl
+      "urls.p87DigitalForm" -> p87RedirectUrl,
+      "auditing.enabled" -> false
     ).build()
 
   private lazy val appConfig: FrontendAppConfig = injector.instanceOf[FrontendAppConfig]
@@ -61,7 +62,7 @@ class CheckAlreadyClaimedActionSpec extends SpecBase with WireMockHelper with Sc
   private lazy val grossAmount = 312
 
   "checkAlreadyClaimedAction" must {
-    "allow access for claimants that have not already claimed for expenses" in {
+    "must allow access for claimants that have not already claimed for expenses" in {
       server.stubFor(
         get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}"))
           .willReturn(
@@ -82,10 +83,13 @@ class CheckAlreadyClaimedActionSpec extends SpecBase with WireMockHelper with Sc
 
       val result = checkAlreadyClaimedAction.invokeBlock(identifierRequest, checkIdentifierRequest)
       status(result) mustBe OK
+
+      server.verify(1, getRequestedFor(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}")))
+      server.verify(1, getRequestedFor(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.jobExpenseId}")))
     }
 
     "redirect claimants that have already claimed for expenses to p87" when {
-      "IABD 59 (other expenses) is greater than zero" in {
+      "when IABD 59 (other expenses) is greater than zero" in {
         server.stubFor(
           get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}"))
             .willReturn(
@@ -113,7 +117,7 @@ class CheckAlreadyClaimedActionSpec extends SpecBase with WireMockHelper with Sc
         }
       }
 
-      "IABD 55 (job expenses) is greater than zero" in {
+      "when IABD 55 (job expenses) is greater than zero" in {
         server.stubFor(
           get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}"))
             .willReturn(
@@ -141,7 +145,7 @@ class CheckAlreadyClaimedActionSpec extends SpecBase with WireMockHelper with Sc
         }
       }
 
-      "Both IABD 55 and IABD 59 is greater than zero" in {
+      "when both IABD 55 and IABD 59 is greater than zero" in {
         server.stubFor(
           get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}"))
             .willReturn(
@@ -167,7 +171,67 @@ class CheckAlreadyClaimedActionSpec extends SpecBase with WireMockHelper with Sc
           res =>
             res.header.headers(LOCATION) mustBe p87RedirectUrl
         }
+
       }
+    }
+
+    "not call TAI to fetch 2nd IABD (job rate expenses)" when {
+      "when 1st IABD check (other expenses) returns > 0" in {
+        server.stubFor(
+          get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(validIabdJson(Some(grossAmount)).toString)
+            )
+        )
+
+        server.stubFor(
+          get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.jobExpenseId}"))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(validIabdJson(Some(grossAmount)).toString)
+            )
+        )
+
+        val result = checkAlreadyClaimedAction.invokeBlock(identifierRequest, checkIdentifierRequest)
+        status(result) mustBe SEE_OTHER
+
+        server.verify(1, getRequestedFor(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}")))
+        server.verify(0, getRequestedFor(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.jobExpenseId}")))
+      }
+    }
+
+    "call TAI twice" when {
+      "when 1st IABD check (other expenses) returns 0" in {
+        server.stubFor(
+          get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(validIabdJson(Some(0)).toString)
+            )
+        )
+
+        server.stubFor(
+          get(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.jobExpenseId}"))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(validIabdJson(Some(0)).toString)
+            )
+        )
+
+        val result = checkAlreadyClaimedAction.invokeBlock(identifierRequest, checkIdentifierRequest)
+
+        whenReady(result) {
+          _ =>
+            server.verify(1, getRequestedFor(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.otherExpensesId}")))
+            server.verify(1, getRequestedFor(urlEqualTo(s"/tai/$fakeNino/tax-account/2020/expenses/employee-expenses/${appConfig.jobExpenseId}")))
+        }
+      }
+
     }
   }
 

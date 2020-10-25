@@ -19,7 +19,6 @@ package controllers
 import controllers.actions._
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
 import javax.inject.Inject
-import models.Mode
 import navigation.Navigator
 import pages.WhenDidYouFirstStartWorkingFromHomePage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -46,7 +45,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
 
   val form = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData) {
+  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
 
       val preparedForm = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {

@@ -47,14 +47,20 @@ class CheckAlreadyClaimedActionImpl @Inject()(
     implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
 
     { for {
-        otherExpenses <- taiConnector.getOtherExpensesData(request.nino, TAX_YEAR_2020_START_DATE.getYear)
-        jobExpenses <- taiConnector.getJobExpensesData(request.nino, TAX_YEAR_2020_START_DATE.getYear)
-        otherRateAmount = otherExpenses.map(_.grossAmount).sum
-        jobRateAmount = jobExpenses.map(_.grossAmount).sum
+      otherExpenses   <- taiConnector.getOtherExpensesData(request.nino, TAX_YEAR_2020_START_DATE.getYear)
+      otherRateAmount = otherExpenses.map(_.grossAmount).sum
+      jobExpenses     <-
+          if (otherRateAmount==0) {
+            taiConnector.getJobExpensesData(request.nino, TAX_YEAR_2020_START_DATE.getYear)
+          } else {
+            Future.successful(Seq[IABDExpense]())
+          }
+      jobRateAmount             = jobExpenses.map(_.grossAmount).sum
+      wasJobRateExpensesChecked = if (otherRateAmount == 0) true else false
       } yield
         if (otherRateAmount > 0 || jobRateAmount > 0) {
           Logger.info("[CheckAlreadyClaimedAction][filter] Detected already claimed, redirecting to P87 digital form")
-          auditAlreadyClaimed[A](otherExpenses, jobExpenses)(request, hc)
+          auditAlreadyClaimed[A](otherExpenses, jobExpenses, wasJobRateExpensesChecked)(request, hc)
           Some(Redirect(appConfig.p87DigitalFormUrl))
         } else {
           None
@@ -64,19 +70,29 @@ class CheckAlreadyClaimedActionImpl @Inject()(
         Logger.error(s"[CheckAlreadyClaimedAction][filter] failed: $e")
         Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad()))
     }
+
+
   }
 
-  private def auditAlreadyClaimed[A](otherExpenses: Seq[IABDExpense], jobExpenses: Seq[IABDExpense])
-                                 (implicit request: IdentifierRequest[A], hc: HeaderCarrier) =
+  private def auditAlreadyClaimed[A](otherExpenses: Seq[IABDExpense], jobExpenses: Seq[IABDExpense], wasJobRateExpensesChecked: Boolean)
+                                 (implicit request: IdentifierRequest[A], hc: HeaderCarrier) = {
 
-    auditConnector.sendExplicitAudit(
-      AlreadyClaimedExpenses.toString,
-      Json.obj(
-        "nino" -> request.nino,
-        s"iabd-${appConfig.otherExpensesId}"  -> otherExpenses,
-        s"iabd-${appConfig.jobExpenseId}"     -> jobExpenses
-      )
-    )
+    val json = if (wasJobRateExpensesChecked) {
+        Json.obj(
+          "nino" -> request.nino,
+          s"iabd-${appConfig.otherExpensesId}"  -> otherExpenses,
+          s"iabd-${appConfig.jobExpenseId}"     -> jobExpenses
+        )
+    } else {
+        Json.obj(
+          "nino" -> request.nino,
+          s"iabd-${appConfig.otherExpensesId}"  -> otherExpenses,
+          s"iabd-${appConfig.jobExpenseId}"     -> "NOT CHECKED"
+        )
+    }
+
+    auditConnector.sendExplicitAudit(AlreadyClaimedExpenses.toString, json)
+  }
 }
 
 trait CheckAlreadyClaimedAction extends ActionFilter[IdentifierRequest]

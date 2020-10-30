@@ -85,7 +85,7 @@ disclaimer.list.text = You can claim if:
 disclaimer.list.item1 = your employer has not already paid your expenses
 disclaimer.list.item2 = government guidelines or your employer have required you to work from home
 disclaimer.list.item3 = you have extra costs as a result of working from home
-disclaimer.warning =
+disclaimer.warning = Warning
 disclaimer.prosecuted = You may be prosecuted if you deliberately give incorrect or misleading information.
 disclaimer.submit.button = Accept and continue
 

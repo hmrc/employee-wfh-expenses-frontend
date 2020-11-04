@@ -46,7 +46,7 @@ class YourTaxReliefController @Inject()(
                                        yourTaxRelief2020OnlyView: YourTaxRelief2020OnlyView
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData) {
+  def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
       request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
 

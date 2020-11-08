@@ -9,11 +9,10 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "logback-json-logger"            % "4.8.0",
     "uk.gov.hmrc"       %% "play-health"                    % "3.15.0-play-26",
     "uk.gov.hmrc"       %% "play-conditional-form-mapping"  % "1.3.0-play-26",
-    "uk.gov.hmrc"       %% "bootstrap-play-26"              % "1.14.0",
-    "uk.gov.hmrc"       %% "play-whitelist-filter"          % "3.4.0-play-26",
-    "uk.gov.hmrc"       %% "play-frontend-govuk"            % "0.51.0-play-26",
-    "uk.gov.hmrc"       %% "play-frontend-hmrc"             % "0.20.0-play-26",
-    "uk.gov.hmrc"       %% "play-partials"                  % "6.11.0-play-26",
+    "uk.gov.hmrc"       %% "bootstrap-frontend-play-26"     % "3.0.0",
+    "uk.gov.hmrc"       %% "play-frontend-govuk"            % "0.53.0-play-26",
+    "uk.gov.hmrc"       %% "play-frontend-hmrc"             % "0.22.0-play-26",
+    "uk.gov.hmrc"       %% "play-partials"                  % "7.0.0-play-26",
     "uk.gov.hmrc"       %% "tax-year"                       % "1.2.0"
   )
 

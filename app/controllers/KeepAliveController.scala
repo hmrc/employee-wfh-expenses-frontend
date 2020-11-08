@@ -18,13 +18,13 @@ package controllers
 
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.play.bootstrap.controller.BackendBaseController
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.Future
 
-class KeepAliveController @Inject()(val controllerComponents: ControllerComponents)
-  extends BackendBaseController with I18nSupport {
+class KeepAliveController @Inject()(val controllerComponents: MessagesControllerComponents)
+  extends FrontendBaseController with I18nSupport {
 
   def keepAlive: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok(""))

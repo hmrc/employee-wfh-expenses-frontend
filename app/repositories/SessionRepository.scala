@@ -28,6 +28,7 @@ import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json.ImplicitBSONHandlers.JsObjectDocumentWriter
 import reactivemongo.play.json.collection.JSONCollection
+import uk.gov.hmrc.play.http.logging.Mdc
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -50,13 +51,15 @@ class DefaultSessionRepository @Inject()(
     options = BSONDocument("expireAfterSeconds" -> cacheTtl)
   )
 
-  val started: Future[Unit] =
+  val started: Future[Unit] = Mdc.preservingMdc {
     collection.flatMap {
       _.indexesManager.ensure(lastUpdatedIndex)
     }.map(_ => ())
+  }
 
-  override def get(id: String): Future[Option[UserAnswers]] =
+  override def get(id: String): Future[Option[UserAnswers]] = Mdc.preservingMdc {
     collection.flatMap(_.find(Json.obj("_id" -> id), None).one[UserAnswers])
+  }
 
   override def set(userAnswers: UserAnswers): Future[Boolean] = {
 
@@ -68,13 +71,16 @@ class DefaultSessionRepository @Inject()(
       "$set" -> (userAnswers copy (lastUpdated = LocalDateTime.now))
     )
 
-    collection.flatMap {
-      _.update(ordered = false)
-        .one(selector, modifier, upsert = true).map {
+    Mdc.preservingMdc {
+      collection.flatMap {
+        _.update(ordered = false)
+          .one(selector, modifier, upsert = true).map {
           lastError =>
             lastError.ok
+        }
       }
     }
+
   }
 }
 

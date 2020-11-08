@@ -6,6 +6,8 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 lazy val appName: String = "employee-wfh-expenses-frontend"
 
+lazy val silencerVersion = "1.7.1"
+
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SbtAutoBuildPlugin, SbtDistributablesPlugin, SbtArtifactory)
   .disablePlugins(JUnitXmlReportPlugin)
@@ -34,6 +36,12 @@ lazy val root = (project in file("."))
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq("-feature"),
+    scalacOptions += "-P:silencer:pathFilters=routes",
+    scalacOptions += "-P:silencer:lineContentFilters=^\\w",
+    libraryDependencies ++= Seq(
+      compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
+      "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
+    ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     evictionWarningOptions in update :=

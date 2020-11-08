@@ -19,16 +19,16 @@ package controllers
 import config.FrontendAppConfig
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.play.bootstrap.controller.BackendBaseController
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.WeSignedYouOutPageView
 
 import scala.concurrent.Future
 
-class SignedOutController @Inject()(val controllerComponents: ControllerComponents,
+class SignedOutController @Inject()(val controllerComponents: MessagesControllerComponents,
                                     val frontendAppConfig: FrontendAppConfig,
                                     val weSignedYouOutSavedTemplate: WeSignedYouOutPageView)
-  extends BackendBaseController with I18nSupport {
+  extends FrontendBaseController with I18nSupport {
 
   def signedOut: Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok(weSignedYouOutSavedTemplate()).withNewSession)

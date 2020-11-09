@@ -58,11 +58,12 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-
+      val messages = request2Messages
       form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors))),
-
+        formWithErrors => {
+          val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => messages(s"date.$arg").toLowerCase)))
+          Future.successful(BadRequest(view(formWithErrors.copy(errors = errors))))
+        },
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(WhenDidYouFirstStartWorkingFromHomePage, value))

@@ -19,6 +19,8 @@
 @import uk.gov.hmrc.hmrcfrontend.views.Aliases.ReportTechnicalIssue
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcFooter
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcLanguageSelect
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language._
 
 @this(
         govukLayout: GovukLayout,
@@ -26,7 +28,8 @@
         hmrcHeader: HmrcHeader,
         hmrcReportTechnicalIssue: hmrcComponents.HmrcReportTechnicalIssue,
         appConfig: FrontendAppConfig,
-        hmrcTimeoutDialog: HmrcTimeoutDialog
+        hmrcTimeoutDialog: HmrcTimeoutDialog,
+        hmrcLanguageSelect: HmrcLanguageSelect
 )
 
 
@@ -43,7 +46,7 @@
                     countdown= Some(appConfig.timeoutDialogTimeoutCountdown),
                     keepAliveUrl= Some(routes.KeepAliveController.keepAlive().url),
                     signOutUrl= Some(routes.SignedOutController.signedOut().url),
-                    language= Some("en")
+                    language= Some(messages.lang.code)
                 ))
          }
     }
@@ -65,8 +68,18 @@
         serviceName = Some(messages("service.name")),
         serviceUrl = controllers.routes.IndexController.onPageLoad().url,
         containerClasses = "govuk-width-container",
-        signOutHref = Some(routes.SignedOutController.signOutToExitSurvey().url)
+        signOutHref = Some(routes.SignedOutController.signOutToExitSurvey().url),
+        language = if (messages.lang.code == "cy") Cy else En
     ))
+}
+
+@beforeContentBlockWithLanguageToggle = {
+    @hmrcLanguageSelect(LanguageSelect(
+        if (messages.lang.code == "cy") Cy else En,
+        (En, controllers.routes.LanguageSwitchController.switchToLanguage("english").url),
+        (Cy, controllers.routes.LanguageSwitchController.switchToLanguage("cymraeg").url)
+    ))
+    @beforeContentBlock
 }
 
 @content = {
@@ -85,7 +98,7 @@
     pageTitle = Some(title),
     headBlock = Some(head()),
     headerBlock = Some(header()),
-    beforeContentBlock = beforeContentBlock,
+    beforeContentBlock = Some(beforeContentBlockWithLanguageToggle),
     bodyEndBlock = None,
     scriptsBlock = Some(scripts),
     footerBlock = Some(hmrcFooter())

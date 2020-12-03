@@ -60,6 +60,8 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
   lazy val taxReliefMaxPerYear2019: Int = configuration.getOptional[Int]("taxRelief.2019.maxPerYear").getOrElse(212)
   lazy val taxReliefMaxPerYear2020: Int = configuration.getOptional[Int]("taxRelief.2020.maxPerYear").getOrElse(312)
 
+  lazy val optimizelyId: String = configuration.getOptional[String]("optimizely.projectId").getOrElse("18916851035")
+
   lazy val languageTranslationEnabled: Boolean =
     configuration.get[Boolean]("microservice.services.features.welsh-translation")
 

@@ -90,8 +90,7 @@
 
     @hmrcReportTechnicalIssue(ReportTechnicalIssue(
         serviceCode = appConfig.contactFormServiceIdentifier,
-        language = Some(messages.lang.code),
-        classList = None
+        language = if (messages.lang.code == "cy") Cy else En
     ))
 }
 

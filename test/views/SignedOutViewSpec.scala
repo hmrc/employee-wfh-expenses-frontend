@@ -28,7 +28,7 @@ class SignedOutViewSpec extends ViewBehaviours {
 
       val view = application.injector.instanceOf[WeSignedYouOutPageView]
 
-      val applyView = view.apply()(fakeRequest, messages)
+      val applyView = view.apply()(messages)
 
       val doc = asDocument(applyView)
 

@@ -95,7 +95,7 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
     }
 
     contentAsString(result) mustEqual
-      view(paperlessAvailable, paperlessUrl, Some(taxYear))(request, messages).toString
+      view(paperlessAvailable, paperlessUrl, Some(taxYear))(messages).toString
 
     val dataToAudit = Map(NinoReference -> fakeNino, Enabled -> paperlessAvailable.toString)
 

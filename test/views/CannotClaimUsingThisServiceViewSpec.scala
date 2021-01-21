@@ -25,7 +25,7 @@ class CannotClaimUsingThisServiceViewSpec extends ViewBehaviours {
 
     val view = viewFor[CannotClaimUsingThisServiceView](Some(emptyUserAnswers))
 
-    val applyView = view.apply()(fakeRequest, messages)
+    val applyView = view.apply()(messages)
 
     behave like normalPage(applyView, "cannotClaimUsingThisService")
 

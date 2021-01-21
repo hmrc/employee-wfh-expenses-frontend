@@ -36,13 +36,6 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers)(implicit messages: Messag
         routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url
       )
   }
-
-  private def yesOrNo(answer: Boolean)(implicit messages: Messages): Html =
-    if (answer) {
-      HtmlFormat.escape(messages("site.yes"))
-    } else {
-      HtmlFormat.escape(messages("site.no"))
-    }
 }
 
 object CheckYourAnswersHelper {

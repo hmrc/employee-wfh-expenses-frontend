@@ -21,7 +21,7 @@ import connectors.CitizenDetailsConnector
 import controllers.Assets.{LOCKED, OK}
 import controllers.routes
 import models.requests.IdentifierRequest
-import play.api.Logger
+import play.api.{Logger, Logging}
 import play.api.mvc.Results.Redirect
 import play.api.mvc._
 import uk.gov.hmrc.play.HeaderCarrierConverter
@@ -31,7 +31,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ManualCorrespondenceIndicatorActionImpl @Inject()(
                                                citizenDetailsConnector: CitizenDetailsConnector,
                                                val parser: BodyParsers.Default
-                                             )(implicit val executionContext: ExecutionContext) extends ManualCorrespondenceIndicatorAction {
+                                             )(implicit val executionContext: ExecutionContext) extends ManualCorrespondenceIndicatorAction with Logging {
   override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {
     implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
 
@@ -41,15 +41,15 @@ class ManualCorrespondenceIndicatorActionImpl @Inject()(
           case OK =>
             None
           case LOCKED =>
-            Logger.info(s"[ManualCorrespondenceIndicatorAction][filter] - Locked status code")
+            logger.info(s"[ManualCorrespondenceIndicatorAction][filter] - Locked status code")
             Some(Redirect(routes.ManualCorrespondenceIndicatorController.onPageLoad().url))
           case statusCode =>
-            Logger.warn(s"[ManualCorrespondenceIndicatorAction][filter] - Unexpected status code: $statusCode ")
+            logger.warn(s"[ManualCorrespondenceIndicatorAction][filter] - Unexpected status code: $statusCode ")
             Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad().url))
         }
     }.recoverWith {
       case e =>
-        Logger.error(s"[ManualCorrespondenceIndicatorAction][filter] failed: $e")
+        logger.error(s"[ManualCorrespondenceIndicatorAction][filter] failed: $e")
         Future{Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad().url))}
     }
 

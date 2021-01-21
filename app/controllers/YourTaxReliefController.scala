@@ -17,9 +17,10 @@
 package controllers
 
 import controllers.actions._
+
 import javax.inject.Inject
 import pages.WhenDidYouFirstStartWorkingFromHomePage
-import play.api.Logger
+import play.api.{Logger, Logging}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -43,7 +44,7 @@ class YourTaxReliefController @Inject()(
                                        val controllerComponents: MessagesControllerComponents,
                                        yourTaxRelief2019And2020View: YourTaxRelief2019And2020View,
                                        yourTaxRelief2020OnlyView: YourTaxRelief2020OnlyView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
@@ -63,7 +64,7 @@ class YourTaxReliefController @Inject()(
           )
 
         case Some(date) =>
-          Logger.error(s"[YourTaxReliefController][onPageLoad] Received an unexpected date : $date")
+          logger.error(s"[YourTaxReliefController][onPageLoad] Received an unexpected date : $date")
           Redirect(routes.TechnicalDifficultiesController.onPageLoad())
       }
   }
@@ -74,7 +75,7 @@ class YourTaxReliefController @Inject()(
       request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
 
         case None =>
-          Logger.error(s"[SubmitYourClaimController][onSubmit] - Start date is missing")
+          logger.error(s"[SubmitYourClaimController][onSubmit] - Start date is missing")
           Future.successful( Redirect(routes.TechnicalDifficultiesController.onPageLoad()) )
 
         case Some(startDate) =>

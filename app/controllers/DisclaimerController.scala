@@ -36,7 +36,7 @@ class DisclaimerController @Inject()(
                                        getData: DataRetrievalAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: DisclaimerView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                     ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData) {
     implicit request =>
@@ -49,7 +49,6 @@ class DisclaimerController @Inject()(
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData) {
-    implicit request =>
       Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
   }
 }

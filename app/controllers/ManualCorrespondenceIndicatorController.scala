@@ -30,7 +30,7 @@ class ManualCorrespondenceIndicatorController @Inject()(
                                        identify: IdentifierAction,
                                        val controllerComponents: MessagesControllerComponents,
                                        view: ManualCorrespondenceIndicatorView
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                     ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad: Action[AnyContent] = identify {
     implicit request =>

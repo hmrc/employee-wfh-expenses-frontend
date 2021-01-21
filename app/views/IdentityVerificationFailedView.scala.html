@@ -21,7 +21,7 @@
     appConfig:      FrontendAppConfig
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit messages: Messages)
 
 @linkToP87PostalForm = {<a href=@appConfig.p87PostalFormUrl>@messages("ivfailed.postalForm.href.text")</a>}
 @linkToHelpline = {<a href=@appConfig.incomeTaxGeneralEnquiriesUrl>@messages("ivfailed.helpline.href.text")</a>}

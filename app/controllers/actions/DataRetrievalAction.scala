@@ -30,9 +30,7 @@ class DataRetrievalActionImpl @Inject()(
                                        )(implicit val executionContext: ExecutionContext) extends DataRetrievalAction {
 
   override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = {
-
-    implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
-
+    
     sessionRepository.get(request.identifier).map {
       case None =>
         OptionalDataRequest(request.request, request.identifier, None, request.nino)

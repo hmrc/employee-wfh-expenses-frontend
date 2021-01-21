@@ -33,7 +33,7 @@
 )
 
 
-@(title: String, beforeContentBlock: Option[Html] = None, hasTimeout:Boolean = true)(mainContent: Html)(implicit request : Request[_], messages: Messages)
+@(title: String, beforeContentBlock: Option[Html] = None, hasTimeout:Boolean = true)(mainContent: Html)(implicit messages: Messages)
 
 @head() = {
     <!--[if lte IE 8]><link href='@controllers.routes.Assets.versioned("stylesheets/employeewfhexpensesfrontend-app.css")' rel="stylesheet" type="text/css" /><![endif]-->

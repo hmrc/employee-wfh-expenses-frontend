@@ -27,7 +27,7 @@
         button: GovukButton
 )
 
-@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String], startedInTaxYear: Option[TaxYear])(implicit request: Request[_], messages: Messages)
+@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String], startedInTaxYear: Option[TaxYear])(implicit messages: Messages)
 
 @linkToFeedbackForm = {<a href="https://www.tax.service.gov.uk/feedback/employee-expenses-wfh">@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 

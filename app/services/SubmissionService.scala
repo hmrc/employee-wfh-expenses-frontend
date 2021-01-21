@@ -17,14 +17,14 @@
 package services
 
 import java.time.LocalDate
-
 import config.FrontendAppConfig
 import connectors.{CitizenDetailsConnector, TaiConnector}
+
 import javax.inject.{Inject, Singleton}
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
 import models.{AuditData, FlatRateItem}
-import play.api.Logger
+import play.api.{Logger, Logging}
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -41,7 +41,7 @@ class SubmissionService @Inject()
   taiConnector:             TaiConnector,
   auditConnector:           AuditConnector,
   appConfig:                FrontendAppConfig
-) {
+) extends Logging {
 
   val ZERO      = 0
 
@@ -52,12 +52,12 @@ class SubmissionService @Inject()
     submit(startDate) map {
 
       case Right(submittedDetails) =>
-        Logger.info(s"[SubmissionService][submitExpenses] Submission successful")
+        logger.info(s"[SubmissionService][submitExpenses] Submission successful")
         auditSubmissionSuccess(submittedDetails)
         Right(())
 
       case Left(error) =>
-        Logger.error(s"[SubmissionService][submitExpenses] Submission failed : $error")
+        logger.error(s"[SubmissionService][submitExpenses] Submission failed : $error")
         auditSubmissionFailure(error)
         Left(error)
     }
@@ -81,7 +81,7 @@ class SubmissionService @Inject()
           } yield futureSeq :+ future
       )
 
-    Logger.info("[SubmissionService][submit] Submitting")
+    logger.info("[SubmissionService][submit] Submitting")
 
     futureSequence(flatRateItems) {
       item: FlatRateItem =>

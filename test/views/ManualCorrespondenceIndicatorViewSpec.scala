@@ -25,7 +25,7 @@ class ManualCorrespondenceIndicatorViewSpec extends ViewBehaviours {
 
     val view = viewFor[ManualCorrespondenceIndicatorView](Some(emptyUserAnswers))
 
-    val applyView = view.apply()(fakeRequest, messages)
+    val applyView = view.apply()(messages)
 
     behave like normalPage(applyView, "manualCorrespondenceIndicator")
 

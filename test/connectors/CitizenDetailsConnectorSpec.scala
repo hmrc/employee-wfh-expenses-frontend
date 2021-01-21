@@ -98,7 +98,8 @@ class CitizenDetailsConnectorSpec extends SpecBase with MockitoSugar with WireMo
       )
 
       whenReady(citizenDetailsConnector.getETag(fakeNino).failed) { ex =>
-        ex mustBe an[NotFoundException]
+        ex mustBe an[UpstreamErrorResponse]
+        ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe NOT_FOUND
       }
     }
   }

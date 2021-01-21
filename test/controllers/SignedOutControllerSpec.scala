@@ -39,7 +39,7 @@ class SignedOutControllerSpec extends SpecBase {
       status(result) mustEqual OK
 
       contentAsString(result) mustEqual
-        view()(request, messages).toString
+        view()(messages).toString
 
       application.stop()
     }

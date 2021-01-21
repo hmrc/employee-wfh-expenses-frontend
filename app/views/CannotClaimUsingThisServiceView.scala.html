@@ -22,7 +22,7 @@
         backLink: GovukBackLink
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit messages: Messages)
 
     @linkToChangeDate = {<a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("cannotClaimUsingThisService.changeDate.href.text")</a>}
     @linkToP87 = {<a href=@frontendAppConfig.p87DigitalFormUrl>@messages("cannotClaimUsingThisService.alternative.href.text")</a>}

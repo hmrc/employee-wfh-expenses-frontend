@@ -34,7 +34,7 @@ class SignedOutController @Inject()(val controllerComponents: MessagesController
     Future.successful(Ok(weSignedYouOutSavedTemplate()).withNewSession)
   }
 
-  def signOutToExitSurvey: Action[AnyContent] = Action.async { implicit request =>
+  def signOutToExitSurvey: Action[AnyContent] = Action.async {
     Future.successful(
       Redirect(frontendAppConfig.feedbackSurvey).withNewSession
     )

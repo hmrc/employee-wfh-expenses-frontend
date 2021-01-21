@@ -116,7 +116,8 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
       val result = taiConnector.getOtherExpensesData(fakeNino, testTaxYear)
 
       whenReady(result.failed) {ex =>
-        ex mustBe an[NotFoundException]
+        ex mustBe an[UpstreamErrorResponse]
+        ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe NOT_FOUND
       }
     }
   }
@@ -190,7 +191,8 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
       val result = taiConnector.getJobExpensesData(fakeNino, testTaxYear)
 
       whenReady(result.failed) {ex =>
-        ex mustBe an[NotFoundException]
+        ex mustBe an[UpstreamErrorResponse]
+        ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe NOT_FOUND
       }
     }
   }

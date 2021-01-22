@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,8 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
       val result = taiConnector.getOtherExpensesData(fakeNino, testTaxYear)
 
       whenReady(result.failed) {ex =>
-        ex mustBe an[NotFoundException]
+        ex mustBe an[UpstreamErrorResponse]
+        ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe NOT_FOUND
       }
     }
   }
@@ -190,7 +191,8 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
       val result = taiConnector.getJobExpensesData(fakeNino, testTaxYear)
 
       whenReady(result.failed) {ex =>
-        ex mustBe an[NotFoundException]
+        ex mustBe an[UpstreamErrorResponse]
+        ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe NOT_FOUND
       }
     }
   }

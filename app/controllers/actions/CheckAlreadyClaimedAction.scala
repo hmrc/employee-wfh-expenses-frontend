@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import controllers.routes
 import models.IABDExpense
 import models.auditing.AuditEventType.AlreadyClaimedExpenses
 import models.requests.IdentifierRequest
-import play.api.Logger
+import play.api.{Logger, Logging}
 import play.api.libs.json.Json
 import play.api.mvc.Results.Redirect
 import play.api.mvc._
@@ -40,7 +40,7 @@ class CheckAlreadyClaimedActionImpl @Inject()(
                                                taiConnector: TaiConnector,
                                                auditConnector: AuditConnector,
                                                val parser: BodyParsers.Default
-                                             )(implicit val executionContext: ExecutionContext) extends CheckAlreadyClaimedAction {
+                                             )(implicit val executionContext: ExecutionContext) extends CheckAlreadyClaimedAction with Logging {
 
   override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {
 
@@ -59,7 +59,7 @@ class CheckAlreadyClaimedActionImpl @Inject()(
       wasJobRateExpensesChecked = if (otherRateAmount == 0) true else false
       } yield
         if (otherRateAmount > 0 || jobRateAmount > 0) {
-          Logger.info("[CheckAlreadyClaimedAction][filter] Detected already claimed, redirecting to P87 digital form")
+          logger.info("[CheckAlreadyClaimedAction][filter] Detected already claimed, redirecting to P87 digital form")
           auditAlreadyClaimed[A](otherExpenses, jobExpenses, wasJobRateExpensesChecked)(request, hc)
           Some(Redirect(appConfig.p87DigitalFormUrl))
         } else {
@@ -67,7 +67,7 @@ class CheckAlreadyClaimedActionImpl @Inject()(
         }
     } recover {
       case e: Exception =>
-        Logger.error(s"[CheckAlreadyClaimedAction][filter] failed: $e")
+        logger.error(s"[CheckAlreadyClaimedAction][filter] failed: $e")
         Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad()))
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package repositories
 
 import java.time.LocalDateTime
 
-import akka.stream.Materializer
 import javax.inject.Inject
 import models.UserAnswers
 import play.api.Configuration
@@ -35,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class DefaultSessionRepository @Inject()(
                                           mongo: ReactiveMongoApi,
                                           config: Configuration
-                                        )(implicit ec: ExecutionContext, m: Materializer) extends SessionRepository {
+                                        )(implicit ec: ExecutionContext) extends SessionRepository {
 
 
   private val collectionName: String = "user-answers"

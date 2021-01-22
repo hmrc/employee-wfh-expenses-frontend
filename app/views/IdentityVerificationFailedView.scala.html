@@ -1,5 +1,5 @@
 @*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
     appConfig:      FrontendAppConfig
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit messages: Messages)
 
 @linkToP87PostalForm = {<a href=@appConfig.p87PostalFormUrl>@messages("ivfailed.postalForm.href.text")</a>}
 @linkToHelpline = {<a href=@appConfig.incomeTaxGeneralEnquiriesUrl>@messages("ivfailed.helpline.href.text")</a>}

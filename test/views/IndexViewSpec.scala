@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ class IndexViewSpec extends ViewBehaviours {
 
     val view = application.injector.instanceOf[IndexView]
 
-    val applyView = view.apply()(fakeRequest, messages)
+    val applyView = view.apply()(messages)
 
     behave like normalPage(applyView, "index", "heading")
   }

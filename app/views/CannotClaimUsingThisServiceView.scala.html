@@ -1,5 +1,5 @@
 @*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
         backLink: GovukBackLink
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@()(implicit messages: Messages)
 
     @linkToChangeDate = {<a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("cannotClaimUsingThisService.changeDate.href.text")</a>}
     @linkToP87 = {<a href=@frontendAppConfig.p87DigitalFormUrl>@messages("cannotClaimUsingThisService.alternative.href.text")</a>}

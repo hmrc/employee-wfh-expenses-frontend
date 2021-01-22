@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
     }
 
     contentAsString(result) mustEqual
-      view(paperlessAvailable, paperlessUrl, Some(taxYear))(request, messages).toString
+      view(paperlessAvailable, paperlessUrl, Some(taxYear))(messages).toString
 
     val dataToAudit = Map(NinoReference -> fakeNino, Enabled -> paperlessAvailable.toString)
 

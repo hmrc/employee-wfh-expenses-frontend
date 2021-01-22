@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,13 +36,6 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers)(implicit messages: Messag
         routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url
       )
   }
-
-  private def yesOrNo(answer: Boolean)(implicit messages: Messages): Html =
-    if (answer) {
-      HtmlFormat.escape(messages("site.yes"))
-    } else {
-      HtmlFormat.escape(messages("site.no"))
-    }
 }
 
 object CheckYourAnswersHelper {

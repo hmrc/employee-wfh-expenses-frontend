@@ -1,5 +1,5 @@
 @*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
         button: GovukButton
 )
 
-@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String], startedInTaxYear: Option[TaxYear])(implicit request: Request[_], messages: Messages)
+@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String], startedInTaxYear: Option[TaxYear])(implicit messages: Messages)
 
 @linkToFeedbackForm = {<a href="https://www.tax.service.gov.uk/feedback/employee-expenses-wfh">@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,15 @@ package connectors
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
-import javax.inject.Singleton
 import models.ETag
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, NotFoundException, UpstreamErrorResponse}
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import utils.HttpResponseHelper
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http._
 
+import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CitizenDetailsConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClient) extends HttpResponseHelper {
+class CitizenDetailsConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClient) {
 
   def getAddress(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val designatoryDetailsUrl: String = s"${appConfig.citizenDetailsHost}/citizen-details/$nino/designatory-details"

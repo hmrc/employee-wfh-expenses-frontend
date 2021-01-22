@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,8 @@ class CitizenDetailsConnectorSpec extends SpecBase with MockitoSugar with WireMo
       )
 
       whenReady(citizenDetailsConnector.getETag(fakeNino).failed) { ex =>
-        ex mustBe an[NotFoundException]
+        ex mustBe an[UpstreamErrorResponse]
+        ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe NOT_FOUND
       }
     }
   }

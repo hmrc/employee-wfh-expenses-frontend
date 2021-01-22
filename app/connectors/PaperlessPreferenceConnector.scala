@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ package connectors
 import com.google.inject.{ImplementedBy, Inject}
 import config.FrontendAppConfig
 import models.paperless.PaperlessStatusResponse
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
+import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import views.html.helper.urlEncode
 
@@ -34,7 +34,7 @@ class PaperlessPreferenceConnectorImpl @Inject()(
                                                   httpClient: HttpClient,
                                                   applicationCrypto:  ApplicationCrypto,
                                                 )
-  extends PaperlessPreferenceConnector with HeaderCarrierForPartialsConverter {
+  extends PaperlessPreferenceConnector with HeaderCarrierForPartialsConverter with Logging {
 
   override def crypto: String => String = cookie => cookie
 
@@ -44,11 +44,11 @@ class PaperlessPreferenceConnectorImpl @Inject()(
         s"?returnUrl=${ encryptAndEncode( returnUrl ) }" +
         s"&returnLinkText=${ encryptAndEncode( "Continue" ) }"
 
-    Logger.debug(s"[PaperlessPreferenceConnector][getPaperlessPreference] $paperlessStatusUrl")
+    logger.debug(s"[PaperlessPreferenceConnector][getPaperlessPreference] $paperlessStatusUrl")
 
     httpClient.GET[PaperlessStatusResponse](paperlessStatusUrl) map { Right(_) } recoverWith {
       case ex: Exception =>
-        Logger.error(s"[PaperlessPreferenceConnector][getPaperlessStatus] Failed with: ${ex.getMessage}")
+        logger.error(s"[PaperlessPreferenceConnector][getPaperlessStatus] Failed with: ${ex.getMessage}")
         Future.successful(Left(ex.getMessage))
     }
   }

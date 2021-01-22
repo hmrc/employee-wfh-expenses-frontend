@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
 import models.requests.IdentifierRequest
-import play.api.Logger
+import play.api.{Logger, Logging}
 import play.api.libs.json.Reads
 import play.api.mvc.Results._
 import play.api.mvc._
@@ -39,7 +39,7 @@ class AuthenticatedIdentifierAction @Inject()(
                                                config: FrontendAppConfig,
                                                val parser: BodyParsers.Default
                                              )
-                                             (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions {
+                                             (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions with Logging {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
@@ -63,7 +63,7 @@ class AuthenticatedIdentifierAction @Inject()(
     case _: AuthorisationException =>
       Redirect(routes.UnauthorisedController.onPageLoad())
     case e: Exception =>
-      Logger.warn(s"[AuthenticatedIdentifierAction] failed: $e")
+      logger.warn(s"[AuthenticatedIdentifierAction] failed: $e")
       Redirect(routes.TechnicalDifficultiesController.onPageLoad())
   }
 }

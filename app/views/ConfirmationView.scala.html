@@ -29,7 +29,7 @@
 
 @(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String], startedInTaxYear: Option[TaxYear])(implicit messages: Messages)
 
-@linkToFeedbackForm = {<a href="https://www.tax.service.gov.uk/feedback/employee-expenses-wfh">@messages("confirmation.linkToFeedbackForm.href.text")</a>}
+@linkToFeedbackForm = {<a href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
 @main_template(title = messages("confirmation.title")) {
 

@@ -16,18 +16,42 @@
 
 package controllers
 
-import javax.inject.Inject
-import models.NormalMode
+import controllers.actions.{CheckAlreadyClaimedAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
+import models.UserAnswers
+import navigation.Navigator
+import pages.IndexPage
 import play.api.i18n.I18nSupport
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
+import services.IABDService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IndexView
+import utils.TaxYearDates.YEAR_2020
+
+import javax.inject.Inject
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class IndexController @Inject()(
-                                 val controllerComponents: MessagesControllerComponents
+                                 val controllerComponents: MessagesControllerComponents,
+                                 sessionRepository: SessionRepository,
+                                 identify: IdentifierAction,
+                                 checkAlreadyClaimed: CheckAlreadyClaimedAction,
+                                 citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                 iabdService: IABDService,
+                                 navigator: Navigator,
+                                 getData: DataRetrievalAction
                                ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action {
-    Redirect(routes.DisclaimerController.onPageLoad())
+  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData).async {
+    implicit request => {
+      for {
+        alreadyClaimed <- iabdService.alreadyClaimed(request.nino, YEAR_2020)
+      } yield {
+        val answers = UserAnswers(request.internalId, Json.obj(IndexPage.toString -> alreadyClaimed.isDefined))
+        sessionRepository.set(answers)
+        Redirect(navigator.nextPage(IndexPage, answers))
+      }
+    }
+
   }
 }

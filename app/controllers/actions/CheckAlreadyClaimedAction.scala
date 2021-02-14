@@ -18,77 +18,63 @@ package controllers.actions
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
-import connectors.TaiConnector
-import controllers.routes
+import controllers.Assets.Redirect
 import models.IABDExpense
 import models.auditing.AuditEventType.AlreadyClaimedExpenses
 import models.requests.IdentifierRequest
-import play.api.{Logger, Logging}
+import play.api.Logging
 import play.api.libs.json.Json
-import play.api.mvc.Results.Redirect
 import play.api.mvc._
+import services.IABDServiceImpl
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.TaxYearDates.TAX_YEAR_2020_START_DATE
+import utils.TaxYearDates.YEAR_2021
 
 import scala.concurrent.{ExecutionContext, Future}
 
 
 class CheckAlreadyClaimedActionImpl @Inject()(
+                                               iabdService: IABDServiceImpl,
                                                appConfig: FrontendAppConfig,
-                                               taiConnector: TaiConnector,
-                                               auditConnector: AuditConnector,
-                                               val parser: BodyParsers.Default
-                                             )(implicit val executionContext: ExecutionContext) extends CheckAlreadyClaimedAction with Logging {
+                                               auditConnector: AuditConnector
+                                                 )(implicit val executionContext: ExecutionContext) extends CheckAlreadyClaimedAction with Logging {
 
   override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {
 
     implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
 
-    { for {
-      otherExpenses   <- taiConnector.getOtherExpensesData(request.nino, TAX_YEAR_2020_START_DATE.getYear)
-      otherRateAmount = otherExpenses.map(_.grossAmount).sum
-      jobExpenses     <-
-          if (otherRateAmount==0) {
-            taiConnector.getJobExpensesData(request.nino, TAX_YEAR_2020_START_DATE.getYear)
-          } else {
-            Future.successful(Seq[IABDExpense]())
-          }
-      jobRateAmount             = jobExpenses.map(_.grossAmount).sum
-      wasJobRateExpensesChecked = if (otherRateAmount == 0) true else false
-      } yield
-        if (otherRateAmount > 0 || jobRateAmount > 0) {
-          logger.info("[CheckAlreadyClaimedAction][filter] Detected already claimed, redirecting to P87 digital form")
-          auditAlreadyClaimed[A](otherExpenses, jobExpenses, wasJobRateExpensesChecked)(request, hc)
-          Some(Redirect(appConfig.p87DigitalFormUrl))
-        } else {
-          None
-        }
-    } recover {
-      case e: Exception =>
-        logger.error(s"[CheckAlreadyClaimedAction][filter] failed: $e")
-        Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad()))
+    iabdService.alreadyClaimed(request.nino, YEAR_2021) map {
+      case Some(expenses) =>
+        logger.info(s"[CheckAlreadyClaimedAction][filter] Detected already claimed for $YEAR_2021, redirecting to P87 digital form")
+        auditAlreadyClaimed(request.nino, YEAR_2021, expenses.otherExpenses, expenses.jobExpenses, expenses.wasJobRateExpensesChecked)
+        Some(Redirect(appConfig.p87DigitalFormUrl))
+      case None => None
     }
-
-
   }
 
-  private def auditAlreadyClaimed[A](otherExpenses: Seq[IABDExpense], jobExpenses: Seq[IABDExpense], wasJobRateExpensesChecked: Boolean)
-                                 (implicit request: IdentifierRequest[A], hc: HeaderCarrier) = {
+  private def auditAlreadyClaimed(
+                                   nino: String,
+                                   year: Int,
+                                   otherExpenses: Seq[IABDExpense],
+                                   jobExpenses: Seq[IABDExpense],
+                                   wasJobRateExpensesChecked: Boolean
+                                 )(implicit hc: HeaderCarrier): Unit = {
 
     val json = if (wasJobRateExpensesChecked) {
-        Json.obj(
-          "nino" -> request.nino,
-          s"iabd-${appConfig.otherExpensesId}"  -> otherExpenses,
-          s"iabd-${appConfig.jobExpenseId}"     -> jobExpenses
-        )
+      Json.obj(
+        "nino" -> nino,
+        s"taxYear" -> year,
+        s"iabd-${appConfig.otherExpensesId}" -> otherExpenses,
+        s"iabd-${appConfig.jobExpenseId}" -> jobExpenses
+      )
     } else {
-        Json.obj(
-          "nino" -> request.nino,
-          s"iabd-${appConfig.otherExpensesId}"  -> otherExpenses,
-          s"iabd-${appConfig.jobExpenseId}"     -> "NOT CHECKED"
-        )
+      Json.obj(
+        "nino" -> nino,
+        s"taxYear" -> year,
+        s"iabd-${appConfig.otherExpensesId}" -> otherExpenses,
+        s"iabd-${appConfig.jobExpenseId}" -> "NOT CHECKED"
+      )
     }
 
     auditConnector.sendExplicitAudit(AlreadyClaimedExpenses.toString, json)

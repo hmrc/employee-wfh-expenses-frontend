@@ -16,24 +16,31 @@
 
 package utils
 
-import org.joda.time.DateTime
+import uk.gov.hmrc.time.TaxYear
 
-import java.time.{Clock, Instant, LocalDate}
+import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
 object TaxYearDates {
 
-  // scalastyle:off magic.number
-  val TAX_YEAR_2019_START_DATE: LocalDate = LocalDate.of(2019, 4, 6)
-
-  val TAX_YEAR_2019_END_DATE: LocalDate = LocalDate.of(2020, 4, 5)
-
-  val TAX_YEAR_2020_START_DATE: LocalDate = LocalDate.of(2020, 4, 6)
-
-  val TAX_YEAR_2020_END_DATE: LocalDate = LocalDate.of(2021, 4, 5)
-
   val ONE_WEEK  = 1
-  // scalastyle:on magic.number
+
+  val YEAR_2019: Int = 2019
+  val YEAR_2020: Int = 2020
+  val YEAR_2021: Int = 2021
+  val YEAR_2022: Int = 2022
+
+  val TAX_YEAR_2019_START_DATE: LocalDate = TaxYear(YEAR_2019).starts
+
+  val TAX_YEAR_2019_END_DATE: LocalDate = TaxYear(YEAR_2020).starts.minusDays(1)
+
+  val TAX_YEAR_2020_START_DATE: LocalDate = TaxYear(YEAR_2020).starts
+
+  val TAX_YEAR_2020_END_DATE: LocalDate = TaxYear(YEAR_2021).starts.minusDays(1)
+
+  val TAX_YEAR_2021_START_DATE: LocalDate = TaxYear(YEAR_2021).starts
+
+  val TAX_YEAR_2021_END_DATE: LocalDate = TaxYear(YEAR_2022).starts.minusDays(1)
 
 
   def numberOfWeeks(startDate:LocalDate, endDate:LocalDate): Long = {

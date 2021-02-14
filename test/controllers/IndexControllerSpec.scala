@@ -17,25 +17,63 @@
 package controllers
 
 import base.SpecBase
+import models.{Expenses, IABDExpense}
+import org.mockito.Matchers.any
+import org.mockito.Mockito
+import org.mockito.Mockito.when
+import org.scalatest.BeforeAndAfter
+import org.scalatestplus.mockito.MockitoSugar.mock
+import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.IABDService
 
-class IndexControllerSpec extends SpecBase {
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+class IndexControllerSpec extends SpecBase with BeforeAndAfter {
+
+  val testOtherExpensesAmount = 123
+  val testJobExpensesAmount = 321
+  val testYear = 2020
+
+  val mockIABDService = mock[IABDService]
+
+  before {
+    Mockito.reset(mockIABDService)
+  }
 
   "Index Controller" must {
+    val otherExpenses = Seq(IABDExpense(testOtherExpensesAmount))
+    val jobExpenses = Seq(IABDExpense(testJobExpensesAmount))
 
-    "redirect to the Disclaimer page for a GET" in {
+    "redirect to the Disclaimer page for a GET" when {
 
-      val application = applicationBuilder(userAnswers = None).build()
+      val tests = Seq(
+        ("already claimed other expenses for 2020", Expenses(testYear, otherExpenses, Seq.empty, false)),
+        ("already claimed job expenses for 2020", Expenses(testYear, Seq.empty, jobExpenses, true)),
+        ("already claimed other and job expenses for 2020", Expenses(testYear, otherExpenses, jobExpenses, true))
+      )
 
-      val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+      for ((desc, expenses) <- tests) {
+        s"$desc" in {
+          when(mockIABDService.alreadyClaimed(any(), any())(any())).thenReturn(Future(Some(expenses)))
 
-      val result = route(application, request).value
+          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(bind[IABDService].toInstance(mockIABDService))
+            .build()
 
-      status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual(Some("/employee-working-from-home-expenses/disclaimer"))
+          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
-      application.stop()
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result) mustEqual Some("/employee-working-from-home-expenses/disclaimer")
+
+          application.stop()
+        }
+      }
     }
+
   }
 }

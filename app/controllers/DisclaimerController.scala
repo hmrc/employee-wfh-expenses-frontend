@@ -28,23 +28,16 @@ import views.html.DisclaimerView
 import scala.concurrent.ExecutionContext
 
 class DisclaimerController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       sessionRepository: SessionRepository,
-                                       identify: IdentifierAction,
-                                       checkAlreadyClaimed: CheckAlreadyClaimedAction,
-                                       citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                       getData: DataRetrievalAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: DisclaimerView
+                                      override val messagesApi: MessagesApi,
+                                      identify: IdentifierAction,
+                                      citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                      getData: DataRetrievalAction,
+                                      val controllerComponents: MessagesControllerComponents,
+                                      view: DisclaimerView
                                      ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData) {
+  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData) {
     implicit request =>
-
-      if (request.userAnswers.isEmpty) {
-        sessionRepository.set(UserAnswers(request.internalId))
-      }
-
       Ok(view())
   }
 

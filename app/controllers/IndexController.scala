@@ -16,18 +16,32 @@
 
 package controllers
 
-import javax.inject.Inject
-import models.NormalMode
+import controllers.actions.{CheckAlreadyClaimedAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
+import models.UserAnswers
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.IndexView
+
+import javax.inject.Inject
 
 class IndexController @Inject()(
-                                 val controllerComponents: MessagesControllerComponents
+                                 val controllerComponents: MessagesControllerComponents,
+                                 sessionRepository: SessionRepository,
+                                 identify: IdentifierAction,
+                                 checkAlreadyClaimed2021: CheckAlreadyClaimedAction,
+                                 citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                 getData: DataRetrievalAction
                                ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action {
-    Redirect(routes.DisclaimerController.onPageLoad())
+  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed2021 andThen getData) {
+    implicit request =>
+
+      if (request.userAnswers.isEmpty) {
+        sessionRepository.set(UserAnswers(request.internalId))
+      }
+
+      Redirect(routes.DisclaimerController.onPageLoad())
   }
+
 }

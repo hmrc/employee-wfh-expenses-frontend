@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package views
+package pages
+import play.api.libs.json.JsPath
 
-import views.behaviours.ViewBehaviours
-import views.html.Disclaimer2021View
+case object ClaimedForTaxYear2020 extends QuestionPage[Boolean] {
 
-class DisclaimerViewSpec extends ViewBehaviours {
+  override def path: JsPath = JsPath \ toString
 
-  "Disclaimer view" must {
-
-    val view = viewFor[Disclaimer2021View](Some(emptyUserAnswers))
-
-    val applyView = view.apply()(fakeRequest, messages)
-
-    behave like normalPage(applyView, "disclaimer")
-  }
+  override def toString: String = "claimedForTaxYear2020"
 }

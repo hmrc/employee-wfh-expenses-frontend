@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package views
+package forms
 
-import views.behaviours.ViewBehaviours
-import views.html.Disclaimer2021View
+import javax.inject.Inject
 
-class DisclaimerViewSpec extends ViewBehaviours {
+import forms.mappings.Mappings
+import play.api.data.Form
+import play.api.data.Forms.set
+import models.SelectTaxYearsToClaimFor
 
-  "Disclaimer view" must {
+class SelectTaxYearsToClaimForFormProvider @Inject() extends Mappings {
 
-    val view = viewFor[Disclaimer2021View](Some(emptyUserAnswers))
-
-    val applyView = view.apply()(fakeRequest, messages)
-
-    behave like normalPage(applyView, "disclaimer")
-  }
+  def apply(): Form[Set[SelectTaxYearsToClaimFor]] =
+    Form(
+      "value" -> set(enumerable[SelectTaxYearsToClaimFor]("selectTaxYearsToClaimFor.error.required")).verifying(nonEmptySet("selectTaxYearsToClaimFor.error.required"))
+    )
 }

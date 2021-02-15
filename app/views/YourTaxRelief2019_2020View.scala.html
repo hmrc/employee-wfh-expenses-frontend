@@ -24,7 +24,7 @@
         button:             GovukButton
 )
 
-@(startedWorkingFromHome: LocalDate)(implicit request: Request[_], messages: Messages)
+@(startedWorkingFromHome: LocalDate, numberOfWeeksIn2019: Long)(implicit request: Request[_], messages: Messages)
 
 @readableDate(date:LocalDate) = {@{date.getDayOfMonth} @{messages(s"month.${date.getMonthValue}")} @{date.getYear}}
 
@@ -33,6 +33,14 @@
     <b>@readableDate(startedWorkingFromHome)</b>
     <br>
     <a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("yourTaxRelief.changeThisDate.href.text")</a>
+}
+
+@pluralOrSingularWeeks(weeks: Long) = @{
+    if (weeks == 1) {
+        messages("number.of.weeks.singular", weeks)
+    } else {
+        messages("number.of.weeks.plural", weeks)
+    }
 }
 
 @main_template(
@@ -51,7 +59,7 @@
     </br>
     <b>**********************************************</b>
     </br>
-    <b>2020 JOURNEY</b>
+    <b>2019, 2020 JOURNEY</b>
     </br>
     <b>**********************************************</b>
     </br>
@@ -62,8 +70,10 @@
         content = HtmlContent(insetHtml())
         ))
 
-    <p class="govuk-body">@messages("yourTaxRelief.2020.paragraph.one")</p>
-    <p class="govuk-body">@messages("yourTaxRelief.2020.paragraph.two")</p>
+    <p class="govuk-body">
+        @messages("yourTaxRelief.2019And2020.paragraph.one", pluralOrSingularWeeks(numberOfWeeksIn2019))
+    </p>
+    <p class="govuk-body">@messages("yourTaxRelief.2019And2020.paragraph.two")</p>
 
     <h2 class="govuk-heading-m">@messages("yourTaxRelief.submitYourClaim.heading")</h2>
 

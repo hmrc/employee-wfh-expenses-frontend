@@ -24,13 +24,13 @@
         button:             GovukButton
 )
 
-@(startedWorkingFromHome: LocalDate)(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
 @readableDate(date:LocalDate) = {@{date.getDayOfMonth} @{messages(s"month.${date.getMonthValue}")} @{date.getYear}}
 
 @insetHtml() = {
     @messages("yourTaxRelief.inset.text")
-    <b>@readableDate(startedWorkingFromHome)</b>
+    <b>date stuff here</b>
     <br>
     <a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("yourTaxRelief.changeThisDate.href.text")</a>
 }
@@ -51,7 +51,7 @@
     </br>
     <b>**********************************************</b>
     </br>
-    <b>2020 JOURNEY</b>
+    <b>2021 JOURNEY</b>
     </br>
     <b>**********************************************</b>
     </br>

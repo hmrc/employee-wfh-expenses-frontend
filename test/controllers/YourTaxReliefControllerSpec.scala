@@ -17,12 +17,16 @@
 package controllers
 
 import base.SpecBase
+import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 import models.UserAnswers
-import pages.WhenDidYouFirstStartWorkingFromHomePage
+import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import utils.TaxYearDates._
-import views.html.{YourTaxRelief2019And2020View, YourTaxRelief2020OnlyView}
+import utils.TaxYearDates.TAX_YEAR_2019_START_DATE
+import views.html.{YourTaxRelief2019_2020View, YourTaxRelief2019_2020_2021View, YourTaxRelief2021OnlyView}
+
+import java.time.LocalDate
 
 class YourTaxReliefControllerSpec extends SpecBase {
 
@@ -30,60 +34,141 @@ class YourTaxReliefControllerSpec extends SpecBase {
 
     "for a GET" must {
 
-      "redirect when no working from home date" in {
+      "return the 2021 content view" when {
+        val tests = Seq(
+          (
+            "already claimed expenses for 2020", UserAnswers(
+              userAnswersId,
+              Json.obj(ClaimedForTaxYear2020.toString -> true)
+            )
+          ),
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+          (
+            "not already claimed but have chosen only to claim for 2021", UserAnswers(
+              userAnswersId,
+              Json.obj(
+                ClaimedForTaxYear2020.toString -> false,
+                SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString)
+              )
+            )
+          )
+        )
+        for((desc, userAnswer) <- tests) {
+          s"$desc" in {
+            val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
-        val request = FakeRequest(GET, routes.YourTaxReliefController.onPageLoad().url)
+            val view = application.injector.instanceOf[YourTaxRelief2021OnlyView]
 
-        val result = route(application, request).value
+            val request = FakeRequest(GET, routes.YourTaxReliefController.onPageLoad().url)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.DisclaimerController.onPageLoad().url
+            val result = route(application, request).value
 
-        application.stop()
+            status(result) mustEqual OK
+
+            contentAsString(result) mustEqual
+              view()(request, messages).toString
+
+            application.stop()
+          }
+        }
       }
 
-      "return OK and the correct view when a working from home start date is in the 2020-21 tax year" in {
-        val workingFromHomeDate = TAX_YEAR_2020_START_DATE
+      "return the 2019 & 2020 content view" when {
+        "not already claimed expenses for 2020 and tax years 2019 & 2020 have only been selected" in {
+          val userAnswer = UserAnswers(
+            userAnswersId,
+            Json.obj(
+              ClaimedForTaxYear2020.toString -> false,
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString),
+              WhenDidYouFirstStartWorkingFromHomePage.toString -> earliestWorkingFromHomeDate
+            )
+          )
 
-        val userAnswers = UserAnswers(userAnswersId).set(WhenDidYouFirstStartWorkingFromHomePage, workingFromHomeDate).success.value
+          val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+          val view = application.injector.instanceOf[YourTaxRelief2019_2020View]
 
-        val request = FakeRequest(GET, routes.YourTaxReliefController.onPageLoad().url)
+          val request = FakeRequest(GET, routes.YourTaxReliefController.onPageLoad().url)
 
-        val result = route(application, request).value
+          val result = route(application, request).value
 
-        val view = application.injector.instanceOf[YourTaxRelief2020OnlyView]
+          status(result) mustEqual OK
 
-        status(result) mustEqual OK
+          contentAsString(result) mustEqual
+            view(earliestWorkingFromHomeDate, 14)(request, messages).toString
 
-        contentAsString(result) mustEqual
-          view(workingFromHomeDate)(request, messages).toString
-
-        application.stop()
+          application.stop()
+        }
       }
 
-      "return OK and the correct view when a working from home start date is in the 2019-20 tax year" in {
-        val workingFromHomeDate = TAX_YEAR_2019_START_DATE
+      "return the 2019, 2020 & 2021 content view" when {
+        "not already claimed expenses for 2020 and all tax years have been chosen" in {
+          val userAnswer = UserAnswers(
+            userAnswersId,
+            Json.obj(
+              ClaimedForTaxYear2020.toString -> false,
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString),
+              WhenDidYouFirstStartWorkingFromHomePage.toString -> earliestWorkingFromHomeDate
+            )
+          )
 
-        val userAnswers = UserAnswers(userAnswersId).set(WhenDidYouFirstStartWorkingFromHomePage, workingFromHomeDate).success.value
+          val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+          val view = application.injector.instanceOf[YourTaxRelief2019_2020_2021View]
 
-        val request = FakeRequest(GET, routes.YourTaxReliefController.onPageLoad().url)
+          val request = FakeRequest(GET, routes.YourTaxReliefController.onPageLoad().url)
 
-        val result = route(application, request).value
+          val result = route(application, request).value
 
-        val view = application.injector.instanceOf[YourTaxRelief2019And2020View]
+          status(result) mustEqual OK
 
-        status(result) mustEqual OK
+          contentAsString(result) mustEqual
+            view(earliestWorkingFromHomeDate, 14)(request, messages).toString
 
-        contentAsString(result) mustEqual
-          view(workingFromHomeDate, 53)(request, messages).toString
+          application.stop()
+        }
+      }
 
-        application.stop()
+      "redirect to enter start date" when {
+        "2019 and 2020 only but no start date is present" in {
+          val userAnswer = UserAnswers(
+            userAnswersId,
+            Json.obj(
+              ClaimedForTaxYear2020.toString -> false,
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
+            )
+          )
+
+          val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
+
+          val request = FakeRequest(GET, routes.YourTaxReliefController.onPageLoad().url)
+
+          val result = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url
+
+          application.stop()
+        }
+
+        "2019, 2020 and 2021 but no start date is present" in {
+          val userAnswer = UserAnswers(
+            userAnswersId,
+            Json.obj(
+              ClaimedForTaxYear2020.toString -> false,
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString)
+            )
+          )
+
+          val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
+
+          val request = FakeRequest(GET, routes.YourTaxReliefController.onPageLoad().url)
+
+          val result = route(application, request).value
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url
+
+          application.stop()
+        }
       }
 
     }

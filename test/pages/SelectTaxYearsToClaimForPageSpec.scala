@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package views
+package pages
 
-import views.behaviours.ViewBehaviours
-import views.html.Disclaimer2021View
+import models.SelectTaxYearsToClaimFor
+import pages.behaviours.PageBehaviours
 
-class DisclaimerViewSpec extends ViewBehaviours {
+class SelectTaxYearsToClaimForPageSpec extends PageBehaviours {
 
-  "Disclaimer view" must {
+  "SelectTaxYearsToClaimForPage" must {
 
-    val view = viewFor[Disclaimer2021View](Some(emptyUserAnswers))
+    beRetrievable[Set[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
 
-    val applyView = view.apply()(fakeRequest, messages)
+    beSettable[Set[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
 
-    behave like normalPage(applyView, "disclaimer")
+    beRemovable[Set[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
   }
 }

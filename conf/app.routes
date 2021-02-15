@@ -37,3 +37,6 @@ GET        /confirmation-paperless                      controllers.Confirmation
 GET        /contact-us                                  controllers.ManualCorrespondenceIndicatorController.onPageLoad()
 
 GET        /technicalDifficulties                       controllers.TechnicalDifficultiesController.onPageLoad()
+
+GET        /selectTaxYearsToClaimFor                    controllers.SelectTaxYearsToClaimForController.onPageLoad()
+POST       /selectTaxYearsToClaimFor                    controllers.SelectTaxYearsToClaimForController.onSubmit()

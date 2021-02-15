@@ -36,7 +36,7 @@ class Navigator @Inject()() {
   def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
 
   def checkStartWorkingFromHomeDate(userAnswers: UserAnswers) = {
-    val earliestStartDate = LocalDate.of(2019,4,6)
+    val earliestStartDate = LocalDate.of(2020,1,1)
 
     userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
       case Some(startDate) =>

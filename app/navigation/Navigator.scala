@@ -16,26 +16,28 @@
 
 package navigation
 
-import java.time.LocalDate
-
-import javax.inject.{Inject, Singleton}
-import play.api.mvc.Call
 import controllers.routes
-import pages._
 import models._
+import pages._
+import play.api.mvc.Call
+
+import java.time.LocalDate
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
+    case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
+    case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
+    case DisclaimerPage => ua => disclaimerNextPage(ua)
     case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
-    case IndexPage => ua => claimJourneyFlow(ua)
     case _ => _ => routes.IndexController.onPageLoad()
   }
 
   def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
 
-  def checkStartWorkingFromHomeDate(userAnswers: UserAnswers) = {
+  def checkStartWorkingFromHomeDate(userAnswers: UserAnswers): Call = {
     val earliestStartDate = LocalDate.of(2020,1,1)
 
     userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
@@ -48,11 +50,24 @@ class Navigator @Inject()() {
     }
   }
 
-  def claimJourneyFlow(userAnswers: UserAnswers) = {
-    userAnswers.get(IndexPage) match {
-      case Some(claimedAlready) if claimedAlready   => routes.DisclaimerController.onPageLoad() // top flow on iteration 5 diagram, just 2021-22 to claim
-      case Some(claimedAlready) if !claimedAlready  => routes.DisclaimerController.onPageLoad() // show checkbox to select which years to claim
-      case None                                     => routes.IndexController.onPageLoad()      // if missing, start again in order to get it this answer
+  def claimJourneyFlow(userAnswers: UserAnswers): Call = {
+    userAnswers.get(ClaimedForTaxYear2020) match {
+      case Some(claimedAlready) if claimedAlready   => routes.DisclaimerController.onPageLoad()
+      case Some(claimedAlready) if !claimedAlready  => routes.SelectTaxYearsToClaimForController.onPageLoad()
+      case None                                     => routes.IndexController.onPageLoad()
+    }
+  }
+
+  def disclaimerNextPage(userAnswers: UserAnswers): Call = {
+
+    (
+      userAnswers.is2021Only,
+      userAnswers.is2019And2020Only,
+      userAnswers.is2019And2020And2021Only
+    ) match {
+      case (true, _, _) => routes.YourTaxReliefController.onPageLoad()
+      case (_, true, _) => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+      case (_, _, true) => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
     }
   }
 }

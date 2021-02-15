@@ -15,11 +15,13 @@
  */
 
 package pages
+
+import models.SelectTaxYearsToClaimFor
 import play.api.libs.json.JsPath
 
-case object IndexPage extends QuestionPage[Boolean] {
+case object SelectTaxYearsToClaimForPage extends QuestionPage[Set[SelectTaxYearsToClaimFor]] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "claimedForTaxYear2020"
+  override def toString: String = "selectTaxYearsToClaimFor"
 }

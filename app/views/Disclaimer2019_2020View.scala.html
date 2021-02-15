@@ -19,6 +19,7 @@
 @this(
         main_template: MainTemplate,
         formHelper: FormWithCSRF,
+        backLink: GovukBackLink,
         button: GovukButton,
         govukWarningText : GovukWarningText,
         frontendAppConfig: FrontendAppConfig
@@ -26,10 +27,32 @@
 
 @()( implicit request: Request[_], messages: Messages)
 
-@main_template(title = messages("disclaimer.heading")) {
+@main_template(
+ title = messages("disclaimer.heading"),
+ beforeContentBlock = Some(
+  backLink(
+   BackLink(
+    href = routes.SelectTaxYearsToClaimForController.onPageLoad().url,
+    content = Text(messages("site.back")),
+    attributes = Map("id" -> "back-link")
+   )
+  )
+ )) {
     @formHelper(action = routes.DisclaimerController.onSubmit(), 'autoComplete -> "off") {
 
      <h1 class="govuk-heading-xl">@messages("disclaimer.heading")</h1>
+
+     </br>
+     </br>
+     </br>
+     <b>**********************************************</b>
+     </br>
+     <b>2019 - 2020 JOURNEY</b>
+     </br>
+     <b>**********************************************</b>
+     </br>
+     </br>
+     </br>
 
      <p class="govuk-body">@messages("disclaimer.paragraph.one")</p>
      <p class="govuk-body">@messages("disclaimer.paragraph.two")</p>

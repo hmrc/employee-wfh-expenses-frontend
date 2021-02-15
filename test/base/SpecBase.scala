@@ -30,6 +30,8 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.time.LocalDate
+
 trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with ScalaFutures with IntegrationPatience {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -37,6 +39,8 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
   val userAnswersId = "id"
 
   val p87RedirectUrl = "p87-redirect-url"
+
+  val earliestWorkingFromHomeDate = LocalDate.of(2020, 1, 1)
 
   def emptyUserAnswers = UserAnswers(userAnswersId, Json.obj())
 
@@ -47,6 +51,7 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
   def messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
 
   def fakeRequest = FakeRequest("", "")
+
 
   implicit def messages: Messages = messagesApi.preferred(fakeRequest)
 
@@ -122,5 +127,6 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
        |}]
        |""".stripMargin
   )
+
 
 }

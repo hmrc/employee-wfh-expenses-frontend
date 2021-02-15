@@ -20,12 +20,12 @@ import java.time.LocalDate
 
 import utils.TaxYearDates._
 import views.behaviours.ViewBehaviours
-import views.html.YourTaxRelief2019And2020View
+import views.html.YourTaxRelief2019_2020View
 
 // scalastyle:off magic.number
 class YourTaxRelief2019And2020OnlyViewSpec extends ViewBehaviours {
 
-  val view = viewFor[YourTaxRelief2019And2020View](Some(emptyUserAnswers))
+  val view = viewFor[YourTaxRelief2019_2020View](Some(emptyUserAnswers))
 
   "YourTaxRelief2019And2020View" must {
     val applyView = view.apply(TAX_YEAR_2019_START_DATE, 53)(fakeRequest, messages)

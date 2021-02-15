@@ -16,8 +16,9 @@
 
 package models
 
-import java.time.LocalDateTime
+import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 
+import java.time.LocalDateTime
 import pages._
 import play.api.libs.json._
 
@@ -63,6 +64,29 @@ final case class UserAnswers(
         page.cleanup(None, updatedAnswers)
     }
   }
+
+  def is2021Only:Boolean =
+    (get(ClaimedForTaxYear2020), get(SelectTaxYearsToClaimForPage)) match {
+      case ( Some(true), _ ) => true
+      case ( _, Some(years) ) if years.size == 1 && years.contains(Option1) => true
+      case ( _, _ ) => false
+    }
+
+  def is2019And2020Only: Boolean =
+    (is2021Only, get(SelectTaxYearsToClaimForPage)) match {
+      case (true, _) => false
+      case (false, Some(years)) if years.size == 2 => false
+      case (false, Some(years)) if years.size == 1 && years.contains(Option1) => false
+      case (false, Some(years)) if years.size == 1 && years.contains(Option2) => true
+    }
+
+  def is2019And2020And2021Only: Boolean =
+    (is2019And2020Only, get(SelectTaxYearsToClaimForPage)) match {
+      case (true, _) => false
+      case (false, Some(years)) if years.size == 2 => true
+      case (_, _) => false
+    }
+
 }
 
 object UserAnswers {

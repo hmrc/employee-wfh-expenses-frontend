@@ -17,9 +17,10 @@
 package config
 
 import com.google.inject.AbstractModule
-import connectors.{PaperlessPreferenceConnectorImpl, PaperlessPreferenceConnector}
+import connectors.{PaperlessPreferenceConnector, PaperlessPreferenceConnectorImpl}
 import controllers.actions._
 import repositories.{DefaultSessionRepository, SessionRepository}
+import services.{IABDService, IABDServiceImpl}
 
 class Module extends AbstractModule {
 
@@ -33,5 +34,7 @@ class Module extends AbstractModule {
     bind(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).asEagerSingleton()
     bind(classOf[SessionRepository]).to(classOf[DefaultSessionRepository]).asEagerSingleton()
     bind(classOf[PaperlessPreferenceConnector]).to(classOf[PaperlessPreferenceConnectorImpl]).asEagerSingleton()
+
+    bind(classOf[IABDService]).to(classOf[IABDServiceImpl]).asEagerSingleton()
   }
 }

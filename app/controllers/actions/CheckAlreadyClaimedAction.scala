@@ -25,7 +25,7 @@ import models.requests.IdentifierRequest
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc._
-import services.IABDService
+import services.IABDServiceImpl
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -35,9 +35,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 class CheckAlreadyClaimedActionImpl @Inject()(
-                                                   iabdService: IABDService,
-                                                   appConfig: FrontendAppConfig,
-                                                   auditConnector: AuditConnector
+                                               iabdService: IABDServiceImpl,
+                                               appConfig: FrontendAppConfig,
+                                               auditConnector: AuditConnector
                                                  )(implicit val executionContext: ExecutionContext) extends CheckAlreadyClaimedAction with Logging {
 
   override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {

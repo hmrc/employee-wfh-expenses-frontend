@@ -29,6 +29,7 @@ class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
+    case IndexPage => ua => claimJourneyFlow(ua)
     case _ => _ => routes.IndexController.onPageLoad()
   }
 
@@ -45,6 +46,13 @@ class Navigator @Inject()() {
         }
       case None => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
     }
+  }
 
+  def claimJourneyFlow(userAnswers: UserAnswers) = {
+    userAnswers.get(IndexPage) match {
+      case Some(claimedAlready) if claimedAlready   => routes.DisclaimerController.onPageLoad() // top flow on iteration 5 diagram, just 2021-22 to claim
+      case Some(claimedAlready) if !claimedAlready  => routes.DisclaimerController.onPageLoad() // show checkbox to select which years to claim
+      case None                                     => routes.IndexController.onPageLoad()      // if missing, start again in order to get it this answer
+    }
   }
 }

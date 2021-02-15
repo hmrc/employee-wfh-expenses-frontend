@@ -26,7 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class IABDService @Inject()(taiConnector: TaiConnector) extends Logging {
+class IABDServiceImpl @Inject()(taiConnector: TaiConnector) extends IABDService with Logging {
 
   def alreadyClaimed(nino: String, year: Int)(implicit hc:HeaderCarrier):Future[Option[Expenses]] = {
 
@@ -53,6 +53,8 @@ class IABDService @Inject()(taiConnector: TaiConnector) extends Logging {
         throw e
     }
   }
+}
 
-
+trait IABDService {
+  def alreadyClaimed(nino: String, year: Int)(implicit hc:HeaderCarrier):Future[Option[Expenses]]
 }

@@ -29,12 +29,12 @@ import play.api.test.Helpers._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
+class IABDServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
 
   val mockTaiConnector = mock[TaiConnector]
 
   class Setup {
-    val serviceUnderTest = new IABDService(mockTaiConnector)
+    val serviceUnderTest = new IABDServiceImpl(mockTaiConnector)
   }
 
   before {

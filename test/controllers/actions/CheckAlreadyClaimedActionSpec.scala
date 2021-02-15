@@ -27,16 +27,12 @@ import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar.mock
-import play.api.Application
 import play.api.http.Status.OK
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Results._
 import play.api.mvc.{AnyContent, Result}
 import play.api.test.Helpers._
-import services.IABDService
+import services.IABDServiceImpl
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -58,7 +54,7 @@ class CheckAlreadyClaimedActionSpec extends SpecBase with ScalaFutures with Befo
   val testOtherExpensesAmount = 123
   val testJobExpensesAmount = 321
 
-  val mockIabdService = mock[IABDService]
+  val mockIabdService = mock[IABDServiceImpl]
   val mockAppConfig = mock[FrontendAppConfig]
   val mockAuditConnector = mock[AuditConnector]
 

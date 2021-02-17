@@ -133,8 +133,8 @@ confirmation.whatHappensNext.paragraph.1.for.2019 = This change will also includ
 confirmation.whatHappensNext.paragraph.2 = You should be able to see changes to your tax code in your Personal Tax Account after 2 working days.
 confirmation.linkToFeedbackForm.href.text = What did you think of this service? (opens in new tab)
 confirmation.linkToFeedbackForm.href.postfix = (takes 30 seconds)
-confirmation.paperless.header = Go paperless
-confirmation.paperless.paragraph.1 = You can choose to get some of your tax documents and information sent through your HMRC online account instead of by post.
+confirmation.paperless.header = Get tax letters online
+confirmation.paperless.paragraph.1 = You can view, download or print them when you want. Save time and clear clutter.
 
 manualCorrespondenceIndicator.title = You cannot currently use this service
 manualCorrespondenceIndicator.heading = You cannot currently use this service

@@ -17,14 +17,19 @@
 package services
 
 import base.SpecBase
+import com.digitaltangible.playguard.RateLimiter
+import config.RateLimitConfig
 import connectors.TaiConnector
 import models.{Expenses, IABDExpense}
+import org.mockito.Matchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, when}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.Matchers.{convertToAnyShouldWrapper, _}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.TooManyRequestException
+import utils.RateLimiting
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,8 +38,12 @@ class IABDServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
   val mockTaiConnector = mock[TaiConnector]
 
-  class Setup {
-    val serviceUnderTest = new IABDServiceImpl(mockTaiConnector)
+
+  //noinspection ScalaStyle
+  val anEnabledThrottler = new RateLimiting(RateLimitConfig(10, 10, enabled = true), "too many requests")
+
+  class Setup(throttler: RateLimiting) {
+    val serviceUnderTest = new IABDServiceImpl(mockTaiConnector, throttler)
   }
 
   before {
@@ -48,7 +57,7 @@ class IABDServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
   "alreadyClaimed" should {
     "return None" when {
-      "there is no job or other expenses" in new Setup {
+      "there is no job or other expenses" in new Setup(anEnabledThrottler) {
         when(mockTaiConnector.getOtherExpensesData(testNino,testYear)).thenReturn(Future(Seq.empty))
         when(mockTaiConnector.getJobExpensesData(testNino,testYear)).thenReturn(Future(Seq.empty))
 
@@ -61,7 +70,7 @@ class IABDServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAfter
     }
 
     "return Some other expenses" when {
-      "tai returns other expense details" in new Setup {
+      "tai returns other expense details" in new Setup(anEnabledThrottler) {
         val otherExpenses = Seq(IABDExpense(testOtherExpensesAmount))
 
         when(mockTaiConnector.getOtherExpensesData(testNino,testYear)).thenReturn(Future(otherExpenses))
@@ -75,7 +84,7 @@ class IABDServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAfter
     }
 
     "return Some job expenses" when {
-      "tai returns job expense details" in new Setup {
+      "tai returns job expense details" in new Setup(anEnabledThrottler) {
         val otherExpenses = Seq.empty
         val jobExpenses = Seq(IABDExpense(testJobExpensesAmount))
 
@@ -90,5 +99,48 @@ class IABDServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAfter
       }
     }
 
+    class FailToGetTokenRateLimiter extends RateLimiter(1,1) {
+      override def consumeAndCheck(key: Any): Boolean = false
+    }
+
+    "throw a TooManyRequestException exception" when {
+
+      val mockThrottler = mock[RateLimiting]
+
+      "there are no tokens left in the bucket" in new Setup(mockThrottler) {
+        when(mockThrottler.enabled).thenReturn(true)
+        when(mockThrottler.bucket).thenReturn(new FailToGetTokenRateLimiter)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+
+        when(mockTaiConnector.getOtherExpensesData(testNino,testYear)).thenReturn(Future(Seq.empty))
+        when(mockTaiConnector.getJobExpensesData(testNino,testYear)).thenReturn(Future(Seq.empty))
+
+        intercept[TooManyRequestException] {
+          await(serviceUnderTest.alreadyClaimed(testNino, testYear))
+        }
+
+        Mockito.verify(mockTaiConnector, times(0)).getOtherExpensesData(testNino,testYear)
+        Mockito.verify(mockTaiConnector, times(0)).getJobExpensesData(testNino,testYear)
+      }
+    }
+
+    "NOT throw a TooManyRequestException" when {
+
+      val mockThrottler = mock[RateLimiting]
+
+      "the throttle is disabled" in new Setup(mockThrottler) {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.bucket).thenReturn(new FailToGetTokenRateLimiter)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+
+        when(mockTaiConnector.getOtherExpensesData(testNino,testYear)).thenReturn(Future(Seq.empty))
+        when(mockTaiConnector.getJobExpensesData(testNino,testYear)).thenReturn(Future(Seq.empty))
+
+        await(serviceUnderTest.alreadyClaimed(testNino, testYear))
+
+        Mockito.verify(mockTaiConnector, times(1)).getOtherExpensesData(testNino,testYear)
+        Mockito.verify(mockTaiConnector, times(1)).getJobExpensesData(testNino,testYear)
+      }
+    }
   }
 }

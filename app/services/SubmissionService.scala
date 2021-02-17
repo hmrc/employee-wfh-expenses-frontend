@@ -16,20 +16,20 @@
 
 package services
 
-import java.time.LocalDate
 import config.FrontendAppConfig
 import connectors.{CitizenDetailsConnector, TaiConnector}
-
-import javax.inject.{Inject, Singleton}
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
 import models.{AuditData, FlatRateItem}
-import play.api.{Logger, Logging}
+import play.api.Logging
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import utils.RateLimiting
 import utils.TaxYearDates._
 
+import java.time.LocalDate
+import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
@@ -40,17 +40,16 @@ class SubmissionService @Inject()
   citizenDetailsConnector:  CitizenDetailsConnector,
   taiConnector:             TaiConnector,
   auditConnector:           AuditConnector,
-  appConfig:                FrontendAppConfig
+  appConfig:                FrontendAppConfig,
+  @Named("IABD POST") rateLimiter: RateLimiting
 ) extends Logging {
 
   val ZERO      = 0
 
-
   def submitExpenses(startDate: LocalDate)
-                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] = {
+                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
 
-    submit(startDate) map {
-
+    rateLimiter.withToken(() => submit(startDate) map {
       case Right(submittedDetails) =>
         logger.info(s"[SubmissionService][submitExpenses] Submission successful")
         auditSubmissionSuccess(submittedDetails)
@@ -60,8 +59,7 @@ class SubmissionService @Inject()
         logger.error(s"[SubmissionService][submitExpenses] Submission failed : $error")
         auditSubmissionFailure(error)
         Left(error)
-    }
-  }
+    })
 
 
   private def submit(startDate: LocalDate)

@@ -20,22 +20,26 @@ import connectors.TaiConnector
 import models.{Expenses, IABDExpense}
 import play.api.Logging
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.RateLimiting
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class IABDServiceImpl @Inject()(taiConnector: TaiConnector) extends IABDService with Logging {
+class IABDServiceImpl @Inject()(
+                                 taiConnector: TaiConnector,
+                                 @Named("IABD GET") rateLimiter: RateLimiting
+                               ) extends IABDService with Logging {
 
   def alreadyClaimed(nino: String, year: Int)(implicit hc:HeaderCarrier):Future[Option[Expenses]] = {
 
     { for {
-      otherExpenses   <- taiConnector.getOtherExpensesData(nino, year)
+      otherExpenses   <- rateLimiter.withToken(() => taiConnector.getOtherExpensesData(nino, year))
       otherRateAmount = otherExpenses.map(_.grossAmount).sum
       jobExpenses     <-
         if (otherRateAmount==0) {
-          taiConnector.getJobExpensesData(nino, year)
+          rateLimiter.withToken(() => taiConnector.getJobExpensesData(nino, year))
         } else {
           Future.successful(Seq[IABDExpense]())
         }
@@ -47,10 +51,6 @@ class IABDServiceImpl @Inject()(taiConnector: TaiConnector) extends IABDService 
       } else {
         None
       }
-    } recover {
-      case e: Exception =>
-        logger.error(s"[alreadyClaimed] failed: $e")
-        throw e
     }
   }
 }

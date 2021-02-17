@@ -170,26 +170,6 @@ class AuthActionSpec extends SpecBase {
         redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
       }
     }
-
-    "any other exception" must {
-
-      "redirect the user to the Technical Difficulties page" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-
-        val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new Exception), frontendAppConfig, bodyParsers)
-        val controller = new Harness(authAction)
-        val result = controller.onPageLoad()(fakeRequest)
-
-        status(result) mustBe SEE_OTHER
-
-        redirectLocation(result) mustBe Some(routes.TechnicalDifficultiesController.onPageLoad().url)
-
-        application.stop()
-      }
-    }
   }
 }
 

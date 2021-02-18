@@ -29,7 +29,7 @@
 
 @(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String], startedInTaxYear: Option[TaxYear])(implicit messages: Messages)
 
-@linkToFeedbackForm = {<a href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
+@linkToFeedbackForm = {<a  class="govuk-link" href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
 @main_template(title = messages("confirmation.title")) {
 
@@ -55,8 +55,10 @@
 
     <p class="govuk-body">@messages("confirmation.whatHappensNext.paragraph.2")</p>
 
-    <span class="govuk-link">@linkToFeedbackForm</span>
-    <span class="govuk-body">@messages("confirmation.linkToFeedbackForm.href.postfix")</span>
+    <p class="govuk-body">
+        @linkToFeedbackForm
+        @messages("confirmation.linkToFeedbackForm.href.postfix")
+    </p>
 
     @if(!paperLessAvailable) {
         <h2 class="govuk-heading-m">@messages("confirmation.paperless.header")</h2>

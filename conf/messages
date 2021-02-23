@@ -175,3 +175,7 @@ selectTaxYearsToClaimFor.hintText = Select both if they both apply
 selectTaxYearsToClaimFor.option1 = Current tax year 6 April 2021 to 5 April 2022
 selectTaxYearsToClaimFor.option2 = Previous tax years before 6 April 2021 (these are 2019 - 2020 and 2020 - 2021)
 selectTaxYearsToClaimFor.error.required = Select all the tax years you''d like to claim for
+
+service.is.busy.title = Sorry, the service is busy
+service.is.busy.heading = Sorry, the service is busy
+service.is.busy.message = Please try again later.

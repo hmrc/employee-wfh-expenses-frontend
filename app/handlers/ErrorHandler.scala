@@ -16,19 +16,47 @@
 
 package handlers
 
-import javax.inject.{Inject, Singleton}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.Request
+import controllers.Assets.{Redirect, TooManyRequests}
+import controllers.routes
+import play.api.Logging
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.mvc.{Request, RequestHeader, Result}
 import play.twirl.api.Html
+import uk.gov.hmrc.http.TooManyRequestException
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import views.html.ErrorTemplate
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class ErrorHandler @Inject()(
                               val messagesApi: MessagesApi,
                               view: ErrorTemplate
-                            ) extends FrontendErrorHandler with I18nSupport {
+                            ) extends FrontendErrorHandler with I18nSupport with Logging {
+
+  private implicit def rhToRequest(rh: RequestHeader): Request[_] = Request(rh, "")
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: Request[_]): Html =
     view(pageTitle, heading, message)
+
+  override def resolveError(rh: RequestHeader, ex: Throwable): Result = {
+    ex match {
+      case rateLimitEx: TooManyRequestException =>
+        logger.warn(s"[ErrorHandler][resolveError] Rate limiting detected, (${rh.method})(${rh.uri})", rateLimitEx )
+        TooManyRequests( serviceTooBusyTemplate(rh) )
+      case e: Exception =>
+        logger.warn(s"[ErrorHandler][resolveError] failed with: $e")
+        Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+      case _ =>
+        logger.error(s"[ErrorHandler][resolveError] Internal Server Error, (${rh.method})(${rh.uri})", ex)
+        super.resolveError(rh, ex)
+    }
+  }
+
+  def serviceTooBusyTemplate(implicit request: Request[_]): Html =
+    standardErrorTemplate(
+      Messages("service.is.busy.title"),
+      Messages("service.is.busy.heading"),
+      Messages("service.is.busy.message")
+    )
 }

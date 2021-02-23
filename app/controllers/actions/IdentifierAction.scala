@@ -20,13 +20,12 @@ import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
 import models.requests.IdentifierRequest
-import play.api.{Logger, Logging}
+import play.api.Logging
 import play.api.libs.json.Reads
 import play.api.mvc.Results._
 import play.api.mvc._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.OptionalRetrieval
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 
@@ -62,8 +61,5 @@ class AuthenticatedIdentifierAction @Inject()(
         s"&failureURL=${config.ivFailureUrl}")
     case _: AuthorisationException =>
       Redirect(routes.UnauthorisedController.onPageLoad())
-    case e: Exception =>
-      logger.warn(s"[AuthenticatedIdentifierAction] failed: $e")
-      Redirect(routes.TechnicalDifficultiesController.onPageLoad())
   }
 }

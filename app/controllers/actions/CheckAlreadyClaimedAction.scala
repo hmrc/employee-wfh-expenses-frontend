@@ -18,12 +18,12 @@ package controllers.actions
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
-import controllers.Assets.Redirect
 import models.IABDExpense
 import models.auditing.AuditEventType.AlreadyClaimedExpenses
 import models.requests.IdentifierRequest
 import play.api.Logging
 import play.api.libs.json.Json
+import play.api.mvc.Results.Redirect
 import play.api.mvc._
 import services.IABDServiceImpl
 import uk.gov.hmrc.http.HeaderCarrier

@@ -18,7 +18,6 @@ package services
 
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-
 import base.SpecBase
 import connectors.{CitizenDetailsConnector, TaiConnector}
 import models.auditing.AuditEventType.{UpdateWorkingFromHomeFlatRateFailure, UpdateWorkingFromHomeFlatRateSuccess}
@@ -32,8 +31,9 @@ import org.scalatest.Matchers._
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.AnyContent
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.UpstreamErrorResponse
+import uk.gov.hmrc.http.{TooManyRequestException, UpstreamErrorResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import utils.RateLimiting
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -50,15 +50,16 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   val mockCitizenDetailsConnector: CitizenDetailsConnector = mock[CitizenDetailsConnector]
   val mockTaiConnector: TaiConnector = mock[TaiConnector]
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
+  val mockThrottler = mock[RateLimiting]
 
-  val testNino:String = "AA112233A"
+  val testNino: String = "AA112233A"
 
   class Setup {
-    val serviceUnderTest = new SubmissionService(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, frontendAppConfig)
+    val serviceUnderTest = new SubmissionService(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, frontendAppConfig, mockThrottler)
   }
 
   before {
-    Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector)
+    Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockThrottler)
   }
 
   "calculate2019FlatRate" should {
@@ -104,13 +105,12 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
   "calculate2020FlatRate" should {
     "calculate the total rate as £312" in new Setup {
-      serviceUnderTest. calculate2020FlatRate() shouldBe 312
+      serviceUnderTest.calculate2020FlatRate() shouldBe 312
     }
   }
 
-
   "submit" when {
-    implicit val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest,"internalId", UserAnswers("id"), testNino)
+    implicit val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, "internalId", UserAnswers("id"), testNino)
 
     val tests = Seq(TAX_YEAR_2020_START_DATE, TAX_YEAR_2019_START_DATE)
     val etag1 = ETag(100)
@@ -120,9 +120,16 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       s"a working from home date started on $startDate" should {
         "upsert 2 IABD 59's (happy flow) and audit success" in new Setup {
 
+          when(mockThrottler.enabled).thenReturn(false)
+          when(mockThrottler.withToken(any())).thenCallRealMethod()
+
           when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-            .thenReturn(Future {etag1} )
-            .thenReturn(Future {etag2} )
+            .thenReturn(Future {
+              etag1
+            })
+            .thenReturn(Future {
+              etag2
+            })
 
           when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())).thenReturn(Future.successful(()))
           when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())).thenReturn(Future.successful(()))
@@ -136,10 +143,12 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
           inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())
 
           verify(mockAuditConnector, times(1))
-            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString),any[AuditData]())(any(),any(),any())
+            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
         }
 
         "report errors when 1st ETAG call fails and audit failure " in new Setup {
+          when(mockThrottler.enabled).thenReturn(false)
+          when(mockThrottler.withToken(any())).thenCallRealMethod()
           when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
           await(serviceUnderTest.submitExpenses(startDate)).isLeft shouldBe true
@@ -151,12 +160,16 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
           inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
 
           verify(mockAuditConnector, times(1))
-            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString),any[AuditData]())(any(),any(),any())
+            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
         }
 
         "report errors when 2nd ETAG call fails and audit failure" in new Setup {
+          when(mockThrottler.enabled).thenReturn(false)
+          when(mockThrottler.withToken(any())).thenCallRealMethod()
           when(mockCitizenDetailsConnector.getETag(any())(any(), any()))
-            .thenReturn(Future {etag1} )
+            .thenReturn(Future {
+              etag1
+            })
             .thenReturn(Future.failed(new RuntimeException))
 
           when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any()))
@@ -171,13 +184,20 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
           inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
 
           verify(mockAuditConnector, times(1))
-            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString),any[AuditData]())(any(),any(),any())
+            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
         }
 
         "report errors when 1st IABD 59 POST fails and audit failure" in new Setup {
+          when(mockThrottler.enabled).thenReturn(false)
+          when(mockThrottler.withToken(any())).thenCallRealMethod()
+
           when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-            .thenReturn(Future {etag1})
-            .thenReturn(Future {etag2})
+            .thenReturn(Future {
+              etag1
+            })
+            .thenReturn(Future {
+              etag2
+            })
 
           when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any()))
             .thenReturn(Future.failed(UpstreamErrorResponse("SERVICE IS UNAVAILABLE", SERVICE_UNAVAILABLE)))
@@ -191,13 +211,19 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
           inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
 
           verify(mockAuditConnector, times(1))
-            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString),any[AuditData]())(any(),any(),any())
+            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
         }
 
         "report errors when 2nd IABD 59 POST fails and audit failure" in new Setup {
+          when(mockThrottler.enabled).thenReturn(false)
+          when(mockThrottler.withToken(any())).thenCallRealMethod()
           when(mockCitizenDetailsConnector.getETag(any())(any(), any()))
-            .thenReturn(Future {etag1})
-            .thenReturn(Future {etag2})
+            .thenReturn(Future {
+              etag1
+            })
+            .thenReturn(Future {
+              etag2
+            })
 
           when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any()))
             .thenReturn(Future.successful(()))
@@ -214,9 +240,23 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
           inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())
 
           verify(mockAuditConnector, times(1))
-            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString),any[AuditData]())(any(),any(),any())
+            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
         }
       }
+    }
+
+    "rate limit has been reached (no tokens in bucket)" should {
+      "throw a TooManyRequestException" in new Setup {
+
+        when(mockThrottler.enabled).thenReturn(true)
+        when(mockThrottler.hasAToken).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+
+        intercept[TooManyRequestException] {
+          await(serviceUnderTest.submitExpenses(TAX_YEAR_2020_START_DATE))
+        }
+      }
+
     }
   }
 }

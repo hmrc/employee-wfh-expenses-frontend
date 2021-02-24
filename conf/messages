@@ -76,7 +76,7 @@ ivfailed.tryAgain.href.text = confirm your identity
 disclaimer.title = You must read the following before making a claim
 disclaimer.heading = You must read the following before making a claim
 disclaimer.paragraph.one = You can use this service to claim tax relief on the extra expenses of working from home because of coronavirus (COVID-19).
-disclaimer.2021.paragraph.two = You can claim and get tax relief on expenses of £6 a week for the current tax year, 6 April 2021 to 5 April 2022.
+disclaimer.2021.paragraph.two = You can claim and get tax relief on expenses of £6 a week for this tax year, 6 April 2021 to 5 April 2022.
 disclaimer.2019And2020And2021.list1.text = You can claim and get tax relief on expenses of £6 a week for:
 disclaimer.2019And2020And2021.list1.item1 = tax year 6 April 2021 to 5 April 2022
 disclaimer.2019And2020And2021.list1.item2 = tax year 6 April 2020 to 5 April 2021
@@ -84,9 +84,10 @@ disclaimer.2019And2020And2021.list2.text = You can also claim and get tax relief
 disclaimer.2019And2020And2021.list2.item1 = tax year 6 April 2019 to 5 April 2020
 
 
-disclaimer.paragraph.three.a = If your extra costs are more than this you can claim for more tax relief but you will need to
-disclaimer.paragraph.three.b = claim tax relief for expenses of employment
-disclaimer.paragraph.three.c = and provide evidence, like detailed and verifiable receipts and bills.
+disclaimer.paragraph.three.a = If your extra costs are more than this you can claim for more tax relief.
+disclaimer.paragraph.three.b = You will need to
+disclaimer.paragraph.three.c = claim tax relief for expenses of employment
+disclaimer.paragraph.three.d = and provide evidence, like detailed and verifiable receipts and bills.
 disclaimer.list = disclaimerList
 disclaimer.list.text = You can claim if:
 disclaimer.list.item1 = your employer has not already paid your expenses

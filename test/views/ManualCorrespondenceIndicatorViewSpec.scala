@@ -16,6 +16,9 @@
 
 package views
 
+import controllers.routes
+import play.api.test.FakeRequest
+import play.api.test.Helpers.GET
 import views.behaviours.ViewBehaviours
 import views.html.ManualCorrespondenceIndicatorView
 
@@ -25,7 +28,9 @@ class ManualCorrespondenceIndicatorViewSpec extends ViewBehaviours {
 
     val view = viewFor[ManualCorrespondenceIndicatorView](Some(emptyUserAnswers))
 
-    val applyView = view.apply()(messages)
+    val request = FakeRequest(GET, routes.ManualCorrespondenceIndicatorController.onPageLoad().url)
+
+    val applyView = view.apply()(request, messages)
 
     behave like normalPage(applyView, "manualCorrespondenceIndicator")
 

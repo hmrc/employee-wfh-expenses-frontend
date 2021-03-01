@@ -16,6 +16,9 @@
 
 package views
 
+import controllers.routes
+import play.api.test.FakeRequest
+import play.api.test.Helpers.GET
 import views.behaviours.ViewBehaviours
 import views.html.IdentityVerificationFailedView
 
@@ -27,7 +30,7 @@ class IdentityVerificationFailedViewSpec extends ViewBehaviours {
 
     val view = application.injector.instanceOf[IdentityVerificationFailedView]
 
-    val applyView = view.apply()(messages)
+    val applyView = view.apply()(FakeRequest(), messages)
 
     behave like normalPage(applyView, "ivfailed")
   }

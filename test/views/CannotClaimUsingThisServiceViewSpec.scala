@@ -16,6 +16,9 @@
 
 package views
 
+import controllers.routes
+import play.api.test.FakeRequest
+import play.api.test.Helpers.GET
 import views.behaviours.ViewBehaviours
 import views.html.CannotClaimUsingThisServiceView
 
@@ -25,7 +28,9 @@ class CannotClaimUsingThisServiceViewSpec extends ViewBehaviours {
 
     val view = viewFor[CannotClaimUsingThisServiceView](Some(emptyUserAnswers))
 
-    val applyView = view.apply()(messages)
+    val request = FakeRequest(GET, routes.CannotClaimUsingThisServiceController.onPageLoad().url)
+
+    val applyView = view.apply()(request, messages)
 
     behave like normalPage(applyView, "cannotClaimUsingThisService")
 

@@ -16,6 +16,9 @@
 
 package views
 
+import controllers.routes
+import play.api.test.FakeRequest
+import play.api.test.Helpers.GET
 import views.behaviours.ViewBehaviours
 import views.html.IndexView
 
@@ -27,7 +30,9 @@ class IndexViewSpec extends ViewBehaviours {
 
     val view = application.injector.instanceOf[IndexView]
 
-    val applyView = view.apply()(messages)
+    val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+
+    val applyView = view.apply()(request, messages)
 
     behave like normalPage(applyView, "index", "heading")
   }

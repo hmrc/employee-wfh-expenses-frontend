@@ -18,7 +18,7 @@
     main_template: MainTemplate
 )
 
-@()(implicit messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
 @main_template(title = messages("index.title")) {
 

@@ -16,6 +16,7 @@
 
 package views
 
+import play.api.test.FakeRequest
 import views.behaviours.ViewBehaviours
 import views.html.WeSignedYouOutPageView
 
@@ -28,7 +29,7 @@ class SignedOutViewSpec extends ViewBehaviours {
 
       val view = application.injector.instanceOf[WeSignedYouOutPageView]
 
-      val applyView = view.apply()(messages)
+      val applyView = view.apply()(FakeRequest(), messages)
 
       val doc = asDocument(applyView)
 

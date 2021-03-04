@@ -176,12 +176,12 @@ submitYourClaim.list.item2 = you have been forced to work from home by governmen
 submitYourClaim.list.item3 = you have incurred additional costs as a result of working from home
 submitYourClaim.list.item4 = the information you have provided is correct, to the best of your knowledge
 
-selectTaxYearsToClaimFor.title = Select all the tax years you''d like to claim for
-selectTaxYearsToClaimFor.heading = Select all the tax years you''d like to claim for
-selectTaxYearsToClaimFor.hintText = Select both if they both apply
-selectTaxYearsToClaimFor.option1 = Current tax year 6 April 2021 to 5 April 2022
-selectTaxYearsToClaimFor.option2 = Previous tax years before 6 April 2021 (these are 2019 - 2020 and 2020 - 2021)
-selectTaxYearsToClaimFor.error.required = Select all the tax years you''d like to claim for
+selectTaxYearsToClaimFor.title = Which tax years are you claiming for?
+selectTaxYearsToClaimFor.heading = Which tax years are you claiming for?
+selectTaxYearsToClaimFor.hintText = Select all that apply.
+selectTaxYearsToClaimFor.option1 = This tax year (6 April 2021 to 5 April 2022)
+selectTaxYearsToClaimFor.option2 = Previous tax years
+selectTaxYearsToClaimFor.error.required = Select at least one option
 
 service.is.busy.title = Sorry, the service is busy
 service.is.busy.heading = Sorry, the service is busy

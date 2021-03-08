@@ -135,7 +135,7 @@ class YourTaxReliefControllerSpec extends SpecBase {
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> false,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString,Option2.toString)
             )
           )
 

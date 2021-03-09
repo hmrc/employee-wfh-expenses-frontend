@@ -18,23 +18,23 @@ package views
 
 import utils.TaxYearDates._
 import views.behaviours.ViewBehaviours
-import views.html.YourTaxRelief2020OnlyView
+import views.html.YourTaxRelief2021OnlyView
 
 // scalastyle:off magic.number
-class YourTaxRelief2020OnlyViewSpec extends ViewBehaviours {
+class YourTaxRelief2021OnlyViewSpec extends ViewBehaviours {
 
-  val view = viewFor[YourTaxRelief2020OnlyView](Some(emptyUserAnswers))
+  val view = viewFor[YourTaxRelief2021OnlyView](Some(emptyUserAnswers))
 
-  "YourTaxRelief2020OnlyView" must {
-    val applyView = view.apply(TAX_YEAR_2020_START_DATE)(fakeRequest, messages)
+  "YourTaxRelief2021OnlyView" must {
+    val applyView = view.apply()(fakeRequest, messages)
 
-    behave like normalPage(applyView, "yourTaxRelief")
+    behave like normalPage(applyView, "yourTaxRelief.2021")
 
     behave like pageWithBackLink(applyView)
 
     "must display the working from home start date in a easy readable fashion" in {
       val doc = asDocument(applyView)
-      assertContainsText(doc, "6 April 2020")
+      assertContainsText(doc, "6 April 2021")
     }
   }
 

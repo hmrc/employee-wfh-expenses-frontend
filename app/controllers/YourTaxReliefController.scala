@@ -17,18 +17,17 @@
 package controllers
 
 import controllers.actions._
-import models.SelectTaxYearsToClaimFor.{Option1, Option2}
-import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages. WhenDidYouFirstStartWorkingFromHomePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.TaxYearDates.{TAX_YEAR_2019_END_DATE, numberOfWeeks}
-import views.html.{YourTaxRelief2019_2020View, YourTaxRelief2019_2020_2021View, YourTaxRelief2021OnlyView}
+import utils.TaxYearDates._
+import views.html._
 
-import java.time.LocalDate
 import javax.inject.Inject
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class YourTaxReliefController @Inject()(
@@ -56,11 +55,15 @@ class YourTaxReliefController @Inject()(
       ) match {
         case (true, _, _, _) => Ok(yourTaxRelief2021OnlyView())
 
-        case (_, true, _, None) => Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
         case (_, true, _, Some(date)) => Ok(yourTaxRelief2019_2020View(date, numberOfWeeks(date, TAX_YEAR_2019_END_DATE)))
-
-        case (_, _, true, None) => Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
         case (_, _, true, Some(date)) => Ok(yourTaxRelief2019_2020_2021View(date, numberOfWeeks(date, TAX_YEAR_2019_END_DATE)))
+
+        case (_, true, _, None) => Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
+        case (_, _, true, None) => Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
+
+        case _ =>
+          logger.error("[SubmitYourClaimController][onPageLoad] - No years to claim for found")
+          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
       }
   }
 

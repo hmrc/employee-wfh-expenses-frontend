@@ -46,10 +46,11 @@ class SubmissionService @Inject()
 
   val ZERO      = 0
 
-  def submitExpenses(startDate: LocalDate)
-                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] =
+  def submitExpenses(startDate: Option[LocalDate], is2019And2020: Boolean, is2019And2020And2021: Boolean)
+                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] = {
 
-    rateLimiter.withToken(() => submit(startDate) map {
+
+    rateLimiter.withToken(() => submit(startDate, is2019And2020, is2019And2020And2021) map {
       case Right(submittedDetails) =>
         logger.info(s"[SubmissionService][submitExpenses] Submission successful")
         auditSubmissionSuccess(submittedDetails)
@@ -60,25 +61,46 @@ class SubmissionService @Inject()
         auditSubmissionFailure(error)
         Left(error)
     })
+  }
 
 
-  private def submit(startDate: LocalDate)
-            (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Seq[FlatRateItem]]] = {
+  private def submit(startDate: Option[LocalDate], is2019And2020: Boolean, is2019And2020And2021: Boolean)
+                    (implicit dataRequest: DataRequest[AnyContent],
+                     hc: HeaderCarrier,
+                     ec: ExecutionContext): Future[Either[String, Seq[FlatRateItem]]] = {
 
-    val flatRateItems: Seq[FlatRateItem] = Seq[FlatRateItem](
-      FlatRateItem(year = TAX_YEAR_2019_START_DATE.getYear, amount = calculate2019FlatRate(startDate)),
-      FlatRateItem(year = TAX_YEAR_2020_START_DATE.getYear, amount = calculate2020FlatRate())
-    )
-
-    def futureSequence[I, O](inputs: Seq[I])(flatMapFunction: I => Future[O])(implicit ec: ExecutionContext): Future[Seq[O]] =
-      inputs.foldLeft(Future.successful(Seq.empty[O]))(
-        (previousFutureResult, nextInput) =>
-          for {
-            futureSeq <- previousFutureResult
-            future    <- flatMapFunction(nextInput)
-          } yield futureSeq :+ future
-      )
-
+    val flatRateItems: Seq[FlatRateItem] = startDate match {
+      case Some(date) => (is2019And2020, is2019And2020And2021) match {
+        case (false, true) =>
+          if (date.isAfter(TAX_YEAR_2019_END_DATE)) { // Claiming for 2020 and 2021
+            Seq[FlatRateItem](
+              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate()),
+              FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate())
+            )
+          } else { // Claiming for 2019, 2020, 2021
+            Seq[FlatRateItem](
+              FlatRateItem(year = YEAR_2019, amount = calculate2019FlatRate(date)),
+              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate()),
+              FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate())
+            )
+          }
+        case (true, false) =>
+          if (date.isBefore(TAX_YEAR_2020_START_DATE)) { // Claiming for 2019 & 2020
+            Seq[FlatRateItem](
+              FlatRateItem(year = YEAR_2019, amount = calculate2019FlatRate(date)),
+              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())
+            )
+          } else { // Claiming for 2020
+            Seq[FlatRateItem](
+              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())
+            )
+          }
+      }
+      case None => // Claiming for 2021
+        Seq[FlatRateItem](
+          FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate())
+        )
+    }
     logger.info("[SubmissionService][submit] Submitting")
 
     futureSequence(flatRateItems) {
@@ -94,8 +116,19 @@ class SubmissionService @Inject()
     }
   }
 
+    def futureSequence[I, O](inputs: Seq[I])(flatMapFunction: I => Future[O])(implicit ec: ExecutionContext): Future[Seq[O]] = {
+      inputs.foldLeft(Future.successful(Seq.empty[O]))(
+        (previousFutureResult, nextInput) =>
+          for {
+            futureSeq <- previousFutureResult
+            future    <- flatMapFunction(nextInput)
+          } yield futureSeq :+ future
+      )
+    }
 
-  def calculate2019FlatRate(startDate: LocalDate): Int =
+
+
+    def calculate2019FlatRate(startDate: LocalDate): Int =
     if (startDate.isBefore(TAX_YEAR_2020_START_DATE)) {
        numberOfWeeks(startDate, TAX_YEAR_2019_END_DATE) * appConfig.taxReliefPerWeek2019 toInt match {
         case flatRateAmount: Int if flatRateAmount > appConfig.taxReliefMaxPerYear2019  => appConfig.taxReliefMaxPerYear2019
@@ -112,6 +145,12 @@ class SubmissionService @Inject()
       case flatRateAmount: Int                                                        => flatRateAmount
     }
 
+  def calculate2021FlatRate(): Int = {
+      numberOfWeeks(TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE) * appConfig.taxReliefPerWeek2021 toInt match {
+        case flatRateAmount: Int if flatRateAmount > appConfig.taxReliefMaxPerYear2021 => appConfig.taxReliefMaxPerYear2021
+        case flatRateAmount: Int => flatRateAmount
+      }
+    }
 
   private def auditSubmissionSuccess(submittedDetails: Seq[FlatRateItem])
                                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext) =

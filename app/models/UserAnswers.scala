@@ -65,7 +65,7 @@ final case class UserAnswers(
     }
   }
 
-  def is2021Only:Boolean =
+  def is2021Only: Boolean =
     (get(ClaimedForTaxYear2020), get(SelectTaxYearsToClaimForPage)) match {
       case ( Some(true), _ ) => true
       case ( _, Some(years) ) if years.size == 1 && years.contains(Option1) => true

@@ -70,22 +70,17 @@ class YourTaxReliefController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
     implicit request =>
+      submissionService.submitExpenses(
+        request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage),
+        request.userAnswers.is2019And2020Only,
+        request.userAnswers.is2019And2020And2021Only
+      ) map {
+        case Right(_) =>
+          Redirect(routes.ConfirmationController.onPageLoad())
+        case Left(_) =>
+          logger.error("[SubmitYourClaimController][onSubmit] - Error submitting")
+          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
 
-      request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
-
-        case None =>
-          logger.error(s"[SubmitYourClaimController][onSubmit] - Start date is missing")
-          Future.successful( Redirect(routes.TechnicalDifficultiesController.onPageLoad()) )
-
-        case Some(startDate) =>
-          submissionService.submitExpenses(startDate) map {
-
-            case Right(_) =>
-              Redirect(routes.ConfirmationController.onPageLoad())
-
-            case Left(_) =>
-              Redirect(routes.TechnicalDifficultiesController.onPageLoad())
-          }
       }
   }
 

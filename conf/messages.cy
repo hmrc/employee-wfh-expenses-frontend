@@ -90,6 +90,7 @@ whenDidYouFirstStartWorkingFromHome.error.required.two=Mae’n rhaid i’r dyddi
 whenDidYouFirstStartWorkingFromHome.error.required=Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref gynnwys {0} 
 whenDidYouFirstStartWorkingFromHome.error.invalid=Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref fod yn ddyddiad go iawn
 whenDidYouFirstStartWorkingFromHome.error.futureDateNotAllowed=Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref fod heddiw neu yn y gorffennol
+whenDidYouFirstStartWorkingFromHome.error.invalidTaxYearDate = Select a date before 6 April 2021
 whenDidYouFirstStartWorkingFromHome.paragraph.one=Gallwch hawlio nawr am ryddhad treth yn y flwyddyn dreth hon hyd yn oed os nad ydych yn gwybod am faint y byddwch yn gweithio gartref. Y rheswm am hyn yw y byddwn yn defnyddio rhyddhad treth ar gyfer y flwyddyn dreth hon i gyd, hyd yn oed os ewch yn ôl i’ch gweithle cyn 6 Ebrill 2021.
 cannotClaimUsingThisService.title=Ni allwch hawlio drwy ddefnyddio’r gwasanaeth hwn
 cannotClaimUsingThisService.heading=Ni allwch hawlio drwy ddefnyddio’r gwasanaeth hwn

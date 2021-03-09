@@ -14,8 +14,6 @@
  * limitations under the License.
  *@
 
-@import java.time.LocalDate
-
 @this(
         main_template:      MainTemplate,
         formHelper:         FormWithCSRF,
@@ -26,44 +24,19 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@readableDate(date:LocalDate) = {@{date.getDayOfMonth} @{messages(s"month.${date.getMonthValue}")} @{date.getYear}}
-
-@insetHtml() = {
-    @messages("yourTaxRelief.inset.text")
-    <b>date stuff here</b>
-    <br>
-    <a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("yourTaxRelief.changeThisDate.href.text")</a>
-}
-
 @main_template(
-    title = messages("yourTaxRelief.title"),
+    title = messages("yourTaxRelief.2021.title"),
     beforeContentBlock = Some(backLink(BackLink(
-        href = routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url,
+        href = routes.DisclaimerController.onPageLoad().url,
         content = Text(messages("site.back")),
         attributes = Map("id" -> "back-link")
     )))
 ) {
 
-    <h1 class="govuk-heading-xl">@messages("yourTaxRelief.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("yourTaxRelief.2021.heading")</h1>
 
-    </br>
-    </br>
-    </br>
-    <b>**********************************************</b>
-    </br>
-    <b>2021 JOURNEY</b>
-    </br>
-    <b>**********************************************</b>
-    </br>
-    </br>
-    </br>
-
-    @govukInsetText(InsetText(
-        content = HtmlContent(insetHtml())
-        ))
-
-    <p class="govuk-body">@messages("yourTaxRelief.2020.paragraph.one")</p>
-    <p class="govuk-body">@messages("yourTaxRelief.2020.paragraph.two")</p>
+    <p class="govuk-body">@messages("yourTaxRelief.2021.paragraph.one")</p>
+    <p class="govuk-body">@messages("yourTaxRelief.2021.paragraph.two")</p>
 
     <h2 class="govuk-heading-m">@messages("yourTaxRelief.submitYourClaim.heading")</h2>
 

@@ -23,7 +23,6 @@ import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, WhenDidYouFir
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import utils.TaxYearDates.TAX_YEAR_2019_START_DATE
 import views.html.{YourTaxRelief2019_2020View, YourTaxRelief2019_2020_2021View, YourTaxRelief2021OnlyView}
 
 import java.time.LocalDate

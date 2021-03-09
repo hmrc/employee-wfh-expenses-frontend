@@ -120,10 +120,24 @@ yourTaxRelief.title = Check your claim
 yourTaxRelief.heading = Check your claim
 yourTaxRelief.inset.text = You started working from home on
 yourTaxRelief.changeThisDate.href.text = Change this date
+
+yourTaxRelief.2021.title = About your claim
+yourTaxRelief.2021.heading = About your claim
+yourTaxRelief.2021.paragraph.one = You will receive tax relief on your expenses for working from home for the whole of this tax year, 6 April 2021 to 5 April 2022.
+yourTaxRelief.2021.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2022, you will need to claim again.
 yourTaxRelief.2020.paragraph.one = You will receive tax relief on your expenses for working from home for the whole of this tax year (6 April 2020 to 5 April 2021), however long you worked or are working from home.
 yourTaxRelief.2020.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2021, you will need to claim again.
-yourTaxRelief.2019And2020.paragraph.one = You will receive tax relief on your expenses for working from home for {0} of the last tax year (6 April 2019 to 5 April 2020). You will also receive tax relief for the whole of this tax year (6 April 2020 to 5 April 2021), however long you worked or are working from home.
-yourTaxRelief.2019And2020.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2021, you will need to claim again.
+
+yourTaxRelief.2019And2020.list.text = You will receive tax relief on your expenses for working from home for:
+yourTaxRelief.2019And2020.list.item1 = the whole of tax year 6 April 2020 to 5 April 2021
+yourTaxRelief.2019And2020.list.item2 = {0} of tax year 6 April 2019 to 5 April 2020
+
+yourTaxRelief.2019And2020And2021.paragraph.one = You will receive tax relief on your expenses for working from home for the whole of this tax year, 6 April 2021 to 5 April 2022.
+yourTaxRelief.2019And2020And2021.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2022, you will need to claim again.
+yourTaxRelief.2019And2020And2021.list.text = You will also receive tax relief on your expenses for working from home for:
+yourTaxRelief.2019And2020And2021.list.item1 = the whole of tax year 6 April 2020 to 5 April 2021
+yourTaxRelief.2019And2020And2021.list.item2 = {0} of tax year 6 April 2019 to 5 April 2020
+
 yourTaxRelief.submitYourClaim.heading = Now submit your claim
 yourTaxRelief.disclaimer = By submitting this claim you are confirming that, to the best of your knowledge, the details you are providing are correct.
 yourTaxRelief.submit.button.text = Confirm and submit

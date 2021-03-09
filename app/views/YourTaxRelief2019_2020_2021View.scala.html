@@ -15,6 +15,7 @@
  *@
 
 @import java.time.LocalDate
+@import utils.TaxYearDates._
 
 @this(
         main_template:      MainTemplate,
@@ -54,26 +55,25 @@
 
     <h1 class="govuk-heading-xl">@messages("yourTaxRelief.heading")</h1>
 
-    </br>
-    </br>
-    </br>
-    <b>**********************************************</b>
-    </br>
-    <b>2019, 2020 and 2021 JOURNEY</b>
-    </br>
-    <b>**********************************************</b>
-    </br>
-    </br>
-    </br>
-
     @govukInsetText(InsetText(
         content = HtmlContent(insetHtml())
         ))
 
     <p class="govuk-body">
-        @messages("yourTaxRelief.2019And2020.paragraph.one", pluralOrSingularWeeks(numberOfWeeksIn2019))
+        @messages("yourTaxRelief.2019And2020And2021.paragraph.one")
     </p>
-    <p class="govuk-body">@messages("yourTaxRelief.2019And2020.paragraph.two")</p>
+
+    <p class="govuk-body">@messages("yourTaxRelief.2019And2020And2021.list.text")</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("yourTaxRelief.2019And2020And2021.list.item1")</li>
+        @if(startedWorkingFromHome.isBefore(TAX_YEAR_2020_START_DATE)){
+        <li>@messages("yourTaxRelief.2019And2020And2021.list.item2", pluralOrSingularWeeks(numberOfWeeksIn2019))</li>
+        }
+    </ul>
+
+    <p class="govuk-body">
+        @messages("yourTaxRelief.2019And2020And2021.paragraph.two")
+    </p>
 
     <h2 class="govuk-heading-m">@messages("yourTaxRelief.submitYourClaim.heading")</h2>
 

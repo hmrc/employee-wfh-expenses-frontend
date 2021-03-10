@@ -38,5 +38,5 @@ GET        /contact-us                                  controllers.ManualCorres
 
 GET        /technicalDifficulties                       controllers.TechnicalDifficultiesController.onPageLoad()
 
-GET        /selectTaxYearsToClaimFor                    controllers.SelectTaxYearsToClaimForController.onPageLoad()
-POST       /selectTaxYearsToClaimFor                    controllers.SelectTaxYearsToClaimForController.onSubmit()
+GET        /select-tax-years-to-claim-for               controllers.SelectTaxYearsToClaimForController.onPageLoad()
+POST       /select-tax-years-to-claim-for               controllers.SelectTaxYearsToClaimForController.onSubmit()

@@ -21,17 +21,19 @@ import connectors.PaperlessPreferenceConnector
 import controllers.PaperlessAuditConst._
 import controllers.actions._
 import javax.inject.Inject
+import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
-import pages.WhenDidYouFirstStartWorkingFromHomePage
+import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import uk.gov.hmrc.time.TaxYear
 import uk.gov.hmrc.time.TaxYear.taxYearFor
-import views.html.ConfirmationView
+import views.html.Confirmation2019_2020_2021View
+import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 
 import scala.concurrent.ExecutionContext
 
@@ -50,27 +52,28 @@ class ConfirmationController @Inject()(
                                         val paperlessPreferenceConnector: PaperlessPreferenceConnector,
                                         auditConnector: AuditConnector,
                                         appConfig: FrontendAppConfig,
-                                        view: ConfirmationView)
+                                        confirmation2019_2020_2021View: Confirmation2019_2020_2021View)
                                       (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
+      val userDateAnswers = (request.userAnswers.get(ClaimedForTaxYear2020), request.userAnswers.get(SelectTaxYearsToClaimForPage))
       val taxYearStartedWorkingFromHome: Option[TaxYear] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).map(taxYearFor)
 
       paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account") map {
 
         case Right(status) if status.isPaperlessCustomer =>
+          getConfirmationDateByTaxYear(userDateAnswers, true, None, taxYearStartedWorkingFromHome)
           auditPaperlessPreferencesCheckSuccess(paperlessEnabled = true)
-          Ok(view(
-            paperLessAvailable  = true,
-            paperlessSignupUrl  = None,
-            startedInTaxYear    = taxYearStartedWorkingFromHome))
+          Ok(confirmation2019_2020_2021View(
+              paperLessAvailable  = true,
+              paperlessSignupUrl  = None,
+              startedInTaxYear    = taxYearStartedWorkingFromHome))
 
         case Right(status) =>
           auditPaperlessPreferencesCheckSuccess(paperlessEnabled = false)
-          Ok(view(
+          Ok(confirmation2019_2020_2021View(
             paperLessAvailable  = false,
             paperlessSignupUrl  = Some(status.url.link),
             startedInTaxYear    = taxYearStartedWorkingFromHome))
@@ -81,6 +84,21 @@ class ConfirmationController @Inject()(
       }
   }
 
+  def getConfirmationDateByTaxYear(userDateAnswers: (Option[Boolean], Option[Set[models.SelectTaxYearsToClaimFor]]),
+                                   paperLessAvailable: Boolean, paperlessSignupUrl: Option[String],
+                                   taxYearStartedWorkingFromHome: Option[TaxYear])
+                                  (implicit request: Request[_]) {
+
+
+    userDateAnswers._2.size match {
+      //case 0 => Redirect(routes.SelectTaxYearsToClaimForController.onPageLoad())
+      case 2 => ???
+      case 1 => userDateAnswers._2.get.head match {
+        case Option1 => ???
+        case Option2 => Ok(confirmation2019_2020_2021View(paperLessAvailable, paperlessSignupUrl, taxYearStartedWorkingFromHome))
+      }
+    }
+  }
 
   private def auditPaperlessPreferencesCheckSuccess(paperlessEnabled:Boolean)
                                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =

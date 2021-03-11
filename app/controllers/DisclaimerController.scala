@@ -26,7 +26,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{Disclaimer2019_2020View, Disclaimer2019_2020_2021View, Disclaimer2021View}
 
 import javax.inject.Inject
-import scala.concurrent.Future
 
 class DisclaimerController @Inject()(
                                       override val messagesApi: MessagesApi,

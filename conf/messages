@@ -148,15 +148,34 @@ confirmation.title = Confirmation
 confirmation.heading = Claim complete
 confirmation.text = We will change your tax code
 confirmation.text.footer.mail = We will let you know about your tax code change by email.
-confirmation.text.footer.post = We will let you know about your tax code changes by post.
+confirmation.text.footer.post = We will let you know about your tax code change by post, or online if you’ve signed up for paperless notifications.
 confirmation.whatHappensNext.heading = What happens next
-confirmation.whatHappensNext.paragraph.1 = We will increase the amount you can earn tax-free for this tax year to include tax relief on your costs for working from home. We do this by changing your tax code, which decides how much tax you pay.
+#confirmation.whatHappensNext.paragraph.1 = We will:
 confirmation.whatHappensNext.paragraph.1.for.2019 = This change will also include any tax relief from last tax year (6 April 2019 to 5 April 2020).
+#confirmation.whatHappensNext.paragraph.1.for.allyears.1 = increase the amount you can earn tax free for this tax year by changing your tax code
+#confirmation.whatHappensNext.paragraph.1.for.allyears.2 = check your claim for previous tax years and write to you by post or email before November 2021
 confirmation.whatHappensNext.paragraph.2 = You should be able to see changes to your tax code in your Personal Tax Account after 2 working days.
+confirmation.whatHappensNext.paragraph.3 = There is no need to contact HMRC.
 confirmation.linkToFeedbackForm.href.text = What did you think of this service? (opens in new tab)
 confirmation.linkToFeedbackForm.href.postfix = (takes 30 seconds)
 confirmation.paperless.header = Get tax letters online
 confirmation.paperless.paragraph.1 = You can view, download or print them when you want. Save time and clear clutter.
+
+confirmation.whatHappensNext.20192020.paragraph.1.for.allyears.header.note = We will check if you have paid too much tax.
+confirmation.whatHappensNext.20192020.paragraph.1.for.allyears.1 = We will write to you by post or email before November 2021 if you have paid too much tax.
+confirmation.whatHappensNext.20192020.paragraph.1.for.allyears.2 = There is no need to contact HMRC about this.
+
+confirmation.whatHappensNext.2021.paragraph.1.for.allyears.header.note = We will let you know about your tax code change by post or email.
+confirmation.whatHappensNext.2021.paragraph.1.for.allyears.1 = We will increase the amount you can earn tax free for this tax year to include tax relief on your expenses for working from home.
+confirmation.whatHappensNext.2021.paragraph.1.for.allyears.2 = We do this by changing your tax code, which decides how much tax you pay.
+confirmation.whatHappensNext.2021.paragraph.1.for.allyears.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+
+confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.header.note = We will:
+confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.1 = increase the amount you can earn tax free for this tax year by changing your tax code
+confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.2 = check your claim for previous tax years and write to you by post or email before November 2021
+confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+
 
 manualCorrespondenceIndicator.title = You cannot currently use this service
 manualCorrespondenceIndicator.heading = You cannot currently use this service

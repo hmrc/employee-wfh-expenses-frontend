@@ -17,7 +17,7 @@
 @import config.FrontendAppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcTimeoutDialog
 @import uk.gov.hmrc.hmrcfrontend.views.Aliases.ReportTechnicalIssue
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcFooter
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.hmrcStandardFooter
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcLanguageSelect
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language._
@@ -25,7 +25,7 @@
 
 @this(
         govukLayout: GovukLayout,
-        hmrcFooter: HmrcFooter,
+        hmrcFooter: hmrcStandardFooter,
         hmrcHeader: HmrcHeader,
         hmrcReportTechnicalIssue: hmrcComponents.HmrcReportTechnicalIssue,
         appConfig: FrontendAppConfig,

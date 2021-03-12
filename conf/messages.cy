@@ -121,6 +121,7 @@ yourTaxRelief.2019And2020And2021.list.item2 = {0} of tax year 6 April 2019 to 5 
 yourTaxRelief.submitYourClaim.heading=Cyflwynwch eich hawliad nawr
 yourTaxRelief.disclaimer=Drwy anfon yr hawliad hwn, rydych yn cadarnhau, hyd eithaf eich gwybodaeth, bod y manylion yr ydych yn eu darparu’n gywir.
 yourTaxRelief.submit.button.text=Cadarnhau a chyflwyno
+
 confirmation.paperless.button.text=Cofrestrwch ar gyfer hysbysiadau di-bapur
 confirmation.title=Cadarnhad
 confirmation.heading=Hawliad wedi’i gwblhau
@@ -129,12 +130,29 @@ confirmation.text.footer.mail=Byddwn yn rhoi gwybod i chi am newidiadau i’ch c
 confirmation.text.footer.post=Byddwn yn rhoi gwybod i chi am newidiadau i’ch cod treth drwy’r post.
 confirmation.whatHappensNext.heading=Yr hyn sy’n digwydd nesaf
 confirmation.whatHappensNext.paragraph.1=Byddwn yn cynyddu’r swm y gallwch ei ennill yn rhydd o dreth ar gyfer y flwyddyn dreth hon i gynnwys rhyddhad treth ar eich costau ar gyfer gweithio gartref. Byddwn yn gwneud hyn drwy newid eich cod treth, sy’n penderfynu faint o dreth y byddwch yn ei dalu.
-confirmation.whatHappensNext.paragraph.1.for.2019=Bydd y newid hwn hefyd yn cynnwys unrhyw ryddhad treth o’r flwyddyn dreth ddiwethaf (6 Ebrill 2019 i 5 Ebrill 2020).
 confirmation.whatHappensNext.paragraph.2=Dylech allu gweld newidiadau i’ch cod treth yn eich Cyfrif Treth Personol ar ôl 2 ddiwrnod gwaith.
+confirmation.whatHappensNext.paragraph.3 = There is no need to contact HMRC.
 confirmation.linkToFeedbackForm.href.text=Beth oedd eich barn am y gwasanaeth hwn? (yn agor tab newydd)
 confirmation.linkToFeedbackForm.href.postfix=(mae’n cymryd 30 eiliad)
 confirmation.paperless.header=Cael llythyrau treth ar-lein
 confirmation.paperless.paragraph.1=Gallwch fwrw golwg drostynt, eu lawrlwytho neu eu hargraffu pryd bynnag yr hoffech. Arbedwch amser a chlirio annibendod.
+
+confirmation.whatHappensNext.20192020.header.note = We will check if you have paid too much tax.
+confirmation.whatHappensNext.20192020.paragraph.1 = We will write to you by post or email before November 2021 if you have paid too much tax.
+confirmation.whatHappensNext.20192020.paragraph.2 = There is no need to contact HMRC about this.
+
+confirmation.whatHappensNext.20192020.header.note = We will let you know about your tax code change by post or email.
+confirmation.whatHappensNext.2021.paragraph.1 = We will increase the amount you can earn tax free for this tax year to include tax relief on your expenses for working from home.
+confirmation.whatHappensNext.2021.paragraph.2 = We do this by changing your tax code, which decides how much tax you pay.
+confirmation.whatHappensNext.2021.paragraph.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+
+confirmation.whatHappensNext.201920202021.header.note = We will:
+confirmation.whatHappensNext.201920202021.listitem.1 = increase the amount you can earn tax free for this tax year by changing your tax code
+confirmation.whatHappensNext.201920202021.listitem.2 = check your claim for previous tax years and write to you by post or email before November 2021
+confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+
+
 manualCorrespondenceIndicator.title=Ni allwch ddefnyddio’r gwasanaeth hwn ar hyn o bryd
 manualCorrespondenceIndicator.heading=Ni allwch ddefnyddio’r gwasanaeth hwn ar hyn o bryd
 manualCorrespondenceIndicator.paragraph.one=Mae angen i chi gysylltu â CThEM a rhoi gwybod i ni fod gennych ‘Gwall MCI’. Byddwn yn mynd â chi drwy’r hyn sydd angen digwydd nesaf.

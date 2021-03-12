@@ -27,7 +27,7 @@
         button: GovukButton
 )
 
-@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String], startedInTaxYear: Option[TaxYear])(implicit request: Request[_], messages: Messages)
+@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String])(implicit request: Request[_], messages: Messages)
 
 @linkToFeedbackForm = {<a  class="govuk-link" href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
@@ -46,10 +46,10 @@
     <h2 class="govuk-heading-m">@messages("confirmation.whatHappensNext.heading")</h2>
 
     <p class="govuk-body">
-        @messages("confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.header.note")
+        @messages("confirmation.whatHappensNext.201920202021.header.note")
         <ul class="govuk-list govuk-list--bullet">
-            <li>@messages("confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.1")</li>
-            <li>@messages("confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.2")</li>
+            <li>@messages("confirmation.whatHappensNext.201920202021.listitem.1")</li>
+            <li>@messages("confirmation.whatHappensNext.201920202021.listitem.2")</li>
         </ul>
     </p>
 

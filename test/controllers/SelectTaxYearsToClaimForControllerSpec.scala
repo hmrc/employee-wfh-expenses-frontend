@@ -59,7 +59,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
       status(result) mustEqual OK
 
       contentAsString(result) mustEqual
-        view(form)(fakeRequest, messages).toString
+        view(form)(request, messages).toString
 
       application.stop()
     }
@@ -84,7 +84,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
       status(result) mustEqual OK
 
       contentAsString(result) mustEqual
-        view(form.fill(SelectTaxYearsToClaimFor.values.toSet))(fakeRequest, messages).toString
+        view(form.fill(SelectTaxYearsToClaimFor.values.toSet))(request, messages).toString
 
       application.stop()
     }
@@ -133,7 +133,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
       status(result) mustEqual BAD_REQUEST
 
       contentAsString(result) mustEqual
-        view(boundForm)(fakeRequest, messages).toString
+        view(boundForm)(request, messages).toString
 
       application.stop()
     }

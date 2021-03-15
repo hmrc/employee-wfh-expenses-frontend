@@ -20,9 +20,11 @@ import config.FrontendAppConfig
 import connectors.{CitizenDetailsConnector, TaiConnector}
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
-import models.{AuditData, FlatRateItem}
+import models.{AuditData, FlatRateItem, UserAnswers}
+import pages.{SelectTaxYearsToClaimForPage, SubmittedClaim, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.mvc.AnyContent
+import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.RateLimiting
@@ -40,6 +42,7 @@ class SubmissionService @Inject()
   citizenDetailsConnector:  CitizenDetailsConnector,
   taiConnector:             TaiConnector,
   auditConnector:           AuditConnector,
+  sessionRepository:        SessionRepository,
   appConfig:                FrontendAppConfig,
   @Named("IABD POST") rateLimiter: RateLimiting
 ) extends Logging {
@@ -54,6 +57,7 @@ class SubmissionService @Inject()
       case Right(submittedDetails) =>
         logger.info(s"[SubmissionService][submitExpenses] Submission successful")
         auditSubmissionSuccess(submittedDetails)
+        dataRequest.userAnswers.set(SubmittedClaim, value = true).map(sessionRepository.set(_))
         Right(())
 
       case Left(error) =>

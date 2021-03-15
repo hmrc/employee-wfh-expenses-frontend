@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions._
-import pages. WhenDidYouFirstStartWorkingFromHomePage
+import pages.WhenDidYouFirstStartWorkingFromHomePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -27,8 +27,7 @@ import utils.TaxYearDates._
 import views.html._
 
 import javax.inject.Inject
-
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class YourTaxReliefController @Inject()(
                                          override val messagesApi: MessagesApi,
@@ -70,6 +69,7 @@ class YourTaxReliefController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
     implicit request =>
+
       submissionService.submitExpenses(
         request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage),
         request.userAnswers.is2019And2020Only,

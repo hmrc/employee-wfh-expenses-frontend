@@ -23,15 +23,16 @@ import controllers.actions._
 import javax.inject.Inject
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
-import pages.WhenDidYouFirstStartWorkingFromHomePage
+import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.time.TaxYear
-import uk.gov.hmrc.time.TaxYear.taxYearFor
-import views.html.ConfirmationView
+import views.html.Confirmation2019_2020_2021View
+import views.html.Confirmation2019_2020View
+import views.html.Confirmation2021View
+import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 
 import scala.concurrent.ExecutionContext
 
@@ -50,37 +51,32 @@ class ConfirmationController @Inject()(
                                         val paperlessPreferenceConnector: PaperlessPreferenceConnector,
                                         auditConnector: AuditConnector,
                                         appConfig: FrontendAppConfig,
-                                        view: ConfirmationView)
+                                        confirmation2019_2020_2021View: Confirmation2019_2020_2021View,
+                                        confirmation2019_2020View: Confirmation2019_2020View,
+                                        confirmation2021View: Confirmation2021View)
                                       (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
-      val taxYearStartedWorkingFromHome: Option[TaxYear] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).map(taxYearFor)
-
       paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account") map {
-
-        case Right(status) if status.isPaperlessCustomer =>
-          auditPaperlessPreferencesCheckSuccess(paperlessEnabled = true)
-          Ok(view(
-            paperLessAvailable  = true,
-            paperlessSignupUrl  = None,
-            startedInTaxYear    = taxYearStartedWorkingFromHome))
-
         case Right(status) =>
-          auditPaperlessPreferencesCheckSuccess(paperlessEnabled = false)
-          Ok(view(
-            paperLessAvailable  = false,
-            paperlessSignupUrl  = Some(status.url.link),
-            startedInTaxYear    = taxYearStartedWorkingFromHome))
-
+          auditPaperlessPreferencesCheckSuccess(paperlessEnabled = status.isPaperlessCustomer)
+          (
+            request.userAnswers.is2021Only,
+            request.userAnswers.is2019And2020Only,
+            request.userAnswers.is2019And2020And2021Only,
+            request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+          ) match {
+            case (true, _, _, _) => Ok(confirmation2021View(status.isPaperlessCustomer, Some(status.url.link)))
+            case (_, true, _, Some(_)) => Ok(confirmation2019_2020View(status.isPaperlessCustomer, Some(status.url.link)))
+            case (_, _, true, Some(_)) => Ok(confirmation2019_2020_2021View(status.isPaperlessCustomer, Some(status.url.link)))
+          }
         case Left(error) =>
           auditPaperlessPreferencesCheckFailure(error)
           Redirect(routes.TechnicalDifficultiesController.onPageLoad())
       }
   }
-
 
   private def auditPaperlessPreferencesCheckSuccess(paperlessEnabled:Boolean)
                                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =

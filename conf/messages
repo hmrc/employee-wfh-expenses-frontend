@@ -113,12 +113,15 @@ whenDidYouFirstStartWorkingFromHome2019And2020And2021.paragraph.two = This is be
 
 cannotClaimUsingThisService.title = You cannot claim using this service
 cannotClaimUsingThisService.heading = You cannot claim using this service
-cannotClaimUsingThisService.reason = You can only use this service to claim for this tax year (6 April 2020 to 5 April 2021) or last tax year (6 April 2019 to 5 April 2020).
+cannotClaimUsingThisService.reason = You can only claim expenses for working from home because of coronavirus (COVID-19) for these tax years:
+cannotClaimUsingThisService.reason.year1 = 6 April 2021 to 5 April 2022 (this tax year)
+cannotClaimUsingThisService.reason.year2 = 6 April 2020 to 5 April 2021
+cannotClaimUsingThisService.reason.year3 = 6 April 2019 to 5 April 2020
 cannotClaimUsingThisService.options.text = You can:
 cannotClaimUsingThisService.changeDate.href.text = change the date
-cannotClaimUsingThisService.changeDate = {0} you started working from home
-cannotClaimUsingThisService.alternative.href.text = go to the Tax relief for expenses of employment service
-cannotClaimUsingThisService.alternative = {0} to claim for tax years before 6th April 2019
+cannotClaimUsingThisService.changeDate = {0} you started working from home because of coronavirus (COVID-19)
+cannotClaimUsingThisService.alternative.href.text = claim tax relief for expenses of employment
+cannotClaimUsingThisService.alternative = {0} for tax years before 6 April 2019
 
 yourTaxRelief.title = Check your claim
 yourTaxRelief.heading = Check your claim

@@ -16,28 +16,30 @@
 
 package controllers
 
-import java.time.{LocalDate, ZoneOffset}
-
 import base.SpecBase
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
+import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import pages.WhenDidYouFirstStartWorkingFromHomePage
+import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.inject.bind
+import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.WhenDidYouFirstStartWorkingFromHomeView
+import views.html.{WhenDidYouFirstStartWorkingFromHome2019_2020View, WhenDidYouFirstStartWorkingFromHome2019_2020_2021View}
 
+import java.time.{LocalDate, ZoneOffset}
 import scala.concurrent.Future
 
 class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new WhenDidYouFirstStartWorkingFromHomeFormProvider()
+
   private def form = formProvider()
 
   def onwardRoute = Call("GET", "/foo")
@@ -54,46 +56,135 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
   def postRequest(): FakeRequest[AnyContentAsFormUrlEncoded] =
     FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
       .withFormUrlEncodedBody(
-        "value.day"   -> validAnswer.getDayOfMonth.toString,
+        "value.day" -> validAnswer.getDayOfMonth.toString,
         "value.month" -> validAnswer.getMonthValue.toString,
-        "value.year"  -> validAnswer.getYear.toString
+        "value.year" -> validAnswer.getYear.toString
       )
 
-  "WhenDidYouFirstStartWorkingFromHome Controller" must {
 
-    "return OK and the correct view for a GET" in {
+  "WhenDidYouFirstStartWorkingFromHome Controller" when {
+    "User has chosen previous tax years only" should {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val answers: UserAnswers = UserAnswers(
+        userAnswersId,
+        Json.obj(
+          ClaimedForTaxYear2020.toString -> false,
+          SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
+        )
+      )
 
-      val result = route(application, getRequest).value
+      "return OK and the correct view for a GET" in {
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
+        val result = route(application, getRequest).value
+        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHome2019_2020View]
 
-      val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
+        status(result) mustEqual OK
 
-      status(result) mustEqual OK
+        contentAsString(result) mustEqual
+          view(form)(getRequest(), messages).toString
 
-      contentAsString(result) mustEqual
-        view(form)(getRequest(), messages).toString
+        application.stop()
+      }
 
-      application.stop()
+      "populate the view correctly on a GET when the question has previously been answered" in {
+        val userAnswers = answers.set(WhenDidYouFirstStartWorkingFromHomePage, validAnswer).success.value
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHome2019_2020View]
+
+        val result = route(application, getRequest).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual
+          view(form.fill(validAnswer))(getRequest, messages).toString
+
+        application.stop()
+      }
+
+      "return a Bad Request and errors when invalid data is submitted" in {
+
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+        val request =
+          FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
+            .withFormUrlEncodedBody(("value", "invalid value"))
+
+        val boundForm = form.bind(Map("value" -> "invalid value"))
+
+        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHome2019_2020View]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+
+        contentAsString(result) mustEqual
+          view(boundForm)(request, messages).toString
+
+        application.stop()
+      }
     }
 
-    "populate the view correctly on a GET when the question has previously been answered" in {
+    "User has chosen both previous and current tax years" should {
 
-      val userAnswers = UserAnswers(userAnswersId).set(WhenDidYouFirstStartWorkingFromHomePage, validAnswer).success.value
+      val answers = UserAnswers(userAnswersId,
+        Json.obj(
+          ClaimedForTaxYear2020.toString -> false,
+          SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString)
+        ))
 
-      val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      "return OK and the correct view for a GET" in {
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
 
-      val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
+        val result = route(application, getRequest).value
 
-      val result = route(application, getRequest).value
+        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHome2019_2020_2021View]
 
-      status(result) mustEqual OK
+        status(result) mustEqual OK
 
-      contentAsString(result) mustEqual
-        view(form.fill(validAnswer))(getRequest, messages).toString
+        contentAsString(result) mustEqual
+          view(form)(getRequest(), messages).toString
 
-      application.stop()
+        application.stop()
+      }
+
+      "populate the view correctly on a GET when the question has previously been answered" in {
+        val userAnswers = answers.set(WhenDidYouFirstStartWorkingFromHomePage, validAnswer).success.value
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHome2019_2020_2021View]
+
+        val result = route(application, getRequest).value
+
+        status(result) mustEqual OK
+
+        contentAsString(result) mustEqual
+          view(form.fill(validAnswer))(getRequest, messages).toString
+
+        application.stop()
+      }
+
+      "return a Bad Request and errors when invalid data is submitted" in {
+
+        val application = applicationBuilder(userAnswers = Some(answers)).build()
+
+        val request =
+          FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
+            .withFormUrlEncodedBody(("value", "invalid value"))
+
+        val boundForm = form.bind(Map("value" -> "invalid value"))
+
+        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHome2019_2020_2021View]
+
+        val result = route(application, request).value
+
+        status(result) mustEqual BAD_REQUEST
+
+        contentAsString(result) mustEqual
+          view(boundForm)(request, messages).toString
+
+        application.stop()
+      }
     }
+
 
     "redirect to the next page when valid data is submitted" in {
 
@@ -114,28 +205,6 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
       status(result) mustEqual SEE_OTHER
 
       redirectLocation(result).value mustEqual onwardRoute.url
-
-      application.stop()
-    }
-
-    "return a Bad Request and errors when invalid data is submitted" in {
-
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-      val request =
-        FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
-          .withFormUrlEncodedBody(("value", "invalid value"))
-
-      val boundForm = form.bind(Map("value" -> "invalid value"))
-
-      val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
-
-      val result = route(application, request).value
-
-      status(result) mustEqual BAD_REQUEST
-
-      contentAsString(result) mustEqual
-        view(boundForm)(request, messages).toString
 
       application.stop()
     }
@@ -165,4 +234,5 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
       application.stop()
     }
   }
+
 }

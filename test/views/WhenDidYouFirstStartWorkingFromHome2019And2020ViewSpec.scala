@@ -16,16 +16,16 @@
 
 package views
 
-import java.time.LocalDate
-
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
 import models.UserAnswers
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 import views.behaviours.QuestionViewBehaviours
-import views.html.WhenDidYouFirstStartWorkingFromHomeView
+import views.html.WhenDidYouFirstStartWorkingFromHome2019_2020View
 
-class WhenDidYouFirstStartWorkingFromHomeViewSpec extends QuestionViewBehaviours[LocalDate] {
+import java.time.LocalDate
+
+class WhenDidYouFirstStartWorkingFromHome2019And2020ViewSpec extends QuestionViewBehaviours[LocalDate] {
 
   val messageKeyPrefix = "whenDidYouFirstStartWorkingFromHome"
 
@@ -35,7 +35,7 @@ class WhenDidYouFirstStartWorkingFromHomeViewSpec extends QuestionViewBehaviours
 
     val application = applicationBuilder(userAnswers = Some(UserAnswers(userAnswersId))).build()
 
-    val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
+    val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHome2019_2020View]
 
     def applyView(form: Form[_]): HtmlFormat.Appendable =
       view.apply(form)(fakeRequest, messages)

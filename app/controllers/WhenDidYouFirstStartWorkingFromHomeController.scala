@@ -18,15 +18,17 @@ package controllers
 
 import controllers.actions._
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
-import javax.inject.Inject
+import models.UserAnswers
 import navigation.Navigator
 import pages.WhenDidYouFirstStartWorkingFromHomePage
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.WhenDidYouFirstStartWorkingFromHomeView
+import views.html.{WhenDidYouFirstStartWorkingFromHome2019_2020View, WhenDidYouFirstStartWorkingFromHome2019_2020_2021View}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
@@ -34,14 +36,14 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
                                         sessionRepository: SessionRepository,
                                         navigator: Navigator,
                                         identify: IdentifierAction,
-                                        checkAlreadyClaimed: CheckAlreadyClaimedAction,
                                         citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
                                         getData: DataRetrievalAction,
                                         requireData: DataRequiredAction,
                                         formProvider: WhenDidYouFirstStartWorkingFromHomeFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view: WhenDidYouFirstStartWorkingFromHomeView
-                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                        view_2019_2020: WhenDidYouFirstStartWorkingFromHome2019_2020View,
+                                        view_2019_2020_2021: WhenDidYouFirstStartWorkingFromHome2019_2020_2021View
+                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   val form = formProvider()
 
@@ -53,16 +55,22 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(view(preparedForm))
+      if (request.userAnswers.is2019And2020Only) Ok(view_2019_2020(preparedForm)) else Ok(view_2019_2020_2021(preparedForm))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val messages = request2Messages
+
       form.bindFromRequest().fold(
         formWithErrors => {
           val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => messages(s"date.$arg").toLowerCase)))
-          Future.successful(BadRequest(view(formWithErrors.copy(errors = errors))))
+
+          if (request.userAnswers.is2019And2020Only) {
+            Future.successful(BadRequest(view_2019_2020(formWithErrors.copy(errors = errors))))
+          } else {
+            Future.successful(BadRequest(view_2019_2020_2021(formWithErrors.copy(errors = errors))))
+          }
         },
         value =>
           for {
@@ -71,4 +79,5 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
           } yield Redirect(navigator.nextPage(WhenDidYouFirstStartWorkingFromHomePage, updatedAnswers))
       )
   }
+
 }

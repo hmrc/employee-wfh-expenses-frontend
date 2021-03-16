@@ -29,8 +29,10 @@ import org.mockito.{InOrder, Mockito}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.Matchers._
 import org.scalatestplus.mockito.MockitoSugar
+import pages.SubmittedClaim
 import play.api.mvc.AnyContent
 import play.api.test.Helpers._
+import repositories.SessionRepository
 import uk.gov.hmrc.http.{TooManyRequestException, UpstreamErrorResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.RateLimiting
@@ -53,15 +55,20 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   val mockTaiConnector: TaiConnector = mock[TaiConnector]
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
   val mockThrottler: RateLimiting = mock[RateLimiting]
+  val mockSessionRepository: SessionRepository = mock[SessionRepository]
 
   val testNino: String = "AA112233A"
 
+  import org.mockito.ArgumentCaptor
+
+  val userAnswersArgumentCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+
   class Setup {
-    val serviceUnderTest = new SubmissionService(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, frontendAppConfig, mockThrottler)
+    val serviceUnderTest = new SubmissionService(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockSessionRepository, frontendAppConfig, mockThrottler)
   }
 
   before {
-    Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockThrottler)
+    Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockThrottler, mockSessionRepository)
   }
 
   "calculate2019FlatRate" should {
@@ -131,8 +138,18 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     val etag2 = ETag(101)
     val etag3 = ETag(102)
 
+    def verifySessionGotSubmittedState = {
+      verify(mockSessionRepository).set(userAnswersArgumentCaptor.capture())
+      userAnswersArgumentCaptor.getValue.get(SubmittedClaim).isDefined shouldBe true
+    }
+
+    def verifyNoSubmittedStateUpdate = {
+      verify(mockSessionRepository, times(0)).set(any())
+    }
+
+
     "no working from home date found (2021 only)" should {
-      "upsert 1 IABD 59 and audit success" in new Setup {
+      "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockThrottler.enabled).thenReturn(false)
         when(mockThrottler.withToken(any())).thenCallRealMethod()
 
@@ -144,6 +161,11 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), eqm(etag3))(any(), any())).thenReturn(Future.successful(()))
 
         await(serviceUnderTest.submitExpenses(None, false, false)).isRight shouldBe true
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
+
+        verifySessionGotSubmittedState
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
@@ -159,6 +181,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
       }
     }
 
@@ -195,6 +219,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
+
+        verifySessionGotSubmittedState
       }
 
       "upsert 2 IABD 59's and audit success without 2021 claim" in new Setup {
@@ -223,6 +249,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
+
+        verifySessionGotSubmittedState
       }
 
       "report errors when 1st ETAG call fails and audit failure" in new Setup {
@@ -238,6 +266,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
       }
 
       "report errors when 2nd ETAG call fails and audit failure" in new Setup {
@@ -262,6 +292,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
       }
 
       "report errors when 3rd ETAG call fails and audit failure" in new Setup {
@@ -293,6 +325,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
       }
 
       "report errors when 1st IABD 59 POST fails and audit failure" in new Setup {
@@ -323,6 +357,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
       }
 
 
@@ -355,6 +391,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
+
+        verifySessionGotSubmittedState
       }
 
       "report errors when 1st ETAG call fails and audit failure " in new Setup {
@@ -372,6 +410,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
       }
 
       "report errors when 2nd ETAG call fails and audit failure" in new Setup {
@@ -396,6 +436,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
       }
 
       "report errors when 1st IABD 59 POST fails and audit failure" in new Setup {
@@ -423,6 +465,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
       }
 
       "report errors when 2nd IABD 59 POST fails and audit failure" in new Setup {
@@ -452,6 +496,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
       }
     }
 

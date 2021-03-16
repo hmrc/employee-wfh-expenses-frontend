@@ -70,9 +70,11 @@ disclaimer.2019And2020And2021.list1.text = You can claim and get tax relief on e
 disclaimer.2019And2020And2021.list1.item1 = tax year 6 April 2021 to 5 April 2022
 disclaimer.2019And2020And2021.list1.item2 = tax year 6 April 2020 to 5 April 2021
 disclaimer.2019And2020And2021.list2.text = You can also claim and get tax relief on expenses of £4 a week for:
-disclaimer.2019And2020And2021.list2.item1 = tax year 6 April 2019 to 5 April 2020disclaimer.paragraph.three.a=Os yw’ch costau ychwanegol yn fwy na hyn, gallwch hawlio am fwy o ryddhad treth ond bydd angen i chi
-disclaimer.paragraph.three.b=ddefnyddio’r gwasanaeth Rhyddhad Treth ar gyfer treuliau cyflogaeth
-disclaimer.paragraph.three.c=a darparu tystiolaeth, fel derbyniadau a biliau manwl a gwiriadwy.
+disclaimer.2019And2020And2021.list2.item1 = tax year 6 April 2019 to 5 April 2020
+disclaimer.paragraph.three.a = If your extra costs are more than this you can claim for more tax relief.
+disclaimer.paragraph.three.b = You will need to
+disclaimer.paragraph.three.c = claim tax relief for expenses of employment
+disclaimer.paragraph.three.d = and provide evidence, like detailed and verifiable receipts and bills.
 disclaimer.list=disclaimerList
 disclaimer.list.text=Gallwch hawlio os yw’r canlynol yn wir:
 disclaimer.list.item1=nad yw’ch cyflogwr eisoes wedi talu’ch treuliau

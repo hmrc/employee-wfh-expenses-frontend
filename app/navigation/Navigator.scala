@@ -16,26 +16,29 @@
 
 package navigation
 
-import java.time.LocalDate
-
-import javax.inject.{Inject, Singleton}
-import play.api.mvc.Call
 import controllers.routes
-import pages._
 import models._
+import pages._
+import play.api.mvc.Call
+
+import java.time.LocalDate
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class Navigator @Inject()() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
+    case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
+    case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
+    case DisclaimerPage => ua => disclaimerNextPage(ua)
     case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
     case _ => _ => routes.IndexController.onPageLoad()
   }
 
   def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
 
-  def checkStartWorkingFromHomeDate(userAnswers: UserAnswers) = {
-    val earliestStartDate = LocalDate.of(2019,4,6)
+  def checkStartWorkingFromHomeDate(userAnswers: UserAnswers): Call = {
+    val earliestStartDate = LocalDate.of(2020,1,1)
 
     userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
       case Some(startDate) =>
@@ -45,6 +48,26 @@ class Navigator @Inject()() {
         }
       case None => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
     }
+  }
 
+  def claimJourneyFlow(userAnswers: UserAnswers): Call = {
+    userAnswers.get(ClaimedForTaxYear2020) match {
+      case Some(claimedAlready) if claimedAlready   => routes.DisclaimerController.onPageLoad()
+      case Some(claimedAlready) if !claimedAlready  => routes.SelectTaxYearsToClaimForController.onPageLoad()
+      case None                                     => routes.IndexController.onPageLoad()
+    }
+  }
+
+  def disclaimerNextPage(userAnswers: UserAnswers): Call = {
+
+    (
+      userAnswers.is2021Only,
+      userAnswers.is2019And2020Only,
+      userAnswers.is2019And2020And2021Only
+    ) match {
+      case (true, _, _) => routes.YourTaxReliefController.onPageLoad()
+      case (_, true, _) => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+      case (_, _, true) => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+    }
   }
 }

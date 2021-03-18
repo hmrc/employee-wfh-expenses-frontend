@@ -16,12 +16,21 @@
 
 package generators
 
+import models.SelectTaxYearsToClaimFor
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
 import play.api.libs.json.{JsValue, Json}
 
 trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
+
+  implicit lazy val arbitrarySelectTaxYearsToClaimForUserAnswersEntry: Arbitrary[(SelectTaxYearsToClaimForPage.type, JsValue)] =
+    Arbitrary {
+      for {
+        page  <- arbitrary[SelectTaxYearsToClaimForPage.type]
+        value <- arbitrary[SelectTaxYearsToClaimFor].map(Json.toJson(_))
+      } yield (page, value)
+    }
 
   implicit lazy val arbitraryWhenDidYouFirstStartWorkingFromHomeUserAnswersEntry: Arbitrary[(WhenDidYouFirstStartWorkingFromHomePage.type, JsValue)] =
     Arbitrary {

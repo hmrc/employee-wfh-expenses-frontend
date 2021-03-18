@@ -19,6 +19,7 @@
 @this(
         main_template: MainTemplate,
         formHelper: FormWithCSRF,
+        backLink: GovukBackLink,
         button: GovukButton,
         govukWarningText : GovukWarningText,
         frontendAppConfig: FrontendAppConfig
@@ -26,17 +27,39 @@
 
 @()( implicit request: Request[_], messages: Messages)
 
-@main_template(title = messages("disclaimer.heading")) {
+@main_template(
+ title = messages("disclaimer.heading"),
+ beforeContentBlock = Some(
+  backLink(
+   BackLink(
+    href = routes.SelectTaxYearsToClaimForController.onPageLoad().url,
+    content = Text(messages("site.back")),
+    attributes = Map("id" -> "back-link")
+   )
+  )
+ )) {
     @formHelper(action = routes.DisclaimerController.onSubmit(), 'autoComplete -> "off") {
 
      <h1 class="govuk-heading-xl">@messages("disclaimer.heading")</h1>
 
      <p class="govuk-body">@messages("disclaimer.paragraph.one")</p>
-     <p class="govuk-body">@messages("disclaimer.paragraph.two")</p>
+
+     <p class="govuk-body">@messages("disclaimer.2019And2020And2021.list1.text")</p>
+     <ul class="govuk-list govuk-list--bullet">
+      <li>@messages("disclaimer.2019And2020And2021.list1.item1")</li>
+      <li>@messages("disclaimer.2019And2020And2021.list1.item2")</li>
+     </ul>
+
+     <p class="govuk-body">@messages("disclaimer.2019And2020And2021.list2.text")</p>
+     <ul class="govuk-list govuk-list--bullet">
+      <li>@messages("disclaimer.2019And2020And2021.list2.item1")</li>
+     </ul>
+
      <p class="govuk-body">
       @messages("disclaimer.paragraph.three.a")
-      <a href=@frontendAppConfig.p87DigitalFormUrl>@messages("disclaimer.paragraph.three.b")</a>
-      @messages("disclaimer.paragraph.three.c")
+      @messages("disclaimer.paragraph.three.b")
+      <a href=@frontendAppConfig.p87DigitalFormUrl>@messages("disclaimer.paragraph.three.c")</a>
+      @messages("disclaimer.paragraph.three.d")
      </p>
 
      <p class="govuk-body">@messages("disclaimer.list.text")</p>

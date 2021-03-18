@@ -34,7 +34,8 @@ class DateMappingsSpec extends FreeSpec with MustMatchers with ScalaCheckPropert
       allRequiredKey = "error.required.all",
       twoRequiredKey = "error.required.two",
       invalidKey     = "error.invalid",
-      futureDateKey  = "error.future.date"
+      futureDateKey  = "error.future.date",
+      invalidTaxYearKey = "whenDidYouFirstStartWorkingFromHome.error.invalidTaxYearDate"
     )
   )
 

@@ -76,10 +76,18 @@ ivfailed.tryAgain.href.text = confirm your identity
 disclaimer.title = You must read the following before making a claim
 disclaimer.heading = You must read the following before making a claim
 disclaimer.paragraph.one = You can use this service to claim tax relief on the extra expenses of working from home because of coronavirus (COVID-19).
-disclaimer.paragraph.two = You can claim and get tax relief on expenses of £6 a week for this tax year, 6 April 2020 to 5 April 2021. Last tax year (6 April 2019 to 5 April 2020) the rate was £4 a week.
-disclaimer.paragraph.three.a = If your extra costs are more than this you can claim for more tax relief but you will need to
-disclaimer.paragraph.three.b = use the Tax relief for expenses of employment service
-disclaimer.paragraph.three.c = and provide evidence, like detailed and verifiable receipts and bills.
+disclaimer.2021.paragraph.two = You can claim and get tax relief on expenses of £6 a week for this tax year, 6 April 2021 to 5 April 2022.
+disclaimer.2019And2020And2021.list1.text = You can claim and get tax relief on expenses of £6 a week for:
+disclaimer.2019And2020And2021.list1.item1 = tax year 6 April 2021 to 5 April 2022
+disclaimer.2019And2020And2021.list1.item2 = tax year 6 April 2020 to 5 April 2021
+disclaimer.2019And2020And2021.list2.text = You can also claim and get tax relief on expenses of £4 a week for:
+disclaimer.2019And2020And2021.list2.item1 = tax year 6 April 2019 to 5 April 2020
+
+
+disclaimer.paragraph.three.a = If your extra costs are more than this you can claim for more tax relief.
+disclaimer.paragraph.three.b = You will need to
+disclaimer.paragraph.three.c = claim tax relief for expenses of employment
+disclaimer.paragraph.three.d = and provide evidence, like detailed and verifiable receipts and bills.
 disclaimer.list = disclaimerList
 disclaimer.list.text = You can claim if:
 disclaimer.list.item1 = your employer has not already paid your expenses
@@ -98,25 +106,45 @@ whenDidYouFirstStartWorkingFromHome.error.required.two = The date you started wo
 whenDidYouFirstStartWorkingFromHome.error.required = The date you started working from home must include a {0}
 whenDidYouFirstStartWorkingFromHome.error.invalid = The date you started working from home must be a real date
 whenDidYouFirstStartWorkingFromHome.error.futureDateNotAllowed = The date you started working from home must be today or in the past
-whenDidYouFirstStartWorkingFromHome.paragraph.one = You can apply now for tax relief in this tax year even if you do not know how much longer you will be working from home. This is because we will apply tax relief for the whole of this tax year, even if you go back to your workplace before 6 April 2021.
+whenDidYouFirstStartWorkingFromHome.error.invalidTaxYearDate = Select a date before 6 April 2021
+whenDidYouFirstStartWorkingFromHome2019And2020.paragraph.one = We will apply tax relief for the whole of tax year 2020 to 2021, even if you went back to your workplace before 6 April 2021.
+whenDidYouFirstStartWorkingFromHome2019And2020And2021.paragraph.one = You can apply now for tax relief for tax year 2021 to 2022 even if you do not know how much longer you will be working from home.
+whenDidYouFirstStartWorkingFromHome2019And2020And2021.paragraph.two = This is because we will apply tax relief for the whole of this tax year, even if you go back to your workplace before 6 April 2022.
 
 cannotClaimUsingThisService.title = You cannot claim using this service
 cannotClaimUsingThisService.heading = You cannot claim using this service
-cannotClaimUsingThisService.reason = You can only use this service to claim for this tax year (6 April 2020 to 5 April 2021) or last tax year (6 April 2019 to 5 April 2020).
+cannotClaimUsingThisService.reason = You can only claim expenses for working from home because of coronavirus (COVID-19) for these tax years:
+cannotClaimUsingThisService.reason.year1 = 6 April 2021 to 5 April 2022 (this tax year)
+cannotClaimUsingThisService.reason.year2 = 6 April 2020 to 5 April 2021
+cannotClaimUsingThisService.reason.year3 = 6 April 2019 to 5 April 2020
 cannotClaimUsingThisService.options.text = You can:
 cannotClaimUsingThisService.changeDate.href.text = change the date
-cannotClaimUsingThisService.changeDate = {0} you started working from home
-cannotClaimUsingThisService.alternative.href.text = go to the Tax relief for expenses of employment service
-cannotClaimUsingThisService.alternative = {0} to claim for tax years before 6th April 2019
+cannotClaimUsingThisService.changeDate = {0} you started working from home because of coronavirus (COVID-19)
+cannotClaimUsingThisService.alternative.href.text = claim tax relief for expenses of employment
+cannotClaimUsingThisService.alternative = {0} for tax years before 6 April 2019
 
 yourTaxRelief.title = Check your claim
 yourTaxRelief.heading = Check your claim
 yourTaxRelief.inset.text = You started working from home on
 yourTaxRelief.changeThisDate.href.text = Change this date
+
+yourTaxRelief.2021.title = About your claim
+yourTaxRelief.2021.heading = About your claim
+yourTaxRelief.2021.paragraph.one = You will receive tax relief on your expenses for working from home for the whole of this tax year, 6 April 2021 to 5 April 2022.
+yourTaxRelief.2021.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2022, you will need to claim again.
 yourTaxRelief.2020.paragraph.one = You will receive tax relief on your expenses for working from home for the whole of this tax year (6 April 2020 to 5 April 2021), however long you worked or are working from home.
 yourTaxRelief.2020.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2021, you will need to claim again.
-yourTaxRelief.2019And2020.paragraph.one = You will receive tax relief on your expenses for working from home for {0} of the last tax year (6 April 2019 to 5 April 2020). You will also receive tax relief for the whole of this tax year (6 April 2020 to 5 April 2021), however long you worked or are working from home.
-yourTaxRelief.2019And2020.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2021, you will need to claim again.
+
+yourTaxRelief.2019And2020.list.text = You will receive tax relief on your expenses for working from home for:
+yourTaxRelief.2019And2020.list.item1 = the whole of tax year 6 April 2020 to 5 April 2021
+yourTaxRelief.2019And2020.list.item2 = {0} of tax year 6 April 2019 to 5 April 2020
+
+yourTaxRelief.2019And2020And2021.paragraph.one = You will receive tax relief on your expenses for working from home for the whole of this tax year, 6 April 2021 to 5 April 2022.
+yourTaxRelief.2019And2020And2021.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2022, you will need to claim again.
+yourTaxRelief.2019And2020And2021.list.text = You will also receive tax relief on your expenses for working from home for:
+yourTaxRelief.2019And2020And2021.list.item1 = the whole of tax year 6 April 2020 to 5 April 2021
+yourTaxRelief.2019And2020And2021.list.item2 = {0} of tax year 6 April 2019 to 5 April 2020
+
 yourTaxRelief.submitYourClaim.heading = Now submit your claim
 yourTaxRelief.disclaimer = By submitting this claim you are confirming that, to the best of your knowledge, the details you are providing are correct.
 yourTaxRelief.submit.button.text = Confirm and submit
@@ -125,16 +153,32 @@ confirmation.paperless.button.text = Sign up for paperless notifications
 confirmation.title = Confirmation
 confirmation.heading = Claim complete
 confirmation.text = We will change your tax code
+confirmation.hmrc.text = HMRC will check your claim
 confirmation.text.footer.mail = We will let you know about your tax code change by email.
-confirmation.text.footer.post = We will let you know about your tax code changes by post.
+confirmation.text.footer.post = We will let you know about your tax code change by post, or online if you’ve signed up for paperless notifications.
 confirmation.whatHappensNext.heading = What happens next
-confirmation.whatHappensNext.paragraph.1 = We will increase the amount you can earn tax-free for this tax year to include tax relief on your costs for working from home. We do this by changing your tax code, which decides how much tax you pay.
-confirmation.whatHappensNext.paragraph.1.for.2019 = This change will also include any tax relief from last tax year (6 April 2019 to 5 April 2020).
-confirmation.whatHappensNext.paragraph.2 = You should be able to see changes to your tax code in your Personal Tax Account after 2 working days.
+confirmation.whatHappensNext.paragraph.2 = You should see changes to your tax code in your personal tax account after 2 working days.
+confirmation.whatHappensNext.paragraph.3 = There is no need to contact HMRC.
 confirmation.linkToFeedbackForm.href.text = What did you think of this service? (opens in new tab)
 confirmation.linkToFeedbackForm.href.postfix = (takes 30 seconds)
 confirmation.paperless.header = Get tax letters online
 confirmation.paperless.paragraph.1 = You can view, download or print them when you want. Save time and clear clutter.
+
+confirmation.whatHappensNext.20192020.header.note = We will check if you have paid too much tax.
+confirmation.whatHappensNext.20192020.paragraph.1 = We will write to you by post or email before November 2021 if you have paid too much tax.
+confirmation.whatHappensNext.20192020.paragraph.2 = There is no need to contact HMRC about this.
+
+confirmation.whatHappensNext.2021.header.note = We will let you know about your tax code change by post or email.
+confirmation.whatHappensNext.2021.paragraph.1 = We will increase the amount you can earn tax free for this tax year to include tax relief on your expenses for working from home.
+confirmation.whatHappensNext.2021.paragraph.2 = We do this by changing your tax code, which decides how much tax you pay.
+confirmation.whatHappensNext.2021.paragraph.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+
+confirmation.whatHappensNext.201920202021.header.note = We will:
+confirmation.whatHappensNext.201920202021.listitem.1 = increase the amount you can earn tax free for this tax year by changing your tax code
+confirmation.whatHappensNext.201920202021.listitem.2 = check your claim for previous tax years and write to you by post or email before November 2021
+confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+
 
 manualCorrespondenceIndicator.title = You cannot currently use this service
 manualCorrespondenceIndicator.heading = You cannot currently use this service
@@ -168,3 +212,14 @@ submitYourClaim.list.item1 = your employer has not already paid your expenses
 submitYourClaim.list.item2 = you have been forced to work from home by government guidelines or your employer
 submitYourClaim.list.item3 = you have incurred additional costs as a result of working from home
 submitYourClaim.list.item4 = the information you have provided is correct, to the best of your knowledge
+
+selectTaxYearsToClaimFor.title = Which tax years are you claiming for?
+selectTaxYearsToClaimFor.heading = Which tax years are you claiming for?
+selectTaxYearsToClaimFor.hintText = Select all that apply
+selectTaxYearsToClaimFor.option1 = This tax year (6 April 2021 to 5 April 2022)
+selectTaxYearsToClaimFor.option2 = Previous tax years
+selectTaxYearsToClaimFor.error.required = Select at least one option
+
+service.is.busy.title = Sorry, the service is busy
+service.is.busy.heading = Sorry, the service is busy
+service.is.busy.message = Please try again later.

@@ -18,7 +18,6 @@ package services
 
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-
 import base.SpecBase
 import connectors.{CitizenDetailsConnector, TaiConnector}
 import models.auditing.AuditEventType.{UpdateWorkingFromHomeFlatRateFailure, UpdateWorkingFromHomeFlatRateSuccess}
@@ -30,10 +29,13 @@ import org.mockito.{InOrder, Mockito}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.Matchers._
 import org.scalatestplus.mockito.MockitoSugar
+import pages.SubmittedClaim
 import play.api.mvc.AnyContent
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.UpstreamErrorResponse
+import repositories.SessionRepository
+import uk.gov.hmrc.http.{TooManyRequestException, UpstreamErrorResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import utils.RateLimiting
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -44,21 +46,29 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   val TAX_YEAR_1999_START_DATE: LocalDate = LocalDate.of(1999, 4, 6)
   val TAX_YEAR_2019_START_DATE: LocalDate = LocalDate.of(2019, 4, 6)
   val TAX_YEAR_2019_END_DATE: LocalDate = LocalDate.of(2020, 4, 5)
+  val YEAR_2020_START_DATE: LocalDate = LocalDate.of(2020, 1, 1)
   val TAX_YEAR_2020_START_DATE: LocalDate = LocalDate.of(2020, 4, 6)
   val TAX_YEAR_2020_END_DATE: LocalDate = LocalDate.of(2021, 4, 5)
+  val TAX_YEAR_2021_START_DATE: LocalDate = LocalDate.of(2021, 4, 6)
 
   val mockCitizenDetailsConnector: CitizenDetailsConnector = mock[CitizenDetailsConnector]
   val mockTaiConnector: TaiConnector = mock[TaiConnector]
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
+  val mockThrottler: RateLimiting = mock[RateLimiting]
+  val mockSessionRepository: SessionRepository = mock[SessionRepository]
 
-  val testNino:String = "AA112233A"
+  val testNino: String = "AA112233A"
+
+  import org.mockito.ArgumentCaptor
+
+  val userAnswersArgumentCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
   class Setup {
-    val serviceUnderTest = new SubmissionService(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, frontendAppConfig)
+    val serviceUnderTest = new SubmissionService(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockSessionRepository, frontendAppConfig, mockThrottler)
   }
 
   before {
-    Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector)
+    Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockThrottler, mockSessionRepository)
   }
 
   "calculate2019FlatRate" should {
@@ -91,12 +101,17 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
     }
 
-    "calculate the total rate as £212" when {
-      "given a start date of 6/4/2019 (the first day of the 2019 tax year)" in new Setup {
-        serviceUnderTest.calculate2019FlatRate(TAX_YEAR_2019_START_DATE) shouldBe 212
+    "calculate the total rate as £56" when {
+      "given a start date of 1/1/2020 (latest 2019 claiming date)" in new Setup {
+        serviceUnderTest.calculate2019FlatRate(YEAR_2020_START_DATE) shouldBe 56
       }
+
+      "given a start date of 6/4/2019 (the start of the 2019 tax year)" in new Setup {
+        serviceUnderTest.calculate2019FlatRate(TAX_YEAR_2019_START_DATE) shouldBe 56
+      }
+
       "given a start date of 6/4/1999 (the first day of the 1999 tax year)" in new Setup {
-        serviceUnderTest.calculate2019FlatRate(TAX_YEAR_1999_START_DATE) shouldBe 212
+        serviceUnderTest.calculate2019FlatRate(TAX_YEAR_1999_START_DATE) shouldBe 56
       }
     }
 
@@ -104,119 +119,400 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
   "calculate2020FlatRate" should {
     "calculate the total rate as £312" in new Setup {
-      serviceUnderTest. calculate2020FlatRate() shouldBe 312
+      serviceUnderTest.calculate2020FlatRate() shouldBe 312
+    }
+  }
+
+  "calculate2021FlatRate" should {
+    "calculate the total rate as £312 for a 2021 claim" in new Setup {
+      serviceUnderTest.calculate2021FlatRate() shouldBe 312
     }
   }
 
 
   "submit" when {
-    implicit val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest,"internalId", UserAnswers("id"), testNino)
 
-    val tests = Seq(TAX_YEAR_2020_START_DATE, TAX_YEAR_2019_START_DATE)
+    implicit val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, "internalId", UserAnswers("id"), testNino)
+
     val etag1 = ETag(100)
     val etag2 = ETag(101)
+    val etag3 = ETag(102)
 
-    for (startDate <- tests) {
-      s"a working from home date started on $startDate" should {
-        "upsert 2 IABD 59's (happy flow) and audit success" in new Setup {
+    def verifySessionGotSubmittedState = {
+      verify(mockSessionRepository).set(userAnswersArgumentCaptor.capture())
+      userAnswersArgumentCaptor.getValue.get(SubmittedClaim).isDefined shouldBe true
+    }
 
-          when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-            .thenReturn(Future {etag1} )
-            .thenReturn(Future {etag2} )
+    def verifyNoSubmittedStateUpdate = {
+      verify(mockSessionRepository, times(0)).set(any())
+    }
 
-          when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())).thenReturn(Future.successful(()))
-          when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())).thenReturn(Future.successful(()))
 
-          await(serviceUnderTest.submitExpenses(startDate)).isRight shouldBe true
+    "no working from home date found (2021 only)" should {
+      "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
 
-          val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
-          inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
-          inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())
-          inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
-          inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future {
+            etag3
+          })
 
-          verify(mockAuditConnector, times(1))
-            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString),any[AuditData]())(any(),any(),any())
-        }
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), eqm(etag3))(any(), any())).thenReturn(Future.successful(()))
 
-        "report errors when 1st ETAG call fails and audit failure " in new Setup {
-          when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        await(serviceUnderTest.submitExpenses(None, false, false)).isRight shouldBe true
 
-          await(serviceUnderTest.submitExpenses(startDate)).isLeft shouldBe true
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
 
-          val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
-          inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
-          inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
-          inOrder.verify(mockCitizenDetailsConnector, times(0)).getETag(any())(any(), any())
-          inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+        verifySessionGotSubmittedState
+      }
 
-          verify(mockAuditConnector, times(1))
-            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString),any[AuditData]())(any(),any(),any())
-        }
+      "report errors when ETAG call fails and audit failure" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
-        "report errors when 2nd ETAG call fails and audit failure" in new Setup {
-          when(mockCitizenDetailsConnector.getETag(any())(any(), any()))
-            .thenReturn(Future {etag1} )
-            .thenReturn(Future.failed(new RuntimeException))
+        await(serviceUnderTest.submitExpenses(None, false, false)).isLeft shouldBe true
 
-          when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any()))
-            .thenReturn(Future.successful(()))
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
 
-          await(serviceUnderTest.submitExpenses(startDate)).isLeft shouldBe true
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
 
-          val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
-          inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
-          inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())
-          inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
-          inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+        verifyNoSubmittedStateUpdate
+      }
+    }
 
-          verify(mockAuditConnector, times(1))
-            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString),any[AuditData]())(any(),any(),any())
-        }
+    s"a working from home date of $YEAR_2020_START_DATE" should {
+      "upsert 3 IABD 59's (happy flow) and audit success" in new Setup {
 
-        "report errors when 1st IABD 59 POST fails and audit failure" in new Setup {
-          when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-            .thenReturn(Future {etag1})
-            .thenReturn(Future {etag2})
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
 
-          when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any()))
-            .thenReturn(Future.failed(UpstreamErrorResponse("SERVICE IS UNAVAILABLE", SERVICE_UNAVAILABLE)))
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future {
+            etag1
+          })
+          .thenReturn(Future {
+            etag2
+          })
+          .thenReturn(Future {
+            etag3
+          })
 
-          await(serviceUnderTest.submitExpenses(startDate)).isLeft shouldBe true
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), eqm(etag3))(any(), any())).thenReturn(Future.successful(()))
 
-          val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
-          inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
-          inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())
-          inOrder.verify(mockCitizenDetailsConnector, times(0)).getETag(any())(any(), any())
-          inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+        await(serviceUnderTest.submitExpenses(Some(YEAR_2020_START_DATE), false, true)).isRight shouldBe true
 
-          verify(mockAuditConnector, times(1))
-            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString),any[AuditData]())(any(),any(),any())
-        }
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2021), any(), eqm(etag3))(any(), any())
 
-        "report errors when 2nd IABD 59 POST fails and audit failure" in new Setup {
-          when(mockCitizenDetailsConnector.getETag(any())(any(), any()))
-            .thenReturn(Future {etag1})
-            .thenReturn(Future {etag2})
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
 
-          when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any()))
-            .thenReturn(Future.successful(()))
+        verifySessionGotSubmittedState
+      }
 
-          when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any()))
-            .thenReturn(Future.failed(UpstreamErrorResponse("Not found", 404)))
+      "upsert 2 IABD 59's and audit success without 2021 claim" in new Setup {
 
-          await(serviceUnderTest.submitExpenses(startDate)).isLeft shouldBe true
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
 
-          val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
-          inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
-          inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())
-          inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
-          inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future {
+            etag1
+          })
+          .thenReturn(Future {
+            etag2
+          })
 
-          verify(mockAuditConnector, times(1))
-            .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString),any[AuditData]())(any(),any(),any())
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())).thenReturn(Future.successful(()))
+
+        await(serviceUnderTest.submitExpenses(Some(YEAR_2020_START_DATE), true, false)).isRight shouldBe true
+
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
+
+        verifySessionGotSubmittedState
+      }
+
+      "report errors when 1st ETAG call fails and audit failure" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+
+        await(serviceUnderTest.submitExpenses(Some(YEAR_2020_START_DATE), true, false)).isLeft shouldBe true
+
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
+      }
+
+      "report errors when 2nd ETAG call fails and audit failure" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+        when(mockCitizenDetailsConnector.getETag(any())(any(), any()))
+          .thenReturn(Future {
+            etag1
+          })
+          .thenReturn(Future.failed(new RuntimeException))
+
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any()))
+          .thenReturn(Future.successful(()))
+
+        await(serviceUnderTest.submitExpenses(Some(YEAR_2020_START_DATE), true, false)).isLeft shouldBe true
+
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
+      }
+
+      "report errors when 3rd ETAG call fails and audit failure" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+        when(mockCitizenDetailsConnector.getETag(any())(any(), any()))
+          .thenReturn(Future {
+            etag1
+          })
+          .thenReturn(Future {
+            etag2
+          })
+          .thenReturn(Future.failed(new RuntimeException))
+
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any()))
+          .thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any()))
+          .thenReturn(Future.successful(()))
+
+        await(serviceUnderTest.submitExpenses(Some(YEAR_2020_START_DATE), false, true)).isLeft shouldBe true
+
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
+      }
+
+      "report errors when 1st IABD 59 POST fails and audit failure" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future {
+            etag1
+          })
+          .thenReturn(Future {
+            etag2
+          })
+          .thenReturn(Future {
+            etag3
+          })
+
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any()))
+          .thenReturn(Future.failed(UpstreamErrorResponse("SERVICE IS UNAVAILABLE", SERVICE_UNAVAILABLE)))
+
+        await(serviceUnderTest.submitExpenses(Some(TAX_YEAR_2019_START_DATE), false, true)).isLeft shouldBe true
+
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2019), any(), eqm(etag1))(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector, times(0)).getETag(any())(any(), any())
+        inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
+      }
+
+
+    }
+
+    s"a working from home date of $TAX_YEAR_2020_START_DATE" should {
+      "upsert 2 IABD 59's and audit success" in new Setup {
+
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future {
+            etag2
+          })
+          .thenReturn(Future {
+            etag3
+          })
+
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), eqm(etag3))(any(), any())).thenReturn(Future.successful(()))
+
+        await(serviceUnderTest.submitExpenses(Some(TAX_YEAR_2020_START_DATE), false, true)).isRight shouldBe true
+
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2021), any(), eqm(etag3))(any(), any())
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
+
+        verifySessionGotSubmittedState
+      }
+
+      "report errors when 1st ETAG call fails and audit failure " in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+
+        await(serviceUnderTest.submitExpenses(Some(TAX_YEAR_2020_START_DATE), false, true)).isLeft shouldBe true
+
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector, times(0)).getETag(any())(any(), any())
+        inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
+      }
+
+      "report errors when 2nd ETAG call fails and audit failure" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+        when(mockCitizenDetailsConnector.getETag(any())(any(), any()))
+          .thenReturn(Future {
+            etag2
+          })
+          .thenReturn(Future.failed(new RuntimeException))
+
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any()))
+          .thenReturn(Future.successful(()))
+
+        await(serviceUnderTest.submitExpenses(Some(TAX_YEAR_2020_START_DATE), false, true)).isLeft shouldBe true
+
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
+      }
+
+      "report errors when 1st IABD 59 POST fails and audit failure" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future {
+            etag2
+          })
+          .thenReturn(Future {
+            etag3
+          })
+
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any()))
+          .thenReturn(Future.failed(UpstreamErrorResponse("SERVICE IS UNAVAILABLE", SERVICE_UNAVAILABLE)))
+
+        await(serviceUnderTest.submitExpenses(Some(TAX_YEAR_2020_START_DATE), false, true)).isLeft shouldBe true
+
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector, times(0)).getETag(any())(any(), any())
+        inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
+      }
+
+      "report errors when 2nd IABD 59 POST fails and audit failure" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+        when(mockCitizenDetailsConnector.getETag(any())(any(), any()))
+          .thenReturn(Future {
+            etag2
+          })
+          .thenReturn(Future {
+            etag3
+          })
+
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any()))
+          .thenReturn(Future.successful(()))
+
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), eqm(etag3))(any(), any()))
+          .thenReturn(Future.failed(UpstreamErrorResponse("Not found", 404)))
+
+        await(serviceUnderTest.submitExpenses(Some(TAX_YEAR_2020_START_DATE), false, true)).isLeft shouldBe true
+
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any())
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(2021), any(), eqm(etag3))(any(), any())
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
+      }
+    }
+
+    "rate limit has been reached (no tokens in bucket)" should {
+      "throw a TooManyRequestException" in new Setup {
+
+        when(mockThrottler.enabled).thenReturn(true)
+        when(mockThrottler.hasAToken).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+
+        intercept[TooManyRequestException] {
+          await(serviceUnderTest.submitExpenses(Some(TAX_YEAR_2020_START_DATE), false, false))
         }
       }
+
     }
   }
 }

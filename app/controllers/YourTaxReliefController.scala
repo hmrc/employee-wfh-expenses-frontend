@@ -17,76 +17,70 @@
 package controllers
 
 import controllers.actions._
-
-import javax.inject.Inject
 import pages.WhenDidYouFirstStartWorkingFromHomePage
-import play.api.{Logger, Logging}
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import uk.gov.hmrc.time.TaxYear
 import utils.TaxYearDates._
-import views.html.{YourTaxRelief2019And2020View, YourTaxRelief2020OnlyView}
+import views.html._
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import scala.concurrent.ExecutionContext
 
 class YourTaxReliefController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       identify: IdentifierAction,
-                                       checkAlreadyClaimed: CheckAlreadyClaimedAction,
-                                       citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                       getData: DataRetrievalAction,
-                                       requireData: DataRequiredAction,
-                                       submissionService: SubmissionService,
-                                       sessionRepository: SessionRepository,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       yourTaxRelief2019And2020View: YourTaxRelief2019And2020View,
-                                       yourTaxRelief2020OnlyView: YourTaxRelief2020OnlyView
+                                         override val messagesApi: MessagesApi,
+                                         identify: IdentifierAction,
+                                         checkAlreadyClaimed: CheckAlreadyClaimedAction,
+                                         citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                         getData: DataRetrievalAction,
+                                         requireData: DataRequiredAction,
+                                         submissionService: SubmissionService,
+                                         val controllerComponents: MessagesControllerComponents,
+                                         yourTaxRelief2021OnlyView: YourTaxRelief2021OnlyView,
+                                         yourTaxRelief2019_2020_2021View: YourTaxRelief2019_2020_2021View,
+                                         yourTaxRelief2019_2020View: YourTaxRelief2019_2020View
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
 
-        case None =>
-          Redirect(routes.DisclaimerController.onPageLoad())
+      (
+        request.userAnswers.is2021Only,
+        request.userAnswers.is2019And2020Only,
+        request.userAnswers.is2019And2020And2021Only,
+        request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+      ) match {
+        case (true, _, _, _) => Ok(yourTaxRelief2021OnlyView())
 
-        case Some(date) if TaxYear(2019).contains(date) =>
-          Ok(
-            yourTaxRelief2019And2020View(date, numberOfWeeks(date, TAX_YEAR_2019_END_DATE))
-          )
+        case (_, true, _, Some(date)) => Ok(yourTaxRelief2019_2020View(date, numberOfWeeks(date, TAX_YEAR_2019_END_DATE)))
+        case (_, _, true, Some(date)) => Ok(yourTaxRelief2019_2020_2021View(date, numberOfWeeks(date, TAX_YEAR_2019_END_DATE)))
 
-        case Some(date) if TaxYear(2020).contains(date) =>
-          Ok(
-            yourTaxRelief2020OnlyView(date)
-          )
+        case (_, true, _, None) => Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
+        case (_, _, true, None) => Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
 
-        case Some(date) =>
-          logger.error(s"[YourTaxReliefController][onPageLoad] Received an unexpected date : $date")
+        case _ =>
+          logger.error("[SubmitYourClaimController][onPageLoad] - No years to claim for found")
           Redirect(routes.TechnicalDifficultiesController.onPageLoad())
       }
   }
 
+
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
     implicit request =>
 
-      request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
+      submissionService.submitExpenses(
+        request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage),
+        request.userAnswers.is2019And2020Only,
+        request.userAnswers.is2019And2020And2021Only
+      ) map {
+        case Right(_) =>
+          Redirect(routes.ConfirmationController.onPageLoad())
+        case Left(_) =>
+          logger.error("[SubmitYourClaimController][onSubmit] - Error submitting")
+          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
 
-        case None =>
-          logger.error(s"[SubmitYourClaimController][onSubmit] - Start date is missing")
-          Future.successful( Redirect(routes.TechnicalDifficultiesController.onPageLoad()) )
-
-        case Some(startDate) =>
-          submissionService.submitExpenses(startDate) map {
-
-            case Right(_) =>
-              Redirect(routes.ConfirmationController.onPageLoad())
-
-            case Left(_) =>
-              Redirect(routes.TechnicalDifficultiesController.onPageLoad())
-          }
       }
   }
 

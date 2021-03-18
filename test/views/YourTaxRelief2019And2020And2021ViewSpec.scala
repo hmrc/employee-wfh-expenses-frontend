@@ -20,14 +20,14 @@ import java.time.LocalDate
 
 import utils.TaxYearDates._
 import views.behaviours.ViewBehaviours
-import views.html.YourTaxRelief2019And2020View
+import views.html.YourTaxRelief2019_2020_2021View
 
 // scalastyle:off magic.number
-class YourTaxRelief2019And2020OnlyViewSpec extends ViewBehaviours {
+class YourTaxRelief2019And2020And2021ViewSpec extends ViewBehaviours {
 
-  val view = viewFor[YourTaxRelief2019And2020View](Some(emptyUserAnswers))
+  val view = viewFor[YourTaxRelief2019_2020_2021View](Some(emptyUserAnswers))
 
-  "YourTaxRelief2019And2020View" must {
+  "YourTaxRelief2019_2020_2021View" must {
     val applyView = view.apply(TAX_YEAR_2019_START_DATE, 53)(fakeRequest, messages)
 
     behave like normalPage(applyView, "yourTaxRelief")
@@ -40,14 +40,14 @@ class YourTaxRelief2019And2020OnlyViewSpec extends ViewBehaviours {
       val applyView = view.apply(workingFromHomeDate, 53)(fakeRequest, messages)
 
       val doc = asDocument(applyView)
-      assertContainsText(doc, messages("yourTaxRelief.2019And2020.paragraph.one", "53 weeks"))
+      assertContainsText(doc, messages("yourTaxRelief.2019And2020And2021.list.item2", "53 weeks"))
     }
 
     "must display the number of weeks on the page (singular)" in {
       val applyView = view.apply(TAX_YEAR_2019_END_DATE, 1)(fakeRequest, messages)
 
       val doc = asDocument(applyView)
-      assertContainsText(doc, messages("yourTaxRelief.2019And2020.paragraph.one", "1 week"))
+      assertContainsText(doc, messages("yourTaxRelief.2019And2020And2021.list.item2", "1 week"))
     }
 
     "must display the working from home start date in a easy readable fashion" in {

@@ -28,6 +28,15 @@ import CheckYourAnswersHelper._
 
 class CheckYourAnswersHelper(userAnswers: UserAnswers)(implicit messages: Messages) {
 
+  def selectTaxYearsToClaimFor: Option[AnswerRow] = userAnswers.get(SelectTaxYearsToClaimForPage) map {
+    x =>
+      AnswerRow(
+        HtmlFormat.escape(messages("selectTaxYearsToClaimFor.checkYourAnswersLabel")),
+        Html(x.map(value => HtmlFormat.escape(messages(s"selectTaxYearsToClaimFor.$value")).toString).mkString(",<br>")),
+        routes.SelectTaxYearsToClaimForController.onPageLoad().url
+      )
+  }
+
   def whenDidYouFirstStartWorkingFromHome: Option[AnswerRow] = userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) map {
     x =>
       AnswerRow(

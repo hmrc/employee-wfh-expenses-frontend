@@ -17,38 +17,53 @@
 package controllers
 
 import controllers.actions._
-import javax.inject.Inject
-import models.UserAnswers
+import models.SelectTaxYearsToClaimFor.{Option1, Option2}
+import navigation.Navigator
+import pages.{ClaimedForTaxYear2020, DisclaimerPage, SelectTaxYearsToClaimForPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.DisclaimerView
+import views.html.{Disclaimer2019_2020View, Disclaimer2019_2020_2021View, Disclaimer2021View}
 
-import scala.concurrent.ExecutionContext
+import javax.inject.Inject
 
 class DisclaimerController @Inject()(
-                                       override val messagesApi: MessagesApi,
-                                       sessionRepository: SessionRepository,
-                                       identify: IdentifierAction,
-                                       checkAlreadyClaimed: CheckAlreadyClaimedAction,
-                                       citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                       getData: DataRetrievalAction,
-                                       val controllerComponents: MessagesControllerComponents,
-                                       view: DisclaimerView
+                                      override val messagesApi: MessagesApi,
+                                      identify: IdentifierAction,
+                                      citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                      getData: DataRetrievalAction,
+                                      requireData: DataRequiredAction,
+                                      navigator: Navigator,
+                                      val controllerComponents: MessagesControllerComponents,
+                                      disclaimer2021View : Disclaimer2021View,
+                                      disclaimer2019_2020View: Disclaimer2019_2020View,
+                                      disclaimer2019_2020_2021View: Disclaimer2019_2020_2021View
                                      ) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData) {
+  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
 
-      if (request.userAnswers.isEmpty) {
-        sessionRepository.set(UserAnswers(request.internalId))
+      (request.userAnswers.get(ClaimedForTaxYear2020), request.userAnswers.get(SelectTaxYearsToClaimForPage) ) match {
+        case (Some(true), _)      => Ok(disclaimer2021View())
+
+        case (Some(false), None)  => Redirect(routes.SelectTaxYearsToClaimForController.onPageLoad())
+
+        case (Some(false), Some(yearsToClaimFor)) => yearsToClaimFor.size match {
+            case 0 => Redirect(routes.SelectTaxYearsToClaimForController.onPageLoad())
+            case 2 => Ok(disclaimer2019_2020_2021View())
+            case 1 => yearsToClaimFor.head match {
+                case Option1 => Ok(disclaimer2021View())
+                case Option2 => Ok(disclaimer2019_2020View())
+              }
+        }
+
+        case (None,_) => Redirect(routes.IndexController.onPageLoad())
       }
 
-      Ok(view())
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData) {
-      Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
+  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
+    implicit request =>
+      Redirect(navigator.nextPage(DisclaimerPage, request.userAnswers))
   }
 }

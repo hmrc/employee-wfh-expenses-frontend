@@ -15,18 +15,15 @@
  *@
 
 @import config.FrontendAppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcTimeoutDialog
 @import uk.gov.hmrc.hmrcfrontend.views.Aliases.ReportTechnicalIssue
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcFooter
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcHeader
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.HmrcLanguageSelect
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcLanguageSelect, HmrcTimeoutDialog}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcStandardHeader, hmrcStandardFooter}
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language._
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcHead
 
 @this(
         govukLayout: GovukLayout,
-        hmrcFooter: HmrcFooter,
-        hmrcHeader: HmrcHeader,
+        hmrcFooter: hmrcStandardFooter,
+        hmrcStandardHeader: HmrcStandardHeader,
         hmrcReportTechnicalIssue: hmrcComponents.HmrcReportTechnicalIssue,
         appConfig: FrontendAppConfig,
         hmrcTimeoutDialog: HmrcTimeoutDialog,
@@ -59,17 +56,6 @@
     <script>window.HMRCFrontend.initAll();</script>
 }
 
-@header() = {
-    @hmrcHeader(hmrcComponents.Header(
-        homepageUrl = controllers.routes.IndexController.onPageLoad().url,
-        serviceName = Some(messages("service.name")),
-        serviceUrl = controllers.routes.IndexController.onPageLoad().url,
-        containerClasses = "govuk-width-container",
-        signOutHref = Some(routes.SignedOutController.signOutToExitSurvey().url),
-        language = if (messages.lang.code == "cy") Cy else En
-    ))
-}
-
 @beforeContentBlockWithLanguageToggle = {
     @hmrcLanguageSelect(LanguageSelect(
         if (messages.lang.code == "cy") Cy else En,
@@ -93,7 +79,11 @@
 @govukLayout(
     pageTitle = Some(title),
     headBlock = Some(hmrcHead(headBlock = Some(headBlock))),
-    headerBlock = Some(header()),
+    headerBlock = Some(
+        hmrcStandardHeader(
+            signOutUrl = Some(routes.SignedOutController.signOutToExitSurvey().url)
+        )
+    ),
     beforeContentBlock = Some(beforeContentBlockWithLanguageToggle),
     bodyEndBlock = None,
     scriptsBlock = Some(scripts),

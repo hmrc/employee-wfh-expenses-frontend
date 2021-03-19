@@ -20,6 +20,7 @@ import java.time.LocalDate
 
 import play.api.data.FormError
 import play.api.data.format.Formatter
+import utils.TaxYearDates.TAX_YEAR_2020_END_DATE
 
 import scala.util.{Failure, Success, Try}
 
@@ -29,6 +30,7 @@ private[mappings] class LocalDateFormatter(
                                             twoRequiredKey: String,
                                             requiredKey: String,
                                             futureDateKey: String,
+                                            invalidTaxYearKey: String,
                                             args: Seq[String] = Seq.empty
                                           ) extends Formatter[LocalDate] with Formatters {
 
@@ -36,14 +38,18 @@ private[mappings] class LocalDateFormatter(
 
   private def toDate(key: String, day: Int, month: Int, year: Int): Either[Seq[FormError], LocalDate] =
     Try(LocalDate.of(year, month, day)) match {
-      case Success(date) =>
-        if (date.isAfter(LocalDate.now())) {
-          Left(Seq(FormError(key, futureDateKey, args)))
-        } else {
-          Right(date)
-        }
+      case Success(date) => date.isAfter(LocalDate.now()) match {
+        case true => Left(Seq(FormError(key, futureDateKey, args)))
+        case false =>
+          if (date.isAfter(TAX_YEAR_2020_END_DATE)) {
+            Left(Seq(FormError(key, invalidTaxYearKey, args)))
+          } else {
+            Right(date)
+          }
+      }
       case Failure(_) =>
         Left(Seq(FormError(key, invalidKey, args)))
+
     }
 
   private def formatDate(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {

@@ -1,0 +1,65 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import config.FrontendAppConfig
+@import uk.gov.hmrc.time.TaxYear
+
+@this(
+        main_template: MainTemplate,
+        frontendAppConfig: FrontendAppConfig,
+        formHelper: FormWithCSRF,
+        backLink: GovukBackLink,
+        govukPanel: GovukPanel,
+        govukInsetText: GovukInsetText,
+        button: GovukButton
+)
+
+@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String])(implicit request: Request[_], messages: Messages)
+
+@linkToFeedbackForm = {<a  class="govuk-link" href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
+
+@main_template(title = messages("confirmation.title")) {
+
+    @govukPanel(Panel(
+        title = Text(messages("confirmation.heading")),
+        content = HtmlContent(messages("confirmation.text"))
+    ))
+
+    <p class="govuk-body">@messages("confirmation.whatHappensNext.2021.header.note")</p>
+
+    <h2 class="govuk-heading-m">@messages("confirmation.whatHappensNext.heading")</h2>
+
+    <p class="govuk-body">
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.2021.paragraph.1")</p>
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.2021.paragraph.2")</p>
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.2021.paragraph.3")</p>
+    </p>
+
+    <p class="govuk-body">
+        @linkToFeedbackForm
+        @messages("confirmation.linkToFeedbackForm.href.postfix")
+    </p>
+
+    @if(!paperLessAvailable) {
+        <h2 class="govuk-heading-m">@messages("confirmation.paperless.header")</h2>
+        <p class="govuk-body">@messages("confirmation.paperless.paragraph.1")</p>
+
+            @button(Button(
+                href = Some(paperlessSignupUrl.get),
+                content = Text(messages("confirmation.paperless.button.text"))
+            ))
+    }
+}

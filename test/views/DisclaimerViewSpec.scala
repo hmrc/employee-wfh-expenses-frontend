@@ -17,13 +17,13 @@
 package views
 
 import views.behaviours.ViewBehaviours
-import views.html.DisclaimerView
+import views.html.Disclaimer2021View
 
 class DisclaimerViewSpec extends ViewBehaviours {
 
   "Disclaimer view" must {
 
-    val view = viewFor[DisclaimerView](Some(emptyUserAnswers))
+    val view = viewFor[Disclaimer2021View](Some(emptyUserAnswers))
 
     val applyView = view.apply()(fakeRequest, messages)
 

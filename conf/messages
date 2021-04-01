@@ -72,7 +72,6 @@ ivfailed.postalForm.href.text = print and post form
 ivfailed.helpline.href.text = Income Tax: general enquiries helpline
 ivfailed.tryAgain.href.text = confirm your identity
 
-
 disclaimer.title = You must read the following before making a claim
 disclaimer.heading = You must read the following before making a claim
 disclaimer.paragraph.one = You can use this service to claim tax relief on the extra expenses of working from home because of coronavirus (COVID-19).
@@ -82,8 +81,6 @@ disclaimer.2019And2020And2021.list1.item1 = tax year 6 April 2021 to 5 April 202
 disclaimer.2019And2020And2021.list1.item2 = tax year 6 April 2020 to 5 April 2021
 disclaimer.2019And2020And2021.list2.text = You can also claim and get tax relief on expenses of £4 a week for:
 disclaimer.2019And2020And2021.list2.item1 = tax year 6 April 2019 to 5 April 2020
-
-
 disclaimer.paragraph.three.a = If your extra costs are more than this you can claim for more tax relief.
 disclaimer.paragraph.three.b = You will need to
 disclaimer.paragraph.three.c = claim tax relief for expenses of employment
@@ -127,29 +124,25 @@ yourTaxRelief.title = Check your claim
 yourTaxRelief.heading = Check your claim
 yourTaxRelief.inset.text = You started working from home on
 yourTaxRelief.changeThisDate.href.text = Change this date
-
 yourTaxRelief.2021.title = About your claim
 yourTaxRelief.2021.heading = About your claim
 yourTaxRelief.2021.paragraph.one = You will receive tax relief on your expenses for working from home for the whole of this tax year, 6 April 2021 to 5 April 2022.
 yourTaxRelief.2021.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2022, you will need to claim again.
 yourTaxRelief.2020.paragraph.one = You will receive tax relief on your expenses for working from home for the whole of this tax year (6 April 2020 to 5 April 2021), however long you worked or are working from home.
 yourTaxRelief.2020.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2021, you will need to claim again.
-
 yourTaxRelief.2019And2020.list.text = You will receive tax relief on your expenses for working from home for:
 yourTaxRelief.2019And2020.list.item1 = the whole of tax year 6 April 2020 to 5 April 2021
 yourTaxRelief.2019And2020.list.item2 = {0} of tax year 6 April 2019 to 5 April 2020
-
 yourTaxRelief.2019And2020And2021.paragraph.one = You will receive tax relief on your expenses for working from home for the whole of this tax year, 6 April 2021 to 5 April 2022.
 yourTaxRelief.2019And2020And2021.paragraph.two = At the end of this tax year, the tax relief will stop. If you are required to work from home after 5 April 2022, you will need to claim again.
 yourTaxRelief.2019And2020And2021.list.text = You will also receive tax relief on your expenses for working from home for:
 yourTaxRelief.2019And2020And2021.list.item1 = the whole of tax year 6 April 2020 to 5 April 2021
 yourTaxRelief.2019And2020And2021.list.item2 = {0} of tax year 6 April 2019 to 5 April 2020
-
 yourTaxRelief.submitYourClaim.heading = Now submit your claim
 yourTaxRelief.disclaimer = By submitting this claim you are confirming that, to the best of your knowledge, the details you are providing are correct.
 yourTaxRelief.submit.button.text = Confirm and submit
-confirmation.paperless.button.text = Sign up for paperless notifications
 
+confirmation.paperless.button.text = Sign up for paperless notifications
 confirmation.title = Confirmation
 confirmation.heading = Claim complete
 confirmation.text = We will change your tax code
@@ -163,22 +156,18 @@ confirmation.linkToFeedbackForm.href.text = What did you think of this service? 
 confirmation.linkToFeedbackForm.href.postfix = (takes 30 seconds)
 confirmation.paperless.header = Get tax letters online
 confirmation.paperless.paragraph.1 = You can view, download or print them when you want. Save time and clear clutter.
-
 confirmation.whatHappensNext.20192020.header.note = We will check if you have paid too much tax.
 confirmation.whatHappensNext.20192020.paragraph.1 = We will write to you by post or email before November 2021 if you have paid too much tax.
 confirmation.whatHappensNext.20192020.paragraph.2 = There is no need to contact HMRC about this.
-
 confirmation.whatHappensNext.2021.header.note = We will let you know about your tax code change by post or email.
 confirmation.whatHappensNext.2021.paragraph.1 = We will increase the amount you can earn tax free for this tax year to include tax relief on your expenses for working from home.
 confirmation.whatHappensNext.2021.paragraph.2 = We do this by changing your tax code, which decides how much tax you pay.
 confirmation.whatHappensNext.2021.paragraph.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
-
 confirmation.whatHappensNext.201920202021.header.note = We will:
 confirmation.whatHappensNext.201920202021.listitem.1 = increase the amount you can earn tax free for this tax year by changing your tax code
 confirmation.whatHappensNext.201920202021.listitem.2 = check your claim for previous tax years and write to you by post or email before November 2021
 confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
 confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
-
 
 manualCorrespondenceIndicator.title = You cannot currently use this service
 manualCorrespondenceIndicator.heading = You cannot currently use this service
@@ -193,6 +182,7 @@ manualCorrespondenceIndicator.phoneLines.two = 8am to 4pm Saturdays
 manualCorrespondenceIndicator.phoneLines.three = 9am to 5pm Sundays
 manualCorrespondenceIndicator.closedBankHolidays = Closed bank holidays
 manualCorrespondenceIndicator.callCharges = Find out about call charges (opens in a new window)
+
 signoutpage.title = For your security, we signed you out
 signoutpage.heading = For your security, we signed you out
 signoutpage.start-again.text = Sign in

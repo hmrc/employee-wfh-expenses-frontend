@@ -20,6 +20,7 @@ import config.FrontendAppConfig
 import connectors.PaperlessPreferenceConnector
 import controllers.PaperlessAuditConst._
 import controllers.actions._
+
 import javax.inject.Inject
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
@@ -33,6 +34,7 @@ import views.html.Confirmation2019_2020_2021View
 import views.html.Confirmation2019_2020View
 import views.html.Confirmation2021View
 import models.SelectTaxYearsToClaimFor.{Option1, Option2}
+import play.api.Logging
 
 import scala.concurrent.ExecutionContext
 
@@ -54,7 +56,7 @@ class ConfirmationController @Inject()(
                                         confirmation2019_2020_2021View: Confirmation2019_2020_2021View,
                                         confirmation2019_2020View: Confirmation2019_2020View,
                                         confirmation2021View: Confirmation2021View)
-                                      (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                      (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
@@ -71,6 +73,9 @@ class ConfirmationController @Inject()(
             case (true, _, _, _) => Ok(confirmation2021View(status.isPaperlessCustomer, Some(status.url.link)))
             case (_, true, _, Some(_)) => Ok(confirmation2019_2020View(status.isPaperlessCustomer, Some(status.url.link)))
             case (_, _, true, Some(_)) => Ok(confirmation2019_2020_2021View(status.isPaperlessCustomer, Some(status.url.link)))
+            case (a, b, c, d) =>
+              logger.error(s"Unexpected case match ($a,$b,$c,$d)")
+              Redirect(routes.TechnicalDifficultiesController.onPageLoad())
           }
         case Left(error) =>
           auditPaperlessPreferencesCheckFailure(error)

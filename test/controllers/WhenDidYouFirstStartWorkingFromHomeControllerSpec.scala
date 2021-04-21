@@ -44,7 +44,9 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
 
   def onwardRoute = Call("GET", "/foo")
 
-  val validAnswer = LocalDate.now(ZoneOffset.UTC)
+  // scalastyle:off magic.number
+  val validAnswer = LocalDate.of(2020, 1, 1)
+  // scalastyle:on magic.number
 
   lazy val whenDidYouFirstStartWorkingFromHomeRoute = routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url
 
@@ -185,15 +187,22 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
       }
     }
 
-
     "redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
+      val userAnswers = UserAnswers(
+        userAnswersId,
+        Json.obj(
+          ClaimedForTaxYear2020.toString -> false,
+          SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString)
+        )
+      ).set(WhenDidYouFirstStartWorkingFromHomePage, validAnswer).success.value
+
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)

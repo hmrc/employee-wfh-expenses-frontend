@@ -27,7 +27,7 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc._
 import services.IABDServiceImpl
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.TaxYearDates.YEAR_2021
 
@@ -42,7 +42,7 @@ class CheckAlreadyClaimedActionImpl @Inject()(
 
   override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {
 
-    implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     iabdService.alreadyClaimed(request.nino, YEAR_2021) map {
       case Some(expenses) =>

@@ -19,13 +19,14 @@ package navigation
 import controllers.routes
 import models._
 import pages._
+import play.api.Logging
 import play.api.mvc.Call
 
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class Navigator @Inject()() {
+class Navigator @Inject()() extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
@@ -59,7 +60,6 @@ class Navigator @Inject()() {
   }
 
   def disclaimerNextPage(userAnswers: UserAnswers): Call = {
-
     (
       userAnswers.is2021Only,
       userAnswers.is2019And2020Only,
@@ -68,6 +68,9 @@ class Navigator @Inject()() {
       case (true, _, _) => routes.YourTaxReliefController.onPageLoad()
       case (_, true, _) => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
       case (_, _, true) => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+      case (a, b, c) =>
+        logger.error(s"Unexpected case match ($a,$b,$c)")
+        routes.TechnicalDifficultiesController.onPageLoad()
     }
   }
 }

@@ -147,7 +147,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       verify(mockSessionRepository, times(0)).set(any())
     }
 
-
     "no working from home date found (2021 only)" should {
       "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockThrottler.enabled).thenReturn(false)

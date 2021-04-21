@@ -21,10 +21,10 @@ import connectors.CitizenDetailsConnector
 import controllers.Assets.{LOCKED, OK}
 import controllers.routes
 import models.requests.IdentifierRequest
-import play.api.{Logger, Logging}
+import play.api.Logging
 import play.api.mvc.Results.Redirect
 import play.api.mvc._
-import uk.gov.hmrc.play.HeaderCarrierConverter
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,7 +33,7 @@ class ManualCorrespondenceIndicatorActionImpl @Inject()(
                                                val parser: BodyParsers.Default
                                              )(implicit val executionContext: ExecutionContext) extends ManualCorrespondenceIndicatorAction with Logging {
   override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {
-    implicit val hc = HeaderCarrierConverter.fromHeadersAndSession(request.headers, Some(request.session))
+    implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     citizenDetailsConnector.getAddress(request.nino).map {
       response =>

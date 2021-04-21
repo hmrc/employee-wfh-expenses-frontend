@@ -99,25 +99,34 @@ class SubmissionService @Inject()
               FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())
             )
           }
+        case (a,b) =>
+          logger.error(s"Unexpected case match ($a,$b)")
+          Seq.empty[FlatRateItem]
       }
       case None => // Claiming for 2021
         Seq[FlatRateItem](
           FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate())
         )
     }
-    logger.info("[SubmissionService][submit] Submitting")
 
-    futureSequence(flatRateItems) {
-      item: FlatRateItem =>
-        for {
-          etag <- citizenDetailsConnector.getETag(dataRequest.nino)
-          _    <- taiConnector.postIabdData(dataRequest.nino, item.year, item.amount, etag)
-        } yield item
-    } map {
-      submittedDetails => Right(submittedDetails)
-    } recover {
-      case e => Left(e.getMessage)
+    if (flatRateItems.isEmpty) {
+      Future.successful(Left("Flat Rate Items sequence is empty, unable to submit"))
+    } else {
+      logger.info("[SubmissionService][submit] Submitting")
+      futureSequence(flatRateItems) {
+        item: FlatRateItem =>
+          for {
+            etag <- citizenDetailsConnector.getETag(dataRequest.nino)
+            _ <- taiConnector.postIabdData(dataRequest.nino, item.year, item.amount, etag)
+          } yield item
+      } map {
+        submittedDetails => Right(submittedDetails)
+      } recover {
+        case e => Left(e.getMessage)
+      }
     }
+
+
   }
 
     def futureSequence[I, O](inputs: Seq[I])(flatMapFunction: I => Future[O])(implicit ec: ExecutionContext): Future[Seq[O]] = {

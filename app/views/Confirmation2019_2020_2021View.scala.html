@@ -28,7 +28,7 @@
 
 @(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String])(implicit request: Request[_], messages: Messages)
 
-@linkToFeedbackForm = {<a  class="govuk-link" href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
+@linkToFeedbackForm = {<a  class="govuk-link" rel="noreferrer noopener" target="_blank" href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
 @main_template(title = messages("confirmation.title")) {
 

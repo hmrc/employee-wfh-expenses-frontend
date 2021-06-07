@@ -36,7 +36,7 @@ class PaperlessPreferenceConnectorImpl @Inject()(
                                                 )
   extends PaperlessPreferenceConnector with HeaderCarrierForPartialsConverter with Logging {
 
-  override def crypto: String => String = cookie => cookie
+  def crypto: String => String = cookie => cookie
 
   def getPaperlessStatus(returnUrl: String)(implicit request: Request[AnyContent], ec: ExecutionContext): Future[Either[String, PaperlessStatusResponse]] = {
     val paperlessStatusUrl =

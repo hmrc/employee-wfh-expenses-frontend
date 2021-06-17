@@ -25,7 +25,6 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, when}
 import org.scalatest.BeforeAndAfter
-import org.scalatest.Matchers.{convertToAnyShouldWrapper, _}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.TooManyRequestException
@@ -62,7 +61,7 @@ class IABDServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAfter
         when(mockTaiConnector.getJobExpensesData(testNino,testYear)).thenReturn(Future(Seq.empty))
 
         val maybeExpenses: Option[Expenses] = await(serviceUnderTest.alreadyClaimed(testNino, testYear))
-        maybeExpenses shouldBe None
+        maybeExpenses mustBe None
 
         Mockito.verify(mockTaiConnector, times(1)).getOtherExpensesData(testNino,testYear)
         Mockito.verify(mockTaiConnector, times(1)).getJobExpensesData(testNino,testYear)
@@ -76,7 +75,7 @@ class IABDServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAfter
         when(mockTaiConnector.getOtherExpensesData(testNino,testYear)).thenReturn(Future(otherExpenses))
 
         val maybeExpenses: Option[Expenses] = await(serviceUnderTest.alreadyClaimed(testNino, testYear))
-        maybeExpenses shouldBe Some(Expenses(testYear, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false))
+        maybeExpenses mustBe Some(Expenses(testYear, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false))
 
         Mockito.verify(mockTaiConnector, times(1)).getOtherExpensesData(testNino,testYear)
         Mockito.verify(mockTaiConnector, times(0)).getJobExpensesData(testNino,testYear)
@@ -92,7 +91,7 @@ class IABDServiceImplSpec extends SpecBase with MockitoSugar with BeforeAndAfter
         when(mockTaiConnector.getJobExpensesData(testNino,testYear)).thenReturn(Future(jobExpenses))
 
         val maybeExpenses: Option[Expenses] = await(serviceUnderTest.alreadyClaimed(testNino, testYear))
-        maybeExpenses shouldBe Some(Expenses(testYear, Seq.empty, jobExpenses, wasJobRateExpensesChecked = true))
+        maybeExpenses mustBe Some(Expenses(testYear, Seq.empty, jobExpenses, wasJobRateExpensesChecked = true))
 
         Mockito.verify(mockTaiConnector, times(1)).getOtherExpensesData(testNino,testYear)
         Mockito.verify(mockTaiConnector, times(1)).getJobExpensesData(testNino,testYear)

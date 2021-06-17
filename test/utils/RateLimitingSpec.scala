@@ -20,7 +20,6 @@ import base.SpecBase
 import config.RateLimitConfig
 import org.mockito.Mockito
 import org.mockito.Mockito.when
-import org.scalatest.Matchers.{convertToAnyShouldWrapper, _}
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.http.TooManyRequestException
 
@@ -30,14 +29,14 @@ class RateLimitingSpec extends SpecBase with MockitoSugar {
     "return true" when {
       "the rate limiter is enabled" in {
         val rateConfig = RateLimitConfig(2, 2, enabled = true)
-        new RateLimiting(rateConfig).enabled shouldBe true
+        new RateLimiting(rateConfig).enabled mustBe true
       }
     }
 
     "return false" when {
       "the rate limiter is disabled" in {
         val rateConfig = RateLimitConfig(2, 2, enabled = false)
-        new RateLimiting(rateConfig).enabled shouldBe false
+        new RateLimiting(rateConfig).enabled mustBe false
       }
     }
   }
@@ -66,7 +65,7 @@ class RateLimitingSpec extends SpecBase with MockitoSugar {
         when(limiter.enabled).thenReturn(true)
         when(limiter.hasAToken).thenReturn(true)
 
-        limiter.withToken[String](() => "success") shouldBe "success"
+        limiter.withToken[String](() => "success") mustBe "success"
       }
 
       "rate liming disabled and a token is denied" in {
@@ -76,7 +75,7 @@ class RateLimitingSpec extends SpecBase with MockitoSugar {
         when(limiter.enabled).thenReturn(false)
         when(limiter.hasAToken).thenReturn(false)
 
-        limiter.withToken[String](() => "success") shouldBe "success"
+        limiter.withToken[String](() => "success") mustBe "success"
       }
     }
 

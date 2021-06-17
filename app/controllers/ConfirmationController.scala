@@ -75,11 +75,11 @@ class ConfirmationController @Inject()(
             case (_, _, true, Some(_)) => Ok(confirmation2019_2020_2021View(status.isPaperlessCustomer, Some(status.url.link)))
             case (a, b, c, d) =>
               logger.error(s"Unexpected case match ($a,$b,$c,$d)")
-              Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+              Redirect(routes.TechnicalDifficultiesController.onPageLoad)
           }
         case Left(error) =>
           auditPaperlessPreferencesCheckFailure(error)
-          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+          Redirect(routes.TechnicalDifficultiesController.onPageLoad)
       }
   }
 

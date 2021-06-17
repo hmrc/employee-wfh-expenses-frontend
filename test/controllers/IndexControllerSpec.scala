@@ -63,7 +63,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
             .overrides(bind[IABDService].toInstance(mockIABDService))
             .build()
 
-          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+          val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
 
           val result = route(application, request).value
 

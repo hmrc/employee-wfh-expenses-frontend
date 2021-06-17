@@ -58,7 +58,7 @@ class SelectTaxYearsToClaimForController @Inject()(
           }
           Ok(view(preparedForm))
 
-        case None => Redirect(routes.IndexController.onPageLoad())
+        case None => Redirect(routes.IndexController.onPageLoad)
       }
 
   }

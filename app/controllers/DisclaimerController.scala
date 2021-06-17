@@ -57,7 +57,7 @@ class DisclaimerController @Inject()(
               }
         }
 
-        case (None,_) => Redirect(routes.IndexController.onPageLoad())
+        case (None,_) => Redirect(routes.IndexController.onPageLoad)
       }
 
   }

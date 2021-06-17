@@ -41,8 +41,8 @@
                 @hmrcTimeoutDialog(hmrcComponents.TimeoutDialog(
                     timeout= Some(appConfig.timeoutDialogTimeout),
                     countdown= Some(appConfig.timeoutDialogTimeoutCountdown),
-                    keepAliveUrl= Some(routes.KeepAliveController.keepAlive().url),
-                    signOutUrl= Some(routes.SignedOutController.signedOut().url),
+                    keepAliveUrl= Some(routes.KeepAliveController.keepAlive.url),
+                    signOutUrl= Some(routes.SignedOutController.signedOut.url),
                     language= Some(messages.lang.code)
                 ))
          }
@@ -81,7 +81,7 @@
     headBlock = Some(hmrcHead(headBlock = Some(headBlock))),
     headerBlock = Some(
         hmrcStandardHeader(
-            signOutUrl = Some(routes.SignedOutController.signOutToExitSurvey().url)
+            signOutUrl = Some(routes.SignedOutController.signOutToExitSurvey.url)
         )
     ),
     beforeContentBlock = Some(beforeContentBlockWithLanguageToggle),

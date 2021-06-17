@@ -30,7 +30,7 @@ class UnauthorisedViewSpec extends ViewBehaviours {
 
     val view = application.injector.instanceOf[UnauthorisedView]
 
-    val request = FakeRequest(GET, routes.UnauthorisedController.onPageLoad().url)
+    val request = FakeRequest(GET, routes.UnauthorisedController.onPageLoad.url)
 
     val applyView = view.apply()(request, messages)
 

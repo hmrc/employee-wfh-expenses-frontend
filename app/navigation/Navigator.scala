@@ -33,7 +33,7 @@ class Navigator @Inject()() extends Logging {
     case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
     case DisclaimerPage => ua => disclaimerNextPage(ua)
     case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
-    case _ => _ => routes.IndexController.onPageLoad()
+    case _ => _ => routes.IndexController.onPageLoad
   }
 
   def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
@@ -55,7 +55,7 @@ class Navigator @Inject()() extends Logging {
     userAnswers.get(ClaimedForTaxYear2020) match {
       case Some(claimedAlready) if claimedAlready   => routes.DisclaimerController.onPageLoad()
       case Some(claimedAlready) if !claimedAlready  => routes.SelectTaxYearsToClaimForController.onPageLoad()
-      case None                                     => routes.IndexController.onPageLoad()
+      case None                                     => routes.IndexController.onPageLoad
     }
   }
 
@@ -70,7 +70,7 @@ class Navigator @Inject()() extends Logging {
       case (_, _, true) => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
       case (a, b, c) =>
         logger.error(s"Unexpected case match ($a,$b,$c)")
-        routes.TechnicalDifficultiesController.onPageLoad()
+        routes.TechnicalDifficultiesController.onPageLoad
     }
   }
 }

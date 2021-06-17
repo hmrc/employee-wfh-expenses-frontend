@@ -62,7 +62,7 @@ class YourTaxReliefController @Inject()(
 
         case _ =>
           logger.error("[SubmitYourClaimController][onPageLoad] - No years to claim for found")
-          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+          Redirect(routes.TechnicalDifficultiesController.onPageLoad)
       }
   }
 
@@ -79,7 +79,7 @@ class YourTaxReliefController @Inject()(
           Redirect(routes.ConfirmationController.onPageLoad())
         case Left(_) =>
           logger.error("[SubmitYourClaimController][onSubmit] - Error submitting")
-          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+          Redirect(routes.TechnicalDifficultiesController.onPageLoad)
 
       }
   }

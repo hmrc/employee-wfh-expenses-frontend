@@ -33,7 +33,7 @@ class DataRequiredActionImpl @Inject()(implicit val executionContext: ExecutionC
 
     request.userAnswers match {
       case None =>
-        Future.successful(Left(Redirect(routes.SessionExpiredController.onPageLoad())))
+        Future.successful(Left(Redirect(routes.SessionExpiredController.onPageLoad)))
       case Some(data) if data.get(SubmittedClaim).isDefined && !currentlyOnTheConfirmationPage =>
         Future.successful(Left(Redirect(routes.ConfirmationController.onPageLoad())))
       case Some(data) =>

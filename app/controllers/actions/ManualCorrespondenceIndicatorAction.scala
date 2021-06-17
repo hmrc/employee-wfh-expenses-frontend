@@ -18,10 +18,10 @@ package controllers.actions
 
 import com.google.inject.Inject
 import connectors.CitizenDetailsConnector
-import controllers.Assets.{LOCKED, OK}
 import controllers.routes
 import models.requests.IdentifierRequest
 import play.api.Logging
+import play.api.http.Status
 import play.api.mvc.Results.Redirect
 import play.api.mvc._
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
@@ -38,19 +38,19 @@ class ManualCorrespondenceIndicatorActionImpl @Inject()(
     citizenDetailsConnector.getAddress(request.nino).map {
       response =>
         response.status match {
-          case OK =>
+          case Status.OK =>
             None
-          case LOCKED =>
+          case Status.LOCKED =>
             logger.info(s"[ManualCorrespondenceIndicatorAction][filter] - Locked status code")
             Some(Redirect(routes.ManualCorrespondenceIndicatorController.onPageLoad().url))
           case statusCode =>
             logger.warn(s"[ManualCorrespondenceIndicatorAction][filter] - Unexpected status code: $statusCode ")
-            Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad().url))
+            Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad.url))
         }
     }.recoverWith {
       case e =>
         logger.error(s"[ManualCorrespondenceIndicatorAction][filter] failed: $e")
-        Future{Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad().url))}
+        Future{Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad.url))}
     }
 
   }

@@ -16,17 +16,18 @@
 
 package handlers
 
-import controllers.Assets.{Redirect, TooManyRequests}
+import play.api.mvc.Results.Redirect
 import controllers.routes
 import play.api.Logging
 import play.api.i18n.{I18nSupport, Messages, MessagesApi}
-import play.api.mvc.{Request, RequestHeader, Result}
+import play.api.mvc.{Request, RequestHeader, ResponseHeader, Result}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.TooManyRequestException
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import views.html.ErrorTemplate
-
 import javax.inject.{Inject, Singleton}
+import play.api.http.{HttpEntity, Status, Writeable}
+
 import scala.language.implicitConversions
 
 @Singleton
@@ -44,10 +45,10 @@ class ErrorHandler @Inject()(
     ex match {
       case rateLimitEx: TooManyRequestException =>
         logger.warn(s"[ErrorHandler][resolveError] Rate limiting detected, (${rh.method})(${rh.uri})", rateLimitEx )
-        TooManyRequests( serviceTooBusyTemplate(rh) )
+        new Status(Status.TOO_MANY_REQUESTS)( serviceTooBusyTemplate(rh) )
       case e: Exception =>
         logger.warn(s"[ErrorHandler][resolveError] failed with: $e")
-        Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+        Redirect(routes.TechnicalDifficultiesController.onPageLoad().url)
       case _ =>
         logger.error(s"[ErrorHandler][resolveError] Internal Server Error, (${rh.method})(${rh.uri})", ex)
         super.resolveError(rh, ex)
@@ -60,4 +61,14 @@ class ErrorHandler @Inject()(
       Messages("service.is.busy.heading"),
       Messages("service.is.busy.message")
     )
+
+  class Status(status: Int) extends Result(header = ResponseHeader(status), body = HttpEntity.NoEntity) {
+
+    def apply[C](content: C)(implicit writeable: Writeable[C]): Result = {
+      Result(
+        header,
+        writeable.toEntity(content)
+      )
+    }
+  }
 }

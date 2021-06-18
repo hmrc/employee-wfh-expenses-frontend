@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.Assets.OK
+import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{GET, contentAsString, defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty}
 import views.html.WeSignedYouOutPageView
@@ -36,7 +36,7 @@ class SignedOutControllerSpec extends SpecBase {
 
       val view = application.injector.instanceOf[WeSignedYouOutPageView]
 
-      status(result) mustEqual OK
+      status(result) mustEqual Status.OK
 
       contentAsString(result) mustEqual
         view()(request, messages).toString

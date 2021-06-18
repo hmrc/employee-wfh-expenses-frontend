@@ -19,7 +19,6 @@ package connectors
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock._
-import org.scalatest.Matchers.convertToAnyShouldWrapper
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -92,7 +91,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
       whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
         res =>
           res.isLeft mustBe true
-          res.left.get should include("returned invalid json")
+          res.left.get must include("returned invalid json")
       }
     }
 
@@ -102,7 +101,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
       whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
         response =>
           response.isLeft mustBe true
-          response.left.get should include("returned 400")
+          response.left.get must include("returned 400")
       }
     }
 
@@ -112,7 +111,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
       whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
         response =>
           response.isLeft mustBe true
-          response.left.get should include("returned 500")
+          response.left.get must include("returned 500")
       }
     }
 

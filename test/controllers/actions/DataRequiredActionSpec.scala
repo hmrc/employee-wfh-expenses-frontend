@@ -17,7 +17,6 @@
 package controllers.actions
 
 import base.SpecBase
-import controllers.Assets.SEE_OTHER
 import controllers.routes
 import models.UserAnswers
 import models.requests.{DataRequest, OptionalDataRequest}

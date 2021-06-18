@@ -19,7 +19,6 @@ package services
 import java.time.temporal.ChronoUnit
 
 import base.SpecBase
-import org.scalatest.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.mockito.MockitoSugar
 import utils.TaxYearDates._
 
@@ -49,7 +48,7 @@ class TaxYearDatesSpec extends SpecBase with MockitoSugar {
 
       for ( (startDate, endDate, numOfWeeks) <- tests) {
         s"calculate $numOfWeeks as the number of weeks between $startDate and $endDate" in {
-          numberOfWeeks(startDate,endDate) shouldBe numOfWeeks
+          numberOfWeeks(startDate,endDate) mustBe numOfWeeks
         }
       }
     }

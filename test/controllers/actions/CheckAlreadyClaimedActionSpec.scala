@@ -44,7 +44,7 @@ class CheckAlreadyClaimedActionSpec extends SpecBase with ScalaFutures with Befo
 
   private def checkIdentifierRequest(identifierRequest: IdentifierRequest[AnyContent]): Future[Result] = {
     identifierRequest match {
-      case IdentifierRequest(_, identifier, nino) if identifier == fakeIdentifier
+      case IdentifierRequest(_, identifier, nino, _) if identifier == fakeIdentifier
         && nino == fakeNino => Future.successful(Ok)
       case _ => Future.successful(InternalServerError)
     }

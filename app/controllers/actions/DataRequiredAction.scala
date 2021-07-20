@@ -37,7 +37,7 @@ class DataRequiredActionImpl @Inject()(implicit val executionContext: ExecutionC
       case Some(data) if data.get(SubmittedClaim).isDefined && !currentlyOnTheConfirmationPage =>
         Future.successful(Left(Redirect(routes.ConfirmationController.onPageLoad())))
       case Some(data) =>
-        Future.successful(Right(DataRequest(request.request, request.internalId, data, request.nino)))
+        Future.successful(Right(DataRequest(request.request, request.internalId, data, request.nino, request.saUtr)))
     }
   }
 }

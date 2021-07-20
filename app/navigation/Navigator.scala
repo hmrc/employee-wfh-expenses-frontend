@@ -52,10 +52,15 @@ class Navigator @Inject()() extends Logging {
   }
 
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
-    userAnswers.get(ClaimedForTaxYear2020) match {
-      case Some(claimedAlready) if claimedAlready   => routes.DisclaimerController.onPageLoad()
-      case Some(claimedAlready) if !claimedAlready  => routes.SelectTaxYearsToClaimForController.onPageLoad()
-      case None                                     => routes.IndexController.onPageLoad()
+    userAnswers.get(HasSelfAssessmentEnrolment) match {
+      case None         => routes.IndexController.onPageLoad()
+      case Some(true)   => routes.DisclaimerController.onPageLoad()
+      case Some(false)  =>
+        userAnswers.get(ClaimedForTaxYear2020) match {
+          case Some(claimedAlready) if claimedAlready   => routes.DisclaimerController.onPageLoad()
+          case Some(claimedAlready) if !claimedAlready  => routes.SelectTaxYearsToClaimForController.onPageLoad()
+          case None                                     => routes.IndexController.onPageLoad()
+        }
     }
   }
 

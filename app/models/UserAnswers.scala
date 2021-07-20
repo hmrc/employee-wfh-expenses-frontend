@@ -65,12 +65,17 @@ final case class UserAnswers(
     }
   }
 
-  def is2021Only: Boolean =
-    (get(ClaimedForTaxYear2020), get(SelectTaxYearsToClaimForPage)) match {
-      case ( Some(true), _ ) => true
-      case ( _, Some(years) ) if years.size == 1 && years.contains(Option1) => true
-      case ( _, _ ) => false
+  def is2021Only: Boolean = {
+    get(HasSelfAssessmentEnrolment) match {
+      case Some(true) => true
+      case Some(false) =>
+        (get(ClaimedForTaxYear2020), get(SelectTaxYearsToClaimForPage)) match {
+          case ( Some(true), _ ) => true
+          case ( _, Some(years) ) if years.size == 1 && years.contains(Option1) => true
+          case ( _, _ ) => false
+        }
     }
+  }
 
   def is2019And2020Only: Boolean =
     (is2021Only, get(SelectTaxYearsToClaimForPage)) match {

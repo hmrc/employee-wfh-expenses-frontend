@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 import models.UserAnswers
-import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -36,20 +36,44 @@ class YourTaxReliefControllerSpec extends SpecBase {
       "return the 2021 content view" when {
         val tests = Seq(
           (
-            "already claimed expenses for 2020", UserAnswers(
+            "not SA enrolled and has already claimed expenses for 2020", UserAnswers(
               userAnswersId,
-              Json.obj(ClaimedForTaxYear2020.toString -> true)
+              Json.obj(
+                ClaimedForTaxYear2020.toString -> true,
+                HasSelfAssessmentEnrolment.toString -> false
+              )
             )
           ),
 
           (
-            "not already claimed but have chosen only to claim for 2021", UserAnswers(
+            "not SA enrolled and hasn't already claimed but have chosen only to claim for 2021", UserAnswers(
               userAnswersId,
               Json.obj(
                 ClaimedForTaxYear2020.toString -> false,
+                HasSelfAssessmentEnrolment.toString -> false,
                 SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString)
               )
             )
+          ),
+
+          (
+            "is SA enrolled and has already claimed expenses for 2020", UserAnswers(
+            userAnswersId,
+            Json.obj(
+              ClaimedForTaxYear2020.toString -> true,
+              HasSelfAssessmentEnrolment.toString -> true
+            )
+          )
+          ),
+
+          (
+            "is SA enrolled and hasn't already claimed expenses for 2020", UserAnswers(
+            userAnswersId,
+            Json.obj(
+              ClaimedForTaxYear2020.toString -> false,
+              HasSelfAssessmentEnrolment.toString -> true
+            )
+          )
           )
         )
         for((desc, userAnswer) <- tests) {
@@ -78,6 +102,7 @@ class YourTaxReliefControllerSpec extends SpecBase {
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> false,
+              HasSelfAssessmentEnrolment.toString -> false,
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString),
               WhenDidYouFirstStartWorkingFromHomePage.toString -> earliestWorkingFromHomeDate
             )
@@ -106,6 +131,7 @@ class YourTaxReliefControllerSpec extends SpecBase {
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> false,
+              HasSelfAssessmentEnrolment.toString -> false,
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString),
               WhenDidYouFirstStartWorkingFromHomePage.toString -> earliestWorkingFromHomeDate
             )
@@ -134,6 +160,7 @@ class YourTaxReliefControllerSpec extends SpecBase {
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> false,
+              HasSelfAssessmentEnrolment.toString -> false,
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
             )
           )
@@ -154,6 +181,7 @@ class YourTaxReliefControllerSpec extends SpecBase {
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> false,
+              HasSelfAssessmentEnrolment.toString -> false,
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString)
             )
           )

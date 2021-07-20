@@ -23,7 +23,7 @@ import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
@@ -31,8 +31,8 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
 import views.html.{WhenDidYouFirstStartWorkingFromHome2019_2020View, WhenDidYouFirstStartWorkingFromHome2019_2020_2021View}
-import java.time.LocalDate
 
+import java.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
 
 import scala.concurrent.Future
@@ -72,6 +72,7 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
         userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
+          HasSelfAssessmentEnrolment.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
         )
       )
@@ -132,6 +133,7 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
       val answers = UserAnswers(userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
+          HasSelfAssessmentEnrolment.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString)
         ))
 
@@ -198,6 +200,7 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
         userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
+          HasSelfAssessmentEnrolment.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString)
         )
       ).set(WhenDidYouFirstStartWorkingFromHomePage, validAnswer).success.value

@@ -21,13 +21,13 @@ import config.FrontendAppConfig
 import controllers.routes
 import models.requests.IdentifierRequest
 import play.api.Logging
-import play.api.libs.json.Reads
 import play.api.mvc.Results._
 import play.api.mvc._
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.OptionalRetrieval
-import uk.gov.hmrc.http.UnauthorizedException
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
+import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.http.UnauthorizedException
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -45,12 +45,16 @@ class AuthenticatedIdentifierAction @Inject()(
     implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised(AuthProviders(AuthProvider.Verify) or (AffinityGroup.Individual and ConfidenceLevel.L200))
-      .retrieve(OptionalRetrieval("internalId", Reads.StringReads) and OptionalRetrieval("nino", Reads.StringReads)) {
-        x =>
-          val internalId = x.a.getOrElse(throw new UnauthorizedException("Unable to retrieve internalId"))
-          val nino = x.b.getOrElse(throw new UnauthorizedException("Unable to retrieve nino"))
-
-          block(IdentifierRequest(request, internalId, nino))
+      .retrieve(internalId and nino and saUtr) {
+        case mayBeId ~ mayBeNino ~ mayBeSaUtr =>
+          block(
+            IdentifierRequest(
+              request,
+              mayBeId.getOrElse(throw new UnauthorizedException("Unable to retrieve internalId")),
+              mayBeNino.getOrElse(throw new UnauthorizedException("Unable to retrieve nino")),
+              mayBeSaUtr
+            )
+          )
       }
   } recover {
     case _: NoActiveSession =>

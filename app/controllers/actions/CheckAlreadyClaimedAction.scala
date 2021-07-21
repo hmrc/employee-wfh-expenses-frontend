@@ -47,7 +47,7 @@ class CheckAlreadyClaimedActionImpl @Inject()(
     iabdService.alreadyClaimed(request.nino, YEAR_2021) map {
       case Some(expenses) =>
         logger.info(s"[CheckAlreadyClaimedAction][filter] Detected already claimed for $YEAR_2021, redirecting to P87 digital form")
-        auditAlreadyClaimed(request.nino, YEAR_2021, expenses.otherExpenses, expenses.jobExpenses, expenses.wasJobRateExpensesChecked)
+        auditAlreadyClaimed(request.nino, request.saUtr, YEAR_2021, expenses.otherExpenses, expenses.jobExpenses, expenses.wasJobRateExpensesChecked)
         Some(Redirect(appConfig.p87DigitalFormUrl))
       case None => None
     }
@@ -55,6 +55,7 @@ class CheckAlreadyClaimedActionImpl @Inject()(
 
   private def auditAlreadyClaimed(
                                    nino: String,
+                                   saUtr: Option[String],
                                    year: Int,
                                    otherExpenses: Seq[IABDExpense],
                                    jobExpenses: Seq[IABDExpense],
@@ -62,15 +63,17 @@ class CheckAlreadyClaimedActionImpl @Inject()(
                                  )(implicit hc: HeaderCarrier): Unit = {
 
     val json = if (wasJobRateExpensesChecked) {
-      Json.obj(
+      Json.obj( fields =
         "nino" -> nino,
+        "saUtr" -> saUtr.getOrElse[String](""),
         s"taxYear" -> year,
         s"iabd-${appConfig.otherExpensesId}" -> otherExpenses,
         s"iabd-${appConfig.jobExpenseId}" -> jobExpenses
       )
     } else {
-      Json.obj(
+      Json.obj( fields =
         "nino" -> nino,
+        "saUtr" -> saUtr.getOrElse[String](""),
         s"taxYear" -> year,
         s"iabd-${appConfig.otherExpensesId}" -> otherExpenses,
         s"iabd-${appConfig.jobExpenseId}" -> "NOT CHECKED"

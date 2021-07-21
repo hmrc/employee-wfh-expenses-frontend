@@ -17,7 +17,6 @@
 package controllers
 
 import java.time.LocalDate
-
 import base.SpecBase
 import connectors.PaperlessPreferenceConnector
 import models.paperless.{PaperlessStatus, PaperlessStatusResponse, Url}
@@ -32,7 +31,7 @@ import views.html.{Confirmation2019_2020View, Confirmation2019_2020_2021View, Co
 import PaperlessAuditConst._
 import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 import models.UserAnswers
-import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.libs.json.Json
 import uk.gov.hmrc.time.TaxYear
 
@@ -110,6 +109,7 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
     val application = applicationBuilder(userAnswers = Some(
       UserAnswers(userAnswersId, Json.obj(
         ClaimedForTaxYear2020.toString -> claimedForTaxYear2020,
+        HasSelfAssessmentEnrolment.toString -> false,
         SelectTaxYearsToClaimForPage.toString -> optionJsonList,
         WhenDidYouFirstStartWorkingFromHomePage.toString -> earliestWorkingFromHomeDate)))
     ).overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))

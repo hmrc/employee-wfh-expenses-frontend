@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 import models.UserAnswers
-import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage}
+import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -32,21 +32,46 @@ class DisclaimerControllerSpec extends SpecBase {
     "return the 2021 content view" when {
       val tests = Seq(
         (
-          "already claimed expenses for 2020", UserAnswers(
+          "not SA enrolled and has already claimed expenses for 2020", UserAnswers(
             userAnswersId,
-            Json.obj(ClaimedForTaxYear2020.toString -> true)
+            Json.obj(
+              ClaimedForTaxYear2020.toString -> true,
+              HasSelfAssessmentEnrolment.toString -> false
+            )
           )
         ),
 
         (
-          "not already claimed but have chosen only to claim for 2021", UserAnswers(
+          "not SA enrolled and hasn't already claimed but have chosen only to claim for 2021", UserAnswers(
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> false,
+              HasSelfAssessmentEnrolment.toString -> false,
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString)
             )
           )
+        ),
+
+        (
+          "is SA enrolled and has already claimed expenses for 2020", UserAnswers(
+          userAnswersId,
+          Json.obj(
+            ClaimedForTaxYear2020.toString -> true,
+            HasSelfAssessmentEnrolment.toString -> true
+          )
         )
+        ),
+
+        (
+          "is SA enrolled and hasn't already claimed expenses for 2020", UserAnswers(
+          userAnswersId,
+          Json.obj(
+            ClaimedForTaxYear2020.toString -> false,
+            HasSelfAssessmentEnrolment.toString -> true
+          )
+        )
+        )
+
       )
       for((desc, userAnswer) <- tests) {
         s"$desc" in {
@@ -69,57 +94,59 @@ class DisclaimerControllerSpec extends SpecBase {
     }
 
     "return the 2019 & 2020 content view" when {
-      "not already claimed expenses for 2020 and tax years 2019 & 2020 have only been selected" in {
-        val userAnswer = UserAnswers(
-          userAnswersId,
-          Json.obj(
-            ClaimedForTaxYear2020.toString -> false,
-            SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
+        "not already claimed expenses for 2020 and tax years 2019 & 2020 have only been selected" in {
+          val userAnswer = UserAnswers(
+            userAnswersId,
+            Json.obj(
+              ClaimedForTaxYear2020.toString -> false,
+              HasSelfAssessmentEnrolment.toString -> false,
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
+            )
           )
-        )
 
-        val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
+          val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
-        val view = application.injector.instanceOf[Disclaimer2019_2020View]
+          val view = application.injector.instanceOf[Disclaimer2019_2020View]
 
-        val request = FakeRequest(GET, routes.DisclaimerController.onPageLoad().url)
+          val request = FakeRequest(GET, routes.DisclaimerController.onPageLoad().url)
 
-        val result = route(application, request).value
+          val result = route(application, request).value
 
-        status(result) mustEqual OK
+          status(result) mustEqual OK
 
-        contentAsString(result) mustEqual
-          view()(request, messages).toString
+          contentAsString(result) mustEqual
+            view()(request, messages).toString
 
-        application.stop()
-      }
+          application.stop()
+        }
     }
 
     "return the 2019, 2020 & 2021 content view" when {
-      "not already claimed expenses for 2020 and all tax years have been chosen" in {
-        val userAnswer = UserAnswers(
-          userAnswersId,
-          Json.obj(
-            ClaimedForTaxYear2020.toString -> false,
-            SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString)
+        "not already claimed expenses for 2020 and all tax years have been chosen" in {
+          val userAnswer = UserAnswers(
+            userAnswersId,
+            Json.obj(
+              ClaimedForTaxYear2020.toString -> false,
+              HasSelfAssessmentEnrolment.toString -> false,
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString)
+            )
           )
-        )
 
-        val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
+          val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
-        val view = application.injector.instanceOf[Disclaimer2019_2020_2021View]
+          val view = application.injector.instanceOf[Disclaimer2019_2020_2021View]
 
-        val request = FakeRequest(GET, routes.DisclaimerController.onPageLoad().url)
+          val request = FakeRequest(GET, routes.DisclaimerController.onPageLoad().url)
 
-        val result = route(application, request).value
+          val result = route(application, request).value
 
-        status(result) mustEqual OK
+          status(result) mustEqual OK
 
-        contentAsString(result) mustEqual
-          view()(request, messages).toString
+          contentAsString(result) mustEqual
+            view()(request, messages).toString
 
-        application.stop()
-      }
+          application.stop()
+        }
     }
 
     "redirect to select tax years page" when {
@@ -127,7 +154,8 @@ class DisclaimerControllerSpec extends SpecBase {
         val userAnswer = UserAnswers(
           userAnswersId,
           Json.obj(
-            ClaimedForTaxYear2020.toString -> false
+            ClaimedForTaxYear2020.toString -> false,
+            HasSelfAssessmentEnrolment.toString -> false
           )
         )
 

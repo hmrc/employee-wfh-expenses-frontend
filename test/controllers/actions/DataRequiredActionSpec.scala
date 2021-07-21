@@ -40,7 +40,7 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar with ScalaFuture
   "DataRequiredAction" should {
     "redirect to the session expired page" when {
       "there are no userAnswers in the session" in {
-        val optionalDataRequest = OptionalDataRequest(FakeRequest("GET", "/"), "internalId", None, "NINO")
+        val optionalDataRequest = OptionalDataRequest(FakeRequest("GET", "/"), "internalId", None, "NINO", None)
         val futureResult = new FilterUnderTest().callRefine(optionalDataRequest)
 
         whenReady(futureResult) { result =>
@@ -60,7 +60,7 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar with ScalaFuture
           Json.obj(SubmittedClaim.toString -> true)
         )
 
-        val optionalDataRequest = OptionalDataRequest(fakeRequest, "internalId", Some(userAnswers), "NINO")
+        val optionalDataRequest = OptionalDataRequest(fakeRequest, "internalId", Some(userAnswers), "NINO", None)
         val futureResult = new FilterUnderTest().callRefine(optionalDataRequest)
 
         whenReady(futureResult) { result =>
@@ -80,7 +80,7 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar with ScalaFuture
           Json.obj(SubmittedClaim.toString -> true)
         )
 
-        val optionalDataRequest = OptionalDataRequest(fakeRequest, "internalId", Some(userAnswers), "NINO")
+        val optionalDataRequest = OptionalDataRequest(fakeRequest, "internalId", Some(userAnswers), "NINO", None)
         val futureResult = new FilterUnderTest().callRefine(optionalDataRequest)
 
         whenReady(futureResult) { result =>

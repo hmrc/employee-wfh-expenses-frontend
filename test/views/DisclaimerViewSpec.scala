@@ -25,7 +25,7 @@ class DisclaimerViewSpec extends ViewBehaviours {
 
     val view = viewFor[Disclaimer2021View](Some(emptyUserAnswers))
 
-    val applyView = view.apply()(fakeRequest, messages)
+    val applyView = view.apply(true)(fakeRequest, messages)
 
     behave like normalPage(applyView, "disclaimer")
   }

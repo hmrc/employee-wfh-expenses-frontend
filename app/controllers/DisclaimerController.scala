@@ -45,10 +45,10 @@ class DisclaimerController @Inject()(
 
       request.userAnswers.get(HasSelfAssessmentEnrolment) match {
         case None        => Redirect(routes.IndexController.onPageLoad())
-        case Some(true)  => Ok(disclaimer2021View())
+        case Some(true)  => Ok(disclaimer2021View(false))
         case Some(false) =>
           (request.userAnswers.get(ClaimedForTaxYear2020), request.userAnswers.get(SelectTaxYearsToClaimForPage) ) match {
-            case (Some(true), _)      => Ok(disclaimer2021View())
+            case (Some(true), _)      => Ok(disclaimer2021View(true))
 
             case (Some(false), None)  => Redirect(routes.SelectTaxYearsToClaimForController.onPageLoad())
 
@@ -56,7 +56,7 @@ class DisclaimerController @Inject()(
               case 0 => Redirect(routes.SelectTaxYearsToClaimForController.onPageLoad())
               case 2 => Ok(disclaimer2019_2020_2021View())
               case 1 => yearsToClaimFor.head match {
-                case Option1 => Ok(disclaimer2021View())
+                case Option1 => Ok(disclaimer2021View(true))
                 case Option2 => Ok(disclaimer2019_2020View())
               }
             }

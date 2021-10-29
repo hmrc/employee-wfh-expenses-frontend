@@ -38,7 +38,8 @@ class DisclaimerControllerSpec extends SpecBase {
               ClaimedForTaxYear2020.toString -> true,
               HasSelfAssessmentEnrolment.toString -> false
             )
-          )
+          ),
+          true
         ),
 
         (
@@ -49,31 +50,34 @@ class DisclaimerControllerSpec extends SpecBase {
               HasSelfAssessmentEnrolment.toString -> false,
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString)
             )
-          )
+          ),
+          true
         ),
 
         (
           "is SA enrolled and has already claimed expenses for 2020", UserAnswers(
-          userAnswersId,
-          Json.obj(
-            ClaimedForTaxYear2020.toString -> true,
-            HasSelfAssessmentEnrolment.toString -> true
-          )
-        )
+            userAnswersId,
+            Json.obj(
+              ClaimedForTaxYear2020.toString -> true,
+              HasSelfAssessmentEnrolment.toString -> true
+            )
+          ),
+          false
         ),
 
         (
           "is SA enrolled and hasn't already claimed expenses for 2020", UserAnswers(
-          userAnswersId,
-          Json.obj(
-            ClaimedForTaxYear2020.toString -> false,
-            HasSelfAssessmentEnrolment.toString -> true
-          )
-        )
+            userAnswersId,
+            Json.obj(
+              ClaimedForTaxYear2020.toString -> false,
+              HasSelfAssessmentEnrolment.toString -> true
+            )
+          ),
+          false
         )
 
       )
-      for((desc, userAnswer) <- tests) {
+      for((desc, userAnswer, backLinkEnabled) <- tests) {
         s"$desc" in {
           val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
@@ -86,7 +90,7 @@ class DisclaimerControllerSpec extends SpecBase {
           status(result) mustEqual OK
 
           contentAsString(result) mustEqual
-            view()(request, messages).toString
+            view(backLinkEnabled)(request, messages).toString
 
           application.stop()
         }

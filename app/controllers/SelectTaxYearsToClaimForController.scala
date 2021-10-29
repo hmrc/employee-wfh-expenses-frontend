@@ -21,7 +21,7 @@ import forms.SelectTaxYearsToClaimForFormProvider
 
 import javax.inject.Inject
 import navigation.Navigator
-import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage}
+import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -47,18 +47,22 @@ class SelectTaxYearsToClaimForController @Inject()(
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
 
-      request.userAnswers.get(ClaimedForTaxYear2020) match {
-        case Some(claimedAlready) if claimedAlready  =>
-          Redirect(routes.DisclaimerController.onPageLoad())
+      request.userAnswers.get(HasSelfAssessmentEnrolment) match {
+        case Some(true) => Redirect(routes.DisclaimerController.onPageLoad())
+        case _ =>
+          request.userAnswers.get(ClaimedForTaxYear2020) match {
+            case Some(claimedAlready) if claimedAlready =>
+              Redirect(routes.DisclaimerController.onPageLoad())
 
-        case Some(claimedAlready) if !claimedAlready =>
-          val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
-            case None => form
-            case Some(value) => form.fill(value)
+            case Some(claimedAlready) if !claimedAlready =>
+              val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
+                case None => form
+                case Some(value) => form.fill(value)
+              }
+              Ok(view(preparedForm))
+
+            case None => Redirect(routes.IndexController.onPageLoad())
           }
-          Ok(view(preparedForm))
-
-        case None => Redirect(routes.IndexController.onPageLoad())
       }
 
   }

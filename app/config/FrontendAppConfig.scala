@@ -34,6 +34,7 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
 
   val preferencesFrontendHost: String = configuration.get[Service]("microservice.services.preferences-frontend").baseUrl
   val citizenDetailsHost: String = configuration.get[Service]("microservice.services.citizen-details").baseUrl
+  val eligibilityCheckerHost: String = configuration.get[Service]("microservice.services.eligibility-checker").baseUrl
   val taiHost: String = configuration.get[Service]("microservice.services.tai").baseUrl
 
   lazy val authUrl: String = configuration.get[Service]("auth").baseUrl

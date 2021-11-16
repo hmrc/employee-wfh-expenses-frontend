@@ -21,11 +21,14 @@ import controllers.routes
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.Call
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class FrontendAppConfig @Inject()(configuration: Configuration) {
+class FrontendAppConfig @Inject()(configuration: Configuration, val servicesConfig: ServicesConfig) {
 
   val contactFormServiceIdentifier = "EEWFH"
+
+  private val contactHost = configuration.get[String]("contact-frontend.host")
 
   val platformHost: Option[String] = configuration.getOptional[String]("platform.frontend.host")
 
@@ -45,6 +48,7 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
   lazy val ivCompletionUrl: String = configuration.get[String]("urls.ivCompletion")
   lazy val ivFailureUrl: String = configuration.get[String]("urls.ivFailure")
   lazy val feedbackSurvey: String = configuration.get[String]("urls.feedbackSurvey")
+  val betaFeedbackUnauthenticatedUrl = s"$contactHost/contact/beta-feedback-unauthenticated?service=$contactFormServiceIdentifier"
   lazy val hmrcCallChargesUrl: String = configuration.get[String]("urls.hmrcCallCharges")
   lazy val incomeTaxGeneralEnquiriesUrl: String = configuration.get[String]("urls.incomeTaxGeneralEnquiries")
 

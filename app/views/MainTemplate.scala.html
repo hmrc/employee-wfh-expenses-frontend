@@ -17,6 +17,7 @@
 @import config.FrontendAppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.Aliases.ReportTechnicalIssue
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcLanguageSelect, HmrcTimeoutDialog}
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukPhaseBanner
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcStandardHeader, hmrcStandardFooter}
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language._
 
@@ -28,7 +29,8 @@
         appConfig: FrontendAppConfig,
         hmrcTimeoutDialog: HmrcTimeoutDialog,
         hmrcLanguageSelect: HmrcLanguageSelect,
-        hmrcHead: HmrcHead
+        hmrcHead: HmrcHead,
+        govukPhaseBanner : GovukPhaseBanner
 )
 
 @(title: String, beforeContentBlock: Option[Html] = None, hasTimeout:Boolean = true)(mainContent: Html)(implicit request: Request[_], messages: Messages)
@@ -56,7 +58,17 @@
     <script>window.HMRCFrontend.initAll();</script>
 }
 
+@insetHtml() = {
+    @messages("phaseBanner.text.part1") <a class="govuk-link" href="@appConfig.betaFeedbackUnauthenticatedUrl">@messages("phaseBanner.linkText")</a> @messages("phaseBanner.text.part2")
+}
+
 @beforeContentBlockWithLanguageToggle = {
+    @govukPhaseBanner(PhaseBanner(
+        tag = Some(Tag(
+            content = Text("beta")
+        )),
+        content = HtmlContent(insetHtml)
+    ))
     @hmrcLanguageSelect(LanguageSelect(
         if (messages.lang.code == "cy") Cy else En,
         (En, controllers.routes.LanguageSwitchController.switchToLanguage("english").url),

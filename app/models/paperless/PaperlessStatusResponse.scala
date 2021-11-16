@@ -19,9 +19,7 @@ package models.paperless
 import play.api.libs.json.Json
 
 case class PaperlessStatus(
-  name:     String,
-  category: String,
-  text:     String
+  name:     String
 )
 
 object PaperlessStatus{

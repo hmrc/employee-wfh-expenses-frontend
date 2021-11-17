@@ -17,13 +17,14 @@
 package controllers
 
 import base.SpecBase
+import connectors.EligibilityCheckerConnector
 import forms.SelectTaxYearsToClaimForFormProvider
-import models.{NormalMode, SelectTaxYearsToClaimFor, UserAnswers}
+import models.{NormalMode, SelectTaxYearsToClaimFor, UserAnswers, WfhDueToCovidStatusWrapper}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage}
+import pages.{ClaimedForTaxYear2020, EligibilityCheckerSessionId, SelectTaxYearsToClaimForPage}
 import play.api.inject.bind
 import play.api.libs.json.{JsString, Json}
 import play.api.mvc.Call
@@ -169,4 +170,62 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
       application.stop()
     }
   }
+
+  "correct flow for all tax years - simulating option1 & option2" in {
+    val userAnswer = UserAnswers(userAnswersId,  Json.obj(EligibilityCheckerSessionId.toString() -> "1"))
+
+    val mockEligibilityCheckerConnector: EligibilityCheckerConnector = mock[EligibilityCheckerConnector]
+    when(mockEligibilityCheckerConnector.wfhDueToCovidStatus(any())(any(), any())) thenReturn Future.successful(WfhDueToCovidStatusWrapper(1))
+
+    val application = applicationBuilder(userAnswers = Some(userAnswer))
+      .overrides(bind[EligibilityCheckerConnector].toInstance(mockEligibilityCheckerConnector)).build()
+
+    val request = FakeRequest(GET, selectTaxYearsToClaimForRoute + "?eligibilityCheckerSessionId=session-4968a9e4-0fa1-445f-a947-a828c69ef96b")
+
+    val result = route(application, request).value
+
+    status(result) mustEqual SEE_OTHER
+
+    redirectLocation(result).value mustEqual Call("GET", "/employee-working-from-home-expenses/disclaimer").url
+    application.stop()
+  }
+
+  "show correct view when session id param is missing" in {
+    val userAnswer = UserAnswers(userAnswersId)
+
+    val mockEligibilityCheckerConnector: EligibilityCheckerConnector = mock[EligibilityCheckerConnector]
+    when(mockEligibilityCheckerConnector.wfhDueToCovidStatus(any())(any(), any())) thenReturn Future.successful(WfhDueToCovidStatusWrapper(1))
+
+    val application = applicationBuilder(userAnswers = Some(userAnswer)).overrides(bind[EligibilityCheckerConnector].toInstance(mockEligibilityCheckerConnector)).build()
+
+    val request = FakeRequest(GET, selectTaxYearsToClaimForRoute)
+
+    val result = route(application, request).value
+
+    status(result) mustEqual SEE_OTHER
+
+    redirectLocation(result).value mustEqual Call("GET", "/employee-working-from-home-expenses").url
+
+    application.stop()
+  }
+
+  "handle error handling in service layer" in {
+    val userAnswer = UserAnswers(userAnswersId)
+
+    val mockEligibilityCheckerConnector: EligibilityCheckerConnector = mock[EligibilityCheckerConnector]
+    when(mockEligibilityCheckerConnector.wfhDueToCovidStatus(any())(any(), any())) thenThrow new RuntimeException("error")
+
+    val application = applicationBuilder(userAnswers = Some(userAnswer)).overrides(bind[EligibilityCheckerConnector].toInstance(mockEligibilityCheckerConnector)).build()
+
+    val request = FakeRequest(GET, selectTaxYearsToClaimForRoute)
+
+    val result = route(application, request).value
+
+    status(result) mustEqual SEE_OTHER
+
+    redirectLocation(result).value mustEqual Call("GET", "/employee-working-from-home-expenses").url
+
+    application.stop()
+  }
+
 }

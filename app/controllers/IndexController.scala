@@ -19,7 +19,7 @@ package controllers
 import controllers.actions.{CheckAlreadyClaimedAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
 import models.UserAnswers
 import navigation.Navigator
-import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment}
+import pages.{ClaimedForTaxYear2020, EligibilityCheckerSessionId, HasSelfAssessmentEnrolment}
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -48,11 +48,17 @@ class IndexController @Inject()(
         alreadyClaimed <- iabdService.alreadyClaimed(request.nino, YEAR_2020)
       } yield {
 
+        val eligibilityCheckerSessionIdString = request.queryString.get("eligibilityCheckerSessionId") match {
+          case Some(sessionIdSeq) => sessionIdSeq.head
+          case None => ""
+        }
+
         val answers = UserAnswers(
           request.internalId,
           Json.obj(
             ClaimedForTaxYear2020.toString -> alreadyClaimed.isDefined,
-            HasSelfAssessmentEnrolment.toString -> request.saUtr.isDefined
+            HasSelfAssessmentEnrolment.toString -> request.saUtr.isDefined,
+            EligibilityCheckerSessionId.toString() -> eligibilityCheckerSessionIdString
           )
         )
 

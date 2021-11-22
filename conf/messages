@@ -213,3 +213,7 @@ selectTaxYearsToClaimFor.error.required = Select at least one option
 service.is.busy.title = Sorry, the service is busy
 service.is.busy.heading = Sorry, the service is busy
 service.is.busy.message = Please try again later.
+
+phaseBanner.text.part1 = This is a new service – your
+phaseBanner.linkText = feedback
+phaseBanner.text.part2 = will help us to improve it.

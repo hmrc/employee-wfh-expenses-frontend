@@ -213,3 +213,7 @@ selectTaxYearsToClaimFor.error.required=Dewiswch o leiaf un opsiwn
 service.is.busy.title=Mae’n ddrwg gennym – mae’r gwasanaeth yn brysur
 service.is.busy.heading=Mae’n ddrwg gennym – mae’r gwasanaeth yn brysur
 service.is.busy.message=Rhowch gynnig arall arni yn nes ymlaen.
+
+phaseBanner.text.part1 = Mae hwn yn wasanaeth newydd - bydd eich
+phaseBanner.linkText = adborth
+phaseBanner.text.part2 = yn ein helpu i'w wella.

@@ -30,13 +30,22 @@ class Navigator @Inject()() extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
-    case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
+    case SelectTaxYearsToClaimForPage => ua => startDateJourneyFlow(ua)
+    //case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
     case DisclaimerPage => ua => disclaimerNextPage(ua)
     case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
     case _ => _ => routes.IndexController.onPageLoad()
   }
 
   def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
+
+  def startDateJourneyFlow(userAnswers: UserAnswers): Call = {
+    if (userAnswers.get(SelectTaxYearsToClaimForPage).get.contains(SelectTaxYearsToClaimFor.Option2)) {
+      routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+    } else {
+      routes.DisclaimerController.onPageLoad()
+    }
+  }
 
   def checkStartWorkingFromHomeDate(userAnswers: UserAnswers): Call = {
     val earliestStartDate = LocalDate.of(2020,1,1)

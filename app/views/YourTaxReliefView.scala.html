@@ -1,0 +1,80 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import java.time.LocalDate
+@import utils.TaxYearDates._
+
+@this(
+        main_template:      MainTemplate,
+        formHelper:         FormWithCSRF,
+        backLink:           GovukBackLink,
+        govukInsetText:     GovukInsetText,
+        button:             GovukButton
+)
+
+@(taxMonthAfterText: String, taxYearAfterText: String,
+  taxMonthBeforeText: Option[String], taxYearBeforeText: Option[String])(implicit request: Request[_], messages: Messages)
+
+@afterDateStringFormatted = {
+    @messages("yourTaxRelief.confirmation.page.heading.after") @messages(taxMonthAfterText) @messages(taxYearAfterText)
+}
+
+@beforeDateStringFormatted = {
+    @messages("yourTaxRelief.confirmation.page.heading.before") @messages(taxMonthBeforeText.getOrElse("")) @messages(taxYearBeforeText.getOrElse(""))
+}
+
+@main_template(
+    title = messages("yourTaxRelief.title"),
+    beforeContentBlock = Some(backLink(BackLink(
+        href = routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url,
+        content = Text(messages("site.back")),
+        attributes = Map("id" -> "back-link")
+    )))
+) {
+
+    <h1 class="govuk-heading-xl">@messages("yourTaxRelief.confirmation.page.heading")</h1>
+
+    <h2 class="govuk-heading-m">@afterDateStringFormatted</h2>
+
+    <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.info.text.1")</p>
+
+    <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.bullet.heading")</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages("yourTaxRelief.confirmation.page.bullet.text.1")</li>
+        <li>@messages("yourTaxRelief.confirmation.page.bullet.text.2")</li>
+    </ul>
+
+    @if(taxMonthBeforeText.isDefined) {
+        <h2 class="govuk-heading-m">@beforeDateStringFormatted</h2>
+
+        <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.bullet.heading.1")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.3")</li>
+            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.4")</li>
+            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.5")</li>
+        </ul>
+    }
+
+    @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
+        @button(
+            Button(
+                content             = Text(messages("yourTaxRelief.confirmation.page.button.text")),
+                preventDoubleClick  = true
+            )
+        )
+    }
+
+}

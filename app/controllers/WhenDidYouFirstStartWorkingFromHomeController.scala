@@ -19,8 +19,8 @@ package controllers
 import controllers.actions._
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
 import models.UserAnswers
-import navigation.Navigator
-import pages.WhenDidYouFirstStartWorkingFromHomePage
+import navigation.{Navigator, SelectedTaxYears}
+import pages.{SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -57,6 +57,28 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
 
       if (request.userAnswers.is2019And2020Only) Ok(view_2019_2020(preparedForm)) else Ok(view_2019_2020_2021(preparedForm))
   }
+
+  /*def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
+    implicit request =>
+      val messages = request2Messages
+
+      form.bindFromRequest().fold(
+        formWithErrors => {
+          val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => messages(s"date.$arg").toLowerCase)))
+
+          if (request.userAnswers.is2019And2020Only) {
+            Future.successful(BadRequest(view_2019_2020(formWithErrors.copy(errors = errors))))
+          } else {
+            Future.successful(BadRequest(view_2019_2020_2021(formWithErrors.copy(errors = errors))))
+          }
+        },
+        value =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(WhenDidYouFirstStartWorkingFromHomePage, value))
+            _              <- sessionRepository.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(WhenDidYouFirstStartWorkingFromHomePage, updatedAnswers))
+      )
+  }*/
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>

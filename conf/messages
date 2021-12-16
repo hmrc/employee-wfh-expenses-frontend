@@ -218,3 +218,27 @@ service.is.busy.message = Please try again later.
 phaseBanner.text.part1 = This is a new service – your
 phaseBanner.linkText = feedback
 phaseBanner.text.part2 = will help us to improve it.
+
+
+disclaimer.your.claim.details.header = Your claim details
+disclaimer.your.claim.details.year.label = You can claim and get tax relief on expenses of £6 a week for full tax years:
+disclaimer.your.claim.date.to = to
+disclaimer.your.claim.text.1 = You can also claim and get tax relief on expenses of £4 a week for part tax year:
+disclaimer.your.claim.text.date.bullet = 1 January 2020 to 5 April 2020
+disclaimer.your.claim.text.2 = If your extra costs are more than this you can claim for more tax relief.
+disclaimer.your.claim.text.3 = You will need to
+disclaimer.your.claim.text.4 = claim tax relief for expenses of employment
+disclaimer.your.claim.text.5 = and provide evidence, like detailed and verifiable receipts and bills.
+
+yourTaxRelief.confirmation.page.heading = You must read the following before making a claim
+yourTaxRelief.confirmation.page.heading.after = Check to ensure you can claim tax relief after
+yourTaxRelief.confirmation.page.info.text.1 = You can claim if your employer has not already paid your expenses and you have additional household costs as a result of working from home.
+yourTaxRelief.confirmation.page.bullet.heading = You must also:
+yourTaxRelief.confirmation.page.bullet.text.1 = have had to work from home because you had to self-isolate
+yourTaxRelief.confirmation.page.bullet.text.2 = or your working arrangements have changed and it is necessary, either because of the nature of your job or the facilities required to perform your job, for you to work from home
+yourTaxRelief.confirmation.page.heading.before = Check to ensure you can claim tax relief before
+yourTaxRelief.confirmation.page.bullet.heading.1 = You can claim if all the following apply:
+yourTaxRelief.confirmation.page.bullet.text.3 = your employer has not already paid your expenses
+yourTaxRelief.confirmation.page.bullet.text.4 = government guidelines or your employer have required you to work from home or self-isolate
+yourTaxRelief.confirmation.page.bullet.text.5 = you have additional household costs as a result of working from home
+yourTaxRelief.confirmation.page.button.text = Accept and continue

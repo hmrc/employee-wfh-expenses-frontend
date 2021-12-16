@@ -1,0 +1,50 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import utils.DateLanguageTokenizerFormattedItem
+@import config.FrontendAppConfig
+
+@this(frontendAppConfig: FrontendAppConfig)
+
+@(claimViewSettings: ClaimViewSettings)(implicit messages: Messages)
+
+<h1 class="govuk-heading-m">@messages("disclaimer.your.claim.details.header")</h1>
+
+<p class="govuk-body">@messages("disclaimer.your.claim.details.year.label")</p>
+
+<ul class="govuk-list govuk-list--bullet">
+@for(dateToken <- claimViewSettings.datesToClaim) {
+ <li>@dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("disclaimer.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</li>
+}
+</ul>
+
+@if(claimViewSettings.additionalTaxReliefDates.isDefined) {
+    <p class="govuk-body">@messages("disclaimer.your.claim.text.1")</p>
+    <ul class="govuk-list govuk-list--bullet">
+    @for(dateToken <- claimViewSettings.additionalTaxReliefDates.get) {
+        <li>@dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("disclaimer.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</li>
+    }
+    </ul>
+}
+
+<p class="govuk-body">
+  @messages("disclaimer.your.claim.text.2")
+  @messages("disclaimer.your.claim.text.3")
+  <a href=@frontendAppConfig.p87DigitalFormUrl>@messages("disclaimer.your.claim.text.4")</a>
+  @messages("disclaimer.your.claim.text.5")
+ </p>
+
+</ul>

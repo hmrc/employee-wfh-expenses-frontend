@@ -21,6 +21,7 @@ import models._
 import pages._
 import play.api.Logging
 import play.api.mvc.Call
+import utils.DateLanguageTokenizer
 
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
@@ -54,10 +55,11 @@ class Navigator @Inject()() extends Logging {
       case Some(startDate) =>
         startDate.isBefore(earliestStartDate) match {
           case true   => routes.CannotClaimUsingThisServiceController.onPageLoad()
-          case false  => routes.YourTaxReliefController.onPageLoad()
+          case false  => routes.DisclaimerController.onPageLoad()
         }
       case None => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
     }
+
   }
 
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
@@ -73,18 +75,33 @@ class Navigator @Inject()() extends Logging {
     }
   }
 
-  def disclaimerNextPage(userAnswers: UserAnswers): Call = {
+  def disclaimerNextPage_old(userAnswers: UserAnswers): Call = {
     (
       userAnswers.is2021Only,
       userAnswers.is2019And2020Only,
       userAnswers.is2019And2020And2021Only
     ) match {
-      case (true, _, _) => routes.YourTaxReliefController.onPageLoad()
-      case (_, true, _) => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
-      case (_, _, true) => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+      case (true, _, _) => {
+        routes.YourTaxReliefController.onPageLoad()
+      }
+      case (_, true, _) => {
+        routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+      }
+      case (_, _, true) => {
+        routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+      }
       case (a, b, c) =>
         logger.error(s"Unexpected case match ($a,$b,$c)")
         routes.TechnicalDifficultiesController.onPageLoad()
     }
+  }
+
+  def disclaimerNextPage(userAnswers: UserAnswers): Call = {
+
+        routes.YourTaxReliefController.onPageLoad()
+
+    //    logger.error(s"Unexpected case match ($a,$b,$c)")
+      //  routes.TechnicalDifficultiesController.onPageLoad()
+
   }
 }

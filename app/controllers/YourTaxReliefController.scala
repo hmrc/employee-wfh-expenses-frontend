@@ -17,15 +17,19 @@
 package controllers
 
 import controllers.actions._
-import pages.WhenDidYouFirstStartWorkingFromHomePage
+import models.{ClaimViewSettings, DisclaimerViewSettings}
+import navigation.SelectedTaxYears
+import pages.{SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.DateLanguageTokenizer
 import utils.TaxYearDates._
 import views.html._
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -38,12 +42,29 @@ class YourTaxReliefController @Inject()(
                                          requireData: DataRequiredAction,
                                          submissionService: SubmissionService,
                                          val controllerComponents: MessagesControllerComponents,
-                                         yourTaxRelief2021OnlyView: YourTaxRelief2021OnlyView,
-                                         yourTaxRelief2019_2020_2021View: YourTaxRelief2019_2020_2021View,
-                                         yourTaxRelief2019_2020View: YourTaxRelief2019_2020View
+                                         yourTaxReliefView: YourTaxReliefView,
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
+    implicit request =>
+
+      val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
+
+      val selectedTaxYears = SelectedTaxYears(request.userAnswers.get(SelectTaxYearsToClaimForPage).get.map(_.toString).toList)
+
+      if(selectedTaxYears.debugAreAllAvailableTaxYearsSelected) {
+        Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
+          Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString)))
+      } else {
+        Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString, None, None))
+      }
+
+//          logger.error("[SubmitYourClaimController][onPageLoad] - No years to claim for found")
+  //        Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+    //  }
+  }
+
+  /*def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
 
       (
@@ -64,7 +85,7 @@ class YourTaxReliefController @Inject()(
           logger.error("[SubmitYourClaimController][onPageLoad] - No years to claim for found")
           Redirect(routes.TechnicalDifficultiesController.onPageLoad())
       }
-  }
+  }*/
 
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {

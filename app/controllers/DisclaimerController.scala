@@ -17,14 +17,17 @@
 package controllers
 
 import controllers.actions._
+import models.{ClaimViewSettings, DisclaimerViewSettings}
 import models.SelectTaxYearsToClaimFor.{Option1, Option2}
-import navigation.Navigator
+import navigation.{Navigator, SelectedTaxYears}
 import pages.{ClaimedForTaxYear2020, DisclaimerPage, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{Disclaimer2019_2020View, Disclaimer2019_2020_2021View, Disclaimer2021View}
+import utils.{DateLanguageTokenizer, DateLanguageTokenizerFormattedItem}
+import views.html.{Disclaimer2019_2020View, Disclaimer2019_2020_2021View, Disclaimer2021View, DisclaimerView}
 
+import java.time.LocalDate
 import javax.inject.Inject
 
 class DisclaimerController @Inject()(
@@ -35,11 +38,34 @@ class DisclaimerController @Inject()(
                                       requireData: DataRequiredAction,
                                       navigator: Navigator,
                                       val controllerComponents: MessagesControllerComponents,
+                                      disclaimerView : DisclaimerView,
                                       disclaimer2021View : Disclaimer2021View,
                                       disclaimer2019_2020View: Disclaimer2019_2020View,
                                       disclaimer2019_2020_2021View: Disclaimer2019_2020_2021View
                                      ) extends FrontendBaseController with I18nSupport {
 
+  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
+    implicit request =>
+
+      val dateList = List((LocalDate.of(2022, 4, 6), LocalDate.of(2020, 4, 5)),
+        (LocalDate.of(2021, 4, 6), LocalDate.of(2020, 4, 5)),
+        (LocalDate.of(2020, 4, 6), LocalDate.of(2020, 4, 5)))
+
+      val defaultDateList = DateLanguageTokenizer.convertList(dateList)
+
+      val selectedTaxYears = SelectedTaxYears(request.userAnswers.get(SelectTaxYearsToClaimForPage).get.map(_.toString).toList)
+
+      val disclaimerViewSettings = if(selectedTaxYears.debugAreAllAvailableTaxYearsSelected) {
+        DisclaimerViewSettings(Some(ClaimViewSettings(defaultDateList, Some(defaultDateList))))
+      } else {
+        DisclaimerViewSettings(Some(ClaimViewSettings(defaultDateList, None)))
+      }
+
+      Ok(disclaimerView(false, disclaimerViewSettings))
+
+  }
+
+  /*
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
 
@@ -65,6 +91,7 @@ class DisclaimerController @Inject()(
           }
       }
   }
+*/
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>

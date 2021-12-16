@@ -27,10 +27,12 @@ object SelectTaxYearsToClaimFor extends Enumerable.Implicits {
 
   case object Option1 extends WithName("option1") with SelectTaxYearsToClaimFor
   case object Option2 extends WithName("option2") with SelectTaxYearsToClaimFor
+  case object Option3 extends WithName("option3") with SelectTaxYearsToClaimFor
 
   val values: Seq[SelectTaxYearsToClaimFor] = Seq(
     Option1,
-    Option2
+    Option2,
+    Option3
   )
 
   def options(form: Form[_])(implicit messages: Messages): Seq[CheckboxItem] = values.map {

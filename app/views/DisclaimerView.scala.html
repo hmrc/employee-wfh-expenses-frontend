@@ -15,7 +15,6 @@
  *@
 
 @import config.FrontendAppConfig
-@import utils.DateLanguageTokenizerFormattedItem
 
 @this(
         main_template: MainTemplate,
@@ -27,27 +26,51 @@
         disclaimerClaimDetailsView: disclaimerClaimDetailsView
 )
 
-@(showBackLink: Boolean, disclaimerViewSettings: DisclaimerViewSettings)( implicit request: Request[_], messages: Messages)
+@(showBackLink: Boolean = true, disclaimerViewSettings: DisclaimerViewSettings, previousTaxYears: Boolean = false, lastTaxYear: Boolean = false, currentTaxYear: Boolean = false)( implicit request: Request[_], messages: Messages)
 
 @main_template(
- title = messages("disclaimer.heading"),
- beforeContentBlock = if(showBackLink){Some(
-  backLink(
-   BackLink(
-    href = routes.SelectTaxYearsToClaimForController.onPageLoad().url,
-    content = Text(messages("site.back")),
-    attributes = Map("id" -> "back-link")
-   )
-  )
- )}else None) {
+    title = messages("disclaimer.heading"),
+    beforeContentBlock = if(showBackLink) {
+            Some(
+                backLink(
+                    BackLink(
+                        href = routes.SelectTaxYearsToClaimForController.onPageLoad().url,
+                        content = Text(messages("site.back")),
+                        attributes = Map("id" -> "back-link")
+                    )
+                )
+            )
+     } else None
+    ) {
+
     @formHelper(action = routes.DisclaimerController.onSubmit(), 'autoComplete -> "off") {
 
-     <h1 class="govuk-heading-xl">@messages("disclaimer.heading")</h1>
+        <h1 class="govuk-heading-xl">@messages("disclaimer.heading")</h1>
 
-    @if(disclaimerViewSettings.claimViewSettings.isDefined) {
-        @disclaimerClaimDetailsView(disclaimerViewSettings.claimViewSettings.get)
-    }
+        <h1 class="govuk-heading-m">@messages("disclaimer.your.claim.details.header")</h1>
 
-     @button(Button(content = Text(messages("disclaimer.submit.button"))))
+        <p class="govuk-body">@messages("disclaimer.your.claim.details.year.label")</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            @if(currentTaxYear) { <li>@messages("disclaimer.your.claim.date.current")</li> }
+            @if(lastTaxYear) { <li>@messages("disclaimer.your.claim.date.last")</li> }
+            @if(previousTaxYears) { <li>@messages("disclaimer.your.claim.date.previous20")</li> }
+        </ul>
+
+        @if(previousTaxYears) {
+            <p class="govuk-body">@messages("disclaimer.your.claim.text.1")</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>@messages("disclaimer.your.claim.date.previous19")</li>
+            </ul>
+        }
+
+        <p class="govuk-body">
+            @messages("disclaimer.your.claim.text.2")
+            @messages("disclaimer.your.claim.text.3")
+            <a href=@frontendAppConfig.p87DigitalFormUrl>@messages("disclaimer.your.claim.text.4")</a>
+            @messages("disclaimer.your.claim.text.5")
+        </p>
+
+        @button(Button(content = Text(messages("disclaimer.submit.button"))))
     }
 }

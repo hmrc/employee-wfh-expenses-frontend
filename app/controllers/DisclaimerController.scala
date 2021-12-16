@@ -61,7 +61,7 @@ class DisclaimerController @Inject()(
         DisclaimerViewSettings(Some(ClaimViewSettings(defaultDateList, None)))
       }
 
-      Ok(disclaimerView(false, disclaimerViewSettings))
+      Ok(disclaimerView(false, disclaimerViewSettings, true, true, true))
 
   }
 

@@ -222,6 +222,10 @@ phaseBanner.text.part2 = will help us to improve it.
 
 disclaimer.your.claim.details.header = Your claim details
 disclaimer.your.claim.details.year.label = You can claim and get tax relief on expenses of £6 a week for full tax years:
+disclaimer.your.claim.date.current = 6 April 2022 to 5 April 2023
+disclaimer.your.claim.date.last = 6 April 2021 to 5 April 2022
+disclaimer.your.claim.date.previous20 = 6 April 2020 to 5 April 2021
+disclaimer.your.claim.date.previous19 = 1 January 2020 to 5 April 2020
 disclaimer.your.claim.date.to = to
 disclaimer.your.claim.text.1 = You can also claim and get tax relief on expenses of £4 a week for part tax year:
 disclaimer.your.claim.text.date.bullet = 1 January 2020 to 5 April 2020

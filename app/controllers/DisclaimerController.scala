@@ -56,7 +56,7 @@ class DisclaimerController @Inject()(
         )
       }
 
-      selectedTaxYears match {
+      selectedTaxYears.checkboxYearOptions match {
         case selectedTaxYears.claimingAllYears => Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.dateListAllYears)))
         case selectedTaxYears.claiming2022Only => Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.dateList2022Only)))
         case selectedTaxYears.claiming2021Only => Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.dateList2021Only)))

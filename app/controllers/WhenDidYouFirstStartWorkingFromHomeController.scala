@@ -54,8 +54,9 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
         case None => form
         case Some(value) => form.fill(value)
       }
+      Ok(view_2019_2020(preparedForm))
 
-      if (request.userAnswers.is2019And2020Only) Ok(view_2019_2020(preparedForm)) else Ok(view_2019_2020_2021(preparedForm))
+      //if (request.userAnswers.is2019And2020Only) Ok(view_2019_2020(preparedForm)) else Ok(view_2019_2020_2021(preparedForm))
   }
 
   /*def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {

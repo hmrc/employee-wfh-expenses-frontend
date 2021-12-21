@@ -59,5 +59,9 @@ case class SelectedTaxYears(checkboxYearOptions: List[String]) {
     }
   }
 
+  def isPreviousTaxYearSelected ={
+    checkboxYearOptions.contains("option3")
+  }
+
 
 }

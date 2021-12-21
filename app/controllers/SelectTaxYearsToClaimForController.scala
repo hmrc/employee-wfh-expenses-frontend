@@ -118,7 +118,9 @@ class SelectTaxYearsToClaimForController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, value))
             _ <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
+          } yield {
+            Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
+          }
       )
   }
 }

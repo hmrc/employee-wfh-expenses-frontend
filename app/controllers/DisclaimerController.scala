@@ -37,36 +37,21 @@ class DisclaimerController @Inject()(
                                       requireData: DataRequiredAction,
                                       navigator: Navigator,
                                       val controllerComponents: MessagesControllerComponents,
-                                      disclaimerView : DisclaimerView
-                                     ) extends FrontendBaseController with I18nSupport {
+                                      disclaimerView: DisclaimerView
+                                    ) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
 
-      val selectedTaxYears = SelectedTaxYears(request.userAnswers.get(SelectTaxYearsToClaimForPage).get.map(_.toString).toList)
+      val selectedOptionsCheckBoxes = request.userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
+
+      val selectedTaxYears = SelectedTaxYears(selectedOptionsCheckBoxes)
 
       def disclaimerSettings(dateList: List[(LocalDate, LocalDate)]) = {
-        DisclaimerViewSettings(
-          Some(
-            ClaimViewSettings(
-              DateLanguageTokenizer.convertList(dateList),
-              Some(DateLanguageTokenizer.convertList(dateList))
-            )
-          )
-        )
+        DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))))
       }
 
-      selectedTaxYears.checkboxYearOptions match {
-        case selectedTaxYears.claimingAllYears => Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.dateListAllYears)))
-        case selectedTaxYears.claiming2022Only => Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.dateList2022Only)))
-        case selectedTaxYears.claiming2021Only => Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.dateList2021Only)))
-        case selectedTaxYears.claimingPrevOnly => Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.dateListPrevOnly)))
-        case selectedTaxYears.claiming2022And2021 => Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.dateList2022And2021)))
-        case selectedTaxYears.claiming2022AndPrev => Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.dateList2022AndPrev)))
-        case selectedTaxYears.claiming2021AndPrev => Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.dateList2021AndPrev)))
-        case _ => Redirect(routes.IndexController.onPageLoad())
-      }
-
+      Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.select())))
 
   }
 

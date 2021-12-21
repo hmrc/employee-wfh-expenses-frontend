@@ -23,33 +23,41 @@ import utils.TaxYearDates._
 case class SelectedTaxYears(checkboxYearOptions: List[String]) {
 
   val claimingAllYears = (List("option1", "option2", "option3"))
-  val claiming2022Only= (List("option1"))
-  val claiming2021Only= (List("option2"))
-  val claimingPrevOnly= (List("option3"))
   val claiming2022And2021 = (List("option1", "option2"))
-  val claiming2022AndPrev = (List("option1", "option3"))
+  val claiming2022Only = (List("option1"))
   val claiming2021AndPrev = (List("option2", "option3"))
+  val claimingPrevOnly = (List("option3"))
+  val claiming2021Only = (List("option2"))
+  val claiming2022AndPrev = (List("option1", "option3"))
 
-  def dateListAllYears = List(
-    (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
-    (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
-    (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
-  )
-  def dateList2022And2021 = List(
-    (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
-    (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes)
-  )
-  def dateList2022AndPrev = List(
-    (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
-    (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
-  )
-  def dateList2021AndPrev = List(
-    (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
-    (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
-  )
-  def dateList2022Only = List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes))
-  def dateList2021Only = List((TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
-  def dateListPrevOnly = List((TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes))
+
+  def select() = {
+    if (checkboxYearOptions == claimingAllYears) {
+      List(
+        (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
+        (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
+        (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
+      )
+    } else if (checkboxYearOptions == claiming2022And2021) {
+      List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
+        (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
+    } else if (checkboxYearOptions == claiming2022Only) {
+      List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes))
+    } else if (checkboxYearOptions == claiming2021AndPrev) {
+      List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
+        (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
+    } else if (checkboxYearOptions == claimingPrevOnly) {
+      List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes))
+    } else if (checkboxYearOptions == claiming2021Only) {
+      List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
+        (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
+    } else if (checkboxYearOptions == claiming2022AndPrev) {
+      List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
+        (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
+    } else {
+      List.empty
+    }
+  }
 
 
 }

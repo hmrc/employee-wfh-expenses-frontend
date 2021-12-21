@@ -31,8 +31,8 @@ class Navigator @Inject()() extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
-    case SelectTaxYearsToClaimForPage => ua => startDateJourneyFlow(ua)
-    //case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
+    //case SelectTaxYearsToClaimForPage => ua => startDateJourneyFlow(ua)
+    case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
     case DisclaimerPage => ua => disclaimerNextPage(ua)
     case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
     case _ => _ => routes.IndexController.onPageLoad()

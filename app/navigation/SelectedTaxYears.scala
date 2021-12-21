@@ -22,13 +22,13 @@ import utils.TaxYearDates._
 
 case class SelectedTaxYears(checkboxYearOptions: List[String]) {
 
-  val claimingAllYears: SelectedTaxYears = SelectedTaxYears(List("option1", "option2", "option3"))
-  val claiming2022Only: SelectedTaxYears = SelectedTaxYears(List("option1"))
-  val claiming2021Only: SelectedTaxYears = SelectedTaxYears(List("option2"))
-  val claimingPrevOnly: SelectedTaxYears = SelectedTaxYears(List("option3"))
-  val claiming2022And2021: SelectedTaxYears = SelectedTaxYears(List("option1", "option2"))
-  val claiming2022AndPrev: SelectedTaxYears = SelectedTaxYears(List("option1", "option3"))
-  val claiming2021AndPrev: SelectedTaxYears = SelectedTaxYears(List("option2", "option3"))
+  val claimingAllYears = (List("option1", "option2", "option3"))
+  val claiming2022Only= (List("option1"))
+  val claiming2021Only= (List("option2"))
+  val claimingPrevOnly= (List("option3"))
+  val claiming2022And2021 = (List("option1", "option2"))
+  val claiming2022AndPrev = (List("option1", "option3"))
+  val claiming2021AndPrev = (List("option2", "option3"))
 
   def dateListAllYears = List(
     (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),

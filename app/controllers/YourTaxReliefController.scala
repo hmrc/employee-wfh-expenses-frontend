@@ -52,7 +52,7 @@ class YourTaxReliefController @Inject()(
 
       val selectedTaxYears = SelectedTaxYears(request.userAnswers.get(SelectTaxYearsToClaimForPage).get.map(_.toString).toList)
 
-      if(selectedTaxYears.debugAreAllAvailableTaxYearsSelected) {
+      if(selectedTaxYears == selectedTaxYears.claimingAllYears) {
         Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
           Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString)))
       } else {

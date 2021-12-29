@@ -19,7 +19,7 @@ package controllers
 import controllers.actions._
 import models.{ClaimViewSettings, DisclaimerViewSettings}
 import navigation.{Navigator, SelectedTaxYears}
-import pages.{DisclaimerPage, SelectTaxYearsToClaimForPage}
+import pages.{DisclaimerPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -45,10 +45,16 @@ class DisclaimerController @Inject()(
 
       val selectedOptionsCheckBoxes = request.userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
 
+      val startDate = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+
       val selectedTaxYears = SelectedTaxYears(selectedOptionsCheckBoxes)
 
       def disclaimerSettings(dateList: List[(LocalDate, LocalDate)]) = {
-        DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))))
+        if (request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).isDefined) {
+          DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))))
+        } else {
+          DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), None)))
+        }
       }
 
       Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.select())))

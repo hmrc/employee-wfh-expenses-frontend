@@ -62,5 +62,7 @@ case class SelectedTaxYears(checkboxYearOptions: List[String]) {
     checkboxYearOptions.contains("option3")
   }
 
-
+  def showWarningSection: Boolean = {
+    !checkboxYearOptions.contains("option1")
+  }
 }

@@ -26,7 +26,9 @@
 )
 
 @(taxMonthAfterText: String, taxYearAfterText: String,
-  taxMonthBeforeText: Option[String], taxYearBeforeText: Option[String])(implicit request: Request[_], messages: Messages)
+  taxMonthBeforeText: Option[String],
+  taxYearBeforeText: Option[String],
+  showWarningSection: Boolean)(implicit request: Request[_], messages: Messages)
 
 @afterDateStringFormatted = {
     @messages("yourTaxRelief.confirmation.page.heading.after") @messages(taxMonthAfterText) @messages(taxYearAfterText)
@@ -68,13 +70,15 @@
         </ul>
     }
 
-    <div class="govuk-warning-text">
-        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-        <strong class="govuk-warning-text__text">
-            <span class="govuk-warning-text__assistive">Warning</span>
-            @messages("yourTaxRelief.confirmation.page.warning.text")<br>
-        </strong>
-    </div>
+    @if(showWarningSection) {
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                @messages("yourTaxRelief.confirmation.page.warning.text")<br>
+            </strong>
+        </div>
+    }
 
     @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
         @button(

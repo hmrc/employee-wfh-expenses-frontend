@@ -51,12 +51,13 @@ class YourTaxReliefController @Inject()(
       val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
 
       val selectedTaxYears = SelectedTaxYears(request.userAnswers.get(SelectTaxYearsToClaimForPage).get.map(_.toString).toList)
+      val showWarningSection = selectedTaxYears.showWarningSection
 
       if(selectedTaxYears == selectedTaxYears.claimingAllYears) {
         Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
-          Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString)))
+          Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString), showWarningSection))
       } else {
-        Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString, None, None))
+        Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString, None, None, showWarningSection))
       }
 
 //          logger.error("[SubmitYourClaimController][onPageLoad] - No years to claim for found")

@@ -25,7 +25,7 @@ govukInsetText:     GovukInsetText,
 button:             GovukButton
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(claimViewSettings: ClaimViewSettings)(implicit request: Request[_], messages: Messages)
 
 @main_template(
 title = messages("yourTaxRelief.title"),
@@ -43,7 +43,9 @@ attributes = Map("id" -> "back-link")
 <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.bullet.heading")</p>
 
 <ul class="govuk-list govuk-list--bullet">
-    <li>@messages("checkYourClaimView.text.2")</li>
+    @for(dateToken <- claimViewSettings.datesToClaim) {
+    <li>@dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("disclaimer.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</li>
+    }
 </ul>
 
 <p class="govuk-body">@messages("checkYourClaimView.text.3")</p>

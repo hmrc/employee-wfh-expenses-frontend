@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
+import models.{ClaimViewSettings, DisclaimerViewSettings}
 import navigation.{Navigator, SelectedTaxYears}
 import pages.{CheckYourClaimPage, DisclaimerPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
@@ -46,7 +47,18 @@ class CheckYourClaimController @Inject()(
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
-    implicit request =>      Ok(checkYourClaimView())
+    implicit request =>
+
+      val selectedOptionsCheckBoxes = request.userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
+
+      val startDate = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+
+      val selectedTaxYears = SelectedTaxYears(selectedOptionsCheckBoxes)
+
+      def claimViewSettings(dateList: List[(LocalDate, LocalDate)]) = {
+        ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))
+      }
+      Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.select())))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {

@@ -17,23 +17,22 @@
 package controllers
 
 import controllers.actions._
-import models.{ClaimViewSettings, DisclaimerViewSettings}
-import navigation.SelectedTaxYears
-import pages.{CheckYourClaimPage, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
+import navigation.{Navigator, SelectedTaxYears}
+import pages.{CheckYourClaimPage, DisclaimerPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateLanguageTokenizer
-import utils.TaxYearDates._
 import views.html._
 
 import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class YourTaxReliefController @Inject()(
+class CheckYourClaimController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          identify: IdentifierAction,
                                          checkAlreadyClaimed: CheckAlreadyClaimedAction,
@@ -41,32 +40,29 @@ class YourTaxReliefController @Inject()(
                                          getData: DataRetrievalAction,
                                          requireData: DataRequiredAction,
                                          submissionService: SubmissionService,
+                                         navigator: Navigator,
                                          val controllerComponents: MessagesControllerComponents,
-                                         yourTaxReliefView: YourTaxReliefView,
-                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                         checkYourClaimView: CheckYourClaimView,
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
-    implicit request =>
-
-      val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
-
-      val selectedTaxYears = SelectedTaxYears(request.userAnswers.get(SelectTaxYearsToClaimForPage).get.map(_.toString).toList)
-      val showWarningSection = selectedTaxYears.showWarningSection
-      if (selectedTaxYears == selectedTaxYears.claimingAllYears) {
-        Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
-          Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString), showWarningSection))
-      } else {
-        Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString, None, None, showWarningSection))
-      }
-
-    //          logger.error("[SubmitYourClaimController][onPageLoad] - No years to claim for found")
-    //        Redirect(routes.TechnicalDifficultiesController.onPageLoad())
-    //  }
+    implicit request =>      Ok(checkYourClaimView())
   }
-
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
     implicit request =>
-      Future(Redirect(routes.CheckYourClaimController.onPageLoad()))
+
+      submissionService.submitExpenses(
+        request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage),
+        request.userAnswers.is2019And2020Only,
+        request.userAnswers.is2019And2020And2021Only) map {
+        case Right(_) =>
+          Redirect(routes.ConfirmationController.onPageLoad())
+        case Left(_) =>
+          logger.error("[SubmitYourClaimController][onSubmit] - Error submitting")
+          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+
+      }
   }
 }
+

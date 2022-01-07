@@ -81,12 +81,6 @@
     }
 
     @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
-        @button(
-            Button(
-                content             = Text(messages("yourTaxRelief.confirmation.page.button.text")),
-                preventDoubleClick  = true
-            )
-        )
+        @button(Button(content = Text(messages("yourTaxRelief.confirmation.page.button.text")), preventDoubleClick  = true))
     }
-
 }

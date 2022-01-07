@@ -26,7 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{WhenDidYouFirstStartWorkingFromHome2019_2020View, WhenDidYouFirstStartWorkingFromHome2019_2020_2021View}
+import views.html.WhenDidYouFirstStartWorkingFromHomeView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,8 +41,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
                                         requireData: DataRequiredAction,
                                         formProvider: WhenDidYouFirstStartWorkingFromHomeFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
-                                        view_2019_2020: WhenDidYouFirstStartWorkingFromHome2019_2020View,
-                                        view_2019_2020_2021: WhenDidYouFirstStartWorkingFromHome2019_2020_2021View
+                                        whenDidYouFirstStartWorkingFromHomeView: WhenDidYouFirstStartWorkingFromHomeView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   val form = formProvider()
@@ -54,7 +53,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
         case None => form
         case Some(value) => form.fill(value)
       }
-      Ok(view_2019_2020(preparedForm))
+      Ok(whenDidYouFirstStartWorkingFromHomeView(preparedForm))
 
       //if (request.userAnswers.is2019And2020Only) Ok(view_2019_2020(preparedForm)) else Ok(view_2019_2020_2021(preparedForm))
   }
@@ -87,13 +86,10 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors => {
-          val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => messages(s"date.$arg").toLowerCase)))
+          //val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => "messages(s"date.$arg").toLowerCase)"))
+          val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => "")))
 
-          if (request.userAnswers.is2019And2020Only) {
-            Future.successful(BadRequest(view_2019_2020(formWithErrors.copy(errors = errors))))
-          } else {
-            Future.successful(BadRequest(view_2019_2020_2021(formWithErrors.copy(errors = errors))))
-          }
+            Future.successful(BadRequest(whenDidYouFirstStartWorkingFromHomeView(formWithErrors.copy(errors = errors))))
         },
         value =>
           for {

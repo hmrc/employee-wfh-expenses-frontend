@@ -19,7 +19,7 @@ package controllers
 import controllers.actions._
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
 import models.{ClaimViewSettings, DisclaimerViewSettings}
-import navigation.{Navigator, SelectedTaxYears}
+import navigation.{Navigator, TaxYearFromUIAssembler}
 import pages.{CheckYourClaimPage, DisclaimerPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -53,12 +53,12 @@ class CheckYourClaimController @Inject()(
 
       val startDate = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
 
-      val selectedTaxYears = SelectedTaxYears(selectedOptionsCheckBoxes)
+      val selectedTaxYears = TaxYearFromUIAssembler(selectedOptionsCheckBoxes)
 
       def claimViewSettings(dateList: List[(LocalDate, LocalDate)]) = {
         ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))
       }
-      Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.select())))
+      Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble)))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {

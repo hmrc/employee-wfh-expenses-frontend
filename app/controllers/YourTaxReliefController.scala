@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import models.{ClaimViewSettings, DisclaimerViewSettings}
-import navigation.SelectedTaxYears
+import navigation.TaxYearFromUIAssembler
 import pages.{CheckYourClaimPage, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -50,9 +50,9 @@ class YourTaxReliefController @Inject()(
 
       val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
 
-      val selectedTaxYears = SelectedTaxYears(request.userAnswers.get(SelectTaxYearsToClaimForPage).get.map(_.toString).toList)
+      val selectedTaxYears = TaxYearFromUIAssembler(request.userAnswers.get(SelectTaxYearsToClaimForPage).get.map(_.toString).toList)
       val showWarningSection = selectedTaxYears.showWarningSection
-      if (selectedTaxYears == selectedTaxYears.claimingAllYears) {
+      if (selectedTaxYears.allYearsSelected) {
         Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
           Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString), showWarningSection))
       } else {

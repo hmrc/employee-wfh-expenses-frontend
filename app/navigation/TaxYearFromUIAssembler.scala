@@ -21,19 +21,22 @@ import utils.TaxYearDates._
 
 import java.time.LocalDate
 
+case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
 
-case class SelectedTaxYears(checkboxYearOptions: List[String]) {
+  private val claimingAllYears = List("option1", "option2", "option3")
+  private val claiming2022And2021 = List("option1", "option2")
+  private val claiming2022Only = List("option1")
+  private val claiming2021AndPrev = List("option2", "option3")
+  private val claiming2021Only = List("option2")
+  private val claiming2022AndPrev = List("option1", "option3")
 
-  val claimingAllYears = List("option1", "option2", "option3")
-  val claiming2022And2021 = List("option1", "option2")
-  val claiming2022Only = List("option1")
-  val claiming2021AndPrev = List("option2", "option3")
-  val claimingPrevOnly = List("option3")
-  val claiming2021Only = List("option2")
-  val claiming2022AndPrev = List("option1", "option3")
+  private val validateInputList ={
+    if(checkboxYearOptions == null || checkboxYearOptions.isEmpty){
+      throw new IllegalArgumentException("input checkbox list is either empty or invalid")
+    }
+  }
 
-
-  def select(): List[(LocalDate, LocalDate)] = {
+  val assemble: List[(LocalDate, LocalDate)] = {
     if (checkboxYearOptions == claimingAllYears) {
       List(
         (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
@@ -58,11 +61,9 @@ case class SelectedTaxYears(checkboxYearOptions: List[String]) {
     }
   }
 
-  def isPreviousTaxYearSelected: Boolean = {
-    checkboxYearOptions.contains("option3")
-  }
+  val isPreviousTaxYearSelected: Boolean = checkboxYearOptions.contains("option3")
 
-  def showWarningSection: Boolean = {
-    !checkboxYearOptions.contains("option1")
-  }
+  val showWarningSection: Boolean = !checkboxYearOptions.contains("option1")
+
+  val allYearsSelected = checkboxYearOptions == claimingAllYears
 }

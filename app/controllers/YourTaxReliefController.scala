@@ -43,14 +43,15 @@ class YourTaxReliefController @Inject()(
                                          submissionService: SubmissionService,
                                          val controllerComponents: MessagesControllerComponents,
                                          yourTaxReliefView: YourTaxReliefView,
-                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
 
       val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
 
-      val selectedTaxYears = TaxYearFromUIAssembler(request.userAnswers.get(SelectTaxYearsToClaimForPage).get.map(_.toString).toList)
+      val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
+
       val showWarningSection = selectedTaxYears.showWarningSection
       if (selectedTaxYears.allYearsSelected) {
         Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,

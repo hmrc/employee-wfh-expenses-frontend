@@ -44,16 +44,11 @@ class CheckYourClaimController @Inject()(
                                          navigator: Navigator,
                                          val controllerComponents: MessagesControllerComponents,
                                          checkYourClaimView: CheckYourClaimView,
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-
-      val selectedOptionsCheckBoxes = request.userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
-
-      val startDate = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-
-      val selectedTaxYears = TaxYearFromUIAssembler(selectedOptionsCheckBoxes)
+      val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
       def claimViewSettings(dateList: List[(LocalDate, LocalDate)]) = {
         ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))

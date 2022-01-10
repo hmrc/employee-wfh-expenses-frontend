@@ -38,16 +38,12 @@ class DisclaimerController @Inject()(
                                       navigator: Navigator,
                                       val controllerComponents: MessagesControllerComponents,
                                       disclaimerView: DisclaimerView
-                                    ) extends FrontendBaseController with I18nSupport {
+                                    ) extends FrontendBaseController with I18nSupport with UIAssembler {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
 
-      val selectedOptionsCheckBoxes = request.userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
-
-      val startDate = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-
-      val selectedTaxYears = TaxYearFromUIAssembler(selectedOptionsCheckBoxes)
+      val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
       def disclaimerSettings(dateList: List[(LocalDate, LocalDate)]) = {
         if (request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).isDefined) {

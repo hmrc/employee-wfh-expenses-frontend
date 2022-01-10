@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import models.{ClaimViewSettings, DisclaimerViewSettings}
-import navigation.{Navigator, SelectedTaxYears}
+import navigation.{Navigator, TaxYearFromUIAssembler}
 import pages.{DisclaimerPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -38,16 +38,12 @@ class DisclaimerController @Inject()(
                                       navigator: Navigator,
                                       val controllerComponents: MessagesControllerComponents,
                                       disclaimerView: DisclaimerView
-                                    ) extends FrontendBaseController with I18nSupport {
+                                    ) extends FrontendBaseController with I18nSupport with UIAssembler {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
 
-      val selectedOptionsCheckBoxes = request.userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
-
-      val startDate = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-
-      val selectedTaxYears = SelectedTaxYears(selectedOptionsCheckBoxes)
+      val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
       def disclaimerSettings(dateList: List[(LocalDate, LocalDate)]) = {
         if (request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).isDefined) {
@@ -57,7 +53,7 @@ class DisclaimerController @Inject()(
         }
       }
 
-      Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.select())))
+      Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.assemble)))
 
   }
 

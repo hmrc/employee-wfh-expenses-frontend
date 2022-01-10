@@ -30,34 +30,32 @@ case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
   private val claiming2021Only = List("option2")
   private val claiming2022AndPrev = List("option1", "option3")
 
-  private val validateInputList ={
-    if(checkboxYearOptions == null || checkboxYearOptions.isEmpty){
+  private val validateInputList = {
+    if (checkboxYearOptions == null || checkboxYearOptions.isEmpty) {
       throw new IllegalArgumentException("input checkbox list is either empty or invalid")
     }
   }
 
   val assemble: List[(LocalDate, LocalDate)] = {
-    if (checkboxYearOptions == claimingAllYears) {
-      List(
-        (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
-        (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
-        (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
-      )
-    } else if (checkboxYearOptions == claiming2022And2021) {
-      List(
-        (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
-        (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes)
-      )
-    } else if (checkboxYearOptions == claiming2022Only || checkboxYearOptions == claiming2022AndPrev) {
-      List(
-        (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes)
-      )
-    } else if (checkboxYearOptions == claiming2021AndPrev || checkboxYearOptions == claiming2021Only) {
-      List(
-        (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes)
-      )
-    } else {
-      List.empty
+    checkboxYearOptions match {
+      case inputList if inputList == claimingAllYears =>
+        List(
+          (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
+          (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
+          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
+        )
+      case inputList if inputList == claiming2022And2021 =>
+        List(
+          (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
+          (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes)
+        )
+      case inputList if (inputList == claiming2022Only || inputList == claiming2022AndPrev) =>
+        List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes))
+      case inputList if (inputList == claiming2021AndPrev || inputList == claiming2021Only) =>
+        List((TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
+      case inputList if(inputList == claiming2021AndPrev || inputList == claiming2021Only) =>
+        List((TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
+      case _ => List.empty
     }
   }
 
@@ -66,4 +64,5 @@ case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
   val showWarningSection: Boolean = !checkboxYearOptions.contains("option1")
 
   val allYearsSelected = checkboxYearOptions == claimingAllYears
+
 }

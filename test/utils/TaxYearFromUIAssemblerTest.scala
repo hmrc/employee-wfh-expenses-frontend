@@ -11,7 +11,6 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
   "Converting UI input components" should {
     "be translated (checkbox input marshalling)" when {
       "when ALL possible years are selected" in {
-
         val expectedYearsTupleList = List(
           (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
           (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
@@ -23,13 +22,12 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
         val assembledResult = TaxYearFromUIAssembler(selectedYearsOptions).assemble
         assert(assembledResult == expectedYearsTupleList)
       }
-      "when 2021 & 2022 only years are selected" in {
 
+      "when 2021 & 2022 only years are selected" in {
         val expectedYearsTupleList = List(
           (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
           (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes)
         )
-
         val selectedYearsOptions = List("option1", "option2")
 
         val assembledResult = TaxYearFromUIAssembler(selectedYearsOptions).assemble

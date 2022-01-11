@@ -29,6 +29,7 @@ case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
   private val claiming2021AndPrev = List("option2", "option3")
   private val claiming2021Only = List("option2")
   private val claiming2022AndPrev = List("option1", "option3")
+  private val claimingPrevOnly = List("option3")
 
   private val validateInputList = {
     if (checkboxYearOptions == null || checkboxYearOptions.isEmpty) {
@@ -52,9 +53,14 @@ case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
       case inputList if (inputList == claiming2022Only || inputList == claiming2022AndPrev) =>
         List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes))
       case inputList if (inputList == claiming2021AndPrev || inputList == claiming2021Only) =>
-        List((TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
-      case inputList if(inputList == claiming2021AndPrev || inputList == claiming2021Only) =>
-        List((TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
+        List(
+          (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
+          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
+        )
+      case inputList if(inputList == claimingPrevOnly) =>
+        List(
+          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
+        )
       case _ => List.empty
     }
   }

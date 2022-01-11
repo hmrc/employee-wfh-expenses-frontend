@@ -44,6 +44,7 @@ class DisclaimerController @Inject()(
     implicit request =>
 
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
+      val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
 
       def disclaimerSettings(dateList: List[(LocalDate, LocalDate)]) = {
         if (request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).isDefined) {
@@ -53,7 +54,7 @@ class DisclaimerController @Inject()(
         }
       }
 
-      Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.assemble)))
+      Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.assemble), startDate))
 
   }
 

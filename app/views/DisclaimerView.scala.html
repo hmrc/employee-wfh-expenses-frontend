@@ -16,6 +16,7 @@
 
 @import config.FrontendAppConfig
 @import utils.DateLanguageTokenizerFormattedItem
+@import java.time.LocalDate
 
 @this(
         main_template: MainTemplate,
@@ -27,7 +28,7 @@
         disclaimerClaimDetailsView: disclaimerClaimDetailsView
 )
 
-@(showBackLink: Boolean, disclaimerViewSettings: DisclaimerViewSettings)( implicit request: Request[_], messages: Messages)
+@(showBackLink: Boolean, disclaimerViewSettings: DisclaimerViewSettings, startDate: Option[LocalDate])( implicit request: Request[_], messages: Messages)
 
 @main_template(
  title = messages("disclaimer.heading"),
@@ -45,7 +46,7 @@
      <h1 class="govuk-heading-xl">@messages("disclaimer.heading")</h1>
 
     @if(disclaimerViewSettings.claimViewSettings.isDefined) {
-        @disclaimerClaimDetailsView(disclaimerViewSettings.claimViewSettings.get)
+        @disclaimerClaimDetailsView(disclaimerViewSettings.claimViewSettings.get, startDate)
     }
 
      @button(Button(content = Text(messages("disclaimer.submit.button"))))

@@ -16,10 +16,12 @@
 
 @import utils.DateLanguageTokenizerFormattedItem
 @import config.FrontendAppConfig
+@import java.time.LocalDate
+@import utils.TaxYearDates._
 
 @this(frontendAppConfig: FrontendAppConfig)
 
-@(claimViewSettings: ClaimViewSettings)(implicit messages: Messages)
+@(claimViewSettings: ClaimViewSettings, startDate: Option[LocalDate])(implicit messages: Messages)
 
 <h1 class="govuk-heading-m">@messages("disclaimer.your.claim.details.header")</h1>
 
@@ -35,10 +37,12 @@
 }
 
 @if(claimViewSettings.additionalTaxReliefDates.isDefined) {
-    <p class="govuk-body">@messages("disclaimer.your.claim.text.1")</p>
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages("disclaimer.your.claim.text.date.bullet")</li>
-    </ul>
+    @if(startDate.get.isBefore(TAX_YEAR_2020_START_DATE)) {
+        <p class="govuk-body">@messages("disclaimer.your.claim.text.1")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("disclaimer.your.claim.text.date.bullet")</li>
+        </ul>
+    }
 }
 
 <p class="govuk-body">

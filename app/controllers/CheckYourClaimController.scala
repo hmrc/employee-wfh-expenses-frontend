@@ -17,10 +17,9 @@
 package controllers
 
 import controllers.actions._
-import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
-import models.{ClaimViewSettings, DisclaimerViewSettings}
-import navigation.{Navigator, TaxYearFromUIAssembler}
-import pages.{CheckYourClaimPage, DisclaimerPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import models.ClaimViewSettings
+import navigation.Navigator
+import pages.WhenDidYouFirstStartWorkingFromHomePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -28,10 +27,11 @@ import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateLanguageTokenizer
 import views.html._
+import utils.TaxYearDates._
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class CheckYourClaimController @Inject()(
                                          override val messagesApi: MessagesApi,
@@ -49,11 +49,14 @@ class CheckYourClaimController @Inject()(
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
+      val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+
+      val weeks = if(startDate.isDefined) numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE) else 0
 
       def claimViewSettings(dateList: List[(LocalDate, LocalDate)]) = {
         ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))
       }
-      Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble)))
+      Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, weeks))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {

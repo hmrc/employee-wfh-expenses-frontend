@@ -18,8 +18,7 @@
 
 @this(
         main_template: MainTemplate,
-        frontendAppConfig: FrontendAppConfig,
-        backLink: GovukBackLink
+        frontendAppConfig: FrontendAppConfig
 )
 
 @()(implicit request: Request[_], messages: Messages)
@@ -28,12 +27,7 @@
     @linkToP87 = {<a href=@frontendAppConfig.p87DigitalFormUrl>@messages("cannotClaimUsingThisService.alternative.href.text")</a>}
 
 @main_template(
-    title = messages("cannotClaimUsingThisService.title"),
-    beforeContentBlock = Some(backLink(BackLink(
-        href = routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url,
-        content = Text(messages("site.back")),
-        attributes = Map("id" -> "back-link")
-    )))
+    title = messages("cannotClaimUsingThisService.title")
 ) {
 
     <h1 class="govuk-heading-xl">@messages("cannotClaimUsingThisService.heading")</h1>

@@ -20,7 +20,6 @@
 @this(
         main_template:      MainTemplate,
         formHelper:         FormWithCSRF,
-        backLink:           GovukBackLink,
         govukInsetText:     GovukInsetText,
         button:             GovukButton
 )
@@ -39,12 +38,7 @@
 }
 
 @main_template(
-    title = messages("yourTaxRelief.title"),
-    beforeContentBlock = Some(backLink(BackLink(
-        href = routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url,
-        content = Text(messages("site.back")),
-        attributes = Map("id" -> "back-link")
-    )))
+    title = messages("yourTaxRelief.title")
 ) {
 
     <h1 class="govuk-heading-xl">@messages("yourTaxRelief.confirmation.page.heading")</h1>

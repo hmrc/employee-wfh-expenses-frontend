@@ -33,36 +33,49 @@ case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
 
   private val validateInputList = {
     if (checkboxYearOptions == null || checkboxYearOptions.isEmpty) {
-      throw new IllegalArgumentException("input checkbox list is either empty or invalid")
+      throw new IllegalArgumentException("Input checkbox list is either empty or invalid")
     }
   }
 
   val assemble: List[(LocalDate, LocalDate)] = {
-    checkboxYearOptions match {
-      case inputList if inputList == claimingAllYears =>
-        List(
-          (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
-          (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
-          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
-        )
-      case inputList if inputList == claiming2022And2021 =>
-        List(
-          (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
-          (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes)
-        )
-      case inputList if (inputList == claiming2022Only || inputList == claiming2022AndPrev) =>
-        List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes))
-      case inputList if (inputList == claiming2021AndPrev || inputList == claiming2021Only) =>
-        List(
-          (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
-          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
-        )
-      case inputList if(inputList == claimingPrevOnly) =>
-        List(
-          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
-        )
-      case _ => List.empty
+    if(checkboxYearOptions == claimingAllYears) {
+      List(
+        (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
+        (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE),
+        (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
+      )
     }
+    else if(checkboxYearOptions == claiming2022Only) {
+      List((TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE))
+    }
+    else if(checkboxYearOptions == claiming2021Only) {
+      List((TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE))
+    }
+    else if(checkboxYearOptions == claimingPrevOnly) {
+      List((TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE))
+    }
+    else if(checkboxYearOptions == claiming2022And2021) {
+      List(
+        (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
+        (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE)
+      )
+    }
+    else if(checkboxYearOptions == claiming2022AndPrev) {
+      List(
+        (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
+        (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
+      )
+    }
+    else if(checkboxYearOptions == claiming2021AndPrev) {
+      List(
+        (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE),
+        (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
+      )
+    }
+    else {
+      List.empty
+    }
+
   }
 
   val isPreviousTaxYearSelected: Boolean = checkboxYearOptions.contains("option3")

@@ -80,8 +80,8 @@ case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
 
   val isPreviousTaxYearSelected: Boolean = checkboxYearOptions.contains("option3")
 
-  val showWarningSection: Boolean = !checkboxYearOptions.contains("option1")
+  val showSecondTaxReliefMessageBlock: Boolean = checkboxYearOptions.contains("option2") || isPreviousTaxYearSelected
 
-  val allYearsSelected = checkboxYearOptions == claimingAllYears
+  val showFirstTaxReliefMessageBlock: Boolean = checkboxYearOptions.contains("option1")
 
 }

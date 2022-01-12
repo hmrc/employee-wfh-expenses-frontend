@@ -1,5 +1,6 @@
 package utils
 
+import junit.framework.TestCase.{assertFalse, assertTrue}
 import navigation.TaxYearFromUIAssembler
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -78,6 +79,24 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
         assertThrows[IllegalArgumentException] {
           TaxYearFromUIAssembler(Nil).assemble
         }
+      }
+    }
+    "contain correct message block selector on tax relief page" when {
+      "when options option1" in {
+        val assembledResult = TaxYearFromUIAssembler(List("option1"))
+        assertFalse(assembledResult.showBothMessageBlocksOnTaxReliefPage)
+      }
+      "when options option2" in {
+        val assembledResult = TaxYearFromUIAssembler(List("option2"))
+        assertTrue(assembledResult.showBothMessageBlocksOnTaxReliefPage)
+      }
+      "when options option1 & 2 selected" in {
+        val assembledResult = TaxYearFromUIAssembler(List("option1", "option2"))
+        assertTrue(assembledResult.showBothMessageBlocksOnTaxReliefPage)
+      }
+      "when all years selected" in {
+        val assembledResult = TaxYearFromUIAssembler(List("option1", "option2", "option3"))
+        assertTrue(assembledResult.showBothMessageBlocksOnTaxReliefPage)
       }
     }
   }

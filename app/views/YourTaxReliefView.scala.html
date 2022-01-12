@@ -24,10 +24,13 @@
         button:             GovukButton
 )
 
-@(taxMonthAfterText: String, taxYearAfterText: String,
-  taxMonthBeforeText: Option[String],
-  taxYearBeforeText: Option[String],
-  showWarningSection: Boolean)(implicit request: Request[_], messages: Messages)
+@(
+    taxMonthAfterText: String, taxYearAfterText: String,
+    taxMonthBeforeText: Option[String],
+    taxYearBeforeText: Option[String],
+    showFirstMessageBlock: Boolean,
+    showSecondMessageBlock: Boolean
+)(implicit request: Request[_], messages: Messages)
 
 @afterDateStringFormatted = {
     @messages("yourTaxRelief.confirmation.page.heading.after") @messages(taxMonthAfterText) @messages(taxYearAfterText)
@@ -43,17 +46,19 @@
 
     <h1 class="govuk-heading-xl">@messages("yourTaxRelief.confirmation.page.heading")</h1>
 
-    <h2 class="govuk-heading-m">@afterDateStringFormatted</h2>
+    @if(showFirstMessageBlock) {
+        <h2 class="govuk-heading-m">@afterDateStringFormatted</h2>
 
-    <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.info.text.1")</p>
+        <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.info.text.1")</p>
 
-    <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.bullet.heading")</p>
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages("yourTaxRelief.confirmation.page.bullet.text.1")</li>
-        <li>@messages("yourTaxRelief.confirmation.page.bullet.text.2")</li>
-    </ul>
+        <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.bullet.heading")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.1")</li>
+            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.2")</li>
+        </ul>
+    }
 
-    @if(taxMonthBeforeText.isDefined) {
+    @if(showSecondMessageBlock) {
         <h2 class="govuk-heading-m">@beforeDateStringFormatted</h2>
 
         <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.bullet.heading.1")</p>
@@ -62,9 +67,7 @@
             <li>@messages("yourTaxRelief.confirmation.page.bullet.text.4")</li>
             <li>@messages("yourTaxRelief.confirmation.page.bullet.text.5")</li>
         </ul>
-    }
 
-    @if(showWarningSection) {
         <div class="govuk-warning-text">
             <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
             <strong class="govuk-warning-text__text">

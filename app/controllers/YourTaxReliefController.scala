@@ -52,13 +52,8 @@ class YourTaxReliefController @Inject()(
 
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
-      val showWarningSection = selectedTaxYears.showWarningSection
-      if (selectedTaxYears.allYearsSelected) {
-        Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
-          Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString), showWarningSection))
-      } else {
-        Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString, None, None, showWarningSection))
-      }
+      Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
+        Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString), selectedTaxYears.showBothMessageBlocksOnTaxReliefPage))
 
     //          logger.error("[SubmitYourClaimController][onPageLoad] - No years to claim for found")
     //        Redirect(routes.TechnicalDifficultiesController.onPageLoad())

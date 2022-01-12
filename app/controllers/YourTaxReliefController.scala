@@ -53,7 +53,7 @@ class YourTaxReliefController @Inject()(
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
       Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
-        Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString), selectedTaxYears.showBothMessageBlocksOnTaxReliefPage))
+        Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString), selectedTaxYears.showFirstTaxReliefMessageBlock, selectedTaxYears.showSecondTaxReliefMessageBlock))
 
     //          logger.error("[SubmitYourClaimController][onPageLoad] - No years to claim for found")
     //        Redirect(routes.TechnicalDifficultiesController.onPageLoad())

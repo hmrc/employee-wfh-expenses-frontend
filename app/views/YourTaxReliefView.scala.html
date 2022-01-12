@@ -24,10 +24,13 @@
         button:             GovukButton
 )
 
-@(taxMonthAfterText: String, taxYearAfterText: String,
-  taxMonthBeforeText: Option[String],
-  taxYearBeforeText: Option[String],
-  showBothMessageBlocks: Boolean)(implicit request: Request[_], messages: Messages)
+@(
+    taxMonthAfterText: String, taxYearAfterText: String,
+    taxMonthBeforeText: Option[String],
+    taxYearBeforeText: Option[String],
+    showFirstMessageBlock: Boolean,
+    showSecondMessageBlock: Boolean
+)(implicit request: Request[_], messages: Messages)
 
 @afterDateStringFormatted = {
     @messages("yourTaxRelief.confirmation.page.heading.after") @messages(taxMonthAfterText) @messages(taxYearAfterText)
@@ -43,7 +46,7 @@
 
     <h1 class="govuk-heading-xl">@messages("yourTaxRelief.confirmation.page.heading")</h1>
 
-
+    @if(showFirstMessageBlock) {
         <h2 class="govuk-heading-m">@afterDateStringFormatted</h2>
 
         <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.info.text.1")</p>
@@ -53,26 +56,26 @@
             <li>@messages("yourTaxRelief.confirmation.page.bullet.text.1")</li>
             <li>@messages("yourTaxRelief.confirmation.page.bullet.text.2")</li>
         </ul>
+    }
 
+    @if(showSecondMessageBlock) {
+        <h2 class="govuk-heading-m">@beforeDateStringFormatted</h2>
 
-        @if(showBothMessageBlocks) {
-            <h2 class="govuk-heading-m">@beforeDateStringFormatted</h2>
+        <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.bullet.heading.1")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.3")</li>
+            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.4")</li>
+            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.5")</li>
+        </ul>
 
-            <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.bullet.heading.1")</p>
-            <ul class="govuk-list govuk-list--bullet">
-                <li>@messages("yourTaxRelief.confirmation.page.bullet.text.3")</li>
-                <li>@messages("yourTaxRelief.confirmation.page.bullet.text.4")</li>
-                <li>@messages("yourTaxRelief.confirmation.page.bullet.text.5")</li>
-            </ul>
-
-            <div class="govuk-warning-text">
-                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <strong class="govuk-warning-text__text">
-                    <span class="govuk-warning-text__assistive">Warning</span>
-                    @messages("yourTaxRelief.confirmation.page.warning.text")<br>
-                </strong>
-            </div>
-        }
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-warning-text__assistive">Warning</span>
+                @messages("yourTaxRelief.confirmation.page.warning.text")<br>
+            </strong>
+        </div>
+    }
 
     @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
         @button(Button(content = Text(messages("yourTaxRelief.confirmation.page.button.text")), preventDoubleClick  = true))

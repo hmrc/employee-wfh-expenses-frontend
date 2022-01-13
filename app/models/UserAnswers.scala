@@ -16,7 +16,7 @@
 
 package models
 
-import models.SelectTaxYearsToClaimFor.{Option1, Option2}
+import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
 
 import java.time.LocalDateTime
 import pages._
@@ -77,18 +77,22 @@ final case class UserAnswers(
     }
   }
 
-  def is2019And2020Only: Boolean =
+  def is2019And2020Only: Boolean = {
     (is2021Only, get(SelectTaxYearsToClaimForPage)) match {
       case (true, _) => false
-      case (false, Some(years)) if years.size == 2 => false
+      case (false, Some(years)) if years.size == 3 => false
       case (false, Some(years)) if years.size == 1 && years.contains(Option1) => false
       case (false, Some(years)) if years.size == 1 && years.contains(Option2) => true
+      case (false, Some(years)) if years.size == 1 && years.contains(Option3) => false
+      case (false, Some(years)) if years.size == 2 && years.contains(Option3) => false
+      case (false, Some(years)) if years.size == 2 && (years.contains(Option1) && years.contains(Option2)) => true
     }
+  }
 
   def is2019And2020And2021Only: Boolean =
     (is2019And2020Only, get(SelectTaxYearsToClaimForPage)) match {
       case (true, _) => false
-      case (false, Some(years)) if years.size == 2 => true
+      case (false, Some(years)) if years.size == 3 => true
       case (_, _) => false
     }
 

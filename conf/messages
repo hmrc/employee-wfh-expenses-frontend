@@ -168,6 +168,10 @@ confirmation.whatHappensNext.201920202021.listitem.1 = increase the amount you c
 confirmation.whatHappensNext.201920202021.listitem.2 = check your claim for previous tax years and write to you by post or email before November 2021
 confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
 confirmation.whatHappensNext.201920202021.paragraph.1.for.allyears.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+confirmation.whatHappensNext.previoustaxyearcheck.text = We will check your claim for previous tax years and we will write to you by post or email if you have paid too much tax. There is no need to contact HMRC about this.
+confirmation.IncreaseTaxAmountText.text.1 = We will increase the amount you can earn tax free for the current tax year to include tax relief on your expenses for working from home.
+confirmation.IncreaseTaxAmountText.text.2 = We do this by changing your tax code, which decides how much tax you pay.
+confirmation.IncreaseTaxAmountText.text.3 = We will let you know about your tax code change by post, or email if you've signed up to paperless notifications.
 
 manualCorrespondenceIndicator.title = You cannot currently use this service
 manualCorrespondenceIndicator.heading = You cannot currently use this service

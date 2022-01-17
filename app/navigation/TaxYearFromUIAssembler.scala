@@ -21,15 +21,19 @@ import utils.TaxYearDates._
 
 import java.time.LocalDate
 
-case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
+trait TaxYearOptionValues {
 
-  private val claimingAllYears = List("option1", "option2", "option3")
-  private val claiming2022And2021 = List("option1", "option2")
-  private val claiming2022Only = List("option1")
-  private val claiming2021AndPrev = List("option2", "option3")
-  private val claiming2021Only = List("option2")
-  private val claiming2022AndPrev = List("option1", "option3")
-  private val claimingPrevOnly = List("option3")
+  val claimingAllYears = List("option1", "option2", "option3")
+  val claiming2022And2021 = List("option1", "option2")
+  val claiming2022Only = List("option1")
+  val claiming2021AndPrev = List("option2", "option3")
+  val claiming2021Only = List("option2")
+  val claiming2022AndPrev = List("option1", "option3")
+  val claimingPrevOnly = List("option3")
+
+}
+
+case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) extends TaxYearOptionValues {
 
   private val validateInputList = {
     if (checkboxYearOptions == null || checkboxYearOptions.isEmpty) {

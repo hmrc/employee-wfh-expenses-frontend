@@ -22,29 +22,34 @@ import models.UserAnswers
 import navigation.{Navigator, TaxYearFromUIAssembler}
 import pages.{SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
+import play.api.data.{Form, FormError}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.StartDateValidator
 import views.html.WhenDidYouFirstStartWorkingFromHomeView
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: WhenDidYouFirstStartWorkingFromHomeFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        whenDidYouFirstStartWorkingFromHomeView: WhenDidYouFirstStartWorkingFromHomeView
-                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                                               override val messagesApi: MessagesApi,
+                                                               sessionRepository: SessionRepository,
+                                                               navigator: Navigator,
+                                                               identify: IdentifierAction,
+                                                               citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                                               getData: DataRetrievalAction,
+                                                               requireData: DataRequiredAction,
+                                                               formProvider: WhenDidYouFirstStartWorkingFromHomeFormProvider,
+                                                               val controllerComponents: MessagesControllerComponents,
+                                                               whenDidYouFirstStartWorkingFromHomeView: WhenDidYouFirstStartWorkingFromHomeView
+                                                             )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with UIAssembler with Logging {
 
   val form = formProvider()
+
+  val previousYearsSelectedMessageKey = "whenDidYouFirstStartWorkingFromHome.error.previousYearsSelected"
 
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
@@ -54,48 +59,48 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
         case Some(value) => form.fill(value)
       }
       Ok(whenDidYouFirstStartWorkingFromHomeView(preparedForm))
-
-      //if (request.userAnswers.is2019And2020Only) Ok(view_2019_2020(preparedForm)) else Ok(view_2019_2020_2021(preparedForm))
   }
-
-  /*def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
-    implicit request =>
-      val messages = request2Messages
-
-      form.bindFromRequest().fold(
-        formWithErrors => {
-          val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => messages(s"date.$arg").toLowerCase)))
-
-          if (request.userAnswers.is2019And2020Only) {
-            Future.successful(BadRequest(view_2019_2020(formWithErrors.copy(errors = errors))))
-          } else {
-            Future.successful(BadRequest(view_2019_2020_2021(formWithErrors.copy(errors = errors))))
-          }
-        },
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(WhenDidYouFirstStartWorkingFromHomePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(WhenDidYouFirstStartWorkingFromHomePage, updatedAnswers))
-      )
-  }*/
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val messages = request2Messages
 
-      form.bindFromRequest().fold(
+      val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
+
+      val validGivenOtherSelectedDates = StartDateValidator(selectedTaxYears.checkboxYearOptions, form.value).isStartDateValid
+
+      val formWithPossibleValidationErrors = validGivenOtherSelectedDates match {
+        case Some(validationResult) if validationResult._1 =>
+          val formErrors = FormError("value", previousYearsSelectedMessageKey, Seq(validationResult._2.get))
+          form.copy(errors = Seq(formErrors))
+        case None => form
+      }
+
+      formWithPossibleValidationErrors.bindFromRequest().fold(
         formWithErrors => {
-          //val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => "messages(s"date.$arg").toLowerCase)"))
           val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => "")))
 
-            Future.successful(BadRequest(whenDidYouFirstStartWorkingFromHomeView(formWithErrors.copy(errors = errors))))
+          val filteredErrorList = if (errors.size > 1) {
+            errors.filterNot(x => x.message == previousYearsSelectedMessageKey)
+          } else {
+            errors
+          }
+          Future.successful(BadRequest(whenDidYouFirstStartWorkingFromHomeView(formWithErrors.copy(errors = filteredErrorList))))
         },
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(WhenDidYouFirstStartWorkingFromHomePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(WhenDidYouFirstStartWorkingFromHomePage, updatedAnswers))
+        value => {
+          val validSelectedDates = StartDateValidator(selectedTaxYears.checkboxYearOptions, Some(value)).isStartDateValid
+
+          validSelectedDates match {
+            case Some(validationResult) if !validationResult._1 =>
+              val formErrors = FormError("value", previousYearsSelectedMessageKey, Seq(validationResult._2.get))
+              Future.successful(BadRequest(whenDidYouFirstStartWorkingFromHomeView(form.fill(value).copy(errors = Seq(formErrors)))))
+            case _ =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(WhenDidYouFirstStartWorkingFromHomePage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(WhenDidYouFirstStartWorkingFromHomePage, updatedAnswers))
+          }
+        }
       )
   }
 

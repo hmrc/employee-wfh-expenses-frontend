@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
 import models.UserAnswers
@@ -42,6 +43,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
                                                                citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
                                                                getData: DataRetrievalAction,
                                                                requireData: DataRequiredAction,
+                                                               frontendAppConfig: FrontendAppConfig,
                                                                formProvider: WhenDidYouFirstStartWorkingFromHomeFormProvider,
                                                                val controllerComponents: MessagesControllerComponents,
                                                                whenDidYouFirstStartWorkingFromHomeView: WhenDidYouFirstStartWorkingFromHomeView
@@ -49,7 +51,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
 
   val form = formProvider()
 
-  val previousYearsSelectedMessageKey = "whenDidYouFirstStartWorkingFromHome.error.previousYearsSelected"
+  val previousYearsSelectedMessageKey = frontendAppConfig.previousYearsSelectedMessageKey
 
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
@@ -63,7 +65,6 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      val messages = request2Messages
 
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 

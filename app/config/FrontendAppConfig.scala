@@ -28,6 +28,8 @@ class FrontendAppConfig @Inject()(configuration: Configuration, val servicesConf
 
   val contactFormServiceIdentifier = "EEWFH"
 
+  val previousYearsSelectedMessageKey = "whenDidYouFirstStartWorkingFromHome.error.previousYearsSelected"
+
   private val contactHost = servicesConfig.getConfString("contact-frontend.www", "")
 
   val platformHost: Option[String] = configuration.getOptional[String]("platform.frontend.host")

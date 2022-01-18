@@ -29,7 +29,22 @@ case class StartDateValidator(selectedUIOptions: List[String],
 
     startDateToValidate match {
       case Some(startDate) =>
-        val nativeResult: (Boolean, Option[String]) = if (startDate.getYear == 2023) {
+        (selectedUIOptions == claimingPrevOnly) match {
+          case true =>
+            if ((startDate.getDayOfMonth <= 5 && startDate.getMonthValue <= 4) && startDate.getYear <= 2021) {
+              Some(DefaultValidResponse)
+            }else {
+              Some(InValidResponse2021Response)
+            }
+          case false =>
+            Some(validateDates(startDate))
+        }
+      case _ => None
+    }
+}
+
+  private def validateDates(startDate: LocalDate): (Boolean, Option[String])  = {
+        if (startDate.getYear == 2023) {
           if ((selectedUIOptions == claimingAllYears) || (selectedUIOptions == claiming2021AndPrev)
             || (selectedUIOptions == claiming2022AndPrev) || (selectedUIOptions == claimingPrevOnly)) {
             InValidResponse2021Response
@@ -59,9 +74,6 @@ case class StartDateValidator(selectedUIOptions: List[String],
         else {
           DefaultValidResponse
         }
-        Some(nativeResult)
-      case None => None
     }
-}
 
 }

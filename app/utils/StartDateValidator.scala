@@ -69,7 +69,7 @@ case class StartDateValidator(selectedUIOptions: List[String],
             InValidResponse2021Response
           } else DefaultValidResponse
         } else if (startDate.getYear == 2020) {
-          (false, Some("2020"))
+          DefaultValidResponse
         }
         else {
           DefaultValidResponse

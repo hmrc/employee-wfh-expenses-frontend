@@ -16,8 +16,8 @@
 
 package controllers
 
+import models.TaxYearFromUIAssembler
 import models.requests.DataRequest
-import navigation.TaxYearFromUIAssembler
 import pages.SelectTaxYearsToClaimForPage
 import play.api.mvc.AnyContent
 

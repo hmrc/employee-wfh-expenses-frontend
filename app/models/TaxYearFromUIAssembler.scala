@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package navigation
+package models
 
-import uk.gov.hmrc.time.TaxYear
 import utils.TaxYearDates._
 
 import java.time.LocalDate
 
 case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
 
-  private val claimingAllYears = List("option1", "option2", "option3")
-  private val claiming2022And2021 = List("option1", "option2")
-  private val claiming2022Only = List("option1")
-  private val claiming2021AndPrev = List("option2", "option3")
-  private val claiming2021Only = List("option2")
-  private val claiming2022AndPrev = List("option1", "option3")
-  private val claimingPrevOnly = List("option3")
+  val claimingAllYears = List("option1", "option2", "option3")
+  val claiming2022And2021 = List("option1", "option2")
+  val claiming2022Only = List("option1")
+  val claiming2021AndPrev = List("option2", "option3")
+  val claiming2021Only = List("option2")
+  val claiming2022AndPrev = List("option1", "option3")
+  val claimingPrevOnly = List("option3")
 
   private val validateInputList = {
     if (checkboxYearOptions == null || checkboxYearOptions.isEmpty) {
@@ -38,35 +37,35 @@ case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
   }
 
   val assemble: List[(LocalDate, LocalDate)] = {
-    if(checkboxYearOptions == claimingAllYears) {
+    if (checkboxYearOptions == claimingAllYears) {
       List(
         (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
         (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE),
         (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
       )
     }
-    else if(checkboxYearOptions == claiming2022Only) {
+    else if (checkboxYearOptions == claiming2022Only) {
       List((TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE))
     }
-    else if(checkboxYearOptions == claiming2021Only) {
+    else if (checkboxYearOptions == claiming2021Only) {
       List((TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE))
     }
-    else if(checkboxYearOptions == claimingPrevOnly) {
+    else if (checkboxYearOptions == claimingPrevOnly) {
       List((TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE))
     }
-    else if(checkboxYearOptions == claiming2022And2021) {
+    else if (checkboxYearOptions == claiming2022And2021) {
       List(
         (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
         (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE)
       )
     }
-    else if(checkboxYearOptions == claiming2022AndPrev) {
+    else if (checkboxYearOptions == claiming2022AndPrev) {
       List(
         (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
         (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
       )
     }
-    else if(checkboxYearOptions == claiming2021AndPrev) {
+    else if (checkboxYearOptions == claiming2021AndPrev) {
       List(
         (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE),
         (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)

@@ -46,16 +46,16 @@ class CheckYourClaimController @Inject()(
                                          checkYourClaimView: CheckYourClaimView,
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
+
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
+
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
+
       val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
 
       val weeks = if(startDate.isDefined) numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE) else 0
 
-      def claimViewSettings(dateList: List[(LocalDate, LocalDate)]) = {
-        ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))
-      }
       Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, weeks))
   }
 

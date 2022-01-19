@@ -18,7 +18,7 @@ package controllers
 
 import models.requests.DataRequest
 import navigation.TaxYearFromUIAssembler
-import pages.SelectTaxYearsToClaimForPage
+import pages.{HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
 import play.api.mvc.AnyContent
 
 trait UIAssembler {

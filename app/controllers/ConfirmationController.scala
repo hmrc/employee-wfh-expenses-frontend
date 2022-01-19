@@ -30,10 +30,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.Confirmation2019_2020_2021View
-import views.html.Confirmation2019_2020View
 import views.html.ConfirmationView
-import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 import play.api.Logging
 
 import scala.concurrent.ExecutionContext

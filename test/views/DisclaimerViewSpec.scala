@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,72 @@
 
 package views
 
+import controllers.{UIAssembler, routes}
+import models.{ClaimViewSettings, DisclaimerViewSettings}
+import navigation.TaxYearFromUIAssembler
+import org.scalatest.Assertions.assert
+import play.api.test.FakeRequest
+import play.api.test.Helpers.GET
+import utils.DateLanguageTokenizer
 import views.behaviours.ViewBehaviours
-import views.html.Disclaimer2021View
+import views.html.DisclaimerView
+import play.api.test.FakeRequest
 
-class DisclaimerViewSpec extends ViewBehaviours {
+import java.time.LocalDate
+
+class DisclaimerViewSpec extends ViewBehaviours with UIAssembler {
 
   "Disclaimer view" must {
 
-    val view = viewFor[Disclaimer2021View](Some(emptyUserAnswers))
+    val view = viewFor[DisclaimerView](Some(emptyUserAnswers))
 
-    val applyView = view.apply(true)(fakeRequest, messages)
+    val assembler = TaxYearFromUIAssembler(List("option1"))
+
+    val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
+      Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+
+    val date = LocalDate.of(2020, 4, 1)
+
+    val applyView = view.apply(true, disclaimerViewSettings, Some(date))(fakeRequest, messages)
 
     behave like normalPage(applyView, "disclaimer")
+
+    "show content" when {
+      "when all disclaimer content is displayed before additional tax relief dates" in {
+        val view = viewFor[DisclaimerView](Some(emptyUserAnswers))
+        val request = FakeRequest()
+
+        val assembler = TaxYearFromUIAssembler(List("option1"))
+
+        val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
+          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+
+        val date = LocalDate.of(2020, 4, 1)
+        val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
+        assert(doc.toString.contains(messages("disclaimer.heading")))
+        assert(doc.toString.contains(messages("disclaimer.your.claim.details.year.label")))
+        assert(doc.toString.contains(messages("6 April 2022 to 5 April 2023")))
+        assert(doc.toString.contains(messages("1 January 2020 to 5 April 2020")))
+        assert(doc.toString.contains(messages("disclaimer.your.claim.text.2")))
+        assert(doc.toString.contains(messages("disclaimer.your.claim.text.3")))
+        assert(doc.toString.contains(messages("disclaimer.your.claim.text.4")))
+        assert(doc.toString.contains(messages("disclaimer.your.claim.text.5")))
+      }
+
+      "when all disclaimer content is displayed after additional tax relief dates" in {
+        val view = viewFor[DisclaimerView](Some(emptyUserAnswers))
+        val request = FakeRequest()
+
+        val assembler = TaxYearFromUIAssembler(List("option1"))
+
+        val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
+          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+
+        val date = LocalDate.of(2020, 5, 1)
+        val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
+        assert(doc.toString.contains(messages("6 April 2022 to 5 April 2023")))
+        assert(!doc.toString.contains(messages("1 January 2020 to 5 April 2020")))
+      }
+    }
   }
 }

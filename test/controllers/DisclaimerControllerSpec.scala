@@ -44,7 +44,7 @@ class DisclaimerControllerSpec extends SpecBase {
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
             )
           ),
-          true
+          false
         ) /*,
 
         (

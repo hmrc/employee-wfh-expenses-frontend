@@ -44,9 +44,9 @@ class DisclaimerControllerSpec extends SpecBase {
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
             )
           ),
-          false
-        ) /*,
-
+          false,
+          List(Option1.toString)
+        ) ,
         (
           "not SA enrolled and hasn't already claimed but have chosen only to claim for 2021", UserAnswers(
             userAnswersId,
@@ -56,35 +56,34 @@ class DisclaimerControllerSpec extends SpecBase {
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString)
             )
           ),
-          true
+          false,
+          List(Option1.toString)
         ),
-
         (
           "is SA enrolled and has already claimed expenses for 2020", UserAnswers(
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> true,
               HasSelfAssessmentEnrolment.toString -> true,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString),
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
             )
           ),
-          false
-        ),
-
+          false,
+          List(Option1.toString)),
         (
           "is SA enrolled and hasn't already claimed expenses for 2020", UserAnswers(
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> false,
               HasSelfAssessmentEnrolment.toString -> true,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString),
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
             )
           ),
-          false
+          false,
+          List(Option1.toString)
         )
-*/
       )
-      for((desc, userAnswer, backLinkEnabled) <- tests) {
+      for((desc, userAnswer, backLinkEnabled, selectedDatesAsOptions: List[String]) <- tests) {
         s"$desc" in {
           val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
@@ -96,7 +95,7 @@ class DisclaimerControllerSpec extends SpecBase {
 
           status(result) mustEqual OK
 
-          val assembler = TaxYearFromUIAssembler(List("option1"))
+          val assembler = TaxYearFromUIAssembler(selectedDatesAsOptions)
 
           val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble), None)))
 

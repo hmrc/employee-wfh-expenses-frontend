@@ -17,7 +17,7 @@
 package utils
 
 import junit.framework.TestCase.{assertFalse, assertTrue}
-import navigation.TaxYearFromUIAssembler
+import models.TaxYearFromUIAssembler
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.time.TaxYear

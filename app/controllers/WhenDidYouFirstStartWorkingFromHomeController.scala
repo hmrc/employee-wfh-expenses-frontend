@@ -19,7 +19,7 @@ package controllers
 import controllers.actions._
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
 import models.UserAnswers
-import navigation.{Navigator, TaxYearFromUIAssembler}
+import navigation.Navigator
 import pages.{SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}

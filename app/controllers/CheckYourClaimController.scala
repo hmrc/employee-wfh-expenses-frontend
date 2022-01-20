@@ -53,19 +53,18 @@ class CheckYourClaimController @Inject()(
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
       val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-
-      val weeks = if(startDate.isDefined) numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE) else 0
+      val numberOfWeeksIn2019 = if(startDate.isDefined) numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE) else 0
 
       Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, weeks))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
     implicit request =>
-
+      val selectedTaxYears = taxYearFromUIAssemblerFromRequest().checkboxYearOptions
       submissionService.submitExpenses(
-        request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage),
-        request.userAnswers.is2019And2020Only,
-        request.userAnswers.is2019And2020And2021Only) map {
+        startDate = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage),
+        selectedTaxYears = selectedTaxYears
+      ) map {
         case Right(_) =>
           Redirect(routes.ConfirmationController.onPageLoad())
         case Left(_) =>

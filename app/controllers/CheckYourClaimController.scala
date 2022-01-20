@@ -54,7 +54,10 @@ class CheckYourClaimController @Inject()(
 
       val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
 
-      val weeks = if(startDate.isDefined) numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE) else 0
+      val weeks = startDate.isDefined match {
+        case true => numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE)
+        case _ => 0
+      }
 
       Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, weeks))
   }

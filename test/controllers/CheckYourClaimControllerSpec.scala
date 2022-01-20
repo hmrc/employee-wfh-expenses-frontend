@@ -17,23 +17,18 @@
 package controllers
 
 import base.SpecBase
-import connectors.PaperlessPreferenceConnector
-import controllers.PaperlessAuditConst._
 import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
 import models.{ClaimViewSettings, DisclaimerViewSettings, UserAnswers}
-import models.paperless.{PaperlessStatus, PaperlessStatusResponse, Url}
+import org.mockito.Mockito._
+import org.mockito.Matchers.any
 import navigation.TaxYearFromUIAssembler
-import org.mockito.Matchers.{any, eq => eqm}
-import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
-import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.DateLanguageTokenizer
-import views.html.{CheckYourClaimView, ConfirmationView, YourTaxRelief2019_2020View}
+import views.html.CheckYourClaimView
 
 import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -75,6 +70,35 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       application.stop()
     }
+
+    "submit claim should redirect to technical difficulties page if results into error" in {
+
+      val mockSubmissionService: services.SubmissionService = mock[services.SubmissionService]
+
+      when(mockSubmissionService.submitExpenses(any(), any(), any())(any(), any(), any())) thenReturn Future.successful(Left(any()))
+
+      val userAnswer = UserAnswers(
+        userAnswersId,
+        Json.obj(
+          ClaimedForTaxYear2020.toString -> false,
+          HasSelfAssessmentEnrolment.toString -> false,
+          SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
+        )
+      )
+
+      val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
+
+      val request = FakeRequest(POST, routes.CheckYourClaimController.onSubmit().url)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+
+      redirectLocation(result).value mustEqual routes.TechnicalDifficultiesController.onPageLoad().url
+
+      application.stop()
+    }
+
   }
 
 

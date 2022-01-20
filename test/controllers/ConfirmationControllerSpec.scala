@@ -27,13 +27,12 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import views.html.{Confirmation2019_2020View, Confirmation2019_2020_2021View, Confirmation2021View}
+import views.html.ConfirmationView
 import PaperlessAuditConst._
-import models.SelectTaxYearsToClaimFor.{Option1, Option2}
+import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
 import models.UserAnswers
 import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.libs.json.Json
-import uk.gov.hmrc.time.TaxYear
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -41,76 +40,27 @@ import scala.concurrent.Future
 // scalastyle:off magic.number
 class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
-  val Confirmation2021ViewConst = 1
-  val Confirmation20192020ViewConst = 2
-  val Confirmation201920202021ViewConst = 3
-
   val somePreferencesUrl = "/change/preferences"
 
-  "Confirmation Controller for when ClaimedForTaxYear2020 is false and confirmation year is 2021" must {
+  "Confirmation Controller is shown" must {
     "return OK and the correct view with paper preferences available" in {
-      paperlessControllerTest(true, false, Confirmation2021ViewConst)
+      paperlessControllerTest(true)
     }
     "return OK and the correct view with paper preferences unavailable" in {
-      paperlessControllerTest(false, false, Confirmation2021ViewConst)
-    }
-    "return OK and the correct view with a 2019 tax year start date" in {
-      paperlessControllerTest(true, false, Confirmation2021ViewConst)
-    }
-    "return OK and the correct view with a 2020 tax year start date" in {
-      paperlessControllerTest(true, false, Confirmation2021ViewConst)
+      paperlessControllerTest(false)
     }
   }
 
-  "Confirmation Controller for when ClaimedForTaxYear2020 is false and confirmation year is 2019 & 2020" must {
-    "return OK and the correct view with paper preferences available" in {
-      paperlessControllerTest(true, false, Confirmation20192020ViewConst)
-    }
-    "return OK and the correct view with paper preferences unavailable" in {
-      paperlessControllerTest(false, false, Confirmation20192020ViewConst)
-    }
-    "return OK and the correct view with a 2019 tax year start date" in {
-      paperlessControllerTest(true, false, Confirmation20192020ViewConst)
-    }
-    "return OK and the correct view with a 2020 tax year start date" in {
-      paperlessControllerTest(true, false, Confirmation20192020ViewConst)
-    }
-  }
-
-  "Confirmation Controller for when ClaimedForTaxYear2020 is false and confirmation year is 2019 & 2020 & 2021" must {
-    "return OK and the correct view with paper preferences available" in {
-      paperlessControllerTest(true, false, Confirmation201920202021ViewConst)
-    }
-    "return OK and the correct view with paper preferences unavailable" in {
-      paperlessControllerTest(false, false, Confirmation201920202021ViewConst)
-    }
-    "return OK and the correct view with a 2019 tax year start date" in {
-      paperlessControllerTest(true, false, Confirmation201920202021ViewConst)
-    }
-    "return OK and the correct view with a 2020 tax year start date" in {
-      paperlessControllerTest(true, false, Confirmation201920202021ViewConst)
-    }
-  }
-
-  private def paperlessControllerTest(paperlessAvailable: Boolean,
-                                      claimedForTaxYear2020: Boolean,
-                                      expectedView: Int): Future[_] = {
-
-    val optionJsonList = expectedView match {
-      case 1 => Json.arr(Option1.toString)
-      case 2 => Json.arr(Option2.toString)
-      case 3 => Json.arr(Option1.toString, Option2.toString)
-      case _ => ???
-    }
+  private def paperlessControllerTest(paperlessAvailable: Boolean): Future[_] = {
 
     val paperlessPreferenceConnector = mock[PaperlessPreferenceConnector]
     val auditConnector = mock[AuditConnector]
 
     val application = applicationBuilder(userAnswers = Some(
       UserAnswers(userAnswersId, Json.obj(
-        ClaimedForTaxYear2020.toString -> claimedForTaxYear2020,
+        ClaimedForTaxYear2020.toString -> true,
         HasSelfAssessmentEnrolment.toString -> false,
-        SelectTaxYearsToClaimForPage.toString -> optionJsonList,
+        SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString),
         WhenDidYouFirstStartWorkingFromHomePage.toString -> earliestWorkingFromHomeDate)))
     ).overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))
       .overrides(bind[AuditConnector].toInstance(auditConnector))
@@ -139,20 +89,9 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
       case false => Some(somePreferencesUrl)
     }
 
-    expectedView match {
-      case 1 =>
-        val view = application.injector.instanceOf[Confirmation2021View]
-        contentAsString(result) mustEqual
-          view(paperlessAvailable, paperlessUrl)(request, messages).toString
-      case 2 =>
-        val view = application.injector.instanceOf[Confirmation2019_2020View]
-        contentAsString(result) mustEqual
-          view(paperlessAvailable, paperlessUrl)(request, messages).toString
-      case 3 =>
-        val view = application.injector.instanceOf[Confirmation2019_2020_2021View]
-        contentAsString(result) mustEqual
-          view(paperlessAvailable, paperlessUrl)(request, messages).toString
-    }
+    val view = application.injector.instanceOf[ConfirmationView]
+    contentAsString(result) mustEqual
+      view(paperlessAvailable, paperlessUrl, true, true, true)(request, messages).toString
 
     val dataToAudit = Map(NinoReference -> fakeNino, Enabled -> paperlessAvailable.toString)
 

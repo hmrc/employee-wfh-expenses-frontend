@@ -17,9 +17,13 @@
 package controllers
 
 import models.TaxYearFromUIAssembler
+import models.{ClaimViewSettings, DisclaimerViewSettings}
 import models.requests.DataRequest
-import pages.SelectTaxYearsToClaimForPage
+import pages.{HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.mvc.AnyContent
+import utils.DateLanguageTokenizer
+
+import java.time.LocalDate
 
 trait UIAssembler {
 
@@ -27,4 +31,9 @@ trait UIAssembler {
     val selectedOptionsCheckBoxes = request.userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
     TaxYearFromUIAssembler(selectedOptionsCheckBoxes)
   }
+
+  def claimViewSettings(dateList: List[(LocalDate, LocalDate)]) = {
+    ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))
+  }
+
 }

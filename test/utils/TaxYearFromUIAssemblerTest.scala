@@ -100,11 +100,11 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
     "contain correct message block selector on tax relief page" when {
       "when options option1" in {
         val assembledResult = TaxYearFromUIAssembler(List("option1"))
-        assertFalse(assembledResult.showFirstTaxReliefMessageBlock)
+        assertTrue(assembledResult.showFirstTaxReliefMessageBlock)
       }
       "when options option2" in {
         val assembledResult = TaxYearFromUIAssembler(List("option2"))
-        assertTrue(assembledResult.showFirstTaxReliefMessageBlock)
+        assertFalse(assembledResult.showFirstTaxReliefMessageBlock)
       }
       "when options option1 & 2 selected" in {
         val assembledResult = TaxYearFromUIAssembler(List("option1", "option2"))

@@ -216,6 +216,7 @@ yourTaxRelief.confirmation.page.warning.text = You may be prosecuted if you deli
 yourTaxRelief.confirmation.page.button.text = Accept and continue
 
 checkYourClaimView.title = Check your claim
+checkYourClaimView.heading = Check your claim
 checkYourClaimView.header = Check your claim
 checkYourClaimView.text.1 = You will receive tax relief on your expenses for working from home for:
 checkYourClaimView.text.2 = the whole of tax year

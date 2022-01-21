@@ -17,8 +17,7 @@
 package views
 
 import controllers.{UIAssembler, routes}
-import models.{ClaimViewSettings, DisclaimerViewSettings}
-import navigation.TaxYearFromUIAssembler
+import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler}
 import org.scalatest.Assertions.assert
 import play.api.test.FakeRequest
 import play.api.test.Helpers.GET

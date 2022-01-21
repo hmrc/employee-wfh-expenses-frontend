@@ -34,6 +34,5 @@ class CannotClaimUsingThisServiceViewSpec extends ViewBehaviours {
 
     behave like normalPage(applyView, "cannotClaimUsingThisService")
 
-    behave like pageWithBackLink(applyView)
   }
 }

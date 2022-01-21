@@ -16,16 +16,12 @@
 
 package views
 
-import controllers.{UIAssembler, routes}
-import models.{ClaimViewSettings, DisclaimerViewSettings}
-import navigation.TaxYearFromUIAssembler
-import org.scalatest.Assertions.assert
+import controllers.UIAssembler
+import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.GET
 import utils.DateLanguageTokenizer
 import views.behaviours.ViewBehaviours
 import views.html.DisclaimerView
-import play.api.test.FakeRequest
 
 import java.time.LocalDate
 

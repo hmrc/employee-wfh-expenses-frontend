@@ -21,7 +21,7 @@ import models.TaxYearFromUIAssembler
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.time.TaxYear
-import utils.TaxYearDates.{YEAR_2020, YEAR_2021, YEAR_2022}
+import utils.TaxYearDates.{TAX_YEAR_2021_END_DATE, TAX_YEAR_2021_START_DATE, TAX_YEAR_2022_END_DATE, TAX_YEAR_2022_START_DATE, YEAR_2020, YEAR_2021, YEAR_2022, YEAR_2023}
 
 class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
 
@@ -58,7 +58,11 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
       }
 
       "when 2022 and previous year is selected" in {
-        val expectedYearsTupleList = List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes))
+        val expectedYearsTupleList = List(
+          (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
+          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
+        )
+
         val assembledResult = TaxYearFromUIAssembler(List("option1", "option3")).assemble
         assert(assembledResult == expectedYearsTupleList)
       }
@@ -70,14 +74,20 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
       }
 
       "when 2021 and previous year is selected" in {
-        val expectedYearsTupleList = List((TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
+        val expectedYearsTupleList = List(
+          (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
+          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
+        )
         val assembledResult = TaxYearFromUIAssembler(List("option2", "option3")).assemble
         assert(assembledResult == expectedYearsTupleList)
       }
 
       "when previous year only is selected" in {
+        val expectedYearsTupleList = List(
+          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
+        )
         val assembledResult = TaxYearFromUIAssembler(List("option3")).assemble
-        assert(assembledResult == Nil)
+        assert(assembledResult == expectedYearsTupleList)
       }
 
       "when something completely unknown is selected" in {

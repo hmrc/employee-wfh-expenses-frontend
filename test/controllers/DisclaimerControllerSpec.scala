@@ -17,9 +17,8 @@
 package controllers
 
 import base.SpecBase
-import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
-import models.{ClaimViewSettings, DisclaimerViewSettings, UserAnswers}
-import navigation.TaxYearFromUIAssembler
+import models.SelectTaxYearsToClaimFor.Option1
+import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler, UserAnswers}
 import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest

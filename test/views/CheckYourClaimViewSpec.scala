@@ -16,8 +16,7 @@
 
 package views
 
-import models.{ClaimViewSettings, DisclaimerViewSettings}
-import navigation.TaxYearFromUIAssembler
+import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler}
 import play.api.test.FakeRequest
 import utils.DateLanguageTokenizer
 import views.behaviours.ViewBehaviours

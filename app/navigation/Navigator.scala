@@ -38,7 +38,7 @@ class Navigator @Inject()() extends Logging {
          routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
       }else {
         routes.DisclaimerController.onPageLoad()
-      }case DisclaimerPage => ua => disclaimerNextPage(ua)
+      }case DisclaimerPage => ua => disclaimerNextPage()
     case CheckYourClaimPage => ua => checkYourClaimPage(ua)
     case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
     case _ => _ => routes.IndexController.onPageLoad()

@@ -18,10 +18,9 @@ package controllers
 
 import base.SpecBase
 import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
-import models.{ClaimViewSettings, DisclaimerViewSettings, UserAnswers}
-import org.mockito.Mockito._
+import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler, UserAnswers}
 import org.mockito.Matchers.any
-import navigation.TaxYearFromUIAssembler
+import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.libs.json.Json
@@ -31,7 +30,6 @@ import utils.DateLanguageTokenizer
 import views.html.CheckYourClaimView
 
 import java.time.LocalDate
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
@@ -75,7 +73,8 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSubmissionService: services.SubmissionService = mock[services.SubmissionService]
 
-      when(mockSubmissionService.submitExpenses(any(), any(), any())(any(), any(), any())) thenReturn Future.successful(Left(any()))
+      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Left(any()))
+      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Left(any()))
 
       val userAnswer = UserAnswers(
         userAnswersId,

@@ -17,8 +17,7 @@
 package controllers
 
 import controllers.actions._
-import models.{ClaimViewSettings, DisclaimerViewSettings}
-import navigation.TaxYearFromUIAssembler
+import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler}
 import pages.{CheckYourClaimPage, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}

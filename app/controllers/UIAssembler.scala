@@ -16,9 +16,9 @@
 
 package controllers
 
+import models.TaxYearFromUIAssembler
 import models.{ClaimViewSettings, DisclaimerViewSettings}
 import models.requests.DataRequest
-import navigation.TaxYearFromUIAssembler
 import pages.{HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.mvc.AnyContent
 import utils.DateLanguageTokenizer

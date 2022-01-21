@@ -64,11 +64,11 @@ class CheckYourClaimController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
     implicit request =>
-
+      val selectedTaxYears = taxYearFromUIAssemblerFromRequest().checkboxYearOptions
       submissionService.submitExpenses(
-        request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage),
-        request.userAnswers.is2019And2020Only,
-        request.userAnswers.is2019And2020And2021Only) map {
+        startDate = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage),
+        selectedTaxYears = selectedTaxYears
+      ) map {
         case Right(_) =>
           Redirect(routes.ConfirmationController.onPageLoad())
         case Left(_) =>

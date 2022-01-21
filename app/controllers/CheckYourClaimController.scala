@@ -41,7 +41,6 @@ class CheckYourClaimController @Inject()(
                                          getData: DataRetrievalAction,
                                          requireData: DataRequiredAction,
                                          submissionService: SubmissionService,
-                                         navigator: Navigator,
                                          val controllerComponents: MessagesControllerComponents,
                                          checkYourClaimView: CheckYourClaimView,
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
@@ -54,12 +53,12 @@ class CheckYourClaimController @Inject()(
 
       val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
 
-      val weeks = startDate.isDefined match {
+      val numberOfWeeksToDisplay = startDate.isDefined match {
         case true => numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE)
         case _ => 0
       }
 
-      Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, weeks))
+      Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, numberOfWeeksToDisplay))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
@@ -74,7 +73,6 @@ class CheckYourClaimController @Inject()(
         case Left(_) =>
           logger.error("[SubmitYourClaimController][onSubmit] - Error submitting")
           Redirect(routes.TechnicalDifficultiesController.onPageLoad())
-
       }
   }
 }

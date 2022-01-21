@@ -31,7 +31,6 @@ class Navigator @Inject()() extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
-    //case SelectTaxYearsToClaimForPage => ua => startDateJourneyFlow(ua)
     case SelectTaxYearsToClaimForPage => ua =>
       val selectedOptionsCheckBoxes = ua.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
       val selectedTaxYears = TaxYearFromUIAssembler(selectedOptionsCheckBoxes)
@@ -78,12 +77,8 @@ class Navigator @Inject()() extends Logging {
     }
   }
 
-  def disclaimerNextPage(userAnswers: UserAnswers): Call = {
-
+  def disclaimerNextPage(): Call = {
     routes.YourTaxReliefController.onPageLoad
-
-    //    logger.error(s"Unexpected case match ($a,$b,$c)")
-      //  routes.TechnicalDifficultiesController.onPageLoad()
-
   }
+
 }

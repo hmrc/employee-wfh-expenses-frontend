@@ -30,10 +30,10 @@
 @readableDate(date: LocalDate) = {@{date.getDayOfMonth} @{messages(s"month.${date.getMonthValue}")} @{date.getYear}}
 
 @insetHtml(date: LocalDate) = {
-    @messages("yourTaxRelief.inset.text")
+    @messages("checkYourClaimView.inset.text")
     <b>@readableDate(date)</b>.
     <br>
-    <a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("yourTaxRelief.changeThisDate.href.text")</a>
+    <a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("checkYourClaimView.changeThisDate.href.text")</a>
 }
 
 @pluralOrSingularWeeks(weeks: Long) = @{
@@ -45,7 +45,7 @@
 }
 
 @main_template(
-    title = messages("yourTaxRelief.title"),
+    title = messages("checkYourClaimView.title"),
     beforeContentBlock = Some(backLink(BackLink(
         href = routes.YourTaxReliefController.onPageLoad().url,
         content = Text(messages("site.back")),
@@ -69,7 +69,7 @@
 
         @if(startDate.isDefined) {
             @if(startDate.get.isBefore(TAX_YEAR_2020_START_DATE)) {
-                <li>@messages("yourTaxRelief.2019And2020And2021.list.item2", pluralOrSingularWeeks(numberOfWeeksIn2019))</li>
+                <li>@messages("checkYourClaimView.list.item2", pluralOrSingularWeeks(numberOfWeeksIn2019))</li>
             }
         }
     </ul>

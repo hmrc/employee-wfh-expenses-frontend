@@ -103,7 +103,7 @@ whenDidYouFirstStartWorkingFromHome.error.required.two = The date you started wo
 whenDidYouFirstStartWorkingFromHome.error.required = The date you started working from home must include a {0}
 whenDidYouFirstStartWorkingFromHome.error.invalid = The date you started working from home must be a real date
 whenDidYouFirstStartWorkingFromHome.error.futureDateNotAllowed = The date you started working from home must be today or in the past
-whenDidYouFirstStartWorkingFromHome.error.invalidTaxYearDate = Select a date before 6 April 2021
+whenDidYouFirstStartWorkingFromHome.error.invalidTaxYearDate = You selected previous years, so you must enter a date before 6 April 2021
 whenDidYouFirstStartWorkingFromHome2019And2020.paragraph.one = We will apply tax relief for the whole of tax year 2020 to 2021, even if you went back to your workplace before 6 April 2021.
 whenDidYouFirstStartWorkingFromHome2019And2020And2021.paragraph.one = You can apply now for tax relief for tax year 2021 to 2022 even if you do not know how much longer you will be working from home.
 whenDidYouFirstStartWorkingFromHome2019And2020And2021.paragraph.two = This is because we will apply tax relief for the whole of this tax year, even if you go back to your workplace before 6 April 2022.
@@ -216,6 +216,7 @@ yourTaxRelief.confirmation.page.warning.text = You may be prosecuted if you deli
 yourTaxRelief.confirmation.page.button.text = Accept and continue
 
 checkYourClaimView.title = Check your claim
+checkYourClaimView.heading = Check your claim
 checkYourClaimView.header = Check your claim
 checkYourClaimView.text.1 = You will receive tax relief on your expenses for working from home for:
 checkYourClaimView.text.2 = the whole of tax year

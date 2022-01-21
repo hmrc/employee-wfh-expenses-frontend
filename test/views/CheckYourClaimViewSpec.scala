@@ -42,7 +42,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
 
         val doc = asDocument(view.apply(claimSettings.claimViewSettings.get, Some(date), 2)(request, messages))
         assert(doc.toString.contains(messages("checkYourClaimView.title")))
-        assert(doc.toString.contains(messages("checkYourClaimView.header")))
+        assert(doc.toString.contains(messages("checkYourClaimView.heading")))
         assert(doc.toString.contains(messages("checkYourClaimView.text.1")))
         assert(doc.toString.contains(messages("checkYourClaimView.text.2")))
         assert(doc.toString.contains(messages("checkYourClaimView.text.3")))
@@ -74,7 +74,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
       val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
         Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
       val startDate = LocalDate.of(2020, 4, 1)
-      behave like normalPage(view.apply(claimSettings.claimViewSettings.get, Some(startDate), 2)(request, messages), "check your claim")
+      behave like normalPage(view.apply(claimSettings.claimViewSettings.get, Some(startDate), 2)(request, messages), "checkYourClaimView")
     }
   }
 }

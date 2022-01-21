@@ -19,7 +19,7 @@ package controllers
 import controllers.actions._
 import models.{ClaimViewSettings, DisclaimerViewSettings}
 import navigation.Navigator
-import pages.{DisclaimerPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{DisclaimerPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -46,7 +46,7 @@ class DisclaimerController @Inject()(
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
       val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
 
-      def disclaimerSettings(dateList: List[(LocalDate, LocalDate)]) = {
+      def buildDisclaimerPageSettings(dateList: List[(LocalDate, LocalDate)]) = {
         if (request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).isDefined) {
           DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))))
         } else {
@@ -54,41 +54,11 @@ class DisclaimerController @Inject()(
         }
       }
 
-      Ok(disclaimerView(showBackLink = false, disclaimerSettings(selectedTaxYears.assemble), startDate))
-
+      Ok(disclaimerView(showBackLink = false, buildDisclaimerPageSettings(selectedTaxYears.assemble), startDate))
   }
-
-  /*
-  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
-    implicit request =>
-
-      request.userAnswers.get(HasSelfAssessmentEnrolment) match {
-        case None        => Redirect(routes.IndexController.onPageLoad())
-        case Some(true)  => Ok(disclaimer2021View(false))
-        case Some(false) =>
-          (request.userAnswers.get(ClaimedForTaxYear2020), request.userAnswers.get(SelectTaxYearsToClaimForPage) ) match {
-            case (Some(true), _)      => Ok(disclaimer2021View(true))
-
-            case (Some(false), None)  => Redirect(routes.SelectTaxYearsToClaimForController.onPageLoad())
-
-            case (Some(false), Some(yearsToClaimFor)) => yearsToClaimFor.size match {
-              case 0 => Redirect(routes.SelectTaxYearsToClaimForController.onPageLoad())
-              case 2 => Ok(disclaimer2019_2020_2021View())
-              case 1 => yearsToClaimFor.head match {
-                case Option1 => Ok(disclaimer2021View(true))
-                case Option2 => Ok(disclaimer2019_2020View())
-              }
-            }
-
-            case (None,_) => Redirect(routes.IndexController.onPageLoad())
-          }
-      }
-  }
-*/
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
       Redirect(navigator.nextPage(DisclaimerPage, request.userAnswers))
   }
-
 }

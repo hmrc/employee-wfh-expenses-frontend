@@ -31,7 +31,9 @@
 ) {
 
     <h1 class="govuk-heading-xl">@messages("cannotClaimUsingThisService.heading")</h1>
+
     <p class="govuk-body">@messages("cannotClaimUsingThisService.reason")</p>
+
     <ul class="govuk-list govuk-list--bullet">
         <li>@Html(messages("cannotClaimUsingThisService.reason.year1"))</li>
         <li>@Html(messages("cannotClaimUsingThisService.reason.year2"))</li>
@@ -39,6 +41,8 @@
         <li>@Html(messages("cannotClaimUsingThisService.reason.year4"))</li>
     </ul>
 
-<p class="govuk-body">@Html(messages("cannotClaimUsingThisService.alternative", linkToChangeDate))</p>
-<p class="govuk-body">@Html(messages("cannotClaimUsingThisService.changeDate", linkToP87))</p>
+    <p class="govuk-body">@Html(messages("cannotClaimUsingThisService.alternative", linkToChangeDate))</p>
+
+    <p class="govuk-body">@Html(messages("cannotClaimUsingThisService.changeDate", linkToP87))</p>
+
 }

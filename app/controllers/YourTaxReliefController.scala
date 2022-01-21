@@ -39,7 +39,6 @@ class YourTaxReliefController @Inject()(
                                          citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
                                          getData: DataRetrievalAction,
                                          requireData: DataRequiredAction,
-                                         submissionService: SubmissionService,
                                          val controllerComponents: MessagesControllerComponents,
                                          yourTaxReliefView: YourTaxReliefView,
                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
@@ -52,13 +51,10 @@ class YourTaxReliefController @Inject()(
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
       Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
-        Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString), selectedTaxYears.showFirstTaxReliefMessageBlock, selectedTaxYears.showSecondTaxReliefMessageBlock))
+        Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString),
+        selectedTaxYears.showFirstTaxReliefMessageBlock, selectedTaxYears.showSecondTaxReliefMessageBlock))
 
-    //          logger.error("[SubmitYourClaimController][onPageLoad] - No years to claim for found")
-    //        Redirect(routes.TechnicalDifficultiesController.onPageLoad())
-    //  }
   }
-
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
     implicit request =>

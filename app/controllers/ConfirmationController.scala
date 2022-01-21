@@ -92,5 +92,4 @@ class ConfirmationController @Inject()(
         FailureReason -> error
       )
     )
-
 }

@@ -33,5 +33,6 @@ class CannotClaimUsingThisServiceViewSpec extends ViewBehaviours {
     val applyView = view.apply()(request, messages)
 
     behave like normalPage(applyView, "cannotClaimUsingThisService")
+
   }
 }

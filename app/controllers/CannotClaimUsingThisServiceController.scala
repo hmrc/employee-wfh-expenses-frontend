@@ -28,7 +28,6 @@ import scala.concurrent.ExecutionContext
 class CannotClaimUsingThisServiceController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,
-                                       checkAlreadyClaimed: CheckAlreadyClaimedAction,
                                        citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
                                        getData: DataRetrievalAction,
                                        requireData: DataRequiredAction,

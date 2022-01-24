@@ -15,7 +15,6 @@
  *@
 
 @import config.FrontendAppConfig
-@import utils.DateLanguageTokenizerFormattedItem
 @import java.time.LocalDate
 @import utils.TaxYearDates._
 
@@ -31,7 +30,7 @@
 @(showBackLink: Boolean, disclaimerViewSettings: DisclaimerViewSettings, startDate: Option[LocalDate])( implicit request: Request[_], messages: Messages)
 
 @main_template(
- title = messages("disclaimer.heading"),
+ title = messages("disclaimer.title"),
  beforeContentBlock = if(showBackLink){Some(
   backLink(
    BackLink(

@@ -74,7 +74,6 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
       val mockSubmissionService: services.SubmissionService = mock[services.SubmissionService]
 
       when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Left(any()))
-      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Left(any()))
 
       val userAnswer = UserAnswers(
         userAnswersId,
@@ -99,6 +98,4 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
     }
 
   }
-
-
 }

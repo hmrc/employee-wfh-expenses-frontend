@@ -72,28 +72,6 @@ ivfailed.postalForm.href.text = print and post form
 ivfailed.helpline.href.text = Income Tax: general enquiries helpline
 ivfailed.tryAgain.href.text = confirm your identity
 
-disclaimer.title = You must read the following before making a claim
-disclaimer.heading = You must read the following before making a claim
-disclaimer.paragraph.one = You can use this service to claim tax relief on the extra expenses of working from home because of coronavirus (COVID-19).
-disclaimer.2021.paragraph.two = You can claim and get tax relief on expenses of £6 a week for this tax year, 6 April 2021 to 5 April 2022.
-disclaimer.2019And2020And2021.list1.text = You can claim and get tax relief on expenses of £6 a week for:
-disclaimer.2019And2020And2021.list1.item1 = tax year 6 April 2021 to 5 April 2022
-disclaimer.2019And2020And2021.list1.item2 = tax year 6 April 2020 to 5 April 2021
-disclaimer.2019And2020And2021.list2.text = You can also claim and get tax relief on expenses of £4 a week for:
-disclaimer.2019And2020And2021.list2.item1 = tax year 6 April 2019 to 5 April 2020
-disclaimer.paragraph.three.a = If your extra costs are more than this you can claim for more tax relief.
-disclaimer.paragraph.three.b = You will need to
-disclaimer.paragraph.three.c = claim tax relief for expenses of employment
-disclaimer.paragraph.three.d = and provide evidence, like detailed and verifiable receipts and bills.
-disclaimer.list = disclaimerList
-disclaimer.list.text = You can claim if:
-disclaimer.list.item1 = your employer has not already paid your expenses
-disclaimer.list.item2 = government guidelines or your employer have required you to work from home
-disclaimer.list.item3 = you have extra costs as a result of working from home
-disclaimer.warning = Warning
-disclaimer.prosecuted = You may be prosecuted if you deliberately give incorrect or misleading information.
-disclaimer.submit.button = Accept and continue
-
 whenDidYouFirstStartWorkingFromHome.title = When did you start working from home?
 whenDidYouFirstStartWorkingFromHome.heading = When did you start working from home?
 whenDidYouFirstStartWorkingFromHome.hinttext = For example, 23 3 2020
@@ -104,9 +82,6 @@ whenDidYouFirstStartWorkingFromHome.error.required = The date you started workin
 whenDidYouFirstStartWorkingFromHome.error.invalid = The date you started working from home must be a real date
 whenDidYouFirstStartWorkingFromHome.error.futureDateNotAllowed = The date you started working from home must be today or in the past
 whenDidYouFirstStartWorkingFromHome.error.invalidTaxYearDate = You selected previous years, so you must enter a date before 6 April 2021
-whenDidYouFirstStartWorkingFromHome2019And2020.paragraph.one = We will apply tax relief for the whole of tax year 2020 to 2021, even if you went back to your workplace before 6 April 2021.
-whenDidYouFirstStartWorkingFromHome2019And2020And2021.paragraph.one = You can apply now for tax relief for tax year 2021 to 2022 even if you do not know how much longer you will be working from home.
-whenDidYouFirstStartWorkingFromHome2019And2020And2021.paragraph.two = This is because we will apply tax relief for the whole of this tax year, even if you go back to your workplace before 6 April 2022.
 
 cannotClaimUsingThisService.title = You cannot claim using this service
 cannotClaimUsingThisService.heading = You cannot claim using this service
@@ -189,7 +164,6 @@ service.is.busy.message = Please try again later.
 phaseBanner.text.part1 = This is a new service – your
 phaseBanner.linkText = feedback
 phaseBanner.text.part2 = will help us to improve it.
-
 
 disclaimer.your.claim.details.header = Your claim details
 disclaimer.your.claim.details.year.label = You can claim and get tax relief on expenses of £6 a week for full tax years:

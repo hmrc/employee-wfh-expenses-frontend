@@ -32,7 +32,7 @@ class IABDServiceImpl @Inject()(
                                  @Named("IABD GET") rateLimiter: RateLimiting
                                ) extends IABDService with Logging {
 
-  def alreadyClaimed(nino: String, year: Int)(implicit hc:HeaderCarrier):Future[Option[Expenses]] = {
+  def alreadyClaimed(nino: String, year: Int)(implicit hc:HeaderCarrier): Future[Option[Expenses]] = {
 
     { for {
       otherExpenses   <- rateLimiter.withToken(() => taiConnector.getOtherExpensesData(nino, year))

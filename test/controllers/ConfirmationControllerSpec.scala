@@ -16,23 +16,22 @@
 
 package controllers
 
-import java.time.LocalDate
 import base.SpecBase
 import connectors.PaperlessPreferenceConnector
+import controllers.PaperlessAuditConst._
+import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
+import models.UserAnswers
 import models.paperless.{PaperlessStatus, PaperlessStatusResponse, Url}
 import org.mockito.Matchers.{any, eq => eqm}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
+import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.inject.bind
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import views.html.ConfirmationView
-import PaperlessAuditConst._
-import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
-import models.UserAnswers
-import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
-import play.api.libs.json.Json
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

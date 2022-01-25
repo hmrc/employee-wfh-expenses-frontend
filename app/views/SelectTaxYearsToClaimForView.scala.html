@@ -46,16 +46,10 @@
         @if(form.errors.nonEmpty) {
             @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
         }
-
+        <h1 class="govuk-heading-xl">@messages("selectTaxYearsToClaimFor.title")</h1>
+        <p class="govuk-body">@messages("selectTaxYearsToClaimFor.para")</p>
         @govUkCheckboxes(Checkboxes(
             name = "value",
-            fieldset = Some(Fieldset(
-                legend = Some(Legend(
-                    content = Text(messages("selectTaxYearsToClaimFor.title")),
-                    isPageHeading = true,
-                    classes = "govuk-fieldset__legend--xl"
-                ))
-            )),
             hint = Some(Hint(
                 content = Text(messages("selectTaxYearsToClaimFor.hintText"))
             )),

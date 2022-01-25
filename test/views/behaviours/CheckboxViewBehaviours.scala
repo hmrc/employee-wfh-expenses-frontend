@@ -32,9 +32,9 @@ trait CheckboxViewBehaviours[A] extends ViewBehaviours {
                    legend: Option[String] = None): Unit = {
 
     "behave like a checkbox page" must {
-      "contain a legend for the question" in {
+      "contain a h1 for the question" in {
         val doc = asDocument(createView(form))
-        val legends = doc.getElementsByTag("legend")
+        val legends = doc.getElementsByTag("h1")
         legends.size mustBe 1
         legends.text contains legend.getOrElse(messages(s"$messageKeyPrefix.heading"))
       }
@@ -111,7 +111,7 @@ trait CheckboxViewBehaviours[A] extends ViewBehaviours {
         val doc = asDocument(createView(form.withError(FormError(fieldKey, "error.invalid"))))
         val errorSpan = doc.getElementsByClass("govuk-error-message").first
         errorSpan.text mustBe (messages("error.browser.title.prefix") + " " + messages("error.invalid"))
-        doc.getElementsByTag("fieldset").first.attr("aria-describedby") contains errorSpan.attr("id")
+        doc.getElementsByTag("div").first.attr("aria-describedby") contains errorSpan.attr("id")
       }
     }
   }

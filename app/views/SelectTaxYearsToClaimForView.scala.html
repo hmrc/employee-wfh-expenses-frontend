@@ -26,7 +26,7 @@
         formHelper: FormWithCSRF
 )
 
-@(form: Form[Set[SelectTaxYearsToClaimFor]])(implicit request: Request[_], messages: Messages)
+@(form: Form[Set[SelectTaxYearsToClaimFor]], checkboxes: Seq[CheckboxItem])(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = s"${errorPrefix(form)} ${messages("selectTaxYearsToClaimFor.title")}",

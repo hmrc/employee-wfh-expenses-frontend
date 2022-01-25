@@ -56,29 +56,30 @@ class Navigator @Inject()() extends Logging {
 
     userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
       case Some(startDate) =>
-        startDate.isBefore(earliestStartDate) match {
-          case true   => routes.CannotClaimUsingThisServiceController.onPageLoad()
-          case false  => routes.DisclaimerController.onPageLoad()
+        if (startDate.isBefore(earliestStartDate)) {
+          routes.CannotClaimUsingThisServiceController.onPageLoad()
+        } else {
+          routes.DisclaimerController.onPageLoad()
         }
       case None => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
     }
-
   }
 
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
-    val claimedYears = Seq(
-      userAnswers.get(ClaimedForTaxYear2020),
-      userAnswers.get(ClaimedForTaxYear2021),
-      userAnswers.get(ClaimedForTaxYear2022)
-    )
     userAnswers.get(HasSelfAssessmentEnrolment) match {
       case None         => routes.IndexController.onPageLoad()
       case Some(true)   => routes.DisclaimerController.onPageLoad()
       case Some(false)  =>
-        userAnswers.get(ClaimedForTaxYear2020) match {
-          case Some(claimedAlready) if claimedAlready   => routes.DisclaimerController.onPageLoad()
-          case Some(claimedAlready) if !claimedAlready  => routes.SelectTaxYearsToClaimForController.onPageLoad()
-          case None                                     => routes.IndexController.onPageLoad()
+        (
+          userAnswers.get(ClaimedForTaxYear2020),
+          userAnswers.get(ClaimedForTaxYear2021),
+          userAnswers.get(ClaimedForTaxYear2022)
+        ) match {
+          case (Some(claimed2020), Some(claimed2021), Some(claimed2022))
+            if claimed2020 && claimed2021 || claimed2020 && claimed2022 || claimed2021 && claimed2022           => routes.DisclaimerController.onPageLoad()
+          case (Some(claimed2020), Some(claimed2021), Some(claimed2022))
+            if !claimed2020 && !claimed2021 || !claimed2020 && !claimed2022 || !claimed2021 && !claimed2022     => routes.SelectTaxYearsToClaimForController.onPageLoad()
+          case (_, _, _)                                                                                        => routes.IndexController.onPageLoad()
         }
     }
   }

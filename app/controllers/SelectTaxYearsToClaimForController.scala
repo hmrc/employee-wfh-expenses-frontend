@@ -51,7 +51,6 @@ class SelectTaxYearsToClaimForController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-
       request.userAnswers.eligibilityCheckerSessionIdOpt match {
         case Some(sessionId) => eligibilityCheckerService.wfhDueToCovidStatus(sessionId).flatMap {
           case Some(wrapper) => handleSAFlow(wrapper)

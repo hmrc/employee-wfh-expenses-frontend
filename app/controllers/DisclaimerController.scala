@@ -59,6 +59,6 @@ class DisclaimerController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      Redirect(navigator.nextPage(DisclaimerPage, request.userAnswers))
+      Redirect(navigator.nextPage(Seq(DisclaimerPage), request.userAnswers))
   }
 }

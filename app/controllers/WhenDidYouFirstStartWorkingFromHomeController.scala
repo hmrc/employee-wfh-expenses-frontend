@@ -95,7 +95,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(WhenDidYouFirstStartWorkingFromHomePage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(WhenDidYouFirstStartWorkingFromHomePage, updatedAnswers))
+          } yield Redirect(navigator.nextPage(Seq(WhenDidYouFirstStartWorkingFromHomePage), updatedAnswers))
       )
   }
 

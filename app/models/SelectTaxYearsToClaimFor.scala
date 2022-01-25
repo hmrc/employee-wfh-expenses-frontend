@@ -29,6 +29,10 @@ object SelectTaxYearsToClaimFor extends Enumerable.Implicits {
   case object Option2 extends WithName("option2") with SelectTaxYearsToClaimFor
   case object Option3 extends WithName("option3") with SelectTaxYearsToClaimFor
 
+  val valuesWithoutPrev = Seq(Option1, Option2)
+  val valuesWithout2021 = Seq(Option1, Option3)
+  val valuesWithout2022 = Seq(Option2, Option3)
+
   val values: Seq[SelectTaxYearsToClaimFor] = Seq(
     Option1,
     Option2,

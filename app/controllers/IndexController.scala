@@ -72,7 +72,9 @@ class IndexController @Inject()(
 
         sessionRepository.set(answers)
 
-        Redirect(navigator.nextPage(ClaimedForTaxYear2020, answers))
+        val pageSeq = Seq(ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022)
+
+        Redirect(navigator.nextPage(pageSeq, answers))
       }
     }
 

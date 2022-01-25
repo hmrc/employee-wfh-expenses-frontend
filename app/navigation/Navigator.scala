@@ -29,22 +29,23 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class Navigator @Inject()() extends Logging {
 
-  private val normalRoutes: Page => UserAnswers => Call = {
-    case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
-    case SelectTaxYearsToClaimForPage => ua =>
+  private val normalRoutes: Seq[Page] => UserAnswers => Call = {
+    case Seq(ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022) => ua => claimJourneyFlow(ua)
+    case Seq(SelectTaxYearsToClaimForPage) => ua =>
       val selectedOptionsCheckBoxes = ua.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
       val selectedTaxYears = TaxYearFromUIAssembler(selectedOptionsCheckBoxes)
       if (selectedTaxYears.isPreviousTaxYearSelected) {
          routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
-      }else {
+      } else {
         routes.DisclaimerController.onPageLoad()
-      }case DisclaimerPage => ua => disclaimerNextPage()
-    case CheckYourClaimPage => ua => checkYourClaimPage(ua)
-    case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
+      }
+    case Seq(DisclaimerPage) => ua => disclaimerNextPage()
+    case Seq(CheckYourClaimPage) => ua => checkYourClaimPage(ua)
+    case Seq(WhenDidYouFirstStartWorkingFromHomePage) => ua => checkStartWorkingFromHomeDate(ua)
     case _ => _ => routes.IndexController.onPageLoad()
   }
 
-  def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
+  def nextPage(page: Seq[Page], userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
 
   def checkYourClaimPage(userAnswers: UserAnswers): Call = {
     routes.YourTaxReliefController.onPageLoad()
@@ -65,6 +66,11 @@ class Navigator @Inject()() extends Logging {
   }
 
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
+    val claimedYears = Seq(
+      userAnswers.get(ClaimedForTaxYear2020),
+      userAnswers.get(ClaimedForTaxYear2021),
+      userAnswers.get(ClaimedForTaxYear2022)
+    )
     userAnswers.get(HasSelfAssessmentEnrolment) match {
       case None         => routes.IndexController.onPageLoad()
       case Some(true)   => routes.DisclaimerController.onPageLoad()
@@ -78,7 +84,7 @@ class Navigator @Inject()() extends Logging {
   }
 
   def disclaimerNextPage(): Call = {
-    routes.YourTaxReliefController.onPageLoad
+    routes.YourTaxReliefController.onPageLoad()
   }
 
 }

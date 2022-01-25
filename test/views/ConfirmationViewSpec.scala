@@ -25,7 +25,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
 
   private val Confirmation = "confirmation"
 
-  "Confirmation 2021 view" should {
+  "Confirmation view" should {
     val view = viewFor[ConfirmationView](Some(emptyUserAnswers))
 
     val request = FakeRequest()

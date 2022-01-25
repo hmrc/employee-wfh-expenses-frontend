@@ -33,51 +33,51 @@
 )(implicit request: Request[_], messages: Messages)
 
 @afterDateStringFormatted = {
-    @messages("yourTaxRelief.confirmation.page.heading.after") @messages(taxMonthAfterText) @messages(taxYearAfterText)
+    @messages("yourTaxRelief.heading.after") @messages(taxMonthAfterText) @messages(taxYearAfterText)
 }
 
 @beforeDateStringFormatted = {
-    @messages("yourTaxRelief.confirmation.page.heading.before") @messages(taxMonthBeforeText.getOrElse("")) @messages(taxYearBeforeText.getOrElse(""))
+    @messages("yourTaxRelief.heading.before") @messages(taxMonthBeforeText.getOrElse("")) @messages(taxYearBeforeText.getOrElse(""))
 }
 
 @main_template(
     title = messages("yourTaxRelief.title")
 ) {
 
-    <h1 class="govuk-heading-xl">@messages("yourTaxRelief.confirmation.page.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("yourTaxRelief.heading")</h1>
 
     @if(showFirstMessageBlock) {
         <h2 class="govuk-heading-m">@afterDateStringFormatted</h2>
 
-        <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.info.text.1")</p>
+        <p class="govuk-body">@messages("yourTaxRelief.info.text.1")</p>
 
-        <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.bullet.heading")</p>
+        <p class="govuk-body">@messages("yourTaxRelief.bullet.heading")</p>
         <ul class="govuk-list govuk-list--bullet">
-            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.1")</li>
-            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.2")</li>
+            <li>@messages("yourTaxRelief.bullet.text.1")</li>
+            <li>@messages("yourTaxRelief.bullet.text.2")</li>
         </ul>
     }
 
     @if(showSecondMessageBlock) {
         <h2 class="govuk-heading-m">@beforeDateStringFormatted</h2>
 
-        <p class="govuk-body">@messages("yourTaxRelief.confirmation.page.bullet.heading.1")</p>
+        <p class="govuk-body">@messages("yourTaxRelief.bullet.heading.1")</p>
         <ul class="govuk-list govuk-list--bullet">
-            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.3")</li>
-            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.4")</li>
-            <li>@messages("yourTaxRelief.confirmation.page.bullet.text.5")</li>
+            <li>@messages("yourTaxRelief.bullet.text.3")</li>
+            <li>@messages("yourTaxRelief.bullet.text.4")</li>
+            <li>@messages("yourTaxRelief.bullet.text.5")</li>
         </ul>
 
         <div class="govuk-warning-text">
             <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
             <strong class="govuk-warning-text__text">
                 <span class="govuk-warning-text__assistive">Warning</span>
-                @messages("yourTaxRelief.confirmation.page.warning.text")<br>
+                @messages("yourTaxRelief.warning.text")<br>
             </strong>
         </div>
     }
 
     @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
-        @button(Button(content = Text(messages("yourTaxRelief.confirmation.page.button.text")), preventDoubleClick  = true))
+        @button(Button(content = Text(messages("yourTaxRelief.button.text")), preventDoubleClick  = true))
     }
 }

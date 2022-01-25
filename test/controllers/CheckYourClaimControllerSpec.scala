@@ -26,6 +26,7 @@ import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsT
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.SubmissionService
 import utils.DateLanguageTokenizer
 import views.html.CheckYourClaimView
 
@@ -71,9 +72,9 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
     "submit claim should redirect to technical difficulties page if results into error" in {
 
-      val mockSubmissionService: services.SubmissionService = mock[services.SubmissionService]
+      val mockSubmissionService = mock[SubmissionService]
 
-      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Left(any()))
+      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Left("dd"))
 
       val userAnswer = UserAnswers(
         userAnswersId,
@@ -96,6 +97,5 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       application.stop()
     }
-
   }
 }

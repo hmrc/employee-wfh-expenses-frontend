@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.SelectTaxYearsToClaimFor.Option1
+import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler, UserAnswers}
 import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
 import play.api.libs.json.Json
@@ -32,7 +32,7 @@ class DisclaimerControllerSpec extends SpecBase {
 
   "Disclaimer Controller" must {
 
-    "return the 2021 content view" when {
+    "return the content view" when {
       val tests = Seq(
         (
           "not SA enrolled and has already claimed expenses for 2020", UserAnswers(
@@ -45,6 +45,18 @@ class DisclaimerControllerSpec extends SpecBase {
           ),
           false,
           List(Option1.toString)
+        ) ,
+        (
+          "not SA enrolled and has already claimed expenses for multiple years", UserAnswers(
+          userAnswersId,
+          Json.obj(
+            ClaimedForTaxYear2020.toString -> true,
+            HasSelfAssessmentEnrolment.toString -> false,
+            SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString),
+          )
+        ),
+          false,
+          List(Option1.toString, Option2.toString)
         ) ,
         (
           "not SA enrolled and hasn't already claimed but have chosen only to claim for 2021", UserAnswers(

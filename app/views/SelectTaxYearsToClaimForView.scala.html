@@ -26,7 +26,7 @@
         formHelper: FormWithCSRF
 )
 
-@(form: Form[Set[SelectTaxYearsToClaimFor]], checkboxes: Seq[CheckboxItem])(implicit request: Request[_], messages: Messages)
+@(form: Form[Set[SelectTaxYearsToClaimFor]], checkboxesShown: Seq[CheckboxItem])(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = s"${errorPrefix(form)} ${messages("selectTaxYearsToClaimFor.title")}",
@@ -59,7 +59,7 @@
             hint = Some(Hint(
                 content = Text(messages("selectTaxYearsToClaimFor.hintText"))
             )),
-            items = SelectTaxYearsToClaimFor.options(form),
+            items = checkboxesShown,
             errorMessage = form.errors.headOption.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*))))
         ))
 

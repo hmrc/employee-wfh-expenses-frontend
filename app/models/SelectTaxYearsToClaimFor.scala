@@ -33,13 +33,13 @@ object SelectTaxYearsToClaimFor extends Enumerable.Implicits {
   val valuesWithout2021 = Seq(Option1, Option3)
   val valuesWithout2022 = Seq(Option2, Option3)
 
-  val values: Seq[SelectTaxYearsToClaimFor] = Seq(
+  val valuesClaimingAll: Seq[SelectTaxYearsToClaimFor] = Seq(
     Option1,
     Option2,
     Option3
   )
 
-  def options(form: Form[_])(implicit messages: Messages): Seq[CheckboxItem] = values.map {
+  def options(form: Form[_], values: Seq[SelectTaxYearsToClaimFor])(implicit messages: Messages): Seq[CheckboxItem] = values.map {
     value =>
       CheckboxItem(
         name = Some("value[]"),
@@ -51,5 +51,5 @@ object SelectTaxYearsToClaimFor extends Enumerable.Implicits {
   }
 
   implicit val enumerable: Enumerable[SelectTaxYearsToClaimFor] =
-    Enumerable(values.map(v => v.toString -> v): _*)
+    Enumerable(valuesClaimingAll.map(v => v.toString -> v): _*)
 }

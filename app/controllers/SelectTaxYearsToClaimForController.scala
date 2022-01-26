@@ -18,17 +18,20 @@ package controllers
 
 import controllers.actions._
 import forms.SelectTaxYearsToClaimForFormProvider
+import models.SelectTaxYearsToClaimFor._
 import models.{SelectTaxYearsToClaimFor, WfhDueToCovidStatusWrapper}
 import models.requests.DataRequest
 
 import javax.inject.Inject
 import navigation.Navigator
-import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
+import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import repositories.SessionRepository
 import services.EligibilityCheckerService
+import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SelectTaxYearsToClaimForView
 
@@ -47,23 +50,35 @@ class SelectTaxYearsToClaimForController @Inject()(
                                                     eligibilityCheckerService: EligibilityCheckerService
                                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
-  val form = formProvider()
+  val form: Form[Set[SelectTaxYearsToClaimFor]] = formProvider()
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+
+      val checkboxes: Seq[CheckboxItem] = (
+        request.userAnswers.get(ClaimedForTaxYear2020).getOrElse(true),
+        request.userAnswers.get(ClaimedForTaxYear2021).getOrElse(true),
+        request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(true)
+      ) match {
+        case (true, true, true) => options(form, valuesClaimingAll)
+        case (true, true, false) => options(form, valuesWithoutPrev)
+        case (true, false, true) => options(form, valuesWithout2021)
+        case (false, true, true) => options(form, valuesWithout2022)
+      }
+
       request.userAnswers.eligibilityCheckerSessionIdOpt match {
         case Some(sessionId) => eligibilityCheckerService.wfhDueToCovidStatus(sessionId).flatMap {
-          case Some(wrapper) => handleSAFlow(wrapper)
-          case None => Future.successful(handleDefaultSAFlow())
+          case Some(wrapper) => handleSAFlow(wrapper, checkboxes)
+          case None => Future.successful(handleDefaultSAFlow(checkboxes))
         }
         case None =>
           logger.info("Eligibility Checker SessionId parameter is missing from the request")
-          Future.successful(handleDefaultSAFlow())
+          Future.successful(handleDefaultSAFlow(checkboxes))
       }
 
   }
 
-  def handleDefaultSAFlow()(implicit request: DataRequest[AnyContent]): Result = {
+  def handleDefaultSAFlow(checkboxes: Seq[CheckboxItem])(implicit request: DataRequest[AnyContent]): Result = {
     request.userAnswers.get(HasSelfAssessmentEnrolment) match {
       case Some(true) => Redirect(routes.DisclaimerController.onPageLoad())
       case _ =>
@@ -76,7 +91,7 @@ class SelectTaxYearsToClaimForController @Inject()(
               case None => form
               case Some(value) => form.fill(value)
             }
-            Ok(view(preparedForm))
+            Ok(view(preparedForm, checkboxes))
 
           case None => Redirect(routes.IndexController.onPageLoad())
         }
@@ -84,7 +99,7 @@ class SelectTaxYearsToClaimForController @Inject()(
 
   }
 
-  def handleSAFlow(wfhDueToCovidStatusWrapper: WfhDueToCovidStatusWrapper)
+  def handleSAFlow(wfhDueToCovidStatusWrapper: WfhDueToCovidStatusWrapper, checkboxes: Seq[CheckboxItem])
                   (implicit request: DataRequest[AnyContent]): Future[Result] = {
 
     val optionList: Option[Set[SelectTaxYearsToClaimFor]] = wfhDueToCovidStatusWrapper.WfhDueToCovidStatus match {
@@ -109,9 +124,20 @@ class SelectTaxYearsToClaimForController @Inject()(
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
 
+      val checkboxes: Seq[CheckboxItem] = (
+        request.userAnswers.get(ClaimedForTaxYear2020).getOrElse(true),
+        request.userAnswers.get(ClaimedForTaxYear2021).getOrElse(true),
+        request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(true)
+      ) match {
+        case (true, true, true) => options(form, valuesClaimingAll)
+        case (true, true, false) => options(form, valuesWithoutPrev)
+        case (true, false, true) => options(form, valuesWithout2021)
+        case (false, true, true) => options(form, valuesWithout2022)
+      }
+
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors))),
+          Future.successful(BadRequest(view(formWithErrors, checkboxes))),
 
         value =>
           for {

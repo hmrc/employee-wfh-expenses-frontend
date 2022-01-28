@@ -82,6 +82,7 @@ whenDidYouFirstStartWorkingFromHome.error.required = The date you started workin
 whenDidYouFirstStartWorkingFromHome.error.invalid = The date you started working from home must be a real date
 whenDidYouFirstStartWorkingFromHome.error.futureDateNotAllowed = The date you started working from home must be today or in the past
 whenDidYouFirstStartWorkingFromHome.error.invalidTaxYearDate = You selected previous years, so you must enter a date before 6 April 2021
+whenDidYouFirstStartWorkingFromHome.paragraph.one = We will apply tax relief for the whole of tax year 2020 to 2021, even if you went back to your workplace before 6 April 2021.
 
 cannotClaimUsingThisService.title = You cannot claim using this service
 cannotClaimUsingThisService.heading = You cannot claim using this service
@@ -113,6 +114,10 @@ confirmation.whatHappensNext.previoustaxyearcheck.text = We will check your clai
 confirmation.IncreaseTaxAmountText.text.1 = We will increase the amount you can earn tax free for the current tax year to include tax relief on your expenses for working from home.
 confirmation.IncreaseTaxAmountText.text.2 = We do this by changing your tax code, which decides how much tax you pay.
 confirmation.IncreaseTaxAmountText.text.3 = We will let you know about your tax code change by post, or email if you've signed up to paperless notifications.
+confirmation.whatHappensNext.info.paragraph.1 = We will increase the amount you can earn tax free for this tax year to include tax relief on your expenses for working from home.
+confirmation.whatHappensNext.info.paragraph.2 = We do this by changing your tax code, which decides how much tax you pay.
+confirmation.whatHappensNext.info.paragraph.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+
 
 manualCorrespondenceIndicator.title = You cannot currently use this service
 manualCorrespondenceIndicator.heading = You cannot currently use this service

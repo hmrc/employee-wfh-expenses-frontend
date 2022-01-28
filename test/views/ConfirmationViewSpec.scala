@@ -37,13 +37,12 @@ class ConfirmationViewSpec extends ViewBehaviours {
         assert(doc.toString.contains(messages("confirmation.IncreaseTaxAmountText.text.2")))
         assert(doc.toString.contains(messages("confirmation.IncreaseTaxAmountText.text.3")))
         assert(doc.toString.contains(messages("confirmation.whatHappensNext.previoustaxyearcheck.text")))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.2021.paragraph.3")))
       }
 
       "when confirmation content is displayed when all display params are false" in {
         val doc = asDocument(view.apply(true, None, false, false, false)(request, messages))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.2021.paragraph.1")))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.2021.paragraph.2")))
+        assert(doc.toString.contains(messages("confirmation.whatHappensNext.info.paragraph.1")))
+        assert(doc.toString.contains(messages("confirmation.whatHappensNext.info.paragraph.2")))
       }
     }
 

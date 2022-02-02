@@ -23,7 +23,7 @@ import models.requests.DataRequest
 
 import javax.inject.Inject
 import navigation.Navigator
-import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
+import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -68,18 +68,17 @@ class SelectTaxYearsToClaimForController @Inject()(
     request.userAnswers.get(HasSelfAssessmentEnrolment) match {
       case Some(true) => Redirect(routes.DisclaimerController.onPageLoad())
       case _ =>
-        request.userAnswers.get(ClaimedForTaxYear2020) match {
-          case Some(claimedAlready) if claimedAlready =>
-            Redirect(routes.DisclaimerController.onPageLoad())
+        (request.userAnswers.get(ClaimedForTaxYear2020), request.userAnswers.get(ClaimedForTaxYear2021), request.userAnswers.get(ClaimedForTaxYear2022)) match {
+          case (Some(claimed2020), Some(claimed2021), Some(claimed2022)) =>
+            val availableYears = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022)
 
-          case Some(claimedAlready) if !claimedAlready =>
             val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
               case None => form
               case Some(value) => form.fill(value)
             }
-            Ok(view(preparedForm))
+            Ok(view(preparedForm, availableYears))
 
-          case None => Redirect(routes.IndexController.onPageLoad())
+          case (None, None, None) => Redirect(routes.IndexController.onPageLoad())
         }
     }
 
@@ -109,10 +108,15 @@ class SelectTaxYearsToClaimForController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      val availableYears = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(
+        request.userAnswers.get(ClaimedForTaxYear2020).getOrElse(false),
+        request.userAnswers.get(ClaimedForTaxYear2021).getOrElse(false),
+        request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(false)
+      )
 
       form.bindFromRequest().fold(
         formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors))),
+          Future.successful(BadRequest(view(formWithErrors, availableYears))),
 
         value =>
           for {

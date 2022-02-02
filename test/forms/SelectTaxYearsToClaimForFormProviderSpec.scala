@@ -32,7 +32,7 @@ class SelectTaxYearsToClaimForFormProviderSpec extends CheckboxFieldBehaviours {
     behave like checkboxField[SelectTaxYearsToClaimFor](
       form,
       fieldName,
-      validValues  = SelectTaxYearsToClaimFor.values,
+      validValues  = SelectTaxYearsToClaimFor.valuesAll,
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 

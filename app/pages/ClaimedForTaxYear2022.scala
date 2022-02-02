@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package generators
+package pages
 
-import models.SelectTaxYearsToClaimFor
-import org.scalacheck.{Arbitrary, Gen}
+import play.api.libs.json.JsPath
 
-trait ModelGenerators {
+case object ClaimedForTaxYear2022 extends QuestionPage[Boolean] {
 
-  implicit lazy val arbitrarySelectTaxYearsToClaimFor: Arbitrary[SelectTaxYearsToClaimFor] =
-    Arbitrary {
-      Gen.oneOf(SelectTaxYearsToClaimFor.valuesAll.toSeq)
-    }
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "claimedForTaxYear2022"
 }

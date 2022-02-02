@@ -21,7 +21,6 @@ import models._
 import pages._
 import play.api.Logging
 import play.api.mvc.Call
-import utils.DateLanguageTokenizer
 
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
@@ -64,21 +63,47 @@ class Navigator @Inject()() extends Logging {
 
   }
 
+//  def hasSingleUnclaimedYearNot2020(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean): Boolean = {
+//    (claimed2020 && !claimed2021 && claimed2022) || (claimed2020 && claimed2021 && !claimed2022)
+//  }
+//
+//  def hasOnlyNotClaimedFor2020(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean): Boolean = {
+//    !claimed2020 && claimed2021 && claimed2022
+//  }
+
+  def hasSingleUnclaimedYear(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean): Boolean = {
+    (claimed2020 && !claimed2021 && claimed2022) || (claimed2020 && claimed2021 && !claimed2022) || (!claimed2020 && claimed2021 && claimed2022)
+  }
+
+  def hasMultipleUnclaimedTaxYears(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean): Boolean = {
+    (!claimed2020 && !claimed2021 && !claimed2022) || (!claimed2020 && !claimed2021 && claimed2022) || (!claimed2020 && claimed2021 && !claimed2022) || (claimed2020 && !claimed2021 && !claimed2022)
+  }
+
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
     userAnswers.get(HasSelfAssessmentEnrolment) match {
       case None         => routes.IndexController.onPageLoad()
       case Some(true)   => routes.DisclaimerController.onPageLoad()
       case Some(false)  =>
-        userAnswers.get(ClaimedForTaxYear2020) match {
-          case Some(claimedAlready) if claimedAlready   => routes.DisclaimerController.onPageLoad()
-          case Some(claimedAlready) if !claimedAlready  => routes.SelectTaxYearsToClaimForController.onPageLoad()
-          case None                                     => routes.IndexController.onPageLoad()
+        (userAnswers.get(ClaimedForTaxYear2020), userAnswers.get(ClaimedForTaxYear2021), userAnswers.get(ClaimedForTaxYear2022)) match {
+          case (Some(claimed2020), Some(claimed2021), Some(claimed2022)) =>
+//            if(hasSingleUnclaimedYearNot2020(claimed2020, claimed2021, claimed2022)) {
+//              routes.DisclaimerController.onPageLoad()
+//            } else if(hasOnlyNotClaimedFor2020(claimed2020, claimed2021, claimed2022)) {
+//              routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+            if(hasSingleUnclaimedYear(claimed2020, claimed2021, claimed2022)) {
+              routes.SelectTaxYearsToClaimForController.onPageLoad()
+            } else if(hasMultipleUnclaimedTaxYears(claimed2020, claimed2021, claimed2022)) {
+              routes.SelectTaxYearsToClaimForController.onPageLoad()
+            } else {
+              routes.IndexController.onPageLoad()
+            }
+          case (None, None, None) => routes.IndexController.onPageLoad()
         }
     }
   }
 
   def disclaimerNextPage(): Call = {
-    routes.YourTaxReliefController.onPageLoad
+    routes.YourTaxReliefController.onPageLoad()
   }
 
 }

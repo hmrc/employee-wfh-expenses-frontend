@@ -17,13 +17,16 @@
 package controllers
 
 import controllers.actions._
+import models.SelectTaxYearsToClaimFor.{getValuesFromClaimedBooleans, valuesAll}
 import models.{ClaimViewSettings, DisclaimerViewSettings}
 import navigation.Navigator
-import pages.{DisclaimerPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, DisclaimerPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateLanguageTokenizer
+import utils.TaxYearDates.TAX_YEAR_2020_START_DATE
 import views.html.DisclaimerView
 
 import java.time.LocalDate
@@ -33,6 +36,7 @@ class DisclaimerController @Inject()(
                                       override val messagesApi: MessagesApi,
                                       identify: IdentifierAction,
                                       citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                      sessionRepository: SessionRepository,
                                       getData: DataRetrievalAction,
                                       requireData: DataRequiredAction,
                                       navigator: Navigator,
@@ -42,9 +46,13 @@ class DisclaimerController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
+      val selectedTaxYearsAssembler = taxYearFromUIAssemblerFromRequest()
 
-      val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
-      val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+      val startDate: Option[LocalDate] = if(!request.userAnswers.get(ClaimedForTaxYear2020).get) {
+        request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+      } else {
+        Some(TAX_YEAR_2020_START_DATE)
+      }
 
       def buildDisclaimerPageSettings(dateList: List[(LocalDate, LocalDate)]) = {
         if (request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).isDefined) {
@@ -54,7 +62,7 @@ class DisclaimerController @Inject()(
         }
       }
 
-      Ok(disclaimerView(showBackLink = false, buildDisclaimerPageSettings(selectedTaxYears.assemble), startDate))
+      Ok(disclaimerView(showBackLink = false, buildDisclaimerPageSettings(selectedTaxYearsAssembler.assemble), startDate))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {

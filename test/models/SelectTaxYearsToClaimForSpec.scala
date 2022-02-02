@@ -40,7 +40,7 @@ class SelectTaxYearsToClaimForSpec extends WordSpec with MustMatchers with Scala
 
     "fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String] suchThat (!SelectTaxYearsToClaimFor.values.map(_.toString).contains(_))
+      val gen = arbitrary[String] suchThat (!SelectTaxYearsToClaimFor.valuesAll.map(_.toString).contains(_))
 
       forAll(gen) {
         invalidValue =>

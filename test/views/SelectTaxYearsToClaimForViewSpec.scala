@@ -17,7 +17,8 @@
 package views
 
 import forms.SelectTaxYearsToClaimForFormProvider
-import models.{SelectTaxYearsToClaimFor, NormalMode}
+import models.SelectTaxYearsToClaimFor.values2022Only
+import models.{NormalMode, SelectTaxYearsToClaimFor}
 import play.api.Application
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
@@ -34,12 +35,12 @@ class SelectTaxYearsToClaimForViewSpec extends CheckboxViewBehaviours[SelectTaxY
 
     val view = viewFor[SelectTaxYearsToClaimForView](Some(emptyUserAnswers))
 
-    def applyView(form: Form[Set[SelectTaxYearsToClaimFor]]): HtmlFormat.Appendable = view.apply(form)(fakeRequest, messages)
+    def applyView(form: Form[Set[SelectTaxYearsToClaimFor]]): HtmlFormat.Appendable = view.apply(form, values2022Only)(fakeRequest, messages)
 
     behave like normalPage(applyView(form), messageKeyPrefix)
 
     behave like pageWithBackLink(applyView(form))
 
-    behave like checkboxPage(form, applyView, messageKeyPrefix, SelectTaxYearsToClaimFor.options(form))
+    behave like checkboxPage(form, applyView, messageKeyPrefix, SelectTaxYearsToClaimFor.options(form, values2022Only))
   }
 }

@@ -29,13 +29,20 @@ object SelectTaxYearsToClaimFor extends Enumerable.Implicits {
   case object Option2 extends WithName("option2") with SelectTaxYearsToClaimFor
   case object Option3 extends WithName("option3") with SelectTaxYearsToClaimFor
 
-  val values: Seq[SelectTaxYearsToClaimFor] = Seq(
+  val valuesAll: Seq[SelectTaxYearsToClaimFor] = Seq(
     Option1,
     Option2,
     Option3
   )
 
-  def options(form: Form[_])(implicit messages: Messages): Seq[CheckboxItem] = values.map {
+  val values2022And2021: Seq[SelectTaxYearsToClaimFor] = Seq(Option1, Option2)
+  val values2022AndPrev: Seq[SelectTaxYearsToClaimFor] = Seq(Option1, Option3)
+  val values2021AndPrev: Seq[SelectTaxYearsToClaimFor] = Seq(Option2, Option3)
+  val values2020Only: Seq[SelectTaxYearsToClaimFor] = Seq(Option3)
+  val values2021Only: Seq[SelectTaxYearsToClaimFor] = Seq(Option2)
+  val values2022Only: Seq[SelectTaxYearsToClaimFor] = Seq(Option1)
+
+  def options(form: Form[_], values: Seq[SelectTaxYearsToClaimFor])(implicit messages: Messages): Seq[CheckboxItem] = values.map {
     value =>
       CheckboxItem(
         name = Some("value[]"),
@@ -47,5 +54,21 @@ object SelectTaxYearsToClaimFor extends Enumerable.Implicits {
   }
 
   implicit val enumerable: Enumerable[SelectTaxYearsToClaimFor] =
-    Enumerable(values.map(v => v.toString -> v): _*)
+    Enumerable(valuesAll.map(v => v.toString -> v): _*)
+
+  def getValuesFromClaimedBooleans(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean): Seq[SelectTaxYearsToClaimFor] = {
+    (
+      claimed2020,
+      claimed2021,
+      claimed2022
+    ) match {
+      case (false, false, true) => values2021AndPrev
+      case (false, true, false) => values2022AndPrev
+      case (true, false, false) => values2022And2021
+      case (true, true, false) => values2022Only
+      case (true, false, true) => values2021Only
+      case (false, true, true) => values2020Only
+      case (_, _, _) => valuesAll
+    }
+  }
 }

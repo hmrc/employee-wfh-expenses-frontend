@@ -62,7 +62,7 @@ class DisclaimerController @Inject()(
         }
       }
 
-      Ok(disclaimerView(showBackLink = false, buildDisclaimerPageSettings(selectedTaxYearsAssembler.assemble), startDate))
+      Ok(disclaimerView(showBackLink = true, buildDisclaimerPageSettings(selectedTaxYearsAssembler.assemble), startDate))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {

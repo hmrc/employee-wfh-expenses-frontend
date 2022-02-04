@@ -43,7 +43,7 @@ class DisclaimerControllerSpec extends SpecBase {
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
             )
           ),
-          false,
+          true,
           List(Option1.toString)
         ) ,
         (
@@ -55,7 +55,7 @@ class DisclaimerControllerSpec extends SpecBase {
             SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString),
           )
         ),
-          false,
+          true,
           List(Option1.toString, Option2.toString)
         ) ,
         (
@@ -67,7 +67,7 @@ class DisclaimerControllerSpec extends SpecBase {
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString)
             )
           ),
-          false,
+          true,
           List(Option1.toString)
         ),
         (
@@ -79,7 +79,7 @@ class DisclaimerControllerSpec extends SpecBase {
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
             )
           ),
-          false,
+          true,
           List(Option1.toString)),
         (
           "is SA enrolled and hasn't already claimed expenses for 2020", UserAnswers(
@@ -90,7 +90,7 @@ class DisclaimerControllerSpec extends SpecBase {
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
             )
           ),
-          false,
+          true,
           List(Option1.toString)
         )
       )

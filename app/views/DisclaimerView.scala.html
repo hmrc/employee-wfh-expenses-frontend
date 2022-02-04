@@ -27,7 +27,7 @@
         frontendAppConfig: FrontendAppConfig
 )
 
-@(showBackLink: Boolean, disclaimerViewSettings: DisclaimerViewSettings, startDate: Option[LocalDate])( implicit request: Request[_], messages: Messages)
+@(showBackLink: Boolean = true, disclaimerViewSettings: DisclaimerViewSettings, startDate: Option[LocalDate])( implicit request: Request[_], messages: Messages)
 
 @main_template(
  title = messages("disclaimer.title"),

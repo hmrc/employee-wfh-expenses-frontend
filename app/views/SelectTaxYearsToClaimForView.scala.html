@@ -19,7 +19,6 @@
 
 @this(
         main_template: MainTemplate,
-        backLink: GovukBackLink,
         button: GovukButton,
         errorSummary: GovukErrorSummary,
         govUkCheckboxes: GovukCheckboxes,
@@ -29,16 +28,7 @@
 @(form: Form[Set[SelectTaxYearsToClaimFor]], availableYears: Seq[SelectTaxYearsToClaimFor])(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    title = s"${errorPrefix(form)} ${messages("selectTaxYearsToClaimFor.title")}",
-    beforeContentBlock = Some(
-        backLink(
-            BackLink(
-                href = routes.IndexController.onPageLoad().url,
-                content = Text(messages("site.back")),
-                attributes = Map("id" -> "back-link")
-            )
-        )
-    )
+    title = s"${errorPrefix(form)} ${messages("selectTaxYearsToClaimFor.title")}"
 ) {
 
     @formHelper(action = routes.SelectTaxYearsToClaimForController.onSubmit(), 'autoComplete -> "off") {

@@ -70,7 +70,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
       application.stop()
     }
 
-    "populate the view correctly on a GET when the question has previously been answered" in {
+    "redirect to next page when there is only 1 available year to claim for" in {
       val userAnswer = UserAnswers(
         userAnswersId,
         Json.obj(
@@ -81,18 +81,19 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
         )
       )
 
-      val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswer))
+        .overrides(
+          bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+        )
+        .build()
 
       val request = FakeRequest(GET, selectTaxYearsToClaimForRoute)
 
-      val view = application.injector.instanceOf[SelectTaxYearsToClaimForView]
-
       val result = route(application, request).value
 
-      status(result) mustEqual OK
+      status(result) mustEqual SEE_OTHER
 
-      contentAsString(result) mustEqual
-        view(form.fill(SelectTaxYearsToClaimFor.valuesAll.toSet), values2022Only)(request, messages).toString
+      redirectLocation(result).value mustEqual onwardRoute.url
 
       application.stop()
     }

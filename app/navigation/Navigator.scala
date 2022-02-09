@@ -54,29 +54,14 @@ class Navigator @Inject()() extends Logging {
 
     userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
       case Some(startDate) =>
-        startDate.isBefore(earliestStartDate) match {
-          case true   => routes.CannotClaimUsingThisServiceController.onPageLoad()
-          case false  => routes.DisclaimerController.onPageLoad()
+        if (startDate.isBefore(earliestStartDate)) {
+          routes.CannotClaimUsingThisServiceController.onPageLoad()
+        } else {
+          routes.DisclaimerController.onPageLoad()
         }
       case None => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
     }
 
-  }
-
-//  def hasSingleUnclaimedYearNot2020(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean): Boolean = {
-//    (claimed2020 && !claimed2021 && claimed2022) || (claimed2020 && claimed2021 && !claimed2022)
-//  }
-//
-//  def hasOnlyNotClaimedFor2020(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean): Boolean = {
-//    !claimed2020 && claimed2021 && claimed2022
-//  }
-
-  def hasSingleUnclaimedYear(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean): Boolean = {
-    (claimed2020 && !claimed2021 && claimed2022) || (claimed2020 && claimed2021 && !claimed2022) || (!claimed2020 && claimed2021 && claimed2022)
-  }
-
-  def hasMultipleUnclaimedTaxYears(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean): Boolean = {
-    (!claimed2020 && !claimed2021 && !claimed2022) || (!claimed2020 && !claimed2021 && claimed2022) || (!claimed2020 && claimed2021 && !claimed2022) || (claimed2020 && !claimed2021 && !claimed2022)
   }
 
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
@@ -85,19 +70,9 @@ class Navigator @Inject()() extends Logging {
       case Some(true)   => routes.DisclaimerController.onPageLoad()
       case Some(false)  =>
         (userAnswers.get(ClaimedForTaxYear2020), userAnswers.get(ClaimedForTaxYear2021), userAnswers.get(ClaimedForTaxYear2022)) match {
-          case (Some(claimed2020), Some(claimed2021), Some(claimed2022)) =>
-//            if(hasSingleUnclaimedYearNot2020(claimed2020, claimed2021, claimed2022)) {
-//              routes.DisclaimerController.onPageLoad()
-//            } else if(hasOnlyNotClaimedFor2020(claimed2020, claimed2021, claimed2022)) {
-//              routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
-            if(hasSingleUnclaimedYear(claimed2020, claimed2021, claimed2022)) {
-              routes.SelectTaxYearsToClaimForController.onPageLoad()
-            } else if(hasMultipleUnclaimedTaxYears(claimed2020, claimed2021, claimed2022)) {
-              routes.SelectTaxYearsToClaimForController.onPageLoad()
-            } else {
-              routes.IndexController.onPageLoad()
-            }
-          case (None, None, None) => routes.IndexController.onPageLoad()
+          case (Some(claimed2020), Some(claimed2021), Some(claimed2022)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
+          case (None, None, None)                                        => routes.IndexController.onPageLoad()
+          case (_, _, _)                                                 => routes.TechnicalDifficultiesController.onPageLoad()
         }
     }
   }

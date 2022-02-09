@@ -28,7 +28,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
 import play.api.mvc.Results.Ok
-import play.api.mvc.{AnyContent, Call, Headers, Result}
+import play.api.mvc.{AnyContent, Call, Headers, Result, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
@@ -38,6 +38,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
+import scala.language.postfixOps
 
 
 case class TaiLookupHandlerImpl(override val iabdService: IABDService,
@@ -51,16 +52,16 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
   val testJobExpensesAmount = 321
   val testYear = 2020
 
-  val mockIABDService = mock[IABDService]
-  val mockNavigator = mock[Navigator]
-  val mockSessionRepository = mock[SessionRepository]
+  val mockIABDService: IABDService = mock[IABDService]
+  val mockNavigator: Navigator = mock[Navigator]
+  val mockSessionRepository: SessionRepository = mock[SessionRepository]
 
-  val taiIndexLookupServiceUnderTest = TaiLookupHandlerImpl(mockIABDService, mockNavigator, mockSessionRepository)
+  val taiIndexLookupServiceUnderTest: TaiLookupHandlerImpl = TaiLookupHandlerImpl(mockIABDService, mockNavigator, mockSessionRepository)
 
   implicit val defaultOptionalDataRequest: OptionalDataRequest[AnyContent] = OptionalDataRequest(
     FakeRequest("GET", "?eligibilityCheckerSessionId=qqq"), "XXX", None, "XX", None)
 
-  val taiLookupSuccessHandler = (a: Boolean, b: Boolean, c: Boolean) => Ok
+  val taiLookupSuccessHandler: (Boolean, Boolean, Boolean) => Results.Status = (a: Boolean, b: Boolean, c: Boolean) => Ok
 
   before {
     Mockito.reset(mockIABDService)
@@ -70,12 +71,12 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
     val otherExpenses = Seq(IABDExpense(testOtherExpensesAmount))
     val jobExpenses = Seq(IABDExpense(testJobExpensesAmount))
 
-    "redirect to the Disclaimer page for a GET" when {
+    "redirect to the SelectTaxYearsToClaimFor page for a GET" when {
 
       val tests = Seq(
-        ("already claimed other expenses for 2020", Expenses(testYear, otherExpenses, Seq.empty, false)),
-        ("already claimed job expenses for 2020", Expenses(testYear, Seq.empty, jobExpenses, true)),
-        ("already claimed other and job expenses for 2020", Expenses(testYear, otherExpenses, jobExpenses, true))
+        ("already claimed other expenses for 2020", Expenses(testYear, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false)),
+        ("already claimed job expenses for 2020", Expenses(testYear, Seq.empty, jobExpenses, wasJobRateExpensesChecked = true)),
+        ("already claimed other and job expenses for 2020", Expenses(testYear, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true))
       )
 
       for ((desc, expenses) <- tests) {
@@ -91,7 +92,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result) mustEqual Some("/employee-working-from-home-expenses")
+          redirectLocation(result) mustEqual Some("/employee-working-from-home-expenses/select-tax-years-to-claim-for")
 
           application.stop()
         }
@@ -110,7 +111,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
 
     "TaiIndexLookupService should handle no errors in tai calls" when {
       when(mockIABDService.alreadyClaimed(any(), any())(any())).thenReturn(
-        Future.successful(Some(Expenses(testYear, otherExpenses, Seq.empty, false))))
+        Future.successful(Some(Expenses(testYear, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false))))
 
       val eventualResult = taiIndexLookupServiceUnderTest.handlePageRequest(taiLookupSuccessHandler)
 
@@ -122,12 +123,12 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
 
       when(mockNavigator.nextPage(any(), any())).thenReturn(Call("method-1", "url-123", "fragment-string"))
 
-      val result = taiIndexLookupServiceUnderTest.taiLookupSuccessHandler(true,
-        true, true)
+      val result = taiIndexLookupServiceUnderTest.taiLookupSuccessHandler(alreadyClaimed2020 = true,
+        alreadyClaimed2021 = true, alreadyClaimed2022 = true)
 
       verify(mockNavigator, times(1)).nextPage(any(), any())
 
-      assertEquals(result.header.headers.get("Location").get,
+      assertEquals(result.header.headers("Location"),
         "url-123#fragment-string")
 
     }

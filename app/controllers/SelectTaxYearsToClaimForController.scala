@@ -18,12 +18,10 @@ package controllers
 
 import controllers.actions._
 import forms.SelectTaxYearsToClaimForFormProvider
-import models.{SelectTaxYearsToClaimFor, WfhDueToCovidStatusWrapper}
 import models.requests.DataRequest
-
-import javax.inject.Inject
+import models.{SelectTaxYearsToClaimFor, WfhDueToCovidStatusWrapper}
 import navigation.Navigator
-import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
+import pages._
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
@@ -32,6 +30,7 @@ import services.EligibilityCheckerService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SelectTaxYearsToClaimForView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SelectTaxYearsToClaimForController @Inject()(
@@ -89,8 +88,8 @@ class SelectTaxYearsToClaimForController @Inject()(
 
     val optionList: Option[Set[SelectTaxYearsToClaimFor]] = wfhDueToCovidStatusWrapper.WfhDueToCovidStatus match {
       case 1 => Some(Set(SelectTaxYearsToClaimFor.Option1))
-      case 2 => Some(Set(SelectTaxYearsToClaimFor.Option2))
-      case 3 => Some(Set(SelectTaxYearsToClaimFor.Option1, SelectTaxYearsToClaimFor.Option2))
+      case 2 => eligibilityCheckerValuesTaiOverride(request)
+      case 3 => Some(Set(SelectTaxYearsToClaimFor.Option1))
       case _ => None
     }
 
@@ -126,5 +125,15 @@ class SelectTaxYearsToClaimForController @Inject()(
             Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
           }
       )
+  }
+
+  def eligibilityCheckerValuesTaiOverride(request: DataRequest[AnyContent]): Option[Set[SelectTaxYearsToClaimFor]] = {
+
+    val overrideList: Set[SelectTaxYearsToClaimFor] = SelectTaxYearsToClaimFor
+      .getValuesFromClaimedBooleans(request.userAnswers.get(ClaimedForTaxYear2020).getOrElse(false),
+        request.userAnswers.get(ClaimedForTaxYear2021).getOrElse(false),
+        request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(false)).toSet
+
+    Some(overrideList)
   }
 }

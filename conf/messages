@@ -82,7 +82,6 @@ whenDidYouFirstStartWorkingFromHome.error.required = The date you started workin
 whenDidYouFirstStartWorkingFromHome.error.invalid = The date you started working from home must be a real date
 whenDidYouFirstStartWorkingFromHome.error.futureDateNotAllowed = The date you started working from home must be today or in the past
 whenDidYouFirstStartWorkingFromHome.error.invalidTaxYearDate = You selected previous years, so you must enter a date before 6 April 2021
-whenDidYouFirstStartWorkingFromHome.paragraph.one = We will apply tax relief for the whole of tax year 2020 to 2021, even if you went back to your workplace before 6 April 2021.
 
 cannotClaimUsingThisService.title = You cannot claim using this service
 cannotClaimUsingThisService.heading = You cannot claim using this service

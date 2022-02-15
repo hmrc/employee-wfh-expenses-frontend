@@ -98,7 +98,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result) mustEqual Some("/employee-working-from-home-expenses/select-tax-years-to-claim-for")
+          redirectLocation(result).get.contains("digital-forms/form/tax-relief-for-expenses-of-employment/draft/guide") mustBe(true)
 
           application.stop()
         }
@@ -123,10 +123,12 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
       when(mockIABDService.alreadyClaimed(any(), any())(any())).thenReturn(
         Future.successful(Some(Expenses(testYear2022, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false))))
 
+      when(mockAppConfig.p87DigitalFormUrl).thenReturn("p87DigitalFormUrl")
+
       val eventualResult = taiIndexLookupServiceUnderTest.handlePageRequest(taiLookupSuccessHandler)
 
       val futureResult = Await.ready(eventualResult, 1 second)
-      assertTrue(futureResult.value.get.get.header.status == 200)
+      assertTrue(futureResult.value.get.get.header.status == 303)
     }
 
     "TaiIndexLookupService should build success result correctly" when {

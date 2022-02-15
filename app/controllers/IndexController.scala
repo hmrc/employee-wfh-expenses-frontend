@@ -16,8 +16,10 @@
 
 package controllers
 
-import controllers.actions.{CheckAlreadyClaimedAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
-import models.UserAnswers
+import config.FrontendAppConfig
+import controllers.actions.{DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
+import models.{IABDExpense, UserAnswers}
+import models.auditing.AuditEventType.AlreadyClaimedExpenses
 import models.requests.OptionalDataRequest
 import navigation.Navigator
 import pages._
@@ -29,6 +31,7 @@ import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Res
 import repositories.SessionRepository
 import services.IABDService
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.TaxYearDates.{YEAR_2020, YEAR_2021, YEAR_2022}
 
@@ -41,6 +44,38 @@ trait TaiLookupHandler extends Logging {
   val iabdService: IABDService
   val navigator: Navigator
   val sessionRepository: SessionRepository
+  val appConfig: FrontendAppConfig
+  val auditConnector: AuditConnector
+
+  private def auditAlreadyClaimed(
+                                   nino: String,
+                                   saUtr: Option[String],
+                                   year: Int,
+                                   otherExpenses: Seq[IABDExpense],
+                                   jobExpenses: Seq[IABDExpense],
+                                   wasJobRateExpensesChecked: Boolean
+                                 )(implicit hc: HeaderCarrier): Unit = {
+
+    val json = if (wasJobRateExpensesChecked) {
+      Json.obj( fields =
+        "nino" -> nino,
+        "saUtr" -> saUtr.getOrElse[String](""),
+        s"taxYear" -> year,
+        s"iabd-${appConfig.otherExpensesId}" -> otherExpenses,
+        s"iabd-${appConfig.jobExpenseId}" -> jobExpenses
+      )
+    } else {
+      Json.obj( fields =
+        "nino" -> nino,
+        "saUtr" -> saUtr.getOrElse[String](""),
+        s"taxYear" -> year,
+        s"iabd-${appConfig.otherExpensesId}" -> otherExpenses,
+        s"iabd-${appConfig.jobExpenseId}" -> "NOT CHECKED"
+      )
+    }
+
+    auditConnector.sendExplicitAudit(AlreadyClaimedExpenses.toString, json)
+  }
 
   def handlePageRequest(successHandler: (Boolean, Boolean, Boolean) => Result)
                        (implicit dataRequest: OptionalDataRequest[AnyContent], hc: HeaderCarrier): Future[Result] = {
@@ -55,8 +90,16 @@ trait TaiLookupHandler extends Logging {
       alreadyClaimed2021 <- alreadyClaimed2021Future
       alreadyClaimed2022 <- alreadyClaimed2022Future
     } yield {
-      successHandler(alreadyClaimed2020.isDefined,
-        alreadyClaimed2021.isDefined, alreadyClaimed2022.isDefined)
+      (alreadyClaimed2020, alreadyClaimed2021, alreadyClaimed2022) match {
+        case (Some(claimed2020), Some(claimed2021), Some(claimed2022)) =>
+          logger.info(s"[TaiLookupHandler][handlePageRequest] Detected already claimed for $YEAR_2020, $YEAR_2021 and $YEAR_2022; redirecting to P87 digital form")
+          auditAlreadyClaimed(dataRequest.nino, dataRequest.saUtr, YEAR_2020, claimed2020.otherExpenses, claimed2020.jobExpenses, claimed2020.wasJobRateExpensesChecked)
+          auditAlreadyClaimed(dataRequest.nino, dataRequest.saUtr, YEAR_2021, claimed2021.otherExpenses, claimed2021.jobExpenses, claimed2021.wasJobRateExpensesChecked)
+          auditAlreadyClaimed(dataRequest.nino, dataRequest.saUtr, YEAR_2022, claimed2022.otherExpenses, claimed2022.jobExpenses, claimed2022.wasJobRateExpensesChecked)
+          Redirect(appConfig.p87DigitalFormUrl)
+        case (_, _, _) =>
+          successHandler(alreadyClaimed2020.isDefined, alreadyClaimed2021.isDefined, alreadyClaimed2022.isDefined)
+      }
     }
   }.recoverWith {
     case ex: Exception =>
@@ -94,22 +137,27 @@ trait TaiLookupHandler extends Logging {
   }
 }
 
+
+
 class IndexController @Inject()(
                                  val controllerComponents: MessagesControllerComponents,
                                  sessionRepositoryInput: SessionRepository,
                                  identify: IdentifierAction,
-                                 checkAlreadyClaimed: CheckAlreadyClaimedAction,
                                  citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
                                  navigatorInput: Navigator,
                                  getData: DataRetrievalAction,
-                                 iabdServiceInput: IABDService)(implicit ec: ExecutionContext) extends FrontendBaseController
+                                 iabdServiceInput: IABDService,
+                                 appConfigInput: FrontendAppConfig,
+                                 auditConnectorInput: AuditConnector)(implicit ec: ExecutionContext) extends FrontendBaseController
   with TaiLookupHandler with I18nSupport {
 
-  val iabdService = iabdServiceInput
-  val navigator = navigatorInput
-  val sessionRepository = sessionRepositoryInput
+  val iabdService: IABDService = iabdServiceInput
+  val navigator: Navigator = navigatorInput
+  val sessionRepository: SessionRepository = sessionRepositoryInput
+  val appConfig: FrontendAppConfig = appConfigInput
+  val auditConnector: AuditConnector = auditConnectorInput
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData).async {
+  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData).async {
     implicit request => {
       handlePageRequest(taiLookupSuccessHandler)
     }

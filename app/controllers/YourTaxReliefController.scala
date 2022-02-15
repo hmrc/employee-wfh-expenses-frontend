@@ -17,15 +17,11 @@
 package controllers
 
 import controllers.actions._
-import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler}
-import pages.{CheckYourClaimPage, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateLanguageTokenizer
-import utils.TaxYearDates._
 import views.html._
 
 import java.time.LocalDate
@@ -35,7 +31,6 @@ import scala.concurrent.{ExecutionContext, Future}
 class YourTaxReliefController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          identify: IdentifierAction,
-                                         checkAlreadyClaimed: CheckAlreadyClaimedAction,
                                          citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
                                          getData: DataRetrievalAction,
                                          requireData: DataRequiredAction,
@@ -56,7 +51,7 @@ class YourTaxReliefController @Inject()(
 
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
+  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       Future(Redirect(routes.CheckYourClaimController.onPageLoad()))
   }

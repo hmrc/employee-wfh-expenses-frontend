@@ -17,15 +17,12 @@
 package controllers
 
 import controllers.actions._
-import models.ClaimViewSettings
-import navigation.Navigator
 import pages.WhenDidYouFirstStartWorkingFromHomePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DateLanguageTokenizer
 import views.html._
 import utils.TaxYearDates._
 
@@ -36,7 +33,6 @@ import scala.concurrent.ExecutionContext
 class CheckYourClaimController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          identify: IdentifierAction,
-                                         checkAlreadyClaimed: CheckAlreadyClaimedAction,
                                          citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
                                          getData: DataRetrievalAction,
                                          requireData: DataRequiredAction,
@@ -62,7 +58,7 @@ class CheckYourClaimController @Inject()(
       Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, numberOfWeeksToDisplay))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
+  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest().checkboxYearOptions
       submissionService.submitExpenses(

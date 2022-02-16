@@ -33,7 +33,7 @@ class Navigator @Inject()() extends Logging {
     case SelectTaxYearsToClaimForPage => ua =>
       val selectedOptionsCheckBoxes = ua.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
       val selectedTaxYears = TaxYearFromUIAssembler(selectedOptionsCheckBoxes)
-      if (selectedTaxYears.isPreviousTaxYearSelected) {
+      if (selectedTaxYears.containsPrevious) {
          routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
       }else {
         routes.DisclaimerController.onPageLoad()

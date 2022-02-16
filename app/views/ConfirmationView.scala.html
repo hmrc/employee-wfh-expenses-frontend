@@ -26,11 +26,15 @@
         button: GovukButton
 )
 
-@(paperLessAvailable: Boolean,
-    paperlessSignupUrl: Option[String],
-    showCheckClaimMessageText: Boolean,
-    showConfirmationNoticeMessage: Boolean,
-    showConfirmationIncreaseTaxAmountText: Boolean)(implicit request: Request[_], messages: Messages)
+@(
+        paperLessAvailable: Boolean,
+        paperlessSignupUrl: Option[String],
+        claimingFor2021OrPrevious: Boolean,
+        claimingForCurrent: Boolean
+)(
+        implicit request: Request[_],
+        messages: Messages
+)
 
 @linkToFeedbackForm = {<a  class="govuk-link" rel="noreferrer noopener" target="_blank" href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
@@ -43,27 +47,21 @@
 
     <h2 class="govuk-heading-m">@messages("confirmation.whatHappensNext.heading")</h2>
 
-    <p class="govuk-body">
+    @if(claimingForCurrent) {
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.1")</p>
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.2")</p>
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.3")</p>
+    }
 
-        @if(showConfirmationIncreaseTaxAmountText) {
-            <p class="govuk-body">@messages("confirmation.IncreaseTaxAmountText.text.1")</p>
-            <p class="govuk-body">@messages("confirmation.IncreaseTaxAmountText.text.2")</p>
-            <p class="govuk-body">@messages("confirmation.IncreaseTaxAmountText.text.3")</p>
-        }
+    @if(claimingFor2021OrPrevious) {
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.previousTaxYears.text")</p>
+    }
 
-        @if(showCheckClaimMessageText) {
-            <p class="govuk-body">@messages("confirmation.whatHappensNext.previoustaxyearcheck.text")</p>
-        } else {
-            <p class="govuk-body">@messages("confirmation.whatHappensNext.info.paragraph.1")</p>
-            <p class="govuk-body">@messages("confirmation.whatHappensNext.info.paragraph.2")</p>
-        }
-
-        @if(showConfirmationNoticeMessage) {
-            <div class="govuk-inset-text">
-                <p class="govuk-body">@messages("confirmation.whatHappensNext.info.paragraph.3")</p>
-            </div>
-        }
-    </p>
+    @if(claimingForCurrent) {
+    <div class="govuk-inset-text">
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.info.paragraph.3")</p>
+    </div>
+    }
 
     <p class="govuk-body">
         @linkToFeedbackForm
@@ -73,7 +71,6 @@
     @if(!paperLessAvailable) {
         <h2 class="govuk-heading-m">@messages("confirmation.paperless.header")</h2>
         <p class="govuk-body">@messages("confirmation.paperless.paragraph.1")</p>
-
             @button(Button(
                 href = Some(paperlessSignupUrl.get),
                 content = Text(messages("confirmation.paperless.button.text"))

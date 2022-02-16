@@ -59,7 +59,7 @@ class YourTaxReliefControllerSpec extends SpecBase {
       contentAsString(result) mustEqual
         view(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
           Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString),
-          selectedTaxYears.showFirstTaxReliefMessageBlock, selectedTaxYears.showSecondTaxReliefMessageBlock)(request, messages).toString
+          selectedTaxYears.containsCurrent, selectedTaxYears.contains2021OrPrevious)(request, messages).toString
 
       application.stop()
 

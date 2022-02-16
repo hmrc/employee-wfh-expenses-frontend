@@ -32,23 +32,17 @@ class ConfirmationViewSpec extends ViewBehaviours {
 
     "show content" when {
       "when all confirmation content is displayed" in {
-        val doc = asDocument(view.apply(true, None, true, true, true)(request, messages))
-        assert(doc.toString.contains(messages("confirmation.IncreaseTaxAmountText.text.1")))
-        assert(doc.toString.contains(messages("confirmation.IncreaseTaxAmountText.text.2")))
-        assert(doc.toString.contains(messages("confirmation.IncreaseTaxAmountText.text.3")))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.previoustaxyearcheck.text")))
-      }
-
-      "when confirmation content is displayed when all display params are false" in {
-        val doc = asDocument(view.apply(true, None, false, false, false)(request, messages))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.info.paragraph.1")))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.info.paragraph.2")))
+        val doc = asDocument(view.apply(true, None, true, true)(request, messages))
+        assert(doc.toString.contains(messages("confirmation.whatHappensNext.currentTaxYear.text.1")))
+        assert(doc.toString.contains(messages("confirmation.whatHappensNext.currentTaxYear.text.2")))
+        assert(doc.toString.contains(messages("confirmation.whatHappensNext.currentTaxYear.text.3")))
+        assert(doc.toString.contains(messages("confirmation.whatHappensNext.previousTaxYears.text")))
       }
     }
 
     "show go paperless content" when {
       "when the user is not already paperless" in {
-        val doc = asDocument(view.apply(false, Some("url-string"), false, false, false)(request, messages))
+        val doc = asDocument(view.apply(false, Some("url-string"), false, false)(request, messages))
         assert(doc.toString.contains(messages("confirmation.paperless.header")))
         assert(doc.toString.contains(messages("confirmation.paperless.paragraph.1")))
         assert(doc.toString.contains(messages("confirmation.paperless.button.text")))
@@ -57,7 +51,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
 
     "not show go paperless content" when {
       "when the user is already paperless" in {
-        val doc = asDocument(view.apply(true, None, false, false, false)(request, messages))
+        val doc = asDocument(view.apply(true, None, false, false)(request, messages))
         assert(!doc.toString.contains(messages("confirmation.paperless.header")))
         assert(!doc.toString.contains(messages("confirmation.paperless.paragraph.1")))
         assert(!doc.toString.contains(messages("confirmation.paperless.button.text")))
@@ -65,7 +59,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
     }
 
     "behave like a normal page" when {
-      behave like normalPage(view.apply(true, None, true, true, true)(request, messages), Confirmation)
+      behave like normalPage(view.apply(true, None, true, true)(request, messages), Confirmation)
     }
   }
 }

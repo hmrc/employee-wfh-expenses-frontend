@@ -59,13 +59,14 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       status(result) mustEqual OK
 
-      val assembler = TaxYearFromUIAssembler(List("option1", "option2", "option3"))
+      val optionList = List("option1", "option2", "option3")
+      val assembler = TaxYearFromUIAssembler(optionList)
       val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
         Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
       val startDate = LocalDate.of(2020, 4, 1)
 
       contentAsString(result) mustEqual
-        view(claimSettings.claimViewSettings.get, Some(startDate), 1)(request, messages).toString
+        view(claimSettings.claimViewSettings.get, Some(startDate), 1, optionList)(request, messages).toString
 
       application.stop()
     }

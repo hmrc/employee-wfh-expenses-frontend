@@ -55,7 +55,7 @@ class CheckYourClaimController @Inject()(
         0
       }
 
-      Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, numberOfWeeksToDisplay))
+      Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, numberOfWeeksToDisplay, selectedTaxYears.checkboxYearOptions))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {

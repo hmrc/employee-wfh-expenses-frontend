@@ -30,7 +30,7 @@ case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
   val claiming2022AndPrev = List("option1", "option3")
   val claimingPrevOnly = List("option3")
 
-  private val validateInputList = {
+  private val validateInputList: Unit = {
     if (checkboxYearOptions == null || checkboxYearOptions.isEmpty) {
       throw new IllegalArgumentException("Input checkbox list is either empty or invalid")
     }
@@ -77,16 +77,9 @@ case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
 
   }
 
-  val isPreviousTaxYearSelected = checkboxYearOptions.contains("option3")
-
-  val showSecondTaxReliefMessageBlock = checkboxYearOptions.contains("option2") || isPreviousTaxYearSelected
-
-  val showFirstTaxReliefMessageBlock = checkboxYearOptions.contains("option1")
-
-  val showConfirmationPreviousTaxYearCheckText = checkboxYearOptions.contains("option2") || checkboxYearOptions.contains("option3")
-
-  val showConfirmationNoticeMessage = checkboxYearOptions.contains("option1")
-
-  val showConfirmationIncreaseTaxAmountText = checkboxYearOptions.contains("option2")
+  val containsCurrent: Boolean = checkboxYearOptions.contains("option1")
+  val contains2021: Boolean = checkboxYearOptions.contains("option2")
+  val containsPrevious: Boolean = checkboxYearOptions.contains("option3")
+  val contains2021OrPrevious: Boolean = contains2021 || containsPrevious
 
 }

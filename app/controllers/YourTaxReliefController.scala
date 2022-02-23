@@ -47,7 +47,7 @@ class YourTaxReliefController @Inject()(
 
       Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
         Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString),
-        selectedTaxYears.showFirstTaxReliefMessageBlock, selectedTaxYears.showSecondTaxReliefMessageBlock))
+        selectedTaxYears.containsCurrent, selectedTaxYears.contains2021OrPrevious))
 
   }
 

@@ -38,14 +38,14 @@ private[mappings] class LocalDateFormatter(
 
   private def toDate(key: String, day: Int, month: Int, year: Int): Either[Seq[FormError], LocalDate] =
     Try(LocalDate.of(year, month, day)) match {
-      case Success(date) => date.isAfter(LocalDate.now()) match {
-        case true => Left(Seq(FormError(key, futureDateKey, args)))
-        case false =>
-          if (date.isAfter(TAX_YEAR_2020_END_DATE)) {
-            Left(Seq(FormError(key, invalidTaxYearKey, args)))
-          } else {
-            Right(date)
-          }
+      case Success(date) => if (date.isAfter(LocalDate.now())) {
+        Left(Seq(FormError(key, futureDateKey, args)))
+      } else {
+        if (date.isAfter(TAX_YEAR_2020_END_DATE)) {
+          Left(Seq(FormError(key, invalidTaxYearKey, args)))
+        } else {
+          Right(date)
+        }
       }
       case Failure(_) =>
         Left(Seq(FormError(key, invalidKey, args)))

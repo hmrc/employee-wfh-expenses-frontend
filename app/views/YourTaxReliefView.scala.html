@@ -18,11 +18,12 @@
 @import utils.TaxYearDates._
 
 @this(
-        main_template:      MainTemplate,
-        formHelper:         FormWithCSRF,
-        govukInsetText:     GovukInsetText,
-        backLink:           GovukBackLink,
-        button:             GovukButton
+        main_template:                  MainTemplate,
+        formHelper:                     FormWithCSRF,
+        govukNotificationBanner:        GovukNotificationBanner,
+        govukInsetText:                 GovukInsetText,
+        backLink:                       GovukBackLink,
+        button:                         GovukButton
 )
 
 @(
@@ -41,6 +42,12 @@
     @messages("yourTaxRelief.heading.before") @messages(taxMonthBeforeText.getOrElse("")) @messages(taxYearBeforeText.getOrElse(""))
 }
 
+@notificationHtml = {
+    <p class="govuk-notification-banner__heading">
+        @messages("yourTaxRelief.notification.text")
+    </p>
+}
+
 @main_template(
     title = messages("yourTaxRelief.title"),
     beforeContentBlock = Some(backLink(BackLink(
@@ -53,6 +60,11 @@
     <h1 class="govuk-heading-xl">@messages("yourTaxRelief.heading")</h1>
 
     @if(showFirstMessageBlock) {
+        @govukNotificationBanner(NotificationBanner(
+        title = HtmlContent(messages("yourTaxRelief.notification.title")),
+        content = HtmlContent(notificationHtml)
+        ))
+
         <h2 class="govuk-heading-m">@afterDateStringFormatted</h2>
 
         <p class="govuk-body">@messages("yourTaxRelief.info.text.1")</p>
@@ -61,7 +73,10 @@
         <ul class="govuk-list govuk-list--bullet">
             <li>@messages("yourTaxRelief.bullet.text.1")</li>
             <li>@messages("yourTaxRelief.bullet.text.2")</li>
+            <li>@messages("yourTaxRelief.bullet.text.3")</li>
         </ul>
+
+        <p class="govuk-body">@messages("yourTaxRelief.info.text.2")</p>
     }
 
     @if(showSecondMessageBlock) {
@@ -74,14 +89,18 @@
             <li>@messages("yourTaxRelief.bullet.text.5")</li>
         </ul>
 
-        <div class="govuk-warning-text">
-            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-            <strong class="govuk-warning-text__text">
-                <span class="govuk-warning-text__assistive">Warning</span>
-                @messages("yourTaxRelief.warning.text")<br>
-            </strong>
-        </div>
     }
+
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            @if(showFirstMessageBlock) {@messages("yourTaxRelief.warning.text.1")<br>}
+            @messages("yourTaxRelief.warning.text.2")<br>
+        </strong>
+    </div>
+
+    <p class="govuk-body">@messages("yourTaxRelief.accept.text.1")</p>
 
     @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
         @button(Button(content = Text(messages("yourTaxRelief.button.text")), preventDoubleClick  = true))

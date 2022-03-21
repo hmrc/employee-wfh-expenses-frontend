@@ -86,8 +86,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors => {
-          //val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => "messages(s"date.$arg").toLowerCase)"))
-          val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => "")))
+          val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => messages(s"date.$arg").toLowerCase)))
 
             Future.successful(BadRequest(whenDidYouFirstStartWorkingFromHomeView(formWithErrors.copy(errors = errors))))
         },

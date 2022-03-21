@@ -36,7 +36,7 @@ class YourTaxReliefViewSpec extends ViewBehaviours {
 
         val doc = asDocument(view.apply("April", "2020",
           Some("May"), Some("2022"), true, true)(request, messages))
-        assert(doc.toString.contains(messages("Claiming tax relief on and after")))
+        assert(doc.toString.contains(messages("Claiming tax relief on or after")))
         assert(doc.toString.contains(messages("Claiming tax relief on or before")))
 
         assert(doc.toString.contains(messages("yourTaxRelief.heading.after")))
@@ -58,7 +58,7 @@ class YourTaxReliefViewSpec extends ViewBehaviours {
       "when all both after only is required" in {
         val doc = asDocument(view.apply("April", "2020",
           None, None, true, false)(request, messages))
-        assert(doc.toString.contains(messages("Claiming tax relief on and after")))
+        assert(doc.toString.contains(messages("Claiming tax relief on or after")))
         assert(!doc.toString.contains(messages("Claiming tax relief on or before")))
       }
     }

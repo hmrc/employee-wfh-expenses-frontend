@@ -185,7 +185,7 @@ disclaimer.submit.button = Accept and continue
 
 yourTaxRelief.title = You must read the following before making a claim
 yourTaxRelief.heading = You must read the following before making a claim
-yourTaxRelief.heading.after = Claiming tax relief on and after 6
+yourTaxRelief.heading.after = Claiming tax relief on or after 6
 yourTaxRelief.notification.title = Guidance has changed for the new tax year
 yourTaxRelief.notification.text = The guidance for claiming tax relief for working from home has changed for expenses on or after 6 April 2022.
 yourTaxRelief.info.text.1 = You can claim if your employer has not already paid your expenses and you have additional household costs as a result of working from home.

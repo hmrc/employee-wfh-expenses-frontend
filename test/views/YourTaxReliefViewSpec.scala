@@ -36,8 +36,8 @@ class YourTaxReliefViewSpec extends ViewBehaviours {
 
         val doc = asDocument(view.apply("April", "2020",
           Some("May"), Some("2022"), true, true)(request, messages))
-        assert(doc.toString.contains(messages("Check to ensure you can claim tax relief after April 2020")))
-        assert(doc.toString.contains(messages("Check to ensure you can claim tax relief before May 2022")))
+        assert(doc.toString.contains(messages("Claiming tax relief on and after")))
+        assert(doc.toString.contains(messages("Claiming tax relief on or before")))
 
         assert(doc.toString.contains(messages("yourTaxRelief.heading.after")))
         assert(doc.toString.contains(messages("yourTaxRelief.info.text.1")))
@@ -49,15 +49,17 @@ class YourTaxReliefViewSpec extends ViewBehaviours {
         assert(doc.toString.contains(messages("yourTaxRelief.bullet.text.3")))
         assert(doc.toString.contains(messages("yourTaxRelief.bullet.text.4")))
         assert(doc.toString.contains(messages("yourTaxRelief.bullet.text.5")))
-        assert(doc.toString.contains(messages("yourTaxRelief.warning.text")))
+        assert(doc.toString.contains(messages("yourTaxRelief.bullet.text.6")))
+        assert(doc.toString.contains(messages("yourTaxRelief.warning.text.1")))
+        assert(doc.toString.contains(messages("yourTaxRelief.warning.text.2")))
         assert(doc.toString.contains(messages("yourTaxRelief.button.text")))
 
       }
       "when all both after only is required" in {
         val doc = asDocument(view.apply("April", "2020",
           None, None, true, false)(request, messages))
-        assert(doc.toString.contains(messages("Check to ensure you can claim tax relief after April 2020")))
-        assert(!doc.toString.contains(messages("Check to ensure you can claim tax relief before")))
+        assert(doc.toString.contains(messages("Claiming tax relief on and after")))
+        assert(!doc.toString.contains(messages("Claiming tax relief on or before")))
       }
     }
 

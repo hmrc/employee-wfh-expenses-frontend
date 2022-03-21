@@ -42,7 +42,7 @@
 
     @govukPanel(Panel(
         title = Text(messages("confirmation.heading")),
-        content = HtmlContent(messages("confirmation.text"))
+        content = if(claimingForCurrent) HtmlContent(messages("confirmation.text")) else HtmlContent("")
     ))
 
     <h2 class="govuk-heading-m">@messages("confirmation.whatHappensNext.heading")</h2>
@@ -50,7 +50,9 @@
     @if(claimingForCurrent) {
         <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.1")</p>
         <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.2")</p>
-        <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.3")</p>
+        @if(claimingFor2021OrPrevious) {
+            <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.3")</p>
+        }
     }
 
     @if(claimingFor2021OrPrevious) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,9 @@ trait ViewSpecBase extends SpecBase {
 
   def assertPageTitleEqualsMessage(doc: Document, expectedMessageKey: String, args: Any*) = {
     val headers = doc.getElementsByTag("h1")
-    headers.size mustBe 1
+    val heading = doc.getElementsByClass("govuk-heading-xl")
+    val sizeToCheck = if (headers.size == 1) headers.size else heading.size
+    sizeToCheck mustBe 1
     headers.first.text.replaceAll("\u00a0", " ") mustBe messages(expectedMessageKey, args:_*).replaceAll("&nbsp;", " ")
   }
 

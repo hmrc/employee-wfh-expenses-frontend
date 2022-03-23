@@ -1,0 +1,105 @@
+@*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@this(
+        main_template:                  MainTemplate,
+        formHelper:                     FormWithCSRF,
+        govukNotificationBanner:        GovukNotificationBanner,
+        govukInsetText:                 GovukInsetText,
+        backLink:                       GovukBackLink,
+        button:                         GovukButton
+)
+
+@(
+    taxMonthAfterText: String, taxYearAfterText: String,
+    taxMonthBeforeText: Option[String],
+    taxYearBeforeText: Option[String],
+    showFirstMessageBlock: Boolean,
+    showSecondMessageBlock: Boolean
+)(implicit request: Request[_], messages: Messages)
+
+@afterDateStringFormatted = {
+    @messages("yourTaxRelief.heading.after") @messages(taxMonthAfterText) @messages(taxYearAfterText)
+}
+
+@beforeDateStringFormatted = {
+    @messages("yourTaxRelief.heading.before") @messages(taxMonthBeforeText.getOrElse("")) @messages(taxYearBeforeText.getOrElse(""))
+}
+
+@notificationHtml = {
+    <p class="govuk-notification-banner__heading">
+        @messages("yourTaxRelief.notification.text")
+    </p>
+}
+
+@main_template(
+    title = messages("yourTaxRelief.title"),
+    beforeContentBlock = Some(backLink(BackLink(
+        href = routes.YourTaxReliefController.onPageLoad().url,
+        content = Text(messages("site.back")),
+        attributes = Map("id" -> "back-link")
+    )))
+) {
+
+    <h1 class="govuk-heading-xl">@messages("yourTaxRelief.heading")</h1>
+
+    @if(showFirstMessageBlock) {
+        @govukNotificationBanner(NotificationBanner(
+        title = HtmlContent(messages("yourTaxRelief.notification.title")),
+        content = HtmlContent(notificationHtml)
+        ))
+
+        <h2 class="govuk-heading-m">@afterDateStringFormatted</h2>
+
+        <p class="govuk-body">@messages("yourTaxRelief.info.text.1")</p>
+
+        <p class="govuk-body">@messages("yourTaxRelief.bullet.heading")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("yourTaxRelief.bullet.text.1")</li>
+            <li>@messages("yourTaxRelief.bullet.text.2")</li>
+            <li>@messages("yourTaxRelief.bullet.text.3")</li>
+        </ul>
+
+        <p class="govuk-body">@messages("yourTaxRelief.info.text.2")</p>
+    }
+
+    @if(showSecondMessageBlock) {
+        <h2 class="govuk-heading-m">@beforeDateStringFormatted</h2>
+
+        <p class="govuk-body">@messages("yourTaxRelief.bullet.heading.1")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("yourTaxRelief.bullet.text.4")</li>
+            <li>@messages("yourTaxRelief.bullet.text.5")</li>
+            <li>@messages("yourTaxRelief.bullet.text.6")</li>
+        </ul>
+
+    }
+
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            @if(showFirstMessageBlock) {@messages("yourTaxRelief.warning.text.1")<br>}
+            @messages("yourTaxRelief.warning.text.2")<br>
+        </strong>
+    </div>
+
+    <p class="govuk-body">@messages("yourTaxRelief.accept.text.1")</p>
+
+    @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
+        @button(Button(content = Text(messages("yourTaxRelief.button.text")), preventDoubleClick  = true))
+    }
+}

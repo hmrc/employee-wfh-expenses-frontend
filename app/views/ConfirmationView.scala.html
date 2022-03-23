@@ -26,7 +26,15 @@
         button: GovukButton
 )
 
-@(paperLessAvailable: Boolean, paperlessSignupUrl: Option[String])(implicit request: Request[_], messages: Messages)
+@(
+        paperLessAvailable: Boolean,
+        paperlessSignupUrl: Option[String],
+        claimingFor2021OrPrevious: Boolean,
+        claimingForCurrent: Boolean
+)(
+        implicit request: Request[_],
+        messages: Messages
+)
 
 @linkToFeedbackForm = {<a  class="govuk-link" rel="noreferrer noopener" target="_blank" href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
@@ -34,18 +42,28 @@
 
     @govukPanel(Panel(
         title = Text(messages("confirmation.heading")),
-        content = HtmlContent(messages("confirmation.text"))
+        content = if(claimingForCurrent) HtmlContent(messages("confirmation.text")) else HtmlContent("")
     ))
-
-    <p class="govuk-body">@messages("confirmation.whatHappensNext.2021.header.note")</p>
 
     <h2 class="govuk-heading-m">@messages("confirmation.whatHappensNext.heading")</h2>
 
-    <p class="govuk-body">
-        <p class="govuk-body">@messages("confirmation.whatHappensNext.2021.paragraph.1")</p>
-        <p class="govuk-body">@messages("confirmation.whatHappensNext.2021.paragraph.2")</p>
-        <p class="govuk-body">@messages("confirmation.whatHappensNext.2021.paragraph.3")</p>
-    </p>
+    @if(claimingForCurrent) {
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.1")</p>
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.2")</p>
+        @if(claimingFor2021OrPrevious) {
+            <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.3")</p>
+        }
+    }
+
+    @if(claimingFor2021OrPrevious) {
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.previousTaxYears.text")</p>
+    }
+
+    @if(claimingForCurrent) {
+    <div class="govuk-inset-text">
+        <p class="govuk-body">@messages("confirmation.whatHappensNext.info.paragraph.3")</p>
+    </div>
+    }
 
     <p class="govuk-body">
         @linkToFeedbackForm
@@ -55,7 +73,6 @@
     @if(!paperLessAvailable) {
         <h2 class="govuk-heading-m">@messages("confirmation.paperless.header")</h2>
         <p class="govuk-body">@messages("confirmation.paperless.paragraph.1")</p>
-
             @button(Button(
                 href = Some(paperlessSignupUrl.get),
                 content = Text(messages("confirmation.paperless.button.text"))

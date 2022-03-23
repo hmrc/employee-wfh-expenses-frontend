@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class EligibilityCheckerService @Inject()(eligibilityCheckerConnector: EligibilityCheckerConnector) extends Logging {
 
-  def wfhDueToCovidStatus(sessionId: String)(implicit dataRequest: DataRequest[AnyContent],
-                                             hc: HeaderCarrier,
+  def wfhDueToCovidStatus(sessionId: String)(implicit hc: HeaderCarrier,
                                              ec: ExecutionContext): Future[Option[WfhDueToCovidStatusWrapper]] = {
 
     eligibilityCheckerConnector.wfhDueToCovidStatus(sessionId).map {

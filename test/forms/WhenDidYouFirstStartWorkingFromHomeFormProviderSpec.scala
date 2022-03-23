@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class WhenDidYouFirstStartWorkingFromHomeFormProviderSpec extends DateBehaviours
 
     val validData = datesBetween(
       min = LocalDate.of(2000, 1, 1),
-      max = LocalDate.now(ZoneOffset.UTC)
+      max = LocalDate.of(2021, 1, 1)
     )
 
     behave like dateField(form, "value", validData)

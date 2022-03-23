@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,53 +17,52 @@
 package controllers
 
 import controllers.actions._
-import models.SelectTaxYearsToClaimFor.{Option1, Option2}
+import models.SelectTaxYearsToClaimFor.{getValuesFromClaimedBooleans, valuesAll}
+import models.{ClaimViewSettings, DisclaimerViewSettings}
 import navigation.Navigator
-import pages.{ClaimedForTaxYear2020, DisclaimerPage, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
+import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, DisclaimerPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.{Disclaimer2019_2020View, Disclaimer2019_2020_2021View, Disclaimer2021View}
+import utils.DateLanguageTokenizer
+import utils.TaxYearDates.TAX_YEAR_2020_START_DATE
+import views.html.DisclaimerView
 
+import java.time.LocalDate
 import javax.inject.Inject
 
 class DisclaimerController @Inject()(
                                       override val messagesApi: MessagesApi,
                                       identify: IdentifierAction,
                                       citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                      sessionRepository: SessionRepository,
                                       getData: DataRetrievalAction,
                                       requireData: DataRequiredAction,
                                       navigator: Navigator,
                                       val controllerComponents: MessagesControllerComponents,
-                                      disclaimer2021View : Disclaimer2021View,
-                                      disclaimer2019_2020View: Disclaimer2019_2020View,
-                                      disclaimer2019_2020_2021View: Disclaimer2019_2020_2021View
-                                     ) extends FrontendBaseController with I18nSupport {
+                                      disclaimerView: DisclaimerView
+                                    ) extends FrontendBaseController with I18nSupport with UIAssembler {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
+      val selectedTaxYearsAssembler = taxYearFromUIAssemblerFromRequest()
 
-      request.userAnswers.get(HasSelfAssessmentEnrolment) match {
-        case None        => Redirect(routes.IndexController.onPageLoad())
-        case Some(true)  => Ok(disclaimer2021View(false))
-        case Some(false) =>
-          (request.userAnswers.get(ClaimedForTaxYear2020), request.userAnswers.get(SelectTaxYearsToClaimForPage) ) match {
-            case (Some(true), _)      => Ok(disclaimer2021View(true))
-
-            case (Some(false), None)  => Redirect(routes.SelectTaxYearsToClaimForController.onPageLoad())
-
-            case (Some(false), Some(yearsToClaimFor)) => yearsToClaimFor.size match {
-              case 0 => Redirect(routes.SelectTaxYearsToClaimForController.onPageLoad())
-              case 2 => Ok(disclaimer2019_2020_2021View())
-              case 1 => yearsToClaimFor.head match {
-                case Option1 => Ok(disclaimer2021View(true))
-                case Option2 => Ok(disclaimer2019_2020View())
-              }
-            }
-
-            case (None,_) => Redirect(routes.IndexController.onPageLoad())
-          }
+      val startDate: Option[LocalDate] = if(!request.userAnswers.get(ClaimedForTaxYear2020).get) {
+        request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+      } else {
+        Some(TAX_YEAR_2020_START_DATE)
       }
+
+      def buildDisclaimerPageSettings(dateList: List[(LocalDate, LocalDate)]) = {
+        if (request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).isDefined) {
+          DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))))
+        } else {
+          DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), None)))
+        }
+      }
+
+      Ok(disclaimerView(showBackLink = true, buildDisclaimerPageSettings(selectedTaxYearsAssembler.assemble), startDate))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {

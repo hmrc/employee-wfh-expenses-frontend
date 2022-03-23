@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,12 @@ import controllers.actions._
 import javax.inject.Inject
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
-import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.Confirmation2019_2020_2021View
-import views.html.Confirmation2019_2020View
-import views.html.Confirmation2021View
-import models.SelectTaxYearsToClaimFor.{Option1, Option2}
+import views.html.ConfirmationView
 import play.api.Logging
 
 import scala.concurrent.ExecutionContext
@@ -53,30 +49,24 @@ class ConfirmationController @Inject()(
                                         val paperlessPreferenceConnector: PaperlessPreferenceConnector,
                                         auditConnector: AuditConnector,
                                         appConfig: FrontendAppConfig,
-                                        confirmation2019_2020_2021View: Confirmation2019_2020_2021View,
-                                        confirmation2019_2020View: Confirmation2019_2020View,
-                                        confirmation2021View: Confirmation2021View)
-                                      (implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
-
+                                        confirmationView: ConfirmationView)
+                                      (implicit ec: ExecutionContext) extends FrontendBaseController
+  with I18nSupport with Logging with UIAssembler {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account") map {
         case Right(status) =>
           auditPaperlessPreferencesCheckSuccess(paperlessEnabled = status.isPaperlessCustomer)
-          (
-            request.userAnswers.is2021Only,
-            request.userAnswers.is2019And2020Only,
-            request.userAnswers.is2019And2020And2021Only,
-            request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-          ) match {
-            case (true, _, _, _) => Ok(confirmation2021View(status.isPaperlessCustomer, Some(status.url.link)))
-            case (_, true, _, Some(_)) => Ok(confirmation2019_2020View(status.isPaperlessCustomer, Some(status.url.link)))
-            case (_, _, true, Some(_)) => Ok(confirmation2019_2020_2021View(status.isPaperlessCustomer, Some(status.url.link)))
-            case (a, b, c, d) =>
-              logger.error(s"Unexpected case match ($a,$b,$c,$d)")
-              Redirect(routes.TechnicalDifficultiesController.onPageLoad())
-          }
+
+          val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
+
+          Ok(confirmationView(
+              status.isPaperlessCustomer, Some(status.url.link),
+              selectedTaxYears.contains2021OrPrevious,
+              selectedTaxYears.containsCurrent
+          ))
+
         case Left(error) =>
           auditPaperlessPreferencesCheckFailure(error)
           Redirect(routes.TechnicalDifficultiesController.onPageLoad())
@@ -102,5 +92,4 @@ class ConfirmationController @Inject()(
         FailureReason -> error
       )
     )
-
 }

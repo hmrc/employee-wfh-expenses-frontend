@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ package controllers
 import base.SpecBase
 import connectors.EligibilityCheckerConnector
 import forms.SelectTaxYearsToClaimForFormProvider
+import models.SelectTaxYearsToClaimFor.{values2022Only, valuesAll}
 import models.{NormalMode, SelectTaxYearsToClaimFor, UserAnswers, WfhDueToCovidStatusWrapper}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, EligibilityCheckerSessionId, SelectTaxYearsToClaimForPage}
+import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, EligibilityCheckerSessionId, SelectTaxYearsToClaimForPage}
 import play.api.inject.bind
 import play.api.libs.json.{JsString, Json}
 import play.api.mvc.Call
@@ -47,7 +48,11 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
   "SelectTaxYearsToClaimFor Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val userAnswer = UserAnswers(userAnswersId, Json.obj(ClaimedForTaxYear2020.toString -> false))
+      val userAnswer = UserAnswers(userAnswersId, Json.obj(
+        ClaimedForTaxYear2020.toString -> false,
+        ClaimedForTaxYear2021.toString -> false,
+        ClaimedForTaxYear2022.toString -> false
+      ))
 
       val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
@@ -60,32 +65,35 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
       status(result) mustEqual OK
 
       contentAsString(result) mustEqual
-        view(form)(request, messages).toString
+        view(form, valuesAll)(request, messages).toString
 
       application.stop()
     }
 
-    "populate the view correctly on a GET when the question has previously been answered" in {
+    "redirect to next page when there is only 1 available year to claim for" in {
       val userAnswer = UserAnswers(
         userAnswersId,
         Json.obj(
-          ClaimedForTaxYear2020.toString -> false,
-          SelectTaxYearsToClaimForPage.toString -> SelectTaxYearsToClaimFor.values
+          ClaimedForTaxYear2020.toString -> true,
+          ClaimedForTaxYear2021.toString -> true,
+          ClaimedForTaxYear2022.toString -> false,
+          SelectTaxYearsToClaimForPage.toString -> SelectTaxYearsToClaimFor.valuesAll
         )
       )
 
-      val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
+      val application = applicationBuilder(userAnswers = Some(userAnswer))
+        .overrides(
+          bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
+        )
+        .build()
 
       val request = FakeRequest(GET, selectTaxYearsToClaimForRoute)
 
-      val view = application.injector.instanceOf[SelectTaxYearsToClaimForView]
-
       val result = route(application, request).value
 
-      status(result) mustEqual OK
+      status(result) mustEqual SEE_OTHER
 
-      contentAsString(result) mustEqual
-        view(form.fill(SelectTaxYearsToClaimFor.values.toSet))(request, messages).toString
+      redirectLocation(result).value mustEqual onwardRoute.url
 
       application.stop()
     }
@@ -106,7 +114,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
 
       val request =
         FakeRequest(POST, selectTaxYearsToClaimForRoute)
-          .withFormUrlEncodedBody(("value[0]", SelectTaxYearsToClaimFor.values.head.toString))
+          .withFormUrlEncodedBody(("value[0]", SelectTaxYearsToClaimFor.valuesAll.head.toString))
 
       val result = route(application, request).value
 
@@ -134,7 +142,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
       status(result) mustEqual BAD_REQUEST
 
       contentAsString(result) mustEqual
-        view(boundForm)(request, messages).toString
+        view(boundForm, valuesAll)(request, messages).toString
 
       application.stop()
     }
@@ -159,7 +167,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
 
       val request =
         FakeRequest(POST, selectTaxYearsToClaimForRoute)
-          .withFormUrlEncodedBody(("value[0]", SelectTaxYearsToClaimFor.values.head.toString))
+          .withFormUrlEncodedBody(("value[0]", SelectTaxYearsToClaimFor.valuesAll.head.toString))
 
       val result = route(application, request).value
 

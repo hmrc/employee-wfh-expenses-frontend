@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import services.IABDServiceImpl
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.TaxYearDates.YEAR_2021
+import utils.TaxYearDates.{YEAR_2020, YEAR_2021, YEAR_2022}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,12 +44,20 @@ class CheckAlreadyClaimedActionImpl @Inject()(
 
     implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    iabdService.alreadyClaimed(request.nino, YEAR_2021) map {
-      case Some(expenses) =>
-        logger.info(s"[CheckAlreadyClaimedAction][filter] Detected already claimed for $YEAR_2021, redirecting to P87 digital form")
-        auditAlreadyClaimed(request.nino, request.saUtr, YEAR_2021, expenses.otherExpenses, expenses.jobExpenses, expenses.wasJobRateExpensesChecked)
-        Some(Redirect(appConfig.p87DigitalFormUrl))
-      case None => None
+    for {
+      alreadyClaimed2020 <- iabdService.alreadyClaimed(request.nino, YEAR_2020)
+      alreadyClaimed2021 <- iabdService.alreadyClaimed(request.nino, YEAR_2021)
+      alreadyClaimed2022 <- iabdService.alreadyClaimed(request.nino, YEAR_2022)
+    } yield {
+      (alreadyClaimed2020, alreadyClaimed2021, alreadyClaimed2022) match {
+        case (Some(claimed2020), Some(claimed2021), Some(claimed2022)) =>
+          logger.info(s"[CheckAlreadyClaimedAction][filter] Detected already claimed for $YEAR_2020, $YEAR_2021 and $YEAR_2022; redirecting to P87 digital form")
+          auditAlreadyClaimed(request.nino, request.saUtr, YEAR_2020, claimed2020.otherExpenses, claimed2020.jobExpenses, claimed2020.wasJobRateExpensesChecked)
+          auditAlreadyClaimed(request.nino, request.saUtr, YEAR_2021, claimed2021.otherExpenses, claimed2021.jobExpenses, claimed2021.wasJobRateExpensesChecked)
+          auditAlreadyClaimed(request.nino, request.saUtr, YEAR_2022, claimed2022.otherExpenses, claimed2022.jobExpenses, claimed2022.wasJobRateExpensesChecked)
+          Some(Redirect(appConfig.p87DigitalFormUrl))
+        case (_, _, _) => None
+      }
     }
   }
 

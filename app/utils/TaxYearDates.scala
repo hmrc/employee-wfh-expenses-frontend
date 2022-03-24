@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ object TaxYearDates {
   val YEAR_2020: Int = 2020
   val YEAR_2021: Int = 2021
   val YEAR_2022: Int = 2022
+  val YEAR_2023: Int = 2023
 
   val TAX_YEAR_2019_START_DATE: LocalDate = TaxYear(YEAR_2019).starts
 
@@ -41,6 +42,10 @@ object TaxYearDates {
   val TAX_YEAR_2021_START_DATE: LocalDate = TaxYear(YEAR_2021).starts
 
   val TAX_YEAR_2021_END_DATE: LocalDate = TaxYear(YEAR_2022).starts.minusDays(1)
+
+  val TAX_YEAR_2022_START_DATE: LocalDate = TaxYear(YEAR_2022).starts
+
+  val TAX_YEAR_2022_END_DATE: LocalDate = TaxYear(YEAR_2023).starts.minusDays(1)
 
 
   def numberOfWeeks(startDate:LocalDate, endDate:LocalDate): Long = {

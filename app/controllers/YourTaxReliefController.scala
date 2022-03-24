@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,71 +17,41 @@
 package controllers
 
 import controllers.actions._
-import pages.WhenDidYouFirstStartWorkingFromHomePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.TaxYearDates._
+import utils.DateLanguageTokenizer
 import views.html._
 
+import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class YourTaxReliefController @Inject()(
                                          override val messagesApi: MessagesApi,
                                          identify: IdentifierAction,
-                                         checkAlreadyClaimed: CheckAlreadyClaimedAction,
                                          citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
                                          getData: DataRetrievalAction,
                                          requireData: DataRequiredAction,
-                                         submissionService: SubmissionService,
                                          val controllerComponents: MessagesControllerComponents,
-                                         yourTaxRelief2021OnlyView: YourTaxRelief2021OnlyView,
-                                         yourTaxRelief2019_2020_2021View: YourTaxRelief2019_2020_2021View,
-                                         yourTaxRelief2019_2020View: YourTaxRelief2019_2020View
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                         yourTaxReliefView: YourTaxReliefView,
+                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
 
-      (
-        request.userAnswers.is2021Only,
-        request.userAnswers.is2019And2020Only,
-        request.userAnswers.is2019And2020And2021Only,
-        request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-      ) match {
-        case (true, _, _, _) => Ok(yourTaxRelief2021OnlyView())
+      val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
 
-        case (_, true, _, Some(date)) => Ok(yourTaxRelief2019_2020View(date, numberOfWeeks(date, TAX_YEAR_2019_END_DATE)))
-        case (_, _, true, Some(date)) => Ok(yourTaxRelief2019_2020_2021View(date, numberOfWeeks(date, TAX_YEAR_2019_END_DATE)))
+      val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
-        case (_, true, _, None) => Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
-        case (_, _, true, None) => Redirect(routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad())
+      Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
+        Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString),
+        selectedTaxYears.containsCurrent, selectedTaxYears.contains2021OrPrevious))
 
-        case _ =>
-          logger.error("[SubmitYourClaimController][onPageLoad] - No years to claim for found")
-          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
-      }
   }
 
-
-  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen checkAlreadyClaimed andThen getData andThen requireData).async {
-    implicit request =>
-
-      submissionService.submitExpenses(
-        request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage),
-        request.userAnswers.is2019And2020Only,
-        request.userAnswers.is2019And2020And2021Only
-      ) map {
-        case Right(_) =>
-          Redirect(routes.ConfirmationController.onPageLoad())
-        case Left(_) =>
-          logger.error("[SubmitYourClaimController][onSubmit] - Error submitting")
-          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
-
-      }
+  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
+      Future(Redirect(routes.CheckYourClaimController.onPageLoad()))
   }
-
 }

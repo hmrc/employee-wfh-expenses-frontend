@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class SelectTaxYearsToClaimForSpec extends WordSpec with MustMatchers with Scala
 
     "fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String] suchThat (!SelectTaxYearsToClaimFor.values.map(_.toString).contains(_))
+      val gen = arbitrary[String] suchThat (!SelectTaxYearsToClaimFor.valuesAll.map(_.toString).contains(_))
 
       forAll(gen) {
         invalidValue =>

@@ -32,7 +32,7 @@
     beforeContentBlock = Some(
         backLink(
             BackLink(
-                href = routes.DisclaimerController.onPageLoad().url,
+                href = routes.SelectTaxYearsToClaimForController.onPageLoad().url,
                 content = Text(messages("site.back")),
                 attributes = Map("id" -> "back-link")
             )
@@ -46,7 +46,6 @@
         }
 
         <h1 class="govuk-heading-xl">@messages("whenDidYouFirstStartWorkingFromHome.heading")</h1>
-        <p class="govuk-body">@messages("whenDidYouFirstStartWorkingFromHome2019And2020.paragraph.one")</p>
 
         @govukDateInput(DateInput(
             id = "value",

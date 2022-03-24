@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,30 +18,46 @@ package controllers
 
 import base.SpecBase
 import models.SelectTaxYearsToClaimFor.{Option1, Option2}
-import models.UserAnswers
+import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler, UserAnswers}
 import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.{Disclaimer2019_2020View, Disclaimer2019_2020_2021View, Disclaimer2021View}
+import utils.DateLanguageTokenizer
+import views.html.DisclaimerView
+
+import java.time.LocalDate
 
 class DisclaimerControllerSpec extends SpecBase {
 
   "Disclaimer Controller" must {
 
-    "return the 2021 content view" when {
+    "return the content view" when {
       val tests = Seq(
         (
           "not SA enrolled and has already claimed expenses for 2020", UserAnswers(
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> true,
-              HasSelfAssessmentEnrolment.toString -> false
+              HasSelfAssessmentEnrolment.toString -> false,
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
             )
           ),
-          true
+          true,
+          List(Option1.toString)
+        ) ,
+        (
+          "not SA enrolled and has already claimed expenses for multiple years", UserAnswers(
+          userAnswersId,
+          Json.obj(
+            ClaimedForTaxYear2020.toString -> true,
+            HasSelfAssessmentEnrolment.toString -> false,
+            SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString),
+          )
         ),
-
+          true,
+          List(Option1.toString, Option2.toString)
+        ) ,
         (
           "not SA enrolled and hasn't already claimed but have chosen only to claim for 2021", UserAnswers(
             userAnswersId,
@@ -51,37 +67,38 @@ class DisclaimerControllerSpec extends SpecBase {
               SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString)
             )
           ),
-          true
+          true,
+          List(Option1.toString)
         ),
-
         (
           "is SA enrolled and has already claimed expenses for 2020", UserAnswers(
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> true,
-              HasSelfAssessmentEnrolment.toString -> true
+              HasSelfAssessmentEnrolment.toString -> true,
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
             )
           ),
-          false
-        ),
-
+          true,
+          List(Option1.toString)),
         (
           "is SA enrolled and hasn't already claimed expenses for 2020", UserAnswers(
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> false,
-              HasSelfAssessmentEnrolment.toString -> true
+              HasSelfAssessmentEnrolment.toString -> true,
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
             )
           ),
-          false
+          true,
+          List(Option1.toString)
         )
-
       )
-      for((desc, userAnswer, backLinkEnabled) <- tests) {
+      for((desc, userAnswer, backLinkEnabled, selectedDatesAsOptions: List[String]) <- tests) {
         s"$desc" in {
           val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
-          val view = application.injector.instanceOf[Disclaimer2021View]
+          val view = application.injector.instanceOf[DisclaimerView]
 
           val request = FakeRequest(GET, routes.DisclaimerController.onPageLoad().url)
 
@@ -89,90 +106,17 @@ class DisclaimerControllerSpec extends SpecBase {
 
           status(result) mustEqual OK
 
+          val assembler = TaxYearFromUIAssembler(selectedDatesAsOptions)
+
+          val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble), None)))
+
+          val date = LocalDate.of(2021, 4, 1)
+
           contentAsString(result) mustEqual
-            view(backLinkEnabled)(request, messages).toString
+            view(backLinkEnabled, disclaimerViewSettings, Some(date))(request, messages).toString
 
           application.stop()
         }
-      }
-    }
-
-    "return the 2019 & 2020 content view" when {
-        "not already claimed expenses for 2020 and tax years 2019 & 2020 have only been selected" in {
-          val userAnswer = UserAnswers(
-            userAnswersId,
-            Json.obj(
-              ClaimedForTaxYear2020.toString -> false,
-              HasSelfAssessmentEnrolment.toString -> false,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
-            )
-          )
-
-          val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-
-          val view = application.injector.instanceOf[Disclaimer2019_2020View]
-
-          val request = FakeRequest(GET, routes.DisclaimerController.onPageLoad().url)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual OK
-
-          contentAsString(result) mustEqual
-            view()(request, messages).toString
-
-          application.stop()
-        }
-    }
-
-    "return the 2019, 2020 & 2021 content view" when {
-        "not already claimed expenses for 2020 and all tax years have been chosen" in {
-          val userAnswer = UserAnswers(
-            userAnswersId,
-            Json.obj(
-              ClaimedForTaxYear2020.toString -> false,
-              HasSelfAssessmentEnrolment.toString -> false,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString)
-            )
-          )
-
-          val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-
-          val view = application.injector.instanceOf[Disclaimer2019_2020_2021View]
-
-          val request = FakeRequest(GET, routes.DisclaimerController.onPageLoad().url)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual OK
-
-          contentAsString(result) mustEqual
-            view()(request, messages).toString
-
-          application.stop()
-        }
-    }
-
-    "redirect to select tax years page" when {
-      "not already claimed expenses for 2020 and no tax years have been chosen" in {
-        val userAnswer = UserAnswers(
-          userAnswersId,
-          Json.obj(
-            ClaimedForTaxYear2020.toString -> false,
-            HasSelfAssessmentEnrolment.toString -> false
-          )
-        )
-
-        val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-
-        val request = FakeRequest(GET, routes.DisclaimerController.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.SelectTaxYearsToClaimForController.onPageLoad().url
-
-        application.stop()
       }
     }
   }

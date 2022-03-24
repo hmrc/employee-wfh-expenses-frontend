@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,25 +30,38 @@ class Navigator @Inject()() extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
-    case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
-    case DisclaimerPage => ua => disclaimerNextPage(ua)
+    case SelectTaxYearsToClaimForPage => ua =>
+      val selectedOptionsCheckBoxes = ua.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
+      val selectedTaxYears = TaxYearFromUIAssembler(selectedOptionsCheckBoxes)
+      if (selectedTaxYears.containsPrevious) {
+         routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+      }else {
+        routes.DisclaimerController.onPageLoad()
+      }case DisclaimerPage => ua => disclaimerNextPage()
+    case CheckYourClaimPage => ua => checkYourClaimPage(ua)
     case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
     case _ => _ => routes.IndexController.onPageLoad()
   }
 
   def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
 
+  def checkYourClaimPage(userAnswers: UserAnswers): Call = {
+    routes.YourTaxReliefController.onPageLoad()
+  }
+
   def checkStartWorkingFromHomeDate(userAnswers: UserAnswers): Call = {
     val earliestStartDate = LocalDate.of(2020,1,1)
 
     userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
       case Some(startDate) =>
-        startDate.isBefore(earliestStartDate) match {
-          case true   => routes.CannotClaimUsingThisServiceController.onPageLoad()
-          case false  => routes.YourTaxReliefController.onPageLoad()
+        if (startDate.isBefore(earliestStartDate)) {
+          routes.CannotClaimUsingThisServiceController.onPageLoad()
+        } else {
+          routes.DisclaimerController.onPageLoad()
         }
       case None => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
     }
+
   }
 
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
@@ -56,26 +69,16 @@ class Navigator @Inject()() extends Logging {
       case None         => routes.IndexController.onPageLoad()
       case Some(true)   => routes.DisclaimerController.onPageLoad()
       case Some(false)  =>
-        userAnswers.get(ClaimedForTaxYear2020) match {
-          case Some(claimedAlready) if claimedAlready   => routes.DisclaimerController.onPageLoad()
-          case Some(claimedAlready) if !claimedAlready  => routes.SelectTaxYearsToClaimForController.onPageLoad()
-          case None                                     => routes.IndexController.onPageLoad()
+        (userAnswers.get(ClaimedForTaxYear2020), userAnswers.get(ClaimedForTaxYear2021), userAnswers.get(ClaimedForTaxYear2022)) match {
+          case (Some(claimed2020), Some(claimed2021), Some(claimed2022)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
+          case (None, None, None)                                        => routes.IndexController.onPageLoad()
+          case (_, _, _)                                                 => routes.TechnicalDifficultiesController.onPageLoad()
         }
     }
   }
 
-  def disclaimerNextPage(userAnswers: UserAnswers): Call = {
-    (
-      userAnswers.is2021Only,
-      userAnswers.is2019And2020Only,
-      userAnswers.is2019And2020And2021Only
-    ) match {
-      case (true, _, _) => routes.YourTaxReliefController.onPageLoad()
-      case (_, true, _) => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
-      case (_, _, true) => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
-      case (a, b, c) =>
-        logger.error(s"Unexpected case match ($a,$b,$c)")
-        routes.TechnicalDifficultiesController.onPageLoad()
-    }
+  def disclaimerNextPage(): Call = {
+    routes.YourTaxReliefController.onPageLoad()
   }
+
 }

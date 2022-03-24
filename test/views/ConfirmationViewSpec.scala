@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,29 +18,31 @@ package views
 
 import play.api.test.FakeRequest
 import views.behaviours.ViewBehaviours
-import views.html.Confirmation2019_2020View
+import views.html.ConfirmationView
 
 // scalastyle:off magic.number
-class Confirmation20192020ViewSpec extends ViewBehaviours {
+class ConfirmationViewSpec extends ViewBehaviours {
 
   private val Confirmation = "confirmation"
 
-  "Confirmation 2019 & 2020 view" should {
-    val view = viewFor[Confirmation2019_2020View](Some(emptyUserAnswers))
+  "Confirmation view" should {
+    val view = viewFor[ConfirmationView](Some(emptyUserAnswers))
 
     val request = FakeRequest()
 
     "show content" when {
-      "when a started to work from home date is in the tax year" in {
-        val doc = asDocument(view.apply(true, None)(request, messages))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.20192020.paragraph.1")))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.20192020.paragraph.2")))
+      "when all confirmation content is displayed" in {
+        val doc = asDocument(view.apply(true, None, true, true)(request, messages))
+        assert(doc.toString.contains(messages("confirmation.whatHappensNext.currentTaxYear.text.1")))
+        assert(doc.toString.contains(messages("confirmation.whatHappensNext.currentTaxYear.text.2")))
+        assert(doc.toString.contains(messages("confirmation.whatHappensNext.currentTaxYear.text.3")))
+        assert(doc.toString.contains(messages("confirmation.whatHappensNext.previousTaxYears.text")))
       }
     }
 
     "show go paperless content" when {
       "when the user is not already paperless" in {
-        val doc = asDocument(view.apply(false, Some("url-string"))(request, messages))
+        val doc = asDocument(view.apply(false, Some("url-string"), false, false)(request, messages))
         assert(doc.toString.contains(messages("confirmation.paperless.header")))
         assert(doc.toString.contains(messages("confirmation.paperless.paragraph.1")))
         assert(doc.toString.contains(messages("confirmation.paperless.button.text")))
@@ -49,7 +51,7 @@ class Confirmation20192020ViewSpec extends ViewBehaviours {
 
     "not show go paperless content" when {
       "when the user is already paperless" in {
-        val doc = asDocument(view.apply(true, None)(request, messages))
+        val doc = asDocument(view.apply(true, None, false, false)(request, messages))
         assert(!doc.toString.contains(messages("confirmation.paperless.header")))
         assert(!doc.toString.contains(messages("confirmation.paperless.paragraph.1")))
         assert(!doc.toString.contains(messages("confirmation.paperless.button.text")))
@@ -57,9 +59,7 @@ class Confirmation20192020ViewSpec extends ViewBehaviours {
     }
 
     "behave like a normal page" when {
-      behave like normalPage(view.apply(true, None)(request, messages), Confirmation)
+      behave like normalPage(view.apply(true, None, true, true)(request, messages), Confirmation)
     }
-
   }
-  
 }

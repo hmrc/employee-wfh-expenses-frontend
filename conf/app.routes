@@ -40,3 +40,6 @@ GET        /technicalDifficulties                       controllers.TechnicalDif
 
 GET        /select-tax-years-to-claim-for               controllers.SelectTaxYearsToClaimForController.onPageLoad()
 POST       /select-tax-years-to-claim-for               controllers.SelectTaxYearsToClaimForController.onSubmit()
+
+GET        /check-your-claim                            controllers.CheckYourClaimController.onPageLoad()
+POST       /check-your-claim                            controllers.CheckYourClaimController.onSubmit()

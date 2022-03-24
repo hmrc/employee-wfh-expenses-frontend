@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package models
 
-import models.SelectTaxYearsToClaimFor.{Option1, Option2}
+import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
 
 import java.time.LocalDateTime
 import pages._
@@ -64,33 +64,6 @@ final case class UserAnswers(
         page.cleanup(None, updatedAnswers)
     }
   }
-
-  def is2021Only: Boolean = {
-    get(HasSelfAssessmentEnrolment) match {
-      case Some(true) => true
-      case Some(false) =>
-        (get(ClaimedForTaxYear2020), get(SelectTaxYearsToClaimForPage)) match {
-          case ( Some(true), _ ) => true
-          case ( _, Some(years) ) if years.size == 1 && years.contains(Option1) => true
-          case ( _, _ ) => false
-        }
-    }
-  }
-
-  def is2019And2020Only: Boolean =
-    (is2021Only, get(SelectTaxYearsToClaimForPage)) match {
-      case (true, _) => false
-      case (false, Some(years)) if years.size == 2 => false
-      case (false, Some(years)) if years.size == 1 && years.contains(Option1) => false
-      case (false, Some(years)) if years.size == 1 && years.contains(Option2) => true
-    }
-
-  def is2019And2020And2021Only: Boolean =
-    (is2019And2020Only, get(SelectTaxYearsToClaimForPage)) match {
-      case (true, _) => false
-      case (false, Some(years)) if years.size == 2 => true
-      case (_, _) => false
-    }
 
   def eligibilityCheckerSessionIdOpt: Option[String] = get(EligibilityCheckerSessionId) match{
     case Some(sessionIdAsString) =>

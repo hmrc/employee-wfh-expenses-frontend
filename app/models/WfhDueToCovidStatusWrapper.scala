@@ -18,7 +18,7 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class WfhDueToCovidStatusWrapper(WfhDueToCovidStatus: Int)
+case class WfhDueToCovidStatusWrapper(WfhDueToCovidStatus: Int, registeredForSA: Boolean)
 
 object WfhDueToCovidStatusWrapper {
   implicit val formats: OFormat[WfhDueToCovidStatusWrapper] = Json.format[WfhDueToCovidStatusWrapper]

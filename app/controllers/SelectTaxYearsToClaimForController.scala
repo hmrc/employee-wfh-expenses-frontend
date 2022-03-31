@@ -96,19 +96,23 @@ class SelectTaxYearsToClaimForController @Inject()(
   def handleSAFlow(wfhDueToCovidStatusWrapper: WfhDueToCovidStatusWrapper)
                   (implicit request: DataRequest[AnyContent]): Future[Result] = {
 
-    val optionList: Option[Set[SelectTaxYearsToClaimFor]] = wfhDueToCovidStatusWrapper.WfhDueToCovidStatus match {
-      case 1 => Some(Set(SelectTaxYearsToClaimFor.Option1))
-      case 2 => eligibilityCheckerValuesTaiOverride(request)
-      case 3 => Some(Set(SelectTaxYearsToClaimFor.Option1))
-      case _ => None
+    val optionList: Option[Set[SelectTaxYearsToClaimFor]] = if(wfhDueToCovidStatusWrapper.registeredForSA) {
+      wfhDueToCovidStatusWrapper.WfhDueToCovidStatus match {
+        case 1 => Some(Set(SelectTaxYearsToClaimFor.Option1))
+        case 2 => eligibilityCheckerValuesTaiOverride(request)
+        case 3 => Some(Set(SelectTaxYearsToClaimFor.Option1))
+        case _ => None
+    }} else {
+      Some(Set.empty)
     }
 
     optionList match {
-      case Some(listOfOptions) =>
+      case Some(listOfOptions) => if(listOfOptions.isEmpty) handleDefaultSAFlow() else {
         for {
           updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, listOfOptions))
           _ <- sessionRepository.set(updatedAnswers)
         } yield Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
+      }
       case None =>
         logger.error(s"Eligibility Checker return Covid Status value: [${wfhDueToCovidStatusWrapper.WfhDueToCovidStatus}], which is undefined.]")
         Future.successful(Redirect(routes.IndexController.onPageLoad()))

@@ -50,7 +50,7 @@ class EligibilityCheckerServiceSpec extends SpecBase with MockitoSugar with Befo
 
     "return wfhDueToCovidStatus value from repo" in new Setup {
 
-      when(mockEligibilityCheckerConnector.wfhDueToCovidStatus(any())(any(), any())) thenReturn Future.successful(WfhDueToCovidStatusWrapper(1))
+      when(mockEligibilityCheckerConnector.wfhDueToCovidStatus(any())(any(), any())) thenReturn Future.successful(WfhDueToCovidStatusWrapper(1, false))
 
       val result = await(serviceUnderTest.wfhDueToCovidStatus("session-4968a9e4-0fa1-445f-a947-a828c69ef96b"))
 

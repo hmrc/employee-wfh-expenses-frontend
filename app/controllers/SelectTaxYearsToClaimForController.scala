@@ -107,15 +107,15 @@ class SelectTaxYearsToClaimForController @Inject()(
     }
 
     optionList match {
-      case Some(listOfOptions) => if(listOfOptions.nonEmpty) handleDefaultSAFlow() else {
+      case Some(listOfOptions) => if(listOfOptions.isEmpty) handleDefaultSAFlow() else {
         for {
           updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, listOfOptions))
           _ <- sessionRepository.set(updatedAnswers)
         } yield Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
       }
       case None =>
-        logger.error(s"Eligibility Checker return Covid Status value: [${wfhDueToCovidStatusWrapper.WfhDueToCovidStatus}], which is undefined.]")
-        Future.successful(Redirect(routes.IndexController.onPageLoad()))
+        logger.error(s"Eligibility Checker returned Covid Status value: [${wfhDueToCovidStatusWrapper.WfhDueToCovidStatus}], which is undefined.]")
+        Future.successful(Redirect(routes.TechnicalDifficultiesController.onPageLoad()))
     }
   }
 

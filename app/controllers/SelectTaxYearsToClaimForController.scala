@@ -107,7 +107,7 @@ class SelectTaxYearsToClaimForController @Inject()(
     }
 
     optionList match {
-      case Some(listOfOptions) => if(listOfOptions.isEmpty) handleDefaultSAFlow() else {
+      case Some(listOfOptions) => if(listOfOptions.nonEmpty) handleDefaultSAFlow() else {
         for {
           updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, listOfOptions))
           _ <- sessionRepository.set(updatedAnswers)

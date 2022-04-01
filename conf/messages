@@ -72,104 +72,6 @@ ivfailed.postalForm.href.text = print and post form
 ivfailed.helpline.href.text = Income Tax: general enquiries helpline
 ivfailed.tryAgain.href.text = confirm your identity
 
-whenDidYouFirstStartWorkingFromHome.title = When did you start working from home?
-whenDidYouFirstStartWorkingFromHome.heading = When did you start working from home?
-whenDidYouFirstStartWorkingFromHome.hinttext = For example, 23 3 2020
-whenDidYouFirstStartWorkingFromHome.checkYourAnswersLabel = WhenDidYouFirstStartWorkingFromHome
-whenDidYouFirstStartWorkingFromHome.error.required.all = Enter the date you started working from home
-whenDidYouFirstStartWorkingFromHome.error.required.two = The date you started working from home must include a {0} and {1}
-whenDidYouFirstStartWorkingFromHome.error.required = The date you started working from home must include a {0}
-whenDidYouFirstStartWorkingFromHome.error.invalid = The date you started working from home must be a real date
-whenDidYouFirstStartWorkingFromHome.error.futureDateNotAllowed = The date you started working from home must be today or in the past
-whenDidYouFirstStartWorkingFromHome.error.invalidTaxYearDate = You selected previous years, so you must enter a date before 6 April 2021
-
-cannotClaimUsingThisService.title = You cannot claim using this service
-cannotClaimUsingThisService.heading = You cannot claim using this service
-cannotClaimUsingThisService.reason = You can only claim expenses for working from home on or after the 1 January 2020 for these tax years:
-cannotClaimUsingThisService.reason.year1 = 6 April 2022 to 5 April 2023 (this tax year)
-cannotClaimUsingThisService.reason.year2 = 6 April 2021 to 5 April 2022
-cannotClaimUsingThisService.reason.year3 = 6 April 2020 to 5 April 2021
-cannotClaimUsingThisService.reason.year4 = 1 January 2020 to 5 April 2020
-cannotClaimUsingThisService.changeDate.href.text =  change the date
-cannotClaimUsingThisService.changeDate = If you started working from home before 1 January 2020, {0}.
-cannotClaimUsingThisService.alternative.href.text = claim tax relief for expenses of employment
-cannotClaimUsingThisService.alternative = You can {0} you started working from home.
-
-confirmation.paperless.button.text = Sign up for paperless notifications
-confirmation.title = Confirmation
-confirmation.heading = Claim complete
-confirmation.text = We will change your tax code
-confirmation.hmrc.text = HMRC will check your claim
-confirmation.text.footer.mail = We will let you know about your tax code change by email.
-confirmation.text.footer.post = We will let you know about your tax code change by post, or online if you’ve signed up for paperless notifications.
-confirmation.whatHappensNext.heading = What happens next
-confirmation.whatHappensNext.paragraph.2 = You should see changes to your tax code in your personal tax account after 2 working days.
-confirmation.whatHappensNext.paragraph.3 = There is no need to contact HMRC.
-confirmation.linkToFeedbackForm.href.text = What did you think of this service? (opens in new tab)
-confirmation.linkToFeedbackForm.href.postfix = (takes 30 seconds)
-confirmation.paperless.header = Get tax letters online
-confirmation.paperless.paragraph.1 = You can view, download or print them when you want. Save time and clear clutter.
-confirmation.whatHappensNext.previousTaxYears.text = We will check your claim for previous tax years and we will write to you by post or email if you have paid too much tax. There is no need to contact HMRC about this.
-confirmation.whatHappensNext.currentTaxYear.text.1 = We will increase the amount you can earn tax free for the current tax year to include tax relief on your expenses for working from home.
-confirmation.whatHappensNext.currentTaxYear.text.2 = We do this by changing your tax code, which decides how much tax you pay.
-confirmation.whatHappensNext.currentTaxYear.text.3 = We will let you know about your tax code change by post, or email if you''ve signed up to paperless notifications.
-confirmation.whatHappensNext.info.paragraph.1 = We will increase the amount you can earn tax free for this tax year to include tax relief on your expenses for working from home.
-confirmation.whatHappensNext.info.paragraph.2 = We do this by changing your tax code, which decides how much tax you pay.
-confirmation.whatHappensNext.info.paragraph.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
-
-
-manualCorrespondenceIndicator.title = You cannot currently use this service
-manualCorrespondenceIndicator.heading = You cannot currently use this service
-manualCorrespondenceIndicator.paragraph.one = You need to contact HMRC and tell us you have an ‘MCI Error’. We will take you through what needs to happen next.
-manualCorrespondenceIndicator.how.to.contact = How to contact us
-manualCorrespondenceIndicator.how.to.contact.telephone = Telephone: 0300 200 3300
-manualCorrespondenceIndicator.how.to.contact.textphone = Textphone: 0300 200 3319
-manualCorrespondenceIndicator.how.to.contact.outsideUK = Outside UK: +44 135 535 9022
-manualCorrespondenceIndicator.phoneLines = Phone lines are open:
-manualCorrespondenceIndicator.phoneLines.one = 8am to 8pm Monday to Friday
-manualCorrespondenceIndicator.phoneLines.two = 8am to 4pm Saturdays
-manualCorrespondenceIndicator.phoneLines.three = 9am to 5pm Sundays
-manualCorrespondenceIndicator.closedBankHolidays = Closed bank holidays
-manualCorrespondenceIndicator.callCharges = Find out about call charges (opens in a new window)
-
-signoutpage.title = For your security, we signed you out
-signoutpage.heading = For your security, we signed you out
-signoutpage.start-again.text = Sign in
-
-manualCorrespondenceIndicator.title = You cannot make a claim right now
-manualCorrespondenceIndicator.heading = You cannot make a claim right now
-
-technicalDifficulties.title = Sorry, there is a problem with the service
-technicalDifficulties.heading = Sorry, there is a problem with the service
-technicalDifficulties.message = Try again in a few minutes. We did not save your answers.
-
-submitYourClaim.title = Submit your claim
-submitYourClaim.heading = Submit your claim
-submitYourClaim.list = submitYourClaimList
-submitYourClaim.list.text = By submitting this claim for tax relief you are confirming the following:
-submitYourClaim.list.item1 = your employer has not already paid your expenses
-submitYourClaim.list.item2 = you have been forced to work from home by government guidelines or your employer
-submitYourClaim.list.item3 = you have incurred additional costs as a result of working from home
-submitYourClaim.list.item4 = the information you have provided is correct, to the best of your knowledge
-
-selectTaxYearsToClaimFor.title = Which tax years are you claiming for?
-selectTaxYearsToClaimFor.heading = Which tax years are you claiming for?
-selectTaxYearsToClaimFor.para = HMRC have checked our records and you can claim for the following years.
-selectTaxYearsToClaimFor.text = HMRC have checked our records and you can claim for the following years.
-selectTaxYearsToClaimFor.hintText = Select all that apply
-selectTaxYearsToClaimFor.option1 = This tax year (6 April 2022 to 5 April 2023)
-selectTaxYearsToClaimFor.option2 = Last tax year (6 April 2021 to 5 April 2022)
-selectTaxYearsToClaimFor.option3 = Previous tax years before 6 April 2021
-selectTaxYearsToClaimFor.error.required = Select at least one option
-
-service.is.busy.title = Sorry, the service is busy
-service.is.busy.heading = Sorry, the service is busy
-service.is.busy.message = Please try again later.
-
-phaseBanner.text.part1 = This is a new service – your
-phaseBanner.linkText = feedback
-phaseBanner.text.part2 = will help us to improve it.
-
 disclaimer.title = You must read the following before making a claim
 disclaimer.heading = You must read the following before making a claim
 disclaimer.your.claim.details.header = Your claim details
@@ -216,3 +118,100 @@ checkYourClaimView.button.label = Confirm and submit
 checkYourClaimView.inset.text = You started working from home on
 checkYourClaimView.changeThisDate.href.text = Change this date
 checkYourClaimView.list.item2 = {0} of tax year 6 April 2019 to 5 April 2020
+
+submitYourClaim.title = Submit your claim
+submitYourClaim.heading = Submit your claim
+submitYourClaim.list = submitYourClaimList
+submitYourClaim.list.text = By submitting this claim for tax relief you are confirming the following:
+submitYourClaim.list.item1 = your employer has not already paid your expenses
+submitYourClaim.list.item2 = you have been forced to work from home by government guidelines or your employer
+submitYourClaim.list.item3 = you have incurred additional costs as a result of working from home
+submitYourClaim.list.item4 = the information you have provided is correct, to the best of your knowledge
+
+selectTaxYearsToClaimFor.title = Which tax years are you claiming for?
+selectTaxYearsToClaimFor.heading = Which tax years are you claiming for?
+selectTaxYearsToClaimFor.para = HMRC have checked our records and you can claim for the following years.
+selectTaxYearsToClaimFor.text = HMRC have checked our records and you can claim for the following years.
+selectTaxYearsToClaimFor.hintText = Select all that apply
+selectTaxYearsToClaimFor.option1 = This tax year (6 April 2022 to 5 April 2023)
+selectTaxYearsToClaimFor.option2 = Last tax year (6 April 2021 to 5 April 2022)
+selectTaxYearsToClaimFor.option3 = Previous tax years before 6 April 2021
+selectTaxYearsToClaimFor.error.required = Select at least one option
+
+whenDidYouFirstStartWorkingFromHome.title = When did you start working from home?
+whenDidYouFirstStartWorkingFromHome.heading = When did you start working from home?
+whenDidYouFirstStartWorkingFromHome.hinttext = For example, 23 3 2020
+whenDidYouFirstStartWorkingFromHome.checkYourAnswersLabel = WhenDidYouFirstStartWorkingFromHome
+whenDidYouFirstStartWorkingFromHome.error.required.all = Enter the date you started working from home
+whenDidYouFirstStartWorkingFromHome.error.required.two = The date you started working from home must include a {0} and {1}
+whenDidYouFirstStartWorkingFromHome.error.required = The date you started working from home must include a {0}
+whenDidYouFirstStartWorkingFromHome.error.invalid = The date you started working from home must be a real date
+whenDidYouFirstStartWorkingFromHome.error.futureDateNotAllowed = The date you started working from home must be today or in the past
+whenDidYouFirstStartWorkingFromHome.error.invalidTaxYearDate = You selected previous years, so you must enter a date before 6 April 2021
+
+cannotClaimUsingThisService.title = You cannot claim using this service
+cannotClaimUsingThisService.heading = You cannot claim using this service
+cannotClaimUsingThisService.reason = You can only claim expenses for working from home on or after the 1 January 2020 for these tax years:
+cannotClaimUsingThisService.reason.year1 = 6 April 2022 to 5 April 2023 (this tax year)
+cannotClaimUsingThisService.reason.year2 = 6 April 2021 to 5 April 2022
+cannotClaimUsingThisService.reason.year3 = 6 April 2020 to 5 April 2021
+cannotClaimUsingThisService.reason.year4 = 1 January 2020 to 5 April 2020
+cannotClaimUsingThisService.changeDate.href.text =  change the date
+cannotClaimUsingThisService.changeDate = If you started working from home before 1 January 2020, {0}.
+cannotClaimUsingThisService.alternative.href.text = claim tax relief for expenses of employment
+cannotClaimUsingThisService.alternative = You can {0} you started working from home.
+
+confirmation.paperless.button.text = Sign up for paperless notifications
+confirmation.title = Confirmation
+confirmation.heading = Claim complete
+confirmation.text = We will change your tax code
+confirmation.hmrc.text = HMRC will check your claim
+confirmation.text.footer.mail = We will let you know about your tax code change by email.
+confirmation.text.footer.post = We will let you know about your tax code change by post, or online if you’ve signed up for paperless notifications.
+confirmation.whatHappensNext.heading = What happens next
+confirmation.whatHappensNext.paragraph.2 = You should see changes to your tax code in your personal tax account after 2 working days.
+confirmation.whatHappensNext.paragraph.3 = There is no need to contact HMRC.
+confirmation.linkToFeedbackForm.href.text = What did you think of this service? (opens in new tab)
+confirmation.linkToFeedbackForm.href.postfix = (takes 30 seconds)
+confirmation.paperless.header = Get tax letters online
+confirmation.paperless.paragraph.1 = You can view, download or print them when you want. Save time and clear clutter.
+confirmation.whatHappensNext.previousTaxYears.text = We will check your claim for previous tax years and we will write to you by post or email if you have paid too much tax. There is no need to contact HMRC about this.
+confirmation.whatHappensNext.currentTaxYear.text.1 = We will increase the amount you can earn tax free for the current tax year to include tax relief on your expenses for working from home.
+confirmation.whatHappensNext.currentTaxYear.text.2 = We do this by changing your tax code, which decides how much tax you pay.
+confirmation.whatHappensNext.currentTaxYear.text.3 = We will let you know about your tax code change by post, or email if you''ve signed up to paperless notifications.
+confirmation.whatHappensNext.info.paragraph.1 = We will increase the amount you can earn tax free for this tax year to include tax relief on your expenses for working from home.
+confirmation.whatHappensNext.info.paragraph.2 = We do this by changing your tax code, which decides how much tax you pay.
+confirmation.whatHappensNext.info.paragraph.3 = You should be able to see changes to your tax code in your personal tax account after 2 working days.
+
+manualCorrespondenceIndicator.title = You cannot currently use this service
+manualCorrespondenceIndicator.heading = You cannot currently use this service
+manualCorrespondenceIndicator.paragraph.one = You need to contact HMRC and tell us you have an ‘MCI Error’. We will take you through what needs to happen next.
+manualCorrespondenceIndicator.how.to.contact = How to contact us
+manualCorrespondenceIndicator.how.to.contact.telephone = Telephone: 0300 200 3300
+manualCorrespondenceIndicator.how.to.contact.textphone = Textphone: 0300 200 3319
+manualCorrespondenceIndicator.how.to.contact.outsideUK = Outside UK: +44 135 535 9022
+manualCorrespondenceIndicator.phoneLines = Phone lines are open:
+manualCorrespondenceIndicator.phoneLines.one = 8am to 8pm Monday to Friday
+manualCorrespondenceIndicator.phoneLines.two = 8am to 4pm Saturdays
+manualCorrespondenceIndicator.phoneLines.three = 9am to 5pm Sundays
+manualCorrespondenceIndicator.closedBankHolidays = Closed bank holidays
+manualCorrespondenceIndicator.callCharges = Find out about call charges (opens in a new window)
+
+signoutpage.title = For your security, we signed you out
+signoutpage.heading = For your security, we signed you out
+signoutpage.start-again.text = Sign in
+
+manualCorrespondenceIndicator.title = You cannot make a claim right now
+manualCorrespondenceIndicator.heading = You cannot make a claim right now
+
+technicalDifficulties.title = Sorry, there is a problem with the service
+technicalDifficulties.heading = Sorry, there is a problem with the service
+technicalDifficulties.message = Try again in a few minutes. We did not save your answers.
+
+service.is.busy.title = Sorry, the service is busy
+service.is.busy.heading = Sorry, the service is busy
+service.is.busy.message = Please try again later.
+
+phaseBanner.text.part1 = This is a new service – your
+phaseBanner.linkText = feedback
+phaseBanner.text.part2 = will help us to improve it.

@@ -53,8 +53,7 @@ trait TaiLookupHandler extends Logging {
                                    year: Int,
                                    otherExpenses: Seq[IABDExpense],
                                    jobExpenses: Seq[IABDExpense],
-                                   wasJobRateExpensesChecked: Boolean,
-                                   appConfig: FrontendAppConfig
+                                   wasJobRateExpensesChecked: Boolean
                                  )(implicit hc: HeaderCarrier): Unit = {
 
     val json = if (wasJobRateExpensesChecked) {
@@ -125,7 +124,7 @@ trait TaiLookupHandler extends Logging {
         ClaimedForTaxYear2020.toString -> alreadyClaimed2020,
         ClaimedForTaxYear2021.toString -> alreadyClaimed2021,
         ClaimedForTaxYear2022.toString -> alreadyClaimed2022,
-        HasSelfAssessmentEnrolment.toString -> if(appConfig.saLookupEnabled) request.saUtr.isDefined else false,
+        HasSelfAssessmentEnrolment.toString -> request.saUtr.isDefined,
         EligibilityCheckerSessionId.toString() -> eligibilityCheckerSessionIdString
       )
     )

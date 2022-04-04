@@ -90,7 +90,7 @@ class SubmissionService @Inject()
             FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate())
           )
         case e =>
-          logger.error(s"Unexpected case match $e")
+          logger.error(s"[SubmissionService][submit](no startDate found) Unexpected case match $e")
           Seq.empty[FlatRateItem]
       }
       case Some(date) => selectedTaxYears match {
@@ -147,7 +147,7 @@ class SubmissionService @Inject()
             )
           }
         case e =>
-          logger.error(s"Unexpected case match $e")
+          logger.error(s"[SubmissionService][submit](startDate found) Unexpected case match $e")
           Seq.empty[FlatRateItem]
       }
     }
@@ -212,7 +212,7 @@ class SubmissionService @Inject()
   }
 
   private def auditSubmissionSuccess(submittedDetails: Seq[FlatRateItem])
-                                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext) =
+                                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       UpdateWorkingFromHomeFlatRateSuccess.toString,
       AuditData(
@@ -224,7 +224,7 @@ class SubmissionService @Inject()
 
 
   private def auditSubmissionFailure(error: String)
-                                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext) =
+                                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       UpdateWorkingFromHomeFlatRateFailure.toString,
       AuditData(

@@ -65,7 +65,7 @@ class SelectTaxYearsToClaimForController @Inject()(
 
   def handleDefaultSAFlow()(implicit request: DataRequest[AnyContent]): Future[Result] = {
     request.userAnswers.get(HasSelfAssessmentEnrolment) match {
-      case Some(true) => Future.successful(Redirect(routes.DisclaimerController.onPageLoad()))
+      case Some(true) => handleSAFlow(WfhDueToCovidStatusWrapper(1))
       case _ =>
         (request.userAnswers.get(ClaimedForTaxYear2020), request.userAnswers.get(ClaimedForTaxYear2021), request.userAnswers.get(ClaimedForTaxYear2022)) match {
           case (Some(claimed2020), Some(claimed2021), Some(claimed2022)) =>

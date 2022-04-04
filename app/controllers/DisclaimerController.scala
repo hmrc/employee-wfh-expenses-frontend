@@ -17,16 +17,15 @@
 package controllers
 
 import controllers.actions._
-import models.SelectTaxYearsToClaimFor.{getValuesFromClaimedBooleans, valuesAll}
 import models.{ClaimViewSettings, DisclaimerViewSettings}
 import navigation.Navigator
-import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, DisclaimerPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{ClaimedForTaxYear2020, DisclaimerPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateLanguageTokenizer
-import utils.TaxYearDates.TAX_YEAR_2020_START_DATE
+import utils.TaxYearDates.TAX_YEAR_2021_START_DATE
 import views.html.DisclaimerView
 
 import java.time.LocalDate
@@ -48,10 +47,10 @@ class DisclaimerController @Inject()(
     implicit request =>
       val selectedTaxYearsAssembler = taxYearFromUIAssemblerFromRequest()
 
-      val startDate: Option[LocalDate] = if(!request.userAnswers.get(ClaimedForTaxYear2020).get) {
+      val startDate: Option[LocalDate] = if(selectedTaxYearsAssembler.containsPrevious) {
         request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
       } else {
-        Some(TAX_YEAR_2020_START_DATE)
+        Some(TAX_YEAR_2021_START_DATE)
       }
 
       def buildDisclaimerPageSettings(dateList: List[(LocalDate, LocalDate)]) = {

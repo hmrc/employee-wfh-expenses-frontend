@@ -61,8 +61,10 @@ class CheckYourClaimController @Inject()(
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest().checkboxYearOptions
+      val startDate = if(!selectedTaxYears.contains("option3")) None else request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+      logger.info(s"startDate value: $startDate")
       submissionService.submitExpenses(
-        startDate = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage),
+        startDate = startDate,
         selectedTaxYears = selectedTaxYears
       ) map {
         case Right(_) =>

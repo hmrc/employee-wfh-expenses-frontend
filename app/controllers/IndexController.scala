@@ -124,7 +124,7 @@ trait TaiLookupHandler extends Logging {
         ClaimedForTaxYear2020.toString -> alreadyClaimed2020,
         ClaimedForTaxYear2021.toString -> alreadyClaimed2021,
         ClaimedForTaxYear2022.toString -> alreadyClaimed2022,
-        HasSelfAssessmentEnrolment.toString -> request.saUtr.isDefined,
+        HasSelfAssessmentEnrolment.toString -> (if(appConfig.saLookupEnabled) request.saUtr.isDefined else false),
         EligibilityCheckerSessionId.toString() -> eligibilityCheckerSessionIdString
       )
     )

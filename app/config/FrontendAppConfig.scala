@@ -60,6 +60,8 @@ class FrontendAppConfig @Inject()(configuration: Configuration, val servicesConf
   lazy val timeoutDialogTimeout: Int = configuration.getOptional[Int]("timeoutDialog.timeout").getOrElse(900)
   lazy val timeoutDialogTimeoutCountdown: Int = configuration.getOptional[Int]("timeoutDialog.timeoutCountdown").getOrElse(120)
 
+  lazy val saLookupEnabled: Boolean = configuration.getOptional[Boolean]("saLookup.enabled").getOrElse(true)
+
   lazy val taxReliefPerWeek2019: Int = configuration.getOptional[Int]("taxRelief.2019.poundsPerWeek").getOrElse(4)
   lazy val taxReliefPerWeek2020: Int = configuration.getOptional[Int]("taxRelief.2020.poundsPerWeek").getOrElse(6)
   lazy val taxReliefPerWeek2021: Int = configuration.getOptional[Int]("taxRelief.2021.poundsPerWeek").getOrElse(6)

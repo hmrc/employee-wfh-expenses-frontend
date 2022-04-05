@@ -40,7 +40,7 @@ class DisclaimerViewSpec extends ViewBehaviours with UIAssembler {
 
     val applyView = view.apply(true, disclaimerViewSettings, Some(date))(fakeRequest, messages)
 
-    behave like normalPage(applyView, "disclaimer")
+    behave like disclaimerPage(applyView, "disclaimer")
 
     "show content" when {
       "when all disclaimer content is displayed before additional tax relief dates" in {

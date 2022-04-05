@@ -55,6 +55,14 @@ trait ViewSpecBase extends SpecBase {
     headers.first.text.replaceAll("\u00a0", " ") mustBe messages(expectedMessageKey, args:_*).replaceAll("&nbsp;", " ")
   }
 
+  def assertPageTitleEqualsMessageDisclaimer(doc: Document, expectedMessageKey: String, args: Any*) = {
+    val headers = doc.getElementsByTag("h1")
+    val heading = doc.getElementsByClass("govuk-heading-xl")
+    val sizeToCheck = if (headers.size == 2) headers.size else heading.size
+    sizeToCheck mustBe 2
+    headers.first.text.replaceAll("\u00a0", " ") mustBe messages(expectedMessageKey, args:_*).replaceAll("&nbsp;", " ")
+  }
+
   def assertContainsText(doc:Document, text: String) = assert(doc.toString.contains(text), "\n\ntext " + text + " was not rendered on the page.\n")
 
   def assertContainsMessages(doc: Document, expectedMessageKeys: String*) = {

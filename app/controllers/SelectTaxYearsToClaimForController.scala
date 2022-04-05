@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.FrontendAppConfig
 import controllers.actions._
 import forms.SelectTaxYearsToClaimForFormProvider
 import models.requests.DataRequest
@@ -43,7 +44,8 @@ class SelectTaxYearsToClaimForController @Inject()(
                                                     formProvider: SelectTaxYearsToClaimForFormProvider,
                                                     val controllerComponents: MessagesControllerComponents,
                                                     view: SelectTaxYearsToClaimForView,
-                                                    eligibilityCheckerService: EligibilityCheckerService
+                                                    eligibilityCheckerService: EligibilityCheckerService,
+                                                    appConfig: FrontendAppConfig
                                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   val form = formProvider()
@@ -69,24 +71,16 @@ class SelectTaxYearsToClaimForController @Inject()(
       case _ =>
         (request.userAnswers.get(ClaimedForTaxYear2020), request.userAnswers.get(ClaimedForTaxYear2021), request.userAnswers.get(ClaimedForTaxYear2022)) match {
           case (Some(claimed2020), Some(claimed2021), Some(claimed2022)) =>
-            if (hasSingleUnclaimedYear(claimed2020, claimed2021, claimed2022)) {
-              val setOfUnclaimedYears: Set[SelectTaxYearsToClaimFor] = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022).toSet
+            val availableYears = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022)
 
-              for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, setOfUnclaimedYears))
-                _ <- sessionRepository.set(updatedAnswers)
-              } yield Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
-
-            } else {
-              val availableYears = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022)
-
-              val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
-                case None => form
-                case Some(value) => form.fill(value)
-              }
-
-              Future.successful(Ok(view(preparedForm, availableYears)))
+            val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
+              case None => form
+              case Some(value) => form.fill(value)
             }
+
+            val showHintText = !hasSingleUnclaimedYear(claimed2020, claimed2021, claimed2022)
+
+            Future.successful(Ok(view(preparedForm, availableYears, showHintText)))
 
           case (_, _, _) => Future.successful(Redirect(routes.IndexController.onPageLoad()))
         }
@@ -96,22 +90,25 @@ class SelectTaxYearsToClaimForController @Inject()(
   def handleSAFlow(wfhDueToCovidStatusWrapper: WfhDueToCovidStatusWrapper)
                   (implicit request: DataRequest[AnyContent]): Future[Result] = {
 
-    val optionList: Option[Set[SelectTaxYearsToClaimFor]] = wfhDueToCovidStatusWrapper.WfhDueToCovidStatus match {
-      case 1 => Some(Set(SelectTaxYearsToClaimFor.Option1))
-      case 2 => eligibilityCheckerValuesTaiOverride(request)
-      case 3 => Some(Set(SelectTaxYearsToClaimFor.Option1))
-      case _ => None
-    }
+    if(request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(false)) {
+      Future.successful(Redirect(appConfig.p87DigitalFormUrl))
+    } else {
 
-    optionList match {
-      case Some(listOfOptions) =>
-        for {
-          updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, listOfOptions))
-          _ <- sessionRepository.set(updatedAnswers)
-        } yield Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
-      case None =>
-        logger.error(s"Eligibility Checker return Covid Status value: [${wfhDueToCovidStatusWrapper.WfhDueToCovidStatus}], which is undefined.]")
-        Future.successful(Redirect(routes.IndexController.onPageLoad()))
+      val optionList: Option[Set[SelectTaxYearsToClaimFor]] = wfhDueToCovidStatusWrapper.WfhDueToCovidStatus match {
+        case 1 => Some(Set(SelectTaxYearsToClaimFor.Option1))
+        case 2 => eligibilityCheckerValuesTaiOverride(request)
+        case 3 => Some(Set(SelectTaxYearsToClaimFor.Option1))
+        case _ => None
+      }
+
+      val availableYears = optionList.getOrElse(Set(SelectTaxYearsToClaimFor.Option1)).toSeq
+
+      val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
+        case None => form
+        case Some(value) => form.fill(value)
+      }
+
+      Future.successful(Ok(view(preparedForm, availableYears, hintText = false)))
     }
   }
 

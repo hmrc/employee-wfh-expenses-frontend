@@ -70,34 +70,6 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
       application.stop()
     }
 
-    "redirect to next page when there is only 1 available year to claim for" in {
-      val userAnswer = UserAnswers(
-        userAnswersId,
-        Json.obj(
-          ClaimedForTaxYear2020.toString -> true,
-          ClaimedForTaxYear2021.toString -> true,
-          ClaimedForTaxYear2022.toString -> false,
-          SelectTaxYearsToClaimForPage.toString -> SelectTaxYearsToClaimFor.valuesAll
-        )
-      )
-
-      val application = applicationBuilder(userAnswers = Some(userAnswer))
-        .overrides(
-          bind[Navigator].toInstance(new FakeNavigator(onwardRoute))
-        )
-        .build()
-
-      val request = FakeRequest(GET, selectTaxYearsToClaimForRoute)
-
-      val result = route(application, request).value
-
-      status(result) mustEqual SEE_OTHER
-
-      redirectLocation(result).value mustEqual onwardRoute.url
-
-      application.stop()
-    }
-
     "redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
@@ -192,9 +164,8 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
 
     val result = route(application, request).value
 
-    status(result) mustEqual SEE_OTHER
+    status(result) mustEqual OK
 
-    redirectLocation(result).value mustEqual Call("GET", "/employee-working-from-home-expenses/disclaimer").url
     application.stop()
   }
 

@@ -25,7 +25,7 @@
         formHelper: FormWithCSRF
 )
 
-@(form: Form[Set[SelectTaxYearsToClaimFor]], availableYears: Seq[SelectTaxYearsToClaimFor])(implicit request: Request[_], messages: Messages)
+@(form: Form[Set[SelectTaxYearsToClaimFor]], availableYears: Seq[SelectTaxYearsToClaimFor], hintText: Boolean = true)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = s"${errorPrefix(form)} ${messages("selectTaxYearsToClaimFor.title")}"
@@ -40,9 +40,9 @@
         <p class="govuk-body">@messages("selectTaxYearsToClaimFor.para")</p>
         @govUkCheckboxes(Checkboxes(
             name = "value",
-            hint = Some(Hint(
+            hint = if(hintText) {Some(Hint(
                 content = Text(messages("selectTaxYearsToClaimFor.hintText"))
-            )),
+            ))} else None,
             items = SelectTaxYearsToClaimFor.options(form, availableYears),
             errorMessage = form.errors.headOption.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*))))
         ))

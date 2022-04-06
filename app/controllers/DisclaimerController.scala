@@ -19,7 +19,7 @@ package controllers
 import controllers.actions._
 import models.{ClaimViewSettings, DisclaimerViewSettings}
 import navigation.Navigator
-import pages.{ClaimedForTaxYear2020, DisclaimerPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -30,6 +30,7 @@ import views.html.DisclaimerView
 
 import java.time.LocalDate
 import javax.inject.Inject
+import scala.concurrent.Future
 
 class DisclaimerController @Inject()(
                                       override val messagesApi: MessagesApi,
@@ -45,23 +46,29 @@ class DisclaimerController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      val selectedTaxYearsAssembler = taxYearFromUIAssemblerFromRequest()
+      request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
+        case Some(_) =>
+          val selectedTaxYearsAssembler = taxYearFromUIAssemblerFromRequest()
 
-      val startDate: Option[LocalDate] = if(selectedTaxYearsAssembler.containsPrevious) {
-        request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-      } else {
-        Some(TAX_YEAR_2021_START_DATE)
+          val startDate: Option[LocalDate] = if(selectedTaxYearsAssembler.containsPrevious) {
+            request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+          } else {
+            Some(TAX_YEAR_2021_START_DATE)
+          }
+
+          def buildDisclaimerPageSettings(dateList: List[(LocalDate, LocalDate)]) = {
+            if (request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).isDefined) {
+              DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))))
+            } else {
+              DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), None)))
+            }
+          }
+
+          Ok(disclaimerView(showBackLink = true, buildDisclaimerPageSettings(selectedTaxYearsAssembler.assemble), startDate))
+
+        case None => Redirect(routes.IndexController.onPageLoad())
       }
 
-      def buildDisclaimerPageSettings(dateList: List[(LocalDate, LocalDate)]) = {
-        if (request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).isDefined) {
-          DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))))
-        } else {
-          DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), None)))
-        }
-      }
-
-      Ok(disclaimerView(showBackLink = true, buildDisclaimerPageSettings(selectedTaxYearsAssembler.assemble), startDate))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {

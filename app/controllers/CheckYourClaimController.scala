@@ -17,10 +17,11 @@
 package controllers
 
 import controllers.actions._
-import pages.WhenDidYouFirstStartWorkingFromHomePage
+import pages.{CheckYourClaimPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import repositories.SessionRepository
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html._
@@ -28,7 +29,7 @@ import utils.TaxYearDates._
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourClaimController @Inject()(
                                          override val messagesApi: MessagesApi,
@@ -39,30 +40,36 @@ class CheckYourClaimController @Inject()(
                                          submissionService: SubmissionService,
                                          val controllerComponents: MessagesControllerComponents,
                                          checkYourClaimView: CheckYourClaimView,
+                                         sessionRepository: SessionRepository
                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
+      request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
+        case Some(_) =>
+          val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
-      val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
+          val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
 
-      val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+          val numberOfWeeksToDisplay = if (startDate.isDefined) {
+            numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE)
+          } else {
+            0
+          }
 
-      val numberOfWeeksToDisplay = if (startDate.isDefined) {
-        numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE)
-      } else {
-        0
+          Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, numberOfWeeksToDisplay, selectedTaxYears.checkboxYearOptions))
+        case None => Redirect(routes.IndexController.onPageLoad())
       }
 
-      Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, numberOfWeeksToDisplay, selectedTaxYears.checkboxYearOptions))
+
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest().checkboxYearOptions
       val startDate = if(!selectedTaxYears.contains("option3")) None else request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-      logger.info(s"startDate value: $startDate")
+
       submissionService.submitExpenses(
         startDate = startDate,
         selectedTaxYears = selectedTaxYears

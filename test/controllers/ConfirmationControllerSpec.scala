@@ -25,7 +25,7 @@ import models.paperless.{PaperlessStatus, PaperlessStatusResponse, Url}
 import org.mockito.Matchers.{any, eq => eqm}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{CheckYourClaimPage, ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, SubmittedClaim, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -41,7 +41,7 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
   val somePreferencesUrl = "/change/preferences"
 
-  "Confirmation Controller is shown" must {
+  "Confirmation Controller" must {
     "return OK and the correct view with paper preferences available" in {
       paperlessControllerTest(true)
     }
@@ -60,7 +60,8 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
         ClaimedForTaxYear2020.toString -> true,
         HasSelfAssessmentEnrolment.toString -> false,
         SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString),
-        WhenDidYouFirstStartWorkingFromHomePage.toString -> earliestWorkingFromHomeDate)))
+        WhenDidYouFirstStartWorkingFromHomePage.toString -> earliestWorkingFromHomeDate,
+        SubmittedClaim.toString -> true)))
     ).overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))
       .overrides(bind[AuditConnector].toInstance(auditConnector))
       .build()

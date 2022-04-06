@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions._
+import pages.SelectTaxYearsToClaimForPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -40,15 +41,17 @@ class YourTaxReliefController @Inject()(
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
+      request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
+        case Some(_) =>
+          val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
 
-      val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
+          val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
-      val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
-
-      Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
-        Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString),
-        selectedTaxYears.containsCurrent, selectedTaxYears.contains2021OrPrevious))
-
+          Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
+            Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString),
+            selectedTaxYears.containsCurrent, selectedTaxYears.contains2021OrPrevious))
+        case None => Redirect(routes.IndexController.onPageLoad())
+      }
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {

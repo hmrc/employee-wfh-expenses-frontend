@@ -38,7 +38,7 @@
 
 @linkToFeedbackForm = {<a  class="govuk-link" rel="noreferrer noopener" target="_blank" href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
-@main_template(title = messages("confirmation.title")) {
+@main_template(title = messages("confirmation.title"), isConfirmationPage = true) {
 
     @govukPanel(Panel(
         title = Text(messages("confirmation.heading")),

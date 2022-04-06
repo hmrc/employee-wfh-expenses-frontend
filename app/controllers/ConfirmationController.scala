@@ -24,6 +24,7 @@ import controllers.actions._
 import javax.inject.Inject
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
+import pages.{CheckYourClaimPage, SelectTaxYearsToClaimForPage, SubmittedClaim}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -32,7 +33,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ConfirmationView
 import play.api.Logging
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 private object PaperlessAuditConst {
   val NinoReference = "nino"
@@ -55,21 +56,25 @@ class ConfirmationController @Inject()(
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account") map {
-        case Right(status) =>
-          auditPaperlessPreferencesCheckSuccess(paperlessEnabled = status.isPaperlessCustomer)
+      request.userAnswers.get(SubmittedClaim) match {
+        case Some(_) =>
+          paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account") map {
+            case Right(status) =>
+              auditPaperlessPreferencesCheckSuccess(paperlessEnabled = status.isPaperlessCustomer)
 
-          val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
+              val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
-          Ok(confirmationView(
-              status.isPaperlessCustomer, Some(status.url.link),
-              selectedTaxYears.contains2021OrPrevious,
-              selectedTaxYears.containsCurrent
-          ))
+              Ok(confirmationView(
+                status.isPaperlessCustomer, Some(status.url.link),
+                selectedTaxYears.contains2021OrPrevious,
+                selectedTaxYears.containsCurrent
+              ))
 
-        case Left(error) =>
-          auditPaperlessPreferencesCheckFailure(error)
-          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+            case Left(error) =>
+              auditPaperlessPreferencesCheckFailure(error)
+              Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+          }
+        case None => Future.successful(Redirect(routes.IndexController.onPageLoad()))
       }
   }
 

@@ -114,24 +114,43 @@ class SelectTaxYearsToClaimForController @Inject()(
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      val availableYears = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(
+      val availableYearsUserCanClaim = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(
         request.userAnswers.get(ClaimedForTaxYear2020).getOrElse(false),
         request.userAnswers.get(ClaimedForTaxYear2021).getOrElse(false),
         request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(false)
       )
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, availableYears))),
+      request.userAnswers.eligibilityCheckerSessionIdOpt match {
+        case Some(sessionId) => eligibilityCheckerService.wfhDueToCovidStatus(sessionId).flatMap { isSaUser =>
+          val availableYears = if(isSaUser.isDefined) Seq(SelectTaxYearsToClaimFor.Option1) else availableYearsUserCanClaim
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, value))
-            _ <- sessionRepository.set(updatedAnswers)
-          } yield {
-            Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
-          }
-      )
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, availableYears))),
+
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield {
+                Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
+              }
+          )
+        }
+        case None =>
+          form.bindFromRequest().fold(
+            formWithErrors =>
+              Future.successful(BadRequest(view(formWithErrors, availableYearsUserCanClaim))),
+
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield {
+                Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
+              }
+          )
+      }
   }
 
   def eligibilityCheckerValuesTaiOverride(request: DataRequest[AnyContent]): Option[Set[SelectTaxYearsToClaimFor]] = {

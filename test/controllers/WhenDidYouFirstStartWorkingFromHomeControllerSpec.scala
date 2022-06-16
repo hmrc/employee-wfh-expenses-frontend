@@ -229,7 +229,7 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
       val result = route(application, getRequest).value
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad().url
+      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad.url
 
       application.stop()
     }
@@ -242,7 +242,7 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
 
       status(result) mustEqual SEE_OTHER
 
-      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad().url
+      redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad.url
 
       application.stop()
     }

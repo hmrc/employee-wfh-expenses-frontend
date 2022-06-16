@@ -82,7 +82,7 @@ class SelectTaxYearsToClaimForController @Inject()(
 
             Future.successful(Ok(view(preparedForm, availableYears, showHintText)))
 
-          case (_, _, _) => Future.successful(Redirect(routes.IndexController.onPageLoad()))
+          case (_, _, _) => Future.successful(Redirect(routes.IndexController.onPageLoad))
         }
     }
   }

@@ -50,7 +50,7 @@ class YourTaxReliefController @Inject()(
           Ok(yourTaxReliefView(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
             Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString),
             selectedTaxYears.containsCurrent, selectedTaxYears.contains2021OrPrevious))
-        case None => Redirect(routes.IndexController.onPageLoad())
+        case None => Redirect(routes.IndexController.onPageLoad)
       }
   }
 

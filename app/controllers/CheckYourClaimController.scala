@@ -59,7 +59,7 @@ class CheckYourClaimController @Inject()(
           }
 
           Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, numberOfWeeksToDisplay, selectedTaxYears.checkboxYearOptions))
-        case None => Redirect(routes.IndexController.onPageLoad())
+        case None => Redirect(routes.IndexController.onPageLoad)
       }
 
 
@@ -78,7 +78,7 @@ class CheckYourClaimController @Inject()(
           Redirect(routes.ConfirmationController.onPageLoad())
         case Left(_) =>
           logger.error("[SubmitYourClaimController][onSubmit] - Error submitting")
-          Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+          Redirect(routes.TechnicalDifficultiesController.onPageLoad)
       }
   }
 }

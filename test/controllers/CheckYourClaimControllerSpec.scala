@@ -94,7 +94,7 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       status(result) mustEqual SEE_OTHER
 
-      redirectLocation(result).value mustEqual routes.TechnicalDifficultiesController.onPageLoad().url
+      redirectLocation(result).value mustEqual routes.TechnicalDifficultiesController.onPageLoad.url
 
       application.stop()
     }

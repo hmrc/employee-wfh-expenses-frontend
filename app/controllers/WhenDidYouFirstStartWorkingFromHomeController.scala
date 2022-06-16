@@ -55,7 +55,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
             case Some(value) => form.fill(value)
           }
           Ok(whenDidYouFirstStartWorkingFromHomeView(preparedForm))
-        case None => Redirect(routes.IndexController.onPageLoad())
+        case None => Redirect(routes.IndexController.onPageLoad)
       }
   }
 

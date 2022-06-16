@@ -72,9 +72,9 @@ class ConfirmationController @Inject()(
 
             case Left(error) =>
               auditPaperlessPreferencesCheckFailure(error)
-              Redirect(routes.TechnicalDifficultiesController.onPageLoad())
+              Redirect(routes.TechnicalDifficultiesController.onPageLoad)
           }
-        case None => Future.successful(Redirect(routes.IndexController.onPageLoad()))
+        case None => Future.successful(Redirect(routes.IndexController.onPageLoad))
       }
   }
 

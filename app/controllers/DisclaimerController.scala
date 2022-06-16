@@ -66,7 +66,7 @@ class DisclaimerController @Inject()(
 
           Ok(disclaimerView(showBackLink = true, buildDisclaimerPageSettings(selectedTaxYearsAssembler.assemble), startDate))
 
-        case None => Redirect(routes.IndexController.onPageLoad())
+        case None => Redirect(routes.IndexController.onPageLoad)
       }
 
   }

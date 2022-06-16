@@ -64,6 +64,6 @@ class AuthenticatedIdentifierAction @Inject()(
         s"&completionURL=${config.ivCompletionUrl}" +
         s"&failureURL=${config.ivFailureUrl}")
     case _: AuthorisationException =>
-      Redirect(routes.UnauthorisedController.onPageLoad())
+      Redirect(routes.UnauthorisedController.onPageLoad)
   }
 }

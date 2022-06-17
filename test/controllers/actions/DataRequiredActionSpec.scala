@@ -46,7 +46,7 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar with ScalaFuture
         whenReady(futureResult) { result =>
           result.isLeft mustBe true
           result.left.get.header.status mustBe SEE_OTHER
-          result.left.get.header.headers.get(LOCATION).contains(routes.SessionExpiredController.onPageLoad().url) mustBe true
+          result.left.get.header.headers.get(LOCATION).contains(routes.SessionExpiredController.onPageLoad.url) mustBe true
         }
       }
     }

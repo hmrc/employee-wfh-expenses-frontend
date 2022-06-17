@@ -48,7 +48,7 @@ class ErrorHandler @Inject()(
         new Status(Status.TOO_MANY_REQUESTS)( serviceTooBusyTemplate(rh) )
       case e: Exception =>
         logger.warn(s"[ErrorHandler][resolveError] failed with: $e")
-        Redirect(routes.TechnicalDifficultiesController.onPageLoad().url)
+        Redirect(routes.TechnicalDifficultiesController.onPageLoad.url)
       case _ =>
         logger.error(s"[ErrorHandler][resolveError] Internal Server Error, (${rh.method})(${rh.uri})", ex)
         super.resolveError(rh, ex)

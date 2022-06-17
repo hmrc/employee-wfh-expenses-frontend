@@ -1,5 +1,5 @@
 @*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
     @main_template(
         title = messages("manualCorrespondenceIndicator.title"),
         beforeContentBlock = Some(backLink(BackLink(
-            href = routes.IndexController.onPageLoad().url,
+            href = routes.IndexController.onPageLoad.url,
             content = Text(messages("site.back")),
             attributes = Map("id" -> "back-link")
         )))

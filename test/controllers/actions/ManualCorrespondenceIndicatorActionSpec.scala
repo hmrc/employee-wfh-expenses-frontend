@@ -102,7 +102,7 @@ class ManualCorrespondenceIndicatorActionSpec extends SpecBase with WireMockHelp
         status(result) mustBe SEE_OTHER
         whenReady(result) {
           res =>
-            res.header.headers(LOCATION) mustBe routes.TechnicalDifficultiesController.onPageLoad().url
+            res.header.headers(LOCATION) mustBe routes.TechnicalDifficultiesController.onPageLoad.url
         }
       }
     }

@@ -45,12 +45,12 @@ class ManualCorrespondenceIndicatorActionImpl @Inject()(
             Some(Redirect(routes.ManualCorrespondenceIndicatorController.onPageLoad().url))
           case statusCode =>
             logger.warn(s"[ManualCorrespondenceIndicatorAction][filter] - Unexpected status code: $statusCode ")
-            Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad().url))
+            Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad.url))
         }
     }.recoverWith {
       case e =>
         logger.error(s"[ManualCorrespondenceIndicatorAction][filter] failed: $e")
-        Future{Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad().url))}
+        Future{Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad.url))}
     }
 
   }

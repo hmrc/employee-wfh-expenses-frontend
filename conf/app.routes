@@ -1,7 +1,6 @@
-# microservice specific routes
-
-->         /govuk-frontend                              govuk.Routes
 ->         /hmrc-frontend                               hmrcfrontend.Routes
+
+# microservice specific routes
 
 GET        /                                            controllers.IndexController.onPageLoad
 
@@ -20,16 +19,25 @@ GET        /identity-failed                             controllers.Unauthorised
 
 GET        /technical-difficulties                      controllers.TechnicalDifficultiesController.onPageLoad
 
-GET        /disclaimer                                  controllers.DisclaimerController.onPageLoad()
-POST       /disclaimer                                  controllers.DisclaimerController.onSubmit()
+GET        /how-we-will-calculate-tax-relief            controllers.HowWeWillCalculateTaxReliefController.onPageLoad()
+POST       /how-we-will-calculate-tax-relief            controllers.HowWeWillCalculateTaxReliefController.onSubmit()
 
 GET        /start-date                                  controllers.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
 POST       /start-date                                  controllers.WhenDidYouFirstStartWorkingFromHomeController.onSubmit()
 
 GET        /cannot-claim-using-this-service             controllers.CannotClaimUsingThisServiceController.onPageLoad()
 
-GET        /your-tax-relief                             controllers.YourTaxReliefController.onPageLoad()
-POST       /your-tax-relief                             controllers.YourTaxReliefController.onSubmit()
+GET        /disclaimer                                  controllers.DisclaimerController.onPageLoad()
+POST       /disclaimer                                  controllers.DisclaimerController.onSubmit()
+
+GET        /inform-claim-now-in-weeks                   controllers.InformClaimNowInWeeksController.onPageLoad()
+POST       /inform-claim-now-in-weeks                   controllers.InformClaimNowInWeeksController.onSubmit()
+
+GET        /number-of-weeks-to-claim-for                controllers.NumberOfWeeksToClaimForController.onPageLoad()
+POST       /number-of-weeks-to-claim-for                controllers.NumberOfWeeksToClaimForController.onSubmit()
+
+GET        /confirm-claim-in-weeks                      controllers.ConfirmClaimInWeeksController.onPageLoad()
+POST       /confirm-claim-in-weeks                      controllers.ConfirmClaimInWeeksController.onSubmit()
 
 GET        /confirmation                                controllers.ConfirmationController.onPageLoad()
 GET        /confirmation-paperless                      controllers.ConfirmationController.onPageLoad()

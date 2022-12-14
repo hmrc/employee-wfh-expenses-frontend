@@ -22,12 +22,13 @@ lazy val root = (project in file("."))
     RoutesKeys.routesImport += "models._",
     TwirlKeys.templateImports ++= Seq(
       "play.twirl.api.HtmlFormat",
-      "uk.gov.hmrc.govukfrontend.views.html.components._",
-      "uk.gov.hmrc.govukfrontend.views.html.helpers._",
-      "uk.gov.hmrc.hmrcfrontend.views.html.{components => hmrcComponents}",
       "views.ViewUtils._",
       "models.Mode",
-      "controllers.routes._"
+      "controllers.routes._",
+      "uk.gov.hmrc.govukfrontend.views.html.components._",
+      "uk.gov.hmrc.govukfrontend.views.html.components.implicits._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.{components => hmrcComponents}",
+      "uk.gov.hmrc.hmrcfrontend.views.html.helpers._"
     ),
     PlayKeys.playDefaultPort := 9336,
     ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*filters.*;.*handlers.*;.*components.*;.*repositories.*;" +

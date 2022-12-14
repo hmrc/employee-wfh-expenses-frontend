@@ -1,8 +1,6 @@
 
 # employee-wfh-expenses-frontend
 
-This is a placeholder README.md for a new repository
-
 ## Running the service locally
 
 Service manager: sm --start EE_ALL --> sm --stop EE_WFH_FRONTEND

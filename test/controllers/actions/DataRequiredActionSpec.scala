@@ -53,7 +53,7 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar with ScalaFuture
 
     "redirect to the confirmation page" when {
       "the SUBMITTEDCLAIM session member is present" in {
-        val fakeRequest = FakeRequest("GET", routes.DisclaimerController.onPageLoad().url)
+        val fakeRequest = FakeRequest("GET", routes.HowWeWillCalculateTaxReliefController.onPageLoad().url)
 
         val userAnswers = UserAnswers(
           userAnswersId,

@@ -50,11 +50,11 @@ trait ViewBehaviours extends ViewSpecBase {
     }
   }
 
-  def disclaimerPage(view: HtmlFormat.Appendable,
+  def howWeWillCalculateTaxReliefPage(view: HtmlFormat.Appendable,
                  messageKeyPrefix: String,
                  expectedGuidanceKeys: String*): Unit = {
 
-    "behave like a disclaimer page" when {
+    "behave like a howWeWillCalculateTaxRelief page" when {
 
       "rendered" must {
 

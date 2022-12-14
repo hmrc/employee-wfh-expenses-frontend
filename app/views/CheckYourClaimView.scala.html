@@ -47,7 +47,7 @@
 @main_template(
     title = messages("checkYourClaimView.title"),
     beforeContentBlock = Some(backLink(BackLink(
-        href = routes.YourTaxReliefController.onPageLoad().url,
+        href = routes.DisclaimerController.onPageLoad().url,
         content = Text(messages("site.back")),
         attributes = Map("id" -> "back-link")
     )))
@@ -64,7 +64,7 @@
 
     <ul class="govuk-list govuk-list--bullet">
         @for(dateToken <- claimViewSettings.datesToClaim) {
-            <li>@messages("checkYourClaimView.text.2") @dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("disclaimer.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</li>
+            <li>@messages("checkYourClaimView.text.2") @dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("howWeWillCalculateTaxRelief.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</li>
         }
 
         @if(startDate.isDefined) {

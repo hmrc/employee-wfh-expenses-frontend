@@ -31,7 +31,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
     val view = viewFor[CheckYourClaimView](Some(emptyUserAnswers))
 
     val request = FakeRequest()
-    val optionList = List("option1")
+    val optionList = List("option2")
 
     "show content" when {
       "when all possible content is enabled" in {
@@ -46,7 +46,6 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
         assert(doc.toString.contains(messages("checkYourClaimView.heading")))
         assert(doc.toString.contains(messages("checkYourClaimView.text.1")))
         assert(doc.toString.contains(messages("checkYourClaimView.text.2")))
-        assert(doc.toString.contains(messages("checkYourClaimView.text.3")))
         assert(doc.toString.contains(messages("checkYourClaimView.text.4")))
         assert(doc.toString.contains(messages("checkYourClaimView.text.5")))
         assert(doc.toString.contains(messages("checkYourClaimView.button.label")))
@@ -58,7 +57,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
 
       "when content when start date is missing" in {
 
-        val assembler = TaxYearFromUIAssembler(List("option1"))
+        val assembler = TaxYearFromUIAssembler(List("option2"))
         val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
           Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
 
@@ -71,7 +70,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
     }
 
     "behave like a normal page" when {
-      val assembler = TaxYearFromUIAssembler(List("option1"))
+      val assembler = TaxYearFromUIAssembler(List("option2"))
       val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
         Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
       val startDate = LocalDate.of(2020, 4, 1)

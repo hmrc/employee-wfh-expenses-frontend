@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
+import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3, Option4}
 import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler, UserAnswers}
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
@@ -29,8 +29,8 @@ import play.api.test.Helpers._
 import services.SubmissionService
 import utils.DateLanguageTokenizer
 import views.html.CheckYourClaimView
-
 import java.time.LocalDate
+
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
@@ -44,7 +44,7 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
           HasSelfAssessmentEnrolment.toString -> false,
-          SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString),
+          SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString, Option4.toString),
           WhenDidYouFirstStartWorkingFromHomePage.toString -> LocalDate.of(2020, 4, 1)
         )
       )
@@ -59,7 +59,7 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       status(result) mustEqual OK
 
-      val optionList = List("option1", "option2", "option3")
+      val optionList = List("option1", "option2", "option3", "option4")
       val assembler = TaxYearFromUIAssembler(optionList)
       val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
         Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
@@ -75,7 +75,7 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSubmissionService = mock[SubmissionService]
 
-      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Left("dd"))
+      when(mockSubmissionService.submitExpenses(any(), any(), any())(any(), any(), any())) thenReturn Future.successful(Left("dd"))
 
       val userAnswer = UserAnswers(
         userAnswersId,

@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package models
+package pages
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.JsPath
 
-case class WfhDueToCovidStatusWrapper(WfhDueToCovidStatus: Int)
+case object ClaimedForTaxYear2023 extends QuestionPage[Boolean] {
 
-object WfhDueToCovidStatusWrapper {
-  implicit val formats: OFormat[WfhDueToCovidStatusWrapper] = Json.format[WfhDueToCovidStatusWrapper]
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "claimedForTaxYear2023"
 }

@@ -34,8 +34,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.TaxYearDates.{YEAR_2020, YEAR_2021, YEAR_2022, YEAR_2023}
-
 import javax.inject.Inject
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -100,7 +100,7 @@ trait TaiLookupHandler extends Logging {
           auditAlreadyClaimed(dataRequest.nino, dataRequest.saUtr, YEAR_2022, claimed2022.otherExpenses, claimed2022.jobExpenses, claimed2022.wasJobRateExpensesChecked)
           auditAlreadyClaimed(dataRequest.nino, dataRequest.saUtr, YEAR_2023, claimed2023.otherExpenses, claimed2023.jobExpenses, claimed2023.wasJobRateExpensesChecked)
           Redirect(appConfig.p87DigitalFormUrl)
-        case (_, _, _, _) =>
+        case (_, _, _,_) =>
           successHandler(alreadyClaimed2020.isDefined, alreadyClaimed2021.isDefined, alreadyClaimed2022.isDefined, alreadyClaimed2023.isDefined)
       }
     }

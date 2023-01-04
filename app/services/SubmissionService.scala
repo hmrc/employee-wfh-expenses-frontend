@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,11 +49,11 @@ class SubmissionService @Inject()
 
   val ZERO      = 0
 
-  def submitExpenses(startDate: Option[LocalDate], selectedTaxYears: List[String], numberOfWeeks: Option[Int])
+  def submitExpenses(startDate: Option[LocalDate], selectedTaxYears: List[String], numberOfWeeksOf2023: Option[Int])
                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] = {
 
 
-    rateLimiter.withToken(() => submit(startDate, selectedTaxYears, numberOfWeeks) map {
+    rateLimiter.withToken(() => submit(startDate, selectedTaxYears, numberOfWeeksOf2023) map {
       case Right(submittedDetails) =>
         logger.info(s"[SubmissionService][submitExpenses] Submission successful")
         auditSubmissionSuccess(submittedDetails)
@@ -67,7 +67,7 @@ class SubmissionService @Inject()
     })
   }
 
-  private def submit(startDate: Option[LocalDate], selectedTaxYears: List[String], numberOfWeeks: Option[Int])
+  private def submit(startDate: Option[LocalDate], selectedTaxYears: List[String], numberOfWeeksOf2023: Option[Int])
                      (implicit dataRequest: DataRequest[AnyContent],
                       hc: HeaderCarrier,
                       ec: ExecutionContext) = {
@@ -79,7 +79,7 @@ class SubmissionService @Inject()
       if(assembler.contains2022) Some(FlatRateItem(year = YEAR_2022, amount = calculate2022FlatRate())) else None
     ).flatten
 
-    val prevYearItems: Seq[FlatRateItem] = startDate match {
+    val previousYearItems: Seq[FlatRateItem] = startDate match {
       case Some(date) if assembler.containsPrevious => Seq(
         Some(FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())),
         if(date.isBefore(TAX_YEAR_2019_END_DATE)) {
@@ -91,12 +91,12 @@ class SubmissionService @Inject()
       case _ => Seq.empty[FlatRateItem]
     }
 
-    val perWeekItems: Seq[FlatRateItem] = numberOfWeeks match {
+    val perWeekItems: Seq[FlatRateItem] = numberOfWeeksOf2023 match {
       case Some(weeks) => Seq(FlatRateItem(year = YEAR_2023, amount = calculate2023FlatRate(weeks)))
       case _ => Seq.empty[FlatRateItem]
     }
 
-    val flatRateItems = wholeYearItems ++ prevYearItems ++ perWeekItems
+    val flatRateItems = wholeYearItems ++ previousYearItems ++ perWeekItems
 
     if (flatRateItems.isEmpty) {
       Future.successful(Left("Flat Rate Items sequence is empty, unable to submit"))
@@ -156,9 +156,8 @@ class SubmissionService @Inject()
     }
   }
 
-  def calculate2023FlatRate(numberOfWeeks: Int): Int = {
-    ZERO
-  }
+  def calculate2023FlatRate(numberOfWeeks: Int): Int =
+    (numberOfWeeks * appConfig.taxReliefPerWeek2023).min(appConfig.taxReliefMaxPerYear2023)
 
   private def auditSubmissionSuccess(submittedDetails: Seq[FlatRateItem])
                                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =

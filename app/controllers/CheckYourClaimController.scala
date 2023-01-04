@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,12 +70,12 @@ class CheckYourClaimController @Inject()(
     implicit request =>
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest().checkboxYearOptions
       val startDate = if(!selectedTaxYears.contains("option4")) None else request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-      val numberOfWeeks = if(!selectedTaxYears.contains("option1")) None else request.userAnswers.get(NumberOfWeeksToClaimForPage)
+      val numberOfWeeksOf2023 = if(!selectedTaxYears.contains("option1")) None else request.userAnswers.get(NumberOfWeeksToClaimForPage)
 
       submissionService.submitExpenses(
         startDate = startDate,
         selectedTaxYears = selectedTaxYears,
-        numberOfWeeks = numberOfWeeks
+        numberOfWeeksOf2023 = numberOfWeeksOf2023
       ) map {
         case Right(_) =>
           Redirect(routes.ConfirmationController.onPageLoad())

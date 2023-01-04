@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, EligibilityCheckerSessionId, SelectTaxYearsToClaimForPage}
+import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, ClaimedForTaxYear2023, EligibilityCheckerSessionId, SelectTaxYearsToClaimForPage}
 import play.api.inject.bind
 import play.api.libs.json.{JsString, Json}
 import play.api.mvc.Call
@@ -51,7 +51,8 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
       val userAnswer = UserAnswers(userAnswersId, Json.obj(
         ClaimedForTaxYear2020.toString -> false,
         ClaimedForTaxYear2021.toString -> false,
-        ClaimedForTaxYear2022.toString -> false
+        ClaimedForTaxYear2022.toString -> false,
+        ClaimedForTaxYear2023.toString -> false,
       ))
 
       val application = applicationBuilder(userAnswers = Some(userAnswer)).build()

@@ -133,9 +133,10 @@ selectTaxYearsToClaimFor.heading = Which tax years are you claiming for?
 selectTaxYearsToClaimFor.para = HMRC have checked our records and you can claim for the following years.
 selectTaxYearsToClaimFor.text = HMRC have checked our records and you can claim for the following years.
 selectTaxYearsToClaimFor.hintText = Select all that apply.
-selectTaxYearsToClaimFor.option1 = This tax year (6 April 2022 to 5 April 2023)
-selectTaxYearsToClaimFor.option2 = Last tax year (6 April 2021 to 5 April 2022)
-selectTaxYearsToClaimFor.option3 = Previous tax years before 6 April 2021
+selectTaxYearsToClaimFor.option1 = This tax year from 6 April 2023 to 5 April 2024
+selectTaxYearsToClaimFor.option2 = The tax year from 6 April 2022 to 5 April 2023
+selectTaxYearsToClaimFor.option3 = The tax year from 6 April 2021 to 5 April 2022
+selectTaxYearsToClaimFor.option4 = Previous tax years before 6 April 2021
 selectTaxYearsToClaimFor.error.required = Select at least one option
 
 whenDidYouFirstStartWorkingFromHome.title = When did you start working from home?

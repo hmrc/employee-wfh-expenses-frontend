@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
 
     val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
 
-    val assembler = TaxYearFromUIAssembler(List("option1"))
+    val assembler = TaxYearFromUIAssembler(List("option2"))
 
     val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
       Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
@@ -47,7 +47,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
         val request = FakeRequest()
 
-        val assembler = TaxYearFromUIAssembler(List("option1"))
+        val assembler = TaxYearFromUIAssembler(List("option2"))
 
         val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
           Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
@@ -68,7 +68,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
         val request = FakeRequest()
 
-        val assembler = TaxYearFromUIAssembler(List("option1"))
+        val assembler = TaxYearFromUIAssembler(List("option2"))
 
         val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
           Some(DateLanguageTokenizer.convertList(assembler.assemble)))))

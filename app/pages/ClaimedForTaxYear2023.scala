@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import forms.mappings.Mappings
-import play.api.data.{Form, Forms}
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
+case object ClaimedForTaxYear2023 extends QuestionPage[Boolean] {
 
-class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
+  override def path: JsPath = JsPath \ toString
 
-  def apply(): Form[Int] =
-    Form(
-      "value" -> Forms.number
-    )
-
+  override def toString: String = "claimedForTaxYear2023"
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,13 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
     "be translated (checkbox input marshalling)" when {
       "when ALL possible years are selected" in {
         val expectedYearsTupleList = List(
+          (TaxYear(YEAR_2023).starts, TaxYear(YEAR_2023).finishes),
           (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
           (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
           (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
         )
 
-        val selectedYearsOptions = List("option1", "option2", "option3")
+        val selectedYearsOptions = List("option1", "option2", "option3", "option4")
 
         val assembledResult = TaxYearFromUIAssembler(selectedYearsOptions).assemble
         assert(assembledResult == expectedYearsTupleList)
@@ -45,7 +46,7 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
           (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
           (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes)
         )
-        val selectedYearsOptions = List("option1", "option2")
+        val selectedYearsOptions = List("option2", "option3")
 
         val assembledResult = TaxYearFromUIAssembler(selectedYearsOptions).assemble
         assert(assembledResult == expectedYearsTupleList)
@@ -53,7 +54,7 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
 
       "when 2022 only year is selected" in {
         val expectedYearsTupleList = List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes))
-        val assembledResult = TaxYearFromUIAssembler(List("option1")).assemble
+        val assembledResult = TaxYearFromUIAssembler(List("option2")).assemble
         assert(assembledResult == expectedYearsTupleList)
       }
 
@@ -63,13 +64,13 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
           (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
         )
 
-        val assembledResult = TaxYearFromUIAssembler(List("option1", "option3")).assemble
+        val assembledResult = TaxYearFromUIAssembler(List("option2", "option4")).assemble
         assert(assembledResult == expectedYearsTupleList)
       }
 
       "when 2021 only year is selected" in {
         val expectedYearsTupleList = List((TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
-        val assembledResult = TaxYearFromUIAssembler(List("option2")).assemble
+        val assembledResult = TaxYearFromUIAssembler(List("option3")).assemble
         assert(assembledResult == expectedYearsTupleList)
       }
 
@@ -78,7 +79,7 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
           (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
           (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
         )
-        val assembledResult = TaxYearFromUIAssembler(List("option2", "option3")).assemble
+        val assembledResult = TaxYearFromUIAssembler(List("option3", "option4")).assemble
         assert(assembledResult == expectedYearsTupleList)
       }
 
@@ -86,7 +87,7 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
         val expectedYearsTupleList = List(
           (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
         )
-        val assembledResult = TaxYearFromUIAssembler(List("option3")).assemble
+        val assembledResult = TaxYearFromUIAssembler(List("option4")).assemble
         assert(assembledResult == expectedYearsTupleList)
       }
 

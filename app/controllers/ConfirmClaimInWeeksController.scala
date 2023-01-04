@@ -55,7 +55,7 @@ class ConfirmClaimInWeeksController @Inject()(
         case Some(value) => form.fill(value)
       }
 
-      Ok(confirmClaimInWeeksView(preparedForm, numberOfWeeksToConfirm))
+      Ok(confirmClaimInWeeksView(preparedForm, numberOfWeeksToConfirm.toString))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
@@ -64,7 +64,7 @@ class ConfirmClaimInWeeksController @Inject()(
 
       form.bindFromRequest().fold(
         formWithErrors => {
-          Future.successful(BadRequest(confirmClaimInWeeksView(formWithErrors, numberOfWeeksToConfirm)))
+          Future.successful(BadRequest(confirmClaimInWeeksView(formWithErrors, numberOfWeeksToConfirm.toString)))
         },
         value =>
           for {

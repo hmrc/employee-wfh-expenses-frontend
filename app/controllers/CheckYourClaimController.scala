@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions._
-import pages.{CheckYourClaimPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{CheckYourClaimPage, NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -26,9 +26,10 @@ import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html._
 import utils.TaxYearDates._
-
 import java.time.LocalDate
+
 import javax.inject.Inject
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourClaimController @Inject()(
@@ -68,11 +69,13 @@ class CheckYourClaimController @Inject()(
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest().checkboxYearOptions
-      val startDate = if(!selectedTaxYears.contains("option3")) None else request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+      val startDate = if(!selectedTaxYears.contains("option4")) None else request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+      val numberOfWeeks = if(!selectedTaxYears.contains("option1")) None else request.userAnswers.get(NumberOfWeeksToClaimForPage)
 
       submissionService.submitExpenses(
         startDate = startDate,
-        selectedTaxYears = selectedTaxYears
+        selectedTaxYears = selectedTaxYears,
+        numberOfWeeks = numberOfWeeks
       ) map {
         case Right(_) =>
           Redirect(routes.ConfirmationController.onPageLoad())

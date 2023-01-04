@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,9 @@ import services.IABDService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.TaxYearDates.{YEAR_2020, YEAR_2021, YEAR_2022}
-
+import utils.TaxYearDates.{YEAR_2020, YEAR_2021, YEAR_2022, YEAR_2023}
 import javax.inject.Inject
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -77,28 +77,31 @@ trait TaiLookupHandler extends Logging {
     auditConnector.sendExplicitAudit(AlreadyClaimedExpenses.toString, json)
   }
 
-  def handlePageRequest(successHandler: (Boolean, Boolean, Boolean) => Result)
+  def handlePageRequest(successHandler: (Boolean, Boolean, Boolean, Boolean) => Result)
                        (implicit dataRequest: OptionalDataRequest[AnyContent], hc: HeaderCarrier): Future[Result] = {
 
 
     val alreadyClaimed2020Future = iabdService.alreadyClaimed(dataRequest.nino, YEAR_2020)
     val alreadyClaimed2021Future = iabdService.alreadyClaimed(dataRequest.nino, YEAR_2021)
     val alreadyClaimed2022Future = iabdService.alreadyClaimed(dataRequest.nino, YEAR_2022)
+    val alreadyClaimed2023Future = iabdService.alreadyClaimed(dataRequest.nino, YEAR_2023)
 
     for {
       alreadyClaimed2020 <- alreadyClaimed2020Future
       alreadyClaimed2021 <- alreadyClaimed2021Future
       alreadyClaimed2022 <- alreadyClaimed2022Future
+      alreadyClaimed2023 <- alreadyClaimed2023Future
     } yield {
-      (alreadyClaimed2020, alreadyClaimed2021, alreadyClaimed2022) match {
-        case (Some(claimed2020), Some(claimed2021), Some(claimed2022)) =>
-          logger.info(s"[TaiLookupHandler][handlePageRequest] Detected already claimed for $YEAR_2020, $YEAR_2021 and $YEAR_2022; redirecting to P87 digital form")
+      (alreadyClaimed2020, alreadyClaimed2021, alreadyClaimed2022, alreadyClaimed2023) match {
+        case (Some(claimed2020), Some(claimed2021), Some(claimed2022), Some(claimed2023)) =>
+          logger.info(s"[TaiLookupHandler][handlePageRequest] Detected already claimed for $YEAR_2020, $YEAR_2021, $YEAR_2022 and $YEAR_2023; redirecting to P87 digital form")
           auditAlreadyClaimed(dataRequest.nino, dataRequest.saUtr, YEAR_2020, claimed2020.otherExpenses, claimed2020.jobExpenses, claimed2020.wasJobRateExpensesChecked)
           auditAlreadyClaimed(dataRequest.nino, dataRequest.saUtr, YEAR_2021, claimed2021.otherExpenses, claimed2021.jobExpenses, claimed2021.wasJobRateExpensesChecked)
           auditAlreadyClaimed(dataRequest.nino, dataRequest.saUtr, YEAR_2022, claimed2022.otherExpenses, claimed2022.jobExpenses, claimed2022.wasJobRateExpensesChecked)
+          auditAlreadyClaimed(dataRequest.nino, dataRequest.saUtr, YEAR_2023, claimed2023.otherExpenses, claimed2023.jobExpenses, claimed2023.wasJobRateExpensesChecked)
           Redirect(appConfig.p87DigitalFormUrl)
-        case (_, _, _) =>
-          successHandler(alreadyClaimed2020.isDefined, alreadyClaimed2021.isDefined, alreadyClaimed2022.isDefined)
+        case (_, _, _,_) =>
+          successHandler(alreadyClaimed2020.isDefined, alreadyClaimed2021.isDefined, alreadyClaimed2022.isDefined, alreadyClaimed2023.isDefined)
       }
     }
   }.recoverWith {
@@ -110,7 +113,8 @@ trait TaiLookupHandler extends Logging {
 
   def taiLookupSuccessHandler(alreadyClaimed2020: Boolean,
                               alreadyClaimed2021: Boolean,
-                              alreadyClaimed2022: Boolean)
+                              alreadyClaimed2022: Boolean,
+                              alreadyClaimed2023: Boolean)
                              (implicit request: OptionalDataRequest[AnyContent]): Result = {
 
     val eligibilityCheckerSessionIdString = request.queryString.get("eligibilityCheckerSessionId") match {
@@ -124,6 +128,7 @@ trait TaiLookupHandler extends Logging {
         ClaimedForTaxYear2020.toString -> alreadyClaimed2020,
         ClaimedForTaxYear2021.toString -> alreadyClaimed2021,
         ClaimedForTaxYear2022.toString -> alreadyClaimed2022,
+        ClaimedForTaxYear2023.toString -> alreadyClaimed2023,
         HasSelfAssessmentEnrolment.toString -> (if(appConfig.saLookupEnabled) request.saUtr.isDefined else false),
         EligibilityCheckerSessionId.toString() -> eligibilityCheckerSessionIdString
       )

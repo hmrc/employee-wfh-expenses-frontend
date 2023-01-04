@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
   implicit val defaultOptionalDataRequest: OptionalDataRequest[AnyContent] = OptionalDataRequest(
     FakeRequest("GET", "?eligibilityCheckerSessionId=qqq"), "XXX", None, "XX", None)
 
-  val taiLookupSuccessHandler: (Boolean, Boolean, Boolean) => Results.Status = (a: Boolean, b: Boolean, c: Boolean) => Ok
+  val taiLookupSuccessHandler: (Boolean, Boolean, Boolean, Boolean) => Results.Status = (a: Boolean, b: Boolean, c: Boolean, d:Boolean) => Ok
 
   before {
     Mockito.reset(mockIABDService)
@@ -136,7 +136,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
       when(mockNavigator.nextPage(any(), any())).thenReturn(Call("method-1", "url-123", "fragment-string"))
 
       val result = taiIndexLookupServiceUnderTest.taiLookupSuccessHandler(alreadyClaimed2020 = true,
-        alreadyClaimed2021 = true, alreadyClaimed2022 = true)
+        alreadyClaimed2021 = true, alreadyClaimed2022 = true, alreadyClaimed2023 = true)
 
       verify(mockNavigator, times(1)).nextPage(any(), any())
 

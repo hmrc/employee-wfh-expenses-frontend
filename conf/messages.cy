@@ -117,7 +117,7 @@ checkYourClaimView.text.5 = Drwy gyflwyno’r hawliad hwn, rydych yn cadarnhau, 
 checkYourClaimView.button.label = Cadarnhau a chyflwyno
 checkYourClaimView.inset.text = Gwnaethoch ddechrau gweithio gartref ar
 checkYourClaimView.changeThisDate.href.text = Newid y dyddiad hwn
-checkYourClaimView.list.item2 = {0} o flwyddyn dreth 6 Ebrill 2019 i 5 Ebrill 2020
+checkYourClaimView.list.item2 = {0} o flwyddyn dreth 1 Ionawr 2020 i 5 Ebrill 2020
 
 submitYourClaim.title = Cyflwynwch eich hawliad
 submitYourClaim.heading = Cyflwynwch eich hawliad

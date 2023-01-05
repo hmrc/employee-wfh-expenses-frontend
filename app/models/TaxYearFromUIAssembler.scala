@@ -137,10 +137,16 @@ case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
 
   }
 
+
   val containsCurrent: Boolean = checkboxYearOptions.contains("option1")
   val contains2022: Boolean = checkboxYearOptions.contains("option2")
   val contains2021: Boolean = checkboxYearOptions.contains("option3")
   val containsPrevious: Boolean = checkboxYearOptions.contains("option4")
   val contains2021OrPrevious: Boolean = contains2021 || containsPrevious
+  val yearsClaimedByWeek: List[(LocalDate, LocalDate)] = List(
+    (TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE)
+  )
+
+  val assembleWholeYears: List[(LocalDate, LocalDate)] = assemble diff yearsClaimedByWeek
 
 }

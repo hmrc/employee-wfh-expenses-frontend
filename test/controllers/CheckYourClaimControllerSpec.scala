@@ -22,7 +22,7 @@ import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -45,7 +45,8 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
           ClaimedForTaxYear2020.toString -> false,
           HasSelfAssessmentEnrolment.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString, Option4.toString),
-          WhenDidYouFirstStartWorkingFromHomePage.toString -> LocalDate.of(2020, 4, 1)
+          WhenDidYouFirstStartWorkingFromHomePage.toString -> LocalDate.of(2020, 4, 1),
+          NumberOfWeeksToClaimForPage.toString -> 3
         )
       )
 
@@ -61,12 +62,12 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       val optionList = List("option1", "option2", "option3", "option4")
       val assembler = TaxYearFromUIAssembler(optionList)
-      val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-        Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+      val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assembleWholeYears),
+        Some(DateLanguageTokenizer.convertList(assembler.assembleWholeYears)))))
       val startDate = LocalDate.of(2020, 4, 1)
 
       contentAsString(result) mustEqual
-        view(claimSettings.claimViewSettings.get, Some(startDate), 1, optionList)(request, messages).toString
+        view(claimSettings.claimViewSettings.get, Some(startDate), 1, Some(3), optionList)(request, messages).toString
 
       application.stop()
     }

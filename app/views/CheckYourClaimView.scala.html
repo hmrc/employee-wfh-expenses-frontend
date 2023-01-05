@@ -16,16 +16,19 @@
 
 @import java.time.LocalDate
 @import utils.TaxYearDates._
+@import config.FrontendAppConfig
 
 @this(
     main_template:      MainTemplate,
+    appConfig:          FrontendAppConfig,
     formHelper:         FormWithCSRF,
     backLink:           GovukBackLink,
     govukInsetText:     GovukInsetText,
+    govukDetails:       GovukDetails,
     button:             GovukButton
 )
 
-@(claimViewSettings: ClaimViewSettings, startDate: Option[LocalDate], numberOfWeeksIn2019: Long, yearsClaimingFor: List[String])(implicit request: Request[_], messages: Messages)
+@(claimViewSettings: ClaimViewSettings, startDate: Option[LocalDate], numberOfWeeksIn2019: Long, numberOfWeeksIn2023: Option[Int], yearsClaimingFor: List[String])(implicit request: Request[_], messages: Messages)
 
 @readableDate(date: LocalDate) = {@{date.getDayOfMonth} @{messages(s"month.${date.getMonthValue}")} @{date.getYear}}
 
@@ -44,6 +47,19 @@
     }
 }
 
+@maybeWeeksOf2023 = {
+    @numberOfWeeksIn2023.map { weeks =>
+        <li>@messages("checkYourClaimView.list.item3", pluralOrSingularWeeks(weeks))</li>
+    }
+}
+
+@detailsContent = {
+    <p class="govuk-body">@messages("checkYourClaimView.details.text.1")
+        <a class="govuk-link" href="@appConfig.p87DigitalFormUrl">@messages("checkYourClaimView.details.href.text")</a>
+        @messages("checkYourClaimView.details.text.2")
+    </p>
+}
+
 @main_template(
     title = messages("checkYourClaimView.title"),
     beforeContentBlock = Some(backLink(BackLink(
@@ -52,30 +68,44 @@
         attributes = Map("id" -> "back-link")
     )))
 ) {
-    <h1 class="govuk-heading-l">@messages("checkYourClaimView.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("checkYourClaimView.heading")</h1>
 
     @if(startDate.isDefined) {
         @govukInsetText(InsetText(
             content = HtmlContent(insetHtml(startDate.get))
         ))
     }
+    <h2 class="govuk-heading-m">@messages("checkYourClaimView.header")</h2>
 
-    <p class="govuk-body">@messages("checkYourClaimView.text.1")</p>
+    <p class="govuk-body">@messages("checkYourClaimView.text.1.1")
+        <span class="govuk-!-font-weight-bold">&pound;@appConfig.taxReliefPerWeek2020</span>
+        @messages("checkYourClaimView.text.1.2")
+    </p>
 
     <ul class="govuk-list govuk-list--bullet">
+        @maybeWeeksOf2023
         @for(dateToken <- claimViewSettings.datesToClaim) {
             <li>@messages("checkYourClaimView.text.2") @dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("howWeWillCalculateTaxRelief.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</li>
         }
-
-        @if(startDate.isDefined) {
-            @if(startDate.get.isBefore(TAX_YEAR_2020_START_DATE)) {
-                <li>@messages("checkYourClaimView.list.item2", pluralOrSingularWeeks(numberOfWeeksIn2019))</li>
-            }
-        }
     </ul>
+
+    @if(startDate.isDefined && startDate.get.isBefore(TAX_YEAR_2020_START_DATE)) {
+        <p class="govuk-body">@messages("checkYourClaimView.text.1.1")
+            <span class="govuk-!-font-weight-bold">&pound;@appConfig.taxReliefPerWeek2019</span>
+            @messages("checkYourClaimView.text.1.2")
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("checkYourClaimView.list.item2", pluralOrSingularWeeks(numberOfWeeksIn2019))</li>
+        </ul>
+    }
 
     @if(yearsClaimingFor.contains("option1")) {
         <p class="govuk-body">@messages("checkYourClaimView.text.3")</p>
+        @govukDetails(Details(
+            summary = Text(messages("checkYourClaimView.details.heading")),
+            content = HtmlContent(detailsContent)
+        ))
     }
 
     <h2 class="govuk-heading-m">@messages("checkYourClaimView.text.4")</h2>

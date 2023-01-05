@@ -134,6 +134,15 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     }
   }
 
+  "calculate2023FlatRate" should {
+    "calculate the total rate as £90 for the 2023 claim (after specifying 15 weeks)" in new Setup {
+      serviceUnderTest.calculate2023FlatRate(15) mustBe 90
+    }
+    "limit the amount claimed by the maximum possible amount" in new Setup {
+      serviceUnderTest.calculate2023FlatRate(100) mustBe frontendAppConfig.taxReliefMaxPerYear2023
+    }
+  }
+
   "submit" when {
 
     implicit val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, "internalId", UserAnswers("id"), testNino, None)
@@ -142,6 +151,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     val etag2 = ETag(101)
     val etag3 = ETag(102)
     val etag4 = ETag(103)
+    val etag5 = ETag(104)
+    val claimingFor2023 = List("option1")
     val claimingFor2022 = List("option2")
     val claimingFor2021 = List("option3")
     val claimingForPrev = List("option4")
@@ -149,6 +160,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     val claimingFor2022And2021 = List("option2", "option3")
     val claimingFor2021AndPrev = List("option3", "option4")
     val claimingFor2022AndPrev = List("option2", "option4")
+    val claimingFor2023AndPrev = List("option1", "option4")
 
     def verifySessionGotSubmittedState = {
       verify(mockSessionRepository).set(userAnswersArgumentCaptor.capture())
@@ -350,7 +362,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
     }
 
-    s"claiming for all available tax years with a start date of $YEAR_2020_START_DATE" should {
+    s"claiming for all available tax years with a start date of $YEAR_2020_START_DATE, including 3 weeks of 2023" should {
       "upsert 4 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockThrottler.enabled).thenReturn(false)
         when(mockThrottler.withToken(any())).thenCallRealMethod()
@@ -368,13 +380,17 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
           .thenReturn(Future.successful(
             etag4
           ))
+          .thenReturn(Future.successful(
+            etag5
+          ))
 
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), any())(any(), any())).thenReturn(Future.successful(()))
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), any())(any(), any())).thenReturn(Future.successful(()))
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), any())(any(), any())).thenReturn(Future.successful(()))
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), any(), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2023), any(), any())(any(), any())).thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(Some(YEAR_2020_START_DATE), claimingForAll, None)).isRight mustBe true
+        await(serviceUnderTest.submitExpenses(Some(YEAR_2020_START_DATE), claimingForAll, Some(3))).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -548,6 +564,73 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         verifyNoSubmittedStateUpdate
       }
 
+    }
+
+    s"only claiming for 3 weeks of the 2023/24 tax year" should {
+      "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.successful(
+            etag1
+          ))
+
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2023), any(), any())(any(), any())).thenReturn(Future.successful(()))
+
+        await(serviceUnderTest.submitExpenses(None, claimingFor2023, Some(3))).isRight mustBe true
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
+
+        verifySessionGotSubmittedState
+      }
+    }
+
+      s"claiming for 3 weeks of 2023 and previous years with a start date of $YEAR_2020_START_DATE" should {
+      "upsert 3 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.successful(
+            etag1
+          ))
+          .thenReturn(Future.successful(
+            etag2
+          ))
+          .thenReturn(Future.successful(
+            etag5
+          ))
+
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2019), any(), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2023), any(), any())(any(), any())).thenReturn(Future.successful(()))
+
+        await(serviceUnderTest.submitExpenses(Some(YEAR_2020_START_DATE), claimingFor2023AndPrev, Some(3))).isRight mustBe true
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
+
+        verifySessionGotSubmittedState
+      }
+
+      "report errors when ETAG call fails and audit failure" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+
+        await(serviceUnderTest.submitExpenses(Some(YEAR_2020_START_DATE), claimingFor2023AndPrev, Some(3))).isLeft mustBe true
+
+        val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
+        inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
+        inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
+
+        verifyNoSubmittedStateUpdate
+      }
     }
 
     "rate limit has been reached (no tokens in bucket)" should {

@@ -136,14 +136,17 @@ submitYourClaim.list.item4 = the information you have provided is correct, to th
 
 selectTaxYearsToClaimFor.title = Which tax years are you claiming for?
 selectTaxYearsToClaimFor.heading = Which tax years are you claiming for?
-selectTaxYearsToClaimFor.para = HMRC have checked our records and you can claim for the following years.
-selectTaxYearsToClaimFor.text = HMRC have checked our records and you can claim for the following years.
-selectTaxYearsToClaimFor.hintText = Select all that apply.
+selectTaxYearsToClaimFor.para = We have checked your tax records and you can claim for the following years.
+selectTaxYearsToClaimFor.hintText = Select the years that you would like to claim for.
 selectTaxYearsToClaimFor.option1 = This tax year from 6 April 2023 to 5 April 2024
 selectTaxYearsToClaimFor.option2 = The tax year from 6 April 2022 to 5 April 2023
 selectTaxYearsToClaimFor.option3 = The tax year from 6 April 2021 to 5 April 2022
 selectTaxYearsToClaimFor.option4 = Previous tax years before 6 April 2021
-selectTaxYearsToClaimFor.error.required = Select at least one option
+selectTaxYearsToClaimFor.error.required = Select at least one tax year you are claiming for
+selectTaxYearsToClaimFor.details.heading = The tax year I want to claim for is not listed
+selectTaxYearsToClaimFor.details.text.1 = If any tax years are not listed it means that you may have already claimed for them.
+selectTaxYearsToClaimFor.details.text.2 = You can continue to use this service to claim for any of the tax years listed if you are eligible or
+selectTaxYearsToClaimFor.details.href.text = you can amend your previous claims
 
 whenDidYouFirstStartWorkingFromHome.title = When did you start working from home?
 whenDidYouFirstStartWorkingFromHome.heading = When did you start working from home?

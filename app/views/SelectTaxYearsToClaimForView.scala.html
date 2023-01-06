@@ -22,10 +22,19 @@
         button: GovukButton,
         errorSummary: GovukErrorSummary,
         govUkCheckboxes: GovukCheckboxes,
-        formHelper: FormWithCSRF
+        formHelper: FormWithCSRF,
+        govukDetails: GovukDetails,
+        appConfig: config.FrontendAppConfig
 )
 
 @(form: Form[Set[SelectTaxYearsToClaimFor]], availableYears: Seq[SelectTaxYearsToClaimFor], hintText: Boolean = true)(implicit request: Request[_], messages: Messages)
+
+@detailsContent = {
+    <p class="govuk-body">@messages("selectTaxYearsToClaimFor.details.text.1")</p>
+    <p class="govuk-body">@messages("selectTaxYearsToClaimFor.details.text.2")
+        <a class="govuk-link" href="@appConfig.p87DigitalFormUrl">@messages("selectTaxYearsToClaimFor.details.href.text")</a>.
+    </p>
+}
 
 @main_template(
     title = s"${errorPrefix(form)} ${messages("selectTaxYearsToClaimFor.title")}"
@@ -34,10 +43,13 @@
     @formHelper(action = routes.SelectTaxYearsToClaimForController.onSubmit(), 'autoComplete -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+            @errorSummary(ErrorSummary(
+                errorList = form.errors.asTextErrorLinks.map(errorLink => errorLink.copy(href = Some("#option1"))),
+                title = Text(messages("error.summary.title"))
+            ))
         }
         <br> <br>
-        <h1 class="govuk-heading-l">@messages("selectTaxYearsToClaimFor.title")</h1>
+        <h1 class="govuk-heading-xl">@messages("selectTaxYearsToClaimFor.title")</h1>
         <p class="govuk-body">@messages("selectTaxYearsToClaimFor.para")</p>
         @govUkCheckboxes(Checkboxes(
             name = "value",
@@ -48,6 +60,10 @@
             errorMessage = form.errors.headOption.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*))))
         ))
 
+        @govukDetails(Details(
+            summary = Text(messages("selectTaxYearsToClaimFor.details.heading")),
+            content = HtmlContent(detailsContent)
+        ))
 
         @button(Button(content = Text(messages("site.continue"))))
     }

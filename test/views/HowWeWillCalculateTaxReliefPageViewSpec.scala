@@ -40,31 +40,28 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
 
     val applyView = view.apply(true, disclaimerViewSettings, Some(date))(fakeRequest, messages)
 
-    behave like howWeWillCalculateTaxReliefPage(applyView, "howWeWillCalculateTaxRelief")
+    behave like normalPage(applyView, "howWeWillCalculateTaxRelief")
 
     "show content" when {
-      "when all howWeWillCalculateTaxRelief content is displayed before additional tax relief dates" in {
+      "when all howWeWillCalculateTaxRelief content is displayed for tax year 2023 to 2024" in {
         val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
         val request = FakeRequest()
 
-        val assembler = TaxYearFromUIAssembler(List("option2"))
+        val assembler = TaxYearFromUIAssembler(List("option1"))
 
         val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
           Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
 
-        val date = LocalDate.of(2020, 4, 1)
+        val date = LocalDate.of(2022, 4, 1)
         val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.your.claim.details.year.label")))
-        assert(doc.toString.contains(messages("6 April 2022 to 5 April 2023")))
-        assert(doc.toString.contains(messages("1 January 2020 to 5 April 2020")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.your.claim.text.2")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.your.claim.text.3")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.your.claim.text.4")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.your.claim.text.5")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
+        assert(doc.toString.contains(messages("6 April 2023 to 5 April 2024")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)))
       }
 
-      "when all howWeWillCalculateTaxRelief content is displayed after additional tax relief dates" in {
+      "when all howWeWillCalculateTaxRelief content is displayed for tax year 2022 to 2023" in {
         val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
         val request = FakeRequest()
 
@@ -73,10 +70,51 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
           Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
 
-        val date = LocalDate.of(2020, 5, 1)
+        val date = LocalDate.of(2022, 4, 1)
         val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
         assert(doc.toString.contains(messages("6 April 2022 to 5 April 2023")))
-        assert(!doc.toString.contains(messages("1 January 2020 to 5 April 2020")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.yearly.text")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)))
+      }
+
+      "when all howWeWillCalculateTaxRelief content is displayed for tax year 2021 to 2022" in {
+        val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
+        val request = FakeRequest()
+
+        val assembler = TaxYearFromUIAssembler(List("option3"))
+
+        val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
+          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+
+        val date = LocalDate.of(2022, 4, 1)
+        val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
+        assert(doc.toString.contains(messages("6 April 2021 to 5 April 2022")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.yearly.text")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)))
+      }
+
+      "when all howWeWillCalculateTaxRelief content is displayed for tax year before 2021" in {
+        val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
+        val request = FakeRequest()
+
+        val assembler = TaxYearFromUIAssembler(List("option4"))
+
+        val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
+          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+
+        val date = LocalDate.of(2022, 4, 1)
+        val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
+        assert(doc.toString.contains(messages("Previous years before 5 April 2021")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.end.date.inset.text")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 4)))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.enter.start.date.text")))
       }
     }
   }

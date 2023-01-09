@@ -72,18 +72,18 @@ ivfailed.postalForm.href.text=ffurflen argraffu ac anfon
 ivfailed.helpline.href.text=llinell gymorth ymholiadau cyffredinol: Treth Incwm
 ivfailed.tryAgain.href.text=cadarnhau pwy ydych
 
-howWeWillCalculateTaxRelief.title = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad
-howWeWillCalculateTaxRelief.heading = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad
-howWeWillCalculateTaxRelief.your.claim.details.header = Manylion eich hawliad
-howWeWillCalculateTaxRelief.your.claim.details.year.label = Gallwch hawlio a chael rhyddhad treth ar dreuliau o £6 yr wythnos am flynyddoedd treth llawn:
+howWeWillCalculateTaxRelief.title = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad #TODO Get Welsh
+howWeWillCalculateTaxRelief.heading = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad #TODO Get Welsh
+howWeWillCalculateTaxRelief.eligibility.inset.text = To claim, you must meet the eligibility rules for each of the listed years. #TODO Get Welsh
 howWeWillCalculateTaxRelief.your.claim.date.to = i
-howWeWillCalculateTaxRelief.your.claim.text.1 = Gallwch hefyd hawlio a chael rhyddhad treth ar dreuliau o £4 yr wythnos am ran o flwyddyn dreth:
-howWeWillCalculateTaxRelief.your.claim.text.date.bullet = 1 Ionawr 2020 i 5 Ebrill 2020
-howWeWillCalculateTaxRelief.your.claim.text.2 = Os yw’ch costau ychwanegol yn fwy na hyn, gallwch wneud hawliad am ragor o ryddhad treth.
-howWeWillCalculateTaxRelief.your.claim.text.3 = Bydd angen i chi
-howWeWillCalculateTaxRelief.your.claim.text.4 = hawlio rhyddhad treth ar gyfer treuliau cyflogaeth
-howWeWillCalculateTaxRelief.your.claim.text.5 = a darparu tystiolaeth, fel derbynebau a biliau manwl a gwiriadwy.
-howWeWillCalculateTaxRelief.submit.button = Derbyn ac yn eich blaen
+
+howWeWillCalculateTaxRelief.end.date.inset.text = We do not need an end date #TODO Get Welsh
+howWeWillCalculateTaxRelief.bullet.frequency.weekly.text = Claims are calculated in weeks #TODO Get Welsh
+howWeWillCalculateTaxRelief.bullet.frequency.yearly.text = Claims are given for the entire tax year #TODO Get Welsh
+howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text = Tax relief is £{0} per week #TODO Get Welsh
+howWeWillCalculateTaxRelief.bullet.enter.weeks.text = You need to enter the number of weeks you work from home for this tax year #TODO Get Welsh
+howWeWillCalculateTaxRelief.bullet.enter.start.date.text = You need to enter the date you started working from home and we will calculate the number of weeks you are entitled to claim for #TODO Get Welsh
+
 
 disclaimer.title = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad
 disclaimer.heading = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad

@@ -20,11 +20,11 @@ import forms.ConfirmClaimInWeeksFormProvider
 import play.api.Application
 import play.api.data.Form
 import play.twirl.api.Html
-import views.behaviours.{ViewBehaviours, YesNoViewBehaviours}
+import views.behaviours.ViewBehaviours
 import views.html.ConfirmClaimInWeeksView
 
 // scalastyle:off magic.number
-class ConfirmClaimInWeeksViewSpec extends ViewBehaviours with YesNoViewBehaviours {
+class ConfirmClaimInWeeksViewSpec extends ViewBehaviours {
 
 
   val application: Application = applicationBuilder().build

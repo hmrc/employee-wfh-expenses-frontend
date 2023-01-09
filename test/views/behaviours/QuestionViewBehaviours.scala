@@ -22,8 +22,8 @@ import play.twirl.api.HtmlFormat
 trait QuestionViewBehaviours[A] extends ViewBehaviours {
 
   val errorKey = "value"
-  val errorMessage = "error.number"
-  val error = FormError(errorKey, errorMessage)
+  val errorMessage = "error.required"
+  def error(messageKeyPrefix: String) = FormError(errorKey, s"${messageKeyPrefix}.${errorMessage}")
 
   val form: Form[A]
 
@@ -56,7 +56,7 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours {
 
         "show an error prefix in the browser title" in {
 
-          val doc = asDocument(createView(form.withError(error)))
+          val doc = asDocument(createView(form.withError(error(messageKeyPrefix))))
           assertEqualsValue(doc, "title", s"""${messages("error.browser.title.prefix")} ${messages(s"$messageKeyPrefix.title")}""")
         }
       }

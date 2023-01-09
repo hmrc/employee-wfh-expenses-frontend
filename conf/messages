@@ -119,6 +119,10 @@ checkYourClaimView.inset.text = You started working from home on
 checkYourClaimView.changeThisDate.href.text = Change this date
 checkYourClaimView.list.item2 = {0} of tax year 6 April 2019 to 5 April 2020
 
+confirmClaimInWeeks.title = Do you want to claim for {0} weeks of working from home in the current tax year?
+confirmClaimInWeeks.hint = The claim of {0} weeks is for the current tax year from 6 April 2023 to 5 April 2024.
+
+
 submitYourClaim.title = Submit your claim
 submitYourClaim.heading = Submit your claim
 submitYourClaim.list = submitYourClaimList

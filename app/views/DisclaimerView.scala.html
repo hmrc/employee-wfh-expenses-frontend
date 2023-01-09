@@ -48,13 +48,13 @@ button:                         GovukButton
 @main_template(
     title = messages("disclaimer.title"),
     beforeContentBlock = Some(backLink(BackLink(
-        href = routes.DisclaimerController.onPageLoad().url,
+        href = routes.SelectTaxYearsToClaimForController.onPageLoad().url,
         content = Text(messages("site.back")),
         attributes = Map("id" -> "back-link")
     )))
 ) {
 
-    <h1 class="govuk-heading-l">@messages("disclaimer.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("disclaimer.heading")</h1>
 
     @if(showFirstMessageBlock) {
         @govukNotificationBanner(NotificationBanner(

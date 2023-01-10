@@ -16,6 +16,7 @@
 
 @this(
     main_template: MainTemplate,
+    errorSummary: GovukErrorSummary,
     formHelper: FormWithCSRF,
     backLink: GovukBackLink,
     button: GovukButton,
@@ -33,18 +34,26 @@
     )))
 ) {
 
-    <h1 class="govuk-heading-xl">How many weeks do you expect to work from home in the current tax year?***ADD CONTENT</h1>
+    @if(form.errors.nonEmpty) {
+        @errorSummary(ErrorSummary(
+            errorList = form.errors.asTextErrorLinks.map(errorLink => errorLink.copy(href = Some("#value"))),
+            title = Text(messages("error.summary.title"))
+        ))
+    }
 
-    <p class="govuk-body">**CONTENT TO BE ADDED**</p>
+    <h1 class="govuk-heading-xl">@messages("numberOfWeeksToClaimFor.heading")</h1>
+
+    <p class="govuk-body">@messages("numberOfWeeksToClaimFor.body.text")</p>
 
     @formHelper(action = NumberOfWeeksToClaimForController.onSubmit(), 'autoComplete -> "off") {
 
         @inputNumber(
             field = form("value"),
             question = messages("numberOfWeeksToClaimFor.question"),
+            hintText = Some(messages("numberOfWeeksToClaimFor.hint.text")),
             hideLabel = true
         )
 
-        @button(Button(content = Text(messages("numberOfWeeksToClaimFor.button.text")), preventDoubleClick  = true))
+        @button(Button(content = Text(messages("site.continue")), preventDoubleClick  = true))
     }
 }

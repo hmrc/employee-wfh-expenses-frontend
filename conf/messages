@@ -106,6 +106,15 @@ disclaimer.warning.text.2 = You must ensure you meet the rules for claiming, as 
 disclaimer.accept.text.1 = By clicking accept and continue, you are accepting that you meet the rules for the years you are claiming for.
 disclaimer.button.text = Accept and continue
 
+numberOfWeeksToClaimFor.title = How many weeks do you expect to work from home in the current tax year?
+numberOfWeeksToClaimFor.heading = How many weeks do you expect to work from home in the current tax year?
+numberOfWeeksToClaimFor.body.text = This will be the amount of weeks you expect to work from home in the tax year from 6 April 2023 to 5 April 2024.
+numberOfWeeksToClaimFor.hint.text = For example, 29
+numberOfWeeksToClaimFor.error.required = Enter how many weeks you expect to worked from home in the current tax year
+numberOfWeeksToClaimFor.error.wholeNumber = How many weeks you expect to work from home in the current tax year must be a whole number
+numberOfWeeksToClaimFor.error.max = How many weeks you expect to worked from home in the current tax year must be 52 weeks or less
+numberOfWeeksToClaimFor.error.min =  How many weeks you expect to worked from home in the current tax year must be 1 or 2 digits
+
 checkYourClaimView.title = Check your claim
 checkYourClaimView.heading = Check and submit your claim
 checkYourClaimView.header = Check your claim details

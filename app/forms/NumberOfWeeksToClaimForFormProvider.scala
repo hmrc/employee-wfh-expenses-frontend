@@ -17,7 +17,9 @@
 package forms
 
 import forms.mappings.Mappings
-import play.api.data.{Form, Forms}
+import forms.mappings.Constraints
+import play.api.data.Form
+import play.api.data.Forms._
 
 import javax.inject.Inject
 
@@ -25,7 +27,9 @@ class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Int] =
     Form(
-      "value" -> Forms.number
-    )
+      "value" -> int("numberOfWeeksToClaimFor.error.required", "numberOfWeeksToClaimFor.error.wholeNumber", "numberOfWeeksToClaimFor.error.wholeNumber")
+        .verifying(maximumValue(52, "numberOfWeeksToClaimFor.error.max"))
+          .verifying(minimumValue(1,"numberOfWeeksToClaimFor.error.min"))
+  )
 
 }

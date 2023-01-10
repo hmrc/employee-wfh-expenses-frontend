@@ -24,6 +24,7 @@ import java.time.temporal.ChronoUnit
 object TaxYearDates {
 
   val ONE_WEEK  = 1
+  val MAXIMUM_WEEKS_IN_A_YEAR = 52
 
   val YEAR_2019: Int = 2019
   val YEAR_2020: Int = 2020

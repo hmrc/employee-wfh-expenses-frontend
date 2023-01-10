@@ -18,6 +18,7 @@ package forms
 
 import forms.mappings.Mappings
 import play.api.data.{Form, Forms}
+import utils.TaxYearDates.{ONE_WEEK, MAXIMUM_WEEKS_IN_A_YEAR}
 
 import javax.inject.Inject
 
@@ -25,7 +26,11 @@ class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
 
   def apply(): Form[Int] =
     Form(
-      "value" -> Forms.number
+      "value" -> int("numberOfWeeksToClaimFor.error.required",
+        "numberOfWeeksToClaimFor.error.wholeNumber",
+        "numberOfWeeksToClaimFor.error.nonNumeric"
+      ).verifying(minimumValue(ONE_WEEK, "numberOfWeeksToClaimFor.error.minimum"))
+          .verifying(maximumValue(MAXIMUM_WEEKS_IN_A_YEAR, "numberOfWeeksToClaimFor.error.maximum"))
     )
 
 }

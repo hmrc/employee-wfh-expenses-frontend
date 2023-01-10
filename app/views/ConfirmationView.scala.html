@@ -45,25 +45,23 @@
         content = if(claimingForCurrent) HtmlContent(messages("confirmation.text")) else HtmlContent("")
     ))
 
-    <br>
-    <h2 class="govuk-heading-m">@messages("confirmation.whatHappensNext.heading")</h2>
+    @if(claimingForCurrent) {
+        <div class="govuk-inset-text">
+            <p class="govuk-body">@messages("confirmation.info.paragraph")</p>
+        </div>
+    }
 
     @if(claimingForCurrent) {
-        <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.1")</p>
-        <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.2")</p>
-        @if(claimingFor2021OrPrevious) {
-            <p class="govuk-body">@messages("confirmation.whatHappensNext.currentTaxYear.text.3")</p>
-        }
+        <h2 class="govuk-heading-m">@messages("confirmation.changes.currentYear.heading")</h2>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("confirmation.changes.currentYear.bullet.1")</li>
+            <li>@messages("confirmation.changes.currentYear.bullet.2")</li>
+        </ul>
     }
 
     @if(claimingFor2021OrPrevious) {
-        <p class="govuk-body">@messages("confirmation.whatHappensNext.previousTaxYears.text")</p>
-    }
-
-    @if(claimingForCurrent) {
-    <div class="govuk-inset-text">
-        <p class="govuk-body">@messages("confirmation.whatHappensNext.info.paragraph.3")</p>
-    </div>
+        <h2 class="govuk-heading-m">@messages("confirmation.changes.previousYear.heading")</h2>
+        <p class="govuk-body">@messages("confirmation.changes.previousYear.p.1")</p>
     }
 
     <p class="govuk-body">

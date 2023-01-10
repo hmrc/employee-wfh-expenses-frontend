@@ -53,13 +53,20 @@ class CheckYourClaimController @Inject()(
 
           val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
 
-          val numberOfWeeksToDisplay = if (startDate.isDefined) {
+          val numberOfWeeksIn2019 = if (startDate.isDefined) {
             numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE)
           } else {
             0
           }
 
-          Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, numberOfWeeksToDisplay, selectedTaxYears.checkboxYearOptions))
+          val numberOfWeeksIn2023 = if(!taxYearFromUIAssemblerFromRequest().checkboxYearOptions.contains("option1")) {
+            None
+          } else {
+            request.userAnswers.get(NumberOfWeeksToClaimForPage)
+          }
+
+          Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assembleWholeYears), startDate, numberOfWeeksIn2019,
+            numberOfWeeksIn2023, selectedTaxYears.checkboxYearOptions))
         case None => Redirect(routes.IndexController.onPageLoad)
       }
 

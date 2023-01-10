@@ -14,9 +14,13 @@
  * limitations under the License.
  *@
 
+@import utils.DateLanguageTokenizer
+@import utils.TaxYearDates._
+
 @this(
     main_template: MainTemplate,
     formHelper: FormWithCSRF,
+    errorSummary: GovukErrorSummary,
     backLink: GovukBackLink,
     button: GovukButton,
     inputNumber: components.input_number
@@ -24,8 +28,15 @@
 
 @(form: Form[_])(implicit request: Request[_], messages: Messages)
 
+@currentYearContent = @{
+    val (dateFrom, dateTo) = DateLanguageTokenizer.convertDate(TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE)
+    val dateFromString = s"${dateFrom.day} ${messages(dateFrom.month)} ${dateFrom.year}"
+    val dateToString = s"${dateTo.day} ${messages(dateTo.month)} ${dateTo.year}"
+    messages("numberOfWeeksToClaimFor.para", dateFromString, dateToString)
+}
+
 @main_template(
-    title = messages("numberOfWeeksToClaimFor.title"),
+    title = s"${errorPrefix(form)} ${messages("numberOfWeeksToClaimFor.title")}",
     beforeContentBlock = Some(backLink(BackLink(
         href = routes.InformClaimNowInWeeksController.onPageLoad().url,
         content = Text(messages("site.back")),
@@ -33,18 +44,26 @@
     )))
 ) {
 
-    <h1 class="govuk-heading-xl">How many weeks do you expect to work from home in the current tax year?***ADD CONTENT</h1>
+    @if(form.errors.nonEmpty) {
+        @errorSummary(ErrorSummary(
+            errorList = form.errors.asTextErrorLinks,
+            title = Text(messages("error.summary.title"))
+        ))
+    }
 
-    <p class="govuk-body">**CONTENT TO BE ADDED**</p>
+    <h1 class="govuk-heading-xl">@messages("numberOfWeeksToClaimFor.heading")</h1>
+
+    <p class="govuk-body">@currentYearContent</p>
 
     @formHelper(action = NumberOfWeeksToClaimForController.onSubmit(), 'autoComplete -> "off") {
 
         @inputNumber(
             field = form("value"),
+            hintText = Some(messages("numberOfWeeksToClaimFor.hinttext")),
             question = messages("numberOfWeeksToClaimFor.question"),
             hideLabel = true
         )
 
-        @button(Button(content = Text(messages("numberOfWeeksToClaimFor.button.text")), preventDoubleClick  = true))
+        @button(Button(content = Text(messages("site.continue")), preventDoubleClick  = true))
     }
 }

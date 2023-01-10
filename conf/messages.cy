@@ -72,18 +72,18 @@ ivfailed.postalForm.href.text=ffurflen argraffu ac anfon
 ivfailed.helpline.href.text=llinell gymorth ymholiadau cyffredinol: Treth Incwm
 ivfailed.tryAgain.href.text=cadarnhau pwy ydych
 
-howWeWillCalculateTaxRelief.title = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad
-howWeWillCalculateTaxRelief.heading = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad
-howWeWillCalculateTaxRelief.your.claim.details.header = Manylion eich hawliad
-howWeWillCalculateTaxRelief.your.claim.details.year.label = Gallwch hawlio a chael rhyddhad treth ar dreuliau o £6 yr wythnos am flynyddoedd treth llawn:
+howWeWillCalculateTaxRelief.title = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad #TODO Get Welsh
+howWeWillCalculateTaxRelief.heading = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad #TODO Get Welsh
+howWeWillCalculateTaxRelief.eligibility.inset.text = To claim, you must meet the eligibility rules for each of the listed years. #TODO Get Welsh
 howWeWillCalculateTaxRelief.your.claim.date.to = i
-howWeWillCalculateTaxRelief.your.claim.text.1 = Gallwch hefyd hawlio a chael rhyddhad treth ar dreuliau o £4 yr wythnos am ran o flwyddyn dreth:
-howWeWillCalculateTaxRelief.your.claim.text.date.bullet = 1 Ionawr 2020 i 5 Ebrill 2020
-howWeWillCalculateTaxRelief.your.claim.text.2 = Os yw’ch costau ychwanegol yn fwy na hyn, gallwch wneud hawliad am ragor o ryddhad treth.
-howWeWillCalculateTaxRelief.your.claim.text.3 = Bydd angen i chi
-howWeWillCalculateTaxRelief.your.claim.text.4 = hawlio rhyddhad treth ar gyfer treuliau cyflogaeth
-howWeWillCalculateTaxRelief.your.claim.text.5 = a darparu tystiolaeth, fel derbynebau a biliau manwl a gwiriadwy.
-howWeWillCalculateTaxRelief.submit.button = Derbyn ac yn eich blaen
+
+howWeWillCalculateTaxRelief.end.date.inset.text = We do not need an end date #TODO Get Welsh
+howWeWillCalculateTaxRelief.bullet.frequency.weekly.text = Claims are calculated in weeks #TODO Get Welsh
+howWeWillCalculateTaxRelief.bullet.frequency.yearly.text = Claims are given for the entire tax year #TODO Get Welsh
+howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text = Tax relief is £{0} per week #TODO Get Welsh
+howWeWillCalculateTaxRelief.bullet.enter.weeks.text = You need to enter the number of weeks you work from home for this tax year #TODO Get Welsh
+howWeWillCalculateTaxRelief.bullet.enter.start.date.text = You need to enter the date you started working from home and we will calculate the number of weeks you are entitled to claim for #TODO Get Welsh
+
 
 disclaimer.title = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad
 disclaimer.heading = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad
@@ -117,7 +117,7 @@ checkYourClaimView.text.5 = Drwy gyflwyno’r hawliad hwn, rydych yn cadarnhau, 
 checkYourClaimView.button.label = Cadarnhau a chyflwyno
 checkYourClaimView.inset.text = Gwnaethoch ddechrau gweithio gartref ar
 checkYourClaimView.changeThisDate.href.text = Newid y dyddiad hwn
-checkYourClaimView.list.item2 = {0} o flwyddyn dreth 6 Ebrill 2019 i 5 Ebrill 2020
+checkYourClaimView.list.item2 = {0} o flwyddyn dreth 1 Ionawr 2020 i 5 Ebrill 2020
 
 submitYourClaim.title = Cyflwynwch eich hawliad
 submitYourClaim.heading = Cyflwynwch eich hawliad
@@ -164,7 +164,10 @@ cannotClaimUsingThisService.alternative = Gallwch {0} y gwnaethoch ddechrau gwei
 confirmation.paperless.button.text = Cofrestrwch ar gyfer hysbysiadau di-bapur
 confirmation.title = Cadarnhad
 confirmation.heading = Hawliad wedi’i gwblhau
+
+#TODO Needs updated welsh
 confirmation.text = Byddwn yn newid eich cod treth
+
 confirmation.hmrc.text = Bydd CThEF yn gwirio’ch hawliad
 confirmation.text.footer.mail = Byddwn yn rhoi gwybod i chi am y newid i’ch cod treth drwy e-bost.
 confirmation.text.footer.post = Byddwn yn rhoi gwybod i chi am y newid i’ch cod treth drwy’r post, neu ar-lein os ydych wedi cofrestru ar gyfer hysbysiadau di-bapur.
@@ -174,14 +177,18 @@ confirmation.whatHappensNext.paragraph.3 = Nid oes angen i chi gysylltu â CThEF
 confirmation.linkToFeedbackForm.href.text = Beth oedd eich barn am y gwasanaeth hwn? (yn agor tab newydd)
 confirmation.linkToFeedbackForm.href.postfix = (mae’n cymryd 30 eiliad)
 confirmation.paperless.header = Cael llythyrau treth ar-lein
+
+#TODO Needs updated welsh
 confirmation.paperless.paragraph.1 = Gallwch fwrw golwg drostynt, eu lawrlwytho neu eu hargraffu pryd bynnag y mynnwch. Arbedwch amser ac osgowch annibendod.
-confirmation.whatHappensNext.previousTaxYears.text = Byddwn yn gwirio’ch hawliad ar gyfer blynyddoedd treth blaenorol ac yn ysgrifennu atoch drwy’r post neu drwy e-bost os ydych wedi talu gormod o dreth. Does dim angen i chi gysylltu â CThEF ynglŷn â hyn.
-confirmation.whatHappensNext.currentTaxYear.text.1 = Byddwn yn cynyddu’r swm y gallwch ei ennill yn rhydd o dreth ar gyfer y flwyddyn dreth gyfredol er mwyn cynnwys rhyddhad treth ar eich treuliau am weithio gartref.
-confirmation.whatHappensNext.currentTaxYear.text.2 = Rydym yn gwneud hyn drwy newid eich cod treth, sy’n penderfynu faint o dreth y byddwch yn ei thalu.
-confirmation.whatHappensNext.currentTaxYear.text.3 = Byddwn yn rhoi gwybod i chi am y newid i’ch cod treth drwy’r post, neu drwy e-bost os ydych wedi cofrestru ar gyfer hysbysiadau di-bapur.
-confirmation.whatHappensNext.info.paragraph.1 = Byddwn yn cynyddu’r swm y gallwch ei ennill yn rhydd o dreth ar gyfer y flwyddyn dreth hon er mwyn cynnwys rhyddhad treth ar eich treuliau am weithio gartref.
-confirmation.whatHappensNext.info.paragraph.2 = Rydym yn gwneud hyn drwy newid eich cod treth, sy’n penderfynu faint o dreth y byddwch yn ei thalu.
-confirmation.whatHappensNext.info.paragraph.3 = Dylech allu gweld newidiadau i’ch cod treth yn eich cyfrif treth personol ar ôl dau ddiwrnod gwaith.
+
+#TODO Needs updated welsh
+confirmation.changes.currentYear.heading = Changes for the current tax year
+confirmation.changes.currentYear.bullet.1 = We will increase the amount you can earn tax-free for the current tax year to include tax relief on your expenses for working from home. We do this by changing your tax code, which decides how much tax you pay.
+confirmation.changes.currentYear.bullet.2 = We will let you know about your tax code change by post, or by email if you've signed up to paperless notifications.
+confirmation.changes.previousYear.heading = Changes for previous tax years
+confirmation.changes.previousYear.p.1 = We will check your claim for previous tax years and we will write to you by post or email if you have paid too much tax. There is no need to contact HMRC about this.
+
+confirmation.info.paragraph = Dylech allu gweld newidiadau i’ch cod treth yn eich cyfrif treth personol ar ôl dau ddiwrnod gwaith.
 
 manualCorrespondenceIndicator.title=Ni allwch ddefnyddio’r gwasanaeth hwn ar hyn o bryd
 manualCorrespondenceIndicator.heading=Ni allwch ddefnyddio’r gwasanaeth hwn ar hyn o bryd

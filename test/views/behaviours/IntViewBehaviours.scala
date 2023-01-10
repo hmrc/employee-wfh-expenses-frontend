@@ -58,20 +58,20 @@ trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
 
         "show an error summary" in {
 
-          val doc = asDocument(createView(form.withError(error)))
-          assertRenderedById(doc, "error-summary-heading")
+          val doc = asDocument(createView(form.withError(error(messageKeyPrefix))))
+          assertRenderedById(doc, "error-summary-title")
         }
 
         "show an error associated with the value field" in {
 
-          val doc = asDocument(createView(form.withError(error)))
-          val errorSpan = doc.getElementsByClass("error-message").first
-          errorSpan.text mustBe (messages("error.browser.title.prefix") + " " + messages(errorMessage))
+          val doc = asDocument(createView(form.withError(error(messageKeyPrefix))))
+          val errorSpan = doc.getElementById("value-error")
+          errorSpan.text mustBe (messages("error.browser.title.prefix") + " " + messages(s"${messageKeyPrefix}.${errorMessage}"))
         }
 
         "show an error prefix in the browser title" in {
 
-          val doc = asDocument(createView(form.withError(error)))
+          val doc = asDocument(createView(form.withError(error(messageKeyPrefix))))
           assertEqualsValue(doc, "title", s"""${messages("error.browser.title.prefix")} ${messages(s"$messageKeyPrefix.title")}""")
         }
       }

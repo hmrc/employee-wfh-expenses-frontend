@@ -37,14 +37,15 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
       "when all possible content is enabled" in {
 
         val assembler = TaxYearFromUIAssembler(optionList)
-        val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+        val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assembleWholeYears),
+          Some(DateLanguageTokenizer.convertList(assembler.assembleWholeYears)))))
         val date = LocalDate.of(2000, 4, 1)
 
-        val doc = asDocument(view.apply(claimSettings.claimViewSettings.get, Some(date), 2, optionList)(request, messages))
+        val doc = asDocument(view.apply(claimSettings.claimViewSettings.get, Some(date), 2, Some(3), optionList)(request, messages))
         assert(doc.toString.contains(messages("checkYourClaimView.title")))
         assert(doc.toString.contains(messages("checkYourClaimView.heading")))
-        assert(doc.toString.contains(messages("checkYourClaimView.text.1")))
+        assert(doc.toString.contains(messages("checkYourClaimView.text.1.1")))
+        assert(doc.toString.contains(messages("checkYourClaimView.text.1.2")))
         assert(doc.toString.contains(messages("checkYourClaimView.text.2")))
         assert(doc.toString.contains(messages("checkYourClaimView.text.4")))
         assert(doc.toString.contains(messages("checkYourClaimView.text.5")))
@@ -52,16 +53,16 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
 
         assert(doc.toString.contains(messages("checkYourClaimView.inset.text")))
         assert(doc.toString.contains(messages("the whole of tax year 6 April 2022 to 5 April 2023")))
-        assert(doc.toString.contains(messages("2 weeks of tax year 6 April 2019 to 5 April 2020")))
+        assert(doc.toString.contains(messages("2 weeks of tax year 1 January 2020 to 5 April 2020")))
       }
 
       "when content when start date is missing" in {
 
         val assembler = TaxYearFromUIAssembler(List("option2"))
-        val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+        val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assembleWholeYears),
+          Some(DateLanguageTokenizer.convertList(assembler.assembleWholeYears)))))
 
-        val doc = asDocument(view.apply(claimSettings.claimViewSettings.get, None, 2, optionList)(request, messages))
+        val doc = asDocument(view.apply(claimSettings.claimViewSettings.get, None, 2, None, optionList)(request, messages))
         assert(!doc.toString.contains(messages("yourTaxRelief.inset.text")))
         assert(doc.toString.contains(messages("the whole of tax year 6 April 2022 to 5 April 2023")))
         assert(!doc.toString.contains(messages("2 weeks of tax year 6 April 2019 to 5 April 2020")))
@@ -71,10 +72,10 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
 
     "behave like a normal page" when {
       val assembler = TaxYearFromUIAssembler(List("option2"))
-      val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-        Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+      val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assembleWholeYears),
+        Some(DateLanguageTokenizer.convertList(assembler.assembleWholeYears)))))
       val startDate = LocalDate.of(2020, 4, 1)
-      behave like normalPage(view.apply(claimSettings.claimViewSettings.get, Some(startDate), 2, optionList)(request, messages), "checkYourClaimView")
+      behave like normalPage(view.apply(claimSettings.claimViewSettings.get, Some(startDate), 2, None, optionList)(request, messages), "checkYourClaimView")
     }
   }
 }

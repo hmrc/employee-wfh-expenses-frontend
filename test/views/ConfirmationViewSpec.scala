@@ -26,23 +26,32 @@ class ConfirmationViewSpec extends ViewBehaviours {
   private val Confirmation = "confirmation"
 
   "Confirmation view" should {
+
     val view = viewFor[ConfirmationView](Some(emptyUserAnswers))
 
     val request = FakeRequest()
 
     "show content" when {
+
       "when all confirmation content is displayed" in {
+
         val doc = asDocument(view.apply(true, None, true, true)(request, messages))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.currentTaxYear.text.1")))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.currentTaxYear.text.2")))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.currentTaxYear.text.3")))
-        assert(doc.toString.contains(messages("confirmation.whatHappensNext.previousTaxYears.text")))
+
+        assert(doc.toString.contains(messages("confirmation.info.paragraph")))
+        assert(doc.toString.contains(messages("confirmation.changes.currentYear.heading")))
+        assert(doc.toString.contains(messages("confirmation.changes.currentYear.bullet.1")))
+        assert(doc.toString.contains(messages("confirmation.changes.currentYear.bullet.2")))
+        assert(doc.toString.contains(messages("confirmation.changes.previousYear.heading")))
+        assert(doc.toString.contains(messages("confirmation.changes.previousYear.p.1")))
       }
     }
 
     "show go paperless content" when {
+
       "when the user is not already paperless" in {
+
         val doc = asDocument(view.apply(false, Some("url-string"), false, false)(request, messages))
+
         assert(doc.toString.contains(messages("confirmation.paperless.header")))
         assert(doc.toString.contains(messages("confirmation.paperless.paragraph.1")))
         assert(doc.toString.contains(messages("confirmation.paperless.button.text")))
@@ -50,8 +59,11 @@ class ConfirmationViewSpec extends ViewBehaviours {
     }
 
     "not show go paperless content" when {
+
       "when the user is already paperless" in {
+
         val doc = asDocument(view.apply(true, None, false, false)(request, messages))
+
         assert(!doc.toString.contains(messages("confirmation.paperless.header")))
         assert(!doc.toString.contains(messages("confirmation.paperless.paragraph.1")))
         assert(!doc.toString.contains(messages("confirmation.paperless.button.text")))
@@ -59,6 +71,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
     }
 
     "behave like a normal page" when {
+
       behave like normalPage(view.apply(true, None, true, true)(request, messages), Confirmation)
     }
   }

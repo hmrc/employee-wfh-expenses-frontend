@@ -190,6 +190,13 @@ confirmation.changes.previousYear.p.1 = We will check your claim for previous ta
 
 confirmation.info.paragraph = Dylech allu gweld newidiadau i’ch cod treth yn eich cyfrif treth personol ar ôl dau ddiwrnod gwaith.
 
+#TODO Needs updated welsh
+informClaimNowInWeeks.title = Claims on or after 6 April 2023 are now calculated in weeks
+informClaimNowInWeeks.heading = Claims on or after 6 April 2023 are now calculated in weeks
+informClaimNowInWeeks.paragraph.1 = If you work at home one or more days in a week, you can claim for that whole week.
+informClaimNowInWeeks.paragraph.2 = If you are not sure how many weeks you will be eligible to claim for, we advise you to wait until you know because any further changes cannot be made using this service and may take longer to process.
+informClaimNowInWeeks.paragraph.3 = If you would like to claim now, we will check to see if you are eligible.
+
 manualCorrespondenceIndicator.title=Ni allwch ddefnyddio’r gwasanaeth hwn ar hyn o bryd
 manualCorrespondenceIndicator.heading=Ni allwch ddefnyddio’r gwasanaeth hwn ar hyn o bryd
 manualCorrespondenceIndicator.paragraph.one=Mae angen i chi gysylltu â CThEF a rhoi gwybod i ni fod gennych ‘Gwall MCI’. Byddwn yn mynd â chi drwy’r hyn sydd angen digwydd nesaf.

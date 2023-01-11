@@ -30,7 +30,7 @@ class ConfirmClaimInWeeksViewSpec extends ViewBehaviours {
   val application: Application = applicationBuilder().build
 
   val view: ConfirmClaimInWeeksView = application.injector.instanceOf[ConfirmClaimInWeeksView]
-  val form = new ConfirmClaimInWeeksFormProvider()()
+  val form = new ConfirmClaimInWeeksFormProvider()("2")
 
   def createView(form: Form[Boolean]): Html = view.apply(form, "2")(fakeRequest, messages)
 
@@ -38,6 +38,13 @@ class ConfirmClaimInWeeksViewSpec extends ViewBehaviours {
   val hint = "The claim of 2 weeks is for the current tax year from 6 April 2023 to 5 April 2024."
 
   "Confirm claim in weeks view" should {
+
+    "have the correct banner title" in {
+      val doc = asDocument(createView(form))
+      val banner = doc.select(".hmrc-header__service-name")
+
+      banner.text() mustEqual messages("service.name")
+    }
 
     "show content" when {
       "when all confirmClaimInWeeks content is displayed" in {

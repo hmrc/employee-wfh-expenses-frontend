@@ -126,6 +126,7 @@ checkYourClaimView.list.item3 = {0} of tax year 6 April 2023 to 5 April 2024
 
 confirmClaimInWeeks.title = Do you want to claim for {0} weeks of working from home in the current tax year?
 confirmClaimInWeeks.hint = The claim of {0} weeks is for the current tax year from 6 April 2023 to 5 April 2024.
+confirmClaimInWeeks.error.required = Select yes if you want to claim for {0} weeks of working from home
 
 
 submitYourClaim.title = Submit your claim

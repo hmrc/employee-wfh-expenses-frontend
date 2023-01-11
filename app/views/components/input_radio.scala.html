@@ -14,27 +14,29 @@
  * limitations under the License.
  *@
 
-@this(inputRadio: input_radio)
+@this(govukRadios : GovukRadios)
 
 @(
-    field: Field,
-    label: String,
+    legend: String,
+    legendClass: Option[String] = None,
     hint: Option[String] = None,
-    labelClass: Option[String] = None,
-    headingIsLegend: Boolean = true
+    items: Seq[RadioItem],
+    isPageHeading: Boolean = true,
+    inline: Boolean = false,
+    field: Field
 )(implicit messages: Messages)
 
-@inputRadio(
-    field = field,
-    legend = label,
-    inline = true,
-    legendClass = labelClass,
-    hint = hint,
-    isPageHeading = headingIsLegend,
-    items = Seq(
-        RadioItem(content = Text(messages("site.yes")), value = Option("true")),
-        RadioItem(content = Text(messages("site.no")), value = Option("false"))
-    )
+@govukRadios(
+    Radios(
+        fieldset = Some(Fieldset(
+        legend = Some(Legend(
+            classes = legendClass.getOrElse("govuk-label--xl"),
+            content = Text(legend),
+            isPageHeading = isPageHeading
+        ))
+    )),
+    hint = hint.map(hintString => Hint(content = Text(hintString))),
+    items = items,
+    classes = if (inline) "govuk-radios" else ""
+    ).withFormField(field)
 )
-
-

@@ -17,16 +17,14 @@
 package forms
 
 import forms.mappings.Mappings
-import models.SelectTaxYearsToClaimFor
-import play.api.data.Form
-import play.api.data.Forms.set
-
 import javax.inject.Inject
+import play.api.data.Form
 
 class ConfirmClaimInWeeksFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+
+  def apply(numberOfWeeksToConfirm: String): Form[Boolean] =
     Form(
-      "value" -> boolean("confirmClaimInWeeks.error.required")
+      "value" -> boolean("confirmClaimInWeeks.error.required", numberOfWeeksToConfirm)
     )
 }

@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
 import forms.ConfirmClaimInWeeksFormProvider
+import javax.inject.Inject
 import navigation.Navigator
 import pages.{ConfirmClaimInWeeksPage, NumberOfWeeksToClaimForPage}
 import play.api.Logging
@@ -28,7 +29,6 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ConfirmClaimInWeeksView
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmClaimInWeeksController @Inject()(
@@ -44,11 +44,11 @@ class ConfirmClaimInWeeksController @Inject()(
                                                  val controllerComponents: MessagesControllerComponents
                                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
-  val form: Form[Boolean] = formProvider()
-
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
       val numberOfWeeksToConfirm = request.userAnswers.get(NumberOfWeeksToClaimForPage).getOrElse("NO WEEKS FOUND")
+
+      val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm.toString)
 
       val preparedForm = request.userAnswers.get(ConfirmClaimInWeeksPage) match {
         case None => form
@@ -61,6 +61,7 @@ class ConfirmClaimInWeeksController @Inject()(
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val numberOfWeeksToConfirm = request.userAnswers.get(NumberOfWeeksToClaimForPage).getOrElse("NO WEEKS FOUND")
+      val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm.toString)
 
       form.bindFromRequest().fold(
         formWithErrors => {

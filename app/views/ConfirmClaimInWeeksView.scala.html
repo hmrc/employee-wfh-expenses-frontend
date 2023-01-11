@@ -19,13 +19,15 @@
     formHelper: FormWithCSRF,
     backLink: GovukBackLink,
     inputYesNo: components.input_yes_no,
-    button: GovukButton
+    button: GovukButton,
+    errorSummary: components.error_summary
 )
 
 @(form: Form[Boolean], numberOfWeeksToConfirm: String)(implicit request: Request[_], messages: Messages)
 
 @main_template(
-    title = messages("confirmClaimInWeeks.title"),
+
+    title = s"${errorPrefix(form)} ${messages("confirmClaimInWeeks.title", numberOfWeeksToConfirm)}",
     beforeContentBlock = Some(backLink(BackLink(
         href = routes.NumberOfWeeksToClaimForController.onPageLoad().url,
         content = Text(messages("site.back")),
@@ -33,16 +35,22 @@
     )))
 ) {
 
-    <h1 class="govuk-heading-l">NUMBER OF WEEKS: @numberOfWeeksToConfirm</h1>
-
+    @errorSummary(form.errors)
     @formHelper(action = ConfirmClaimInWeeksController.onSubmit(), 'autoComplete -> "off") {
+
+<div class="govuk-form-group">
+    <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+            <h1 class="govuk-fieldset__heading">@messages("confirmClaimInWeeks.title", numberOfWeeksToConfirm)</h1></legend>
+
+    <p class="govuk-body">@messages("confirmClaimInWeeks.hint", numberOfWeeksToConfirm)</p>
 
         @inputYesNo(
             field = form("value"),
-            label = messages("confirmClaimInWeeks.label"),
-            hint = Some("confirmClaimInWeeks.hintText")
+            label = messages("")
         )
-
-        @button(Button(content = Text(messages("confirmClaimInWeeks.button.text")), preventDoubleClick  = true))
+        </fieldset>
+    </div>
+        @button(Button(content = Text(messages("site.continue")), preventDoubleClick  = true))
     }
 }

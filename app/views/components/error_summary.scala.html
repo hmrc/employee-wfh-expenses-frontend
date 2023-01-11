@@ -14,27 +14,23 @@
  * limitations under the License.
  *@
 
-@this(inputRadio: input_radio)
-
-@(
-    field: Field,
-    label: String,
-    hint: Option[String] = None,
-    labelClass: Option[String] = None,
-    headingIsLegend: Boolean = true
-)(implicit messages: Messages)
-
-@inputRadio(
-    field = field,
-    legend = label,
-    inline = true,
-    legendClass = labelClass,
-    hint = hint,
-    isPageHeading = headingIsLegend,
-    items = Seq(
-        RadioItem(content = Text(messages("site.yes")), value = Option("true")),
-        RadioItem(content = Text(messages("site.no")), value = Option("false"))
-    )
+@this(
+    govukErrorSummary : GovukErrorSummary
 )
 
+@(
+    errors: Seq[FormError],
+    errorKey: Option[String] = None
+)(implicit messages: Messages)
 
+@if(errors.nonEmpty) {
+    @govukErrorSummary(ErrorSummary(
+        title       = Text(messages("error.summary.title")),
+        errorList   = for(error <- errors) yield {
+            ErrorLink(
+                href    = errorKey.orElse(Some(error.key)).map(key => s"#$key"),
+                content = Text(messages(error.message, error.args:_*))
+            )
+        }
+    ))
+}

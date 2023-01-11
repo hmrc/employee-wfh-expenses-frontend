@@ -33,9 +33,19 @@
     )))
 ) {
 
-    <h1 class="govuk-heading-xl">Claims on or after 6 April 2023 are now calculated in weeks</h1>
+    <h1 class="govuk-heading-xl">@messages("informClaimNowInWeeks.heading")</h1>
 
-    <p class="govuk-body">**CONTENT TO BE ADDED**</p>
+    <p class="govuk-body">
+        @messages("informClaimNowInWeeks.paragraph.1")
+    </p>
+
+    <p class="govuk-body">
+        @messages("informClaimNowInWeeks.paragraph.2")
+    </p>
+
+    <p class="govuk-body">
+        @messages("informClaimNowInWeeks.paragraph.3")
+    </p>
 
     @formHelper(action = InformClaimNowInWeeksController.onSubmit(), 'autoComplete -> "off") {
         @button(Button(content = Text(messages("informClaimNowInWeeks.button.text")), preventDoubleClick  = true))

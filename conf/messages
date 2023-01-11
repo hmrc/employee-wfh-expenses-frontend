@@ -202,6 +202,13 @@ confirmation.changes.previousYear.heading = Changes for previous tax years
 confirmation.changes.previousYear.p.1 = We will check your claim for previous tax years and we will write to you by post or email if you have paid too much tax. There is no need to contact HMRC about this.
 confirmation.info.paragraph = You should be able to see changes to your tax code in your personal tax account after 2 working days.
 
+informClaimNowInWeeks.title = Claims on or after 6 April 2023 are now calculated in weeks
+informClaimNowInWeeks.heading = Claims on or after 6 April 2023 are now calculated in weeks
+informClaimNowInWeeks.paragraph.1 = If you work at home one or more days in a week, you can claim for that whole week.
+informClaimNowInWeeks.paragraph.2 = If you are not sure how many weeks you will be eligible to claim for, we advise you to wait until you know because any further changes cannot be made using this service and may take longer to process.
+informClaimNowInWeeks.paragraph.3 = If you would like to claim now, we will check to see if you are eligible.
+informClaimNowInWeeks.button.text = Continue
+
 manualCorrespondenceIndicator.title = You cannot currently use this service
 manualCorrespondenceIndicator.heading = You cannot currently use this service
 manualCorrespondenceIndicator.paragraph.one = You need to contact HMRC and tell us you have an ‘MCI Error’. We will take you through what needs to happen next.

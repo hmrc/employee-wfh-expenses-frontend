@@ -152,11 +152,11 @@ selectTaxYearsToClaimFor.details.text.1 = If any tax years are not listed it mea
 selectTaxYearsToClaimFor.details.text.2 = You can continue to use this service to claim for any of the tax years listed if you are eligible or
 selectTaxYearsToClaimFor.details.href.text = you can amend your previous claims
 
-whenDidYouFirstStartWorkingFromHome.title = When did you start working from home?
-whenDidYouFirstStartWorkingFromHome.heading = When did you start working from home?
+whenDidYouFirstStartWorkingFromHome.title = When did you start working from home during 2020 to 2021?
+whenDidYouFirstStartWorkingFromHome.heading = When did you start working from home during 2020 to 2021?
 whenDidYouFirstStartWorkingFromHome.hinttext = For example, 23 3 2020
 whenDidYouFirstStartWorkingFromHome.checkYourAnswersLabel = WhenDidYouFirstStartWorkingFromHome
-whenDidYouFirstStartWorkingFromHome.error.required.all = Enter the date you started working from home
+whenDidYouFirstStartWorkingFromHome.error.required.all = Date you started working from home must be in the correct format, like 23 3 2020
 whenDidYouFirstStartWorkingFromHome.error.required.two = The date you started working from home must include a {0} and {1}
 whenDidYouFirstStartWorkingFromHome.error.required = The date you started working from home must include a {0}
 whenDidYouFirstStartWorkingFromHome.error.invalid = The date you started working from home must be a real date

@@ -88,7 +88,7 @@ howWeWillCalculateTaxRelief.bullet.enter.start.date.text = You need to enter the
 disclaimer.title = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad
 disclaimer.heading = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad
 disclaimer.heading.after = Hawlio rhyddhad treth ar neu ar ôl 6
-disclaimer.notification.title = Mae’r arweiniad wedi newid ar gyfer y flwyddyn dreth newydd
+disclaimer.notification.title = Guidance has changed from 6 April 2022
 disclaimer.notification.text = Mae’r arweiniad ynghylch hawlio rhyddhad treth am weithio gartref wedi newid ar gyfer treuliau sy’n codi ar neu ar ôl 6 Ebrill 2022.
 disclaimer.info.text.1 = Gallwch hawlio os nad yw’ch cyflogwr eisoes wedi talu’ch treuliau a’ch bod wedi mynd i gostau ychwanegol ar eich aelwyd o ganlyniad i weithio gartref.
 disclaimer.info.text.2 = Ni allwch hawlio rhyddhad treth os mai’r cyfan a wnaethoch oedd dewis gweithio gartref.
@@ -101,23 +101,34 @@ disclaimer.bullet.heading.1 = Gallwch wneud hawliad os yw pob un o’r canlynol 
 disclaimer.bullet.text.4 = nid yw’ch cyflogwr wedi talu’ch treuliau’n barod
 disclaimer.bullet.text.5 = mae canllawiau’r llywodraeth neu’ch cyflogwr wedi mynnu eich bod yn gweithio gartref neu’n hunanynysu
 disclaimer.bullet.text.6 = mae costau’ch aelwyd wedi cynyddu o ganlyniad i weithio gartref
-disclaimer.warning.text.1 = Mae’r arweiniad wedi newid ar gyfer y flwyddyn dreth newydd.
+disclaimer.warning.text.1 = Guidance has changed from 6 April 2022.
 disclaimer.warning.text.2 = Mae’n rhaid i chi sicrhau eich bod yn bodloni’r rheolau ar gyfer hawlio, gan y gallech gael eich erlyn os byddwch yn rhoi gwybodaeth anwir neu gamarweiniol yn fwriadol.
 disclaimer.accept.text.1 = Drwy glicio ar ‘Derbyn ac yn eich blaen’, rydych yn derbyn eich bod yn bodloni’r rheolau ar gyfer y blynyddoedd rydych yn hawlio amdanynt.
 disclaimer.button.text = Derbyn ac yn eich blaen
 
 checkYourClaimView.title = Gwiriwch eich hawliad
-checkYourClaimView.heading = Gwiriwch eich hawliad
-checkYourClaimView.header = Gwiriwch eich hawliad
-checkYourClaimView.text.1 = Byddwch yn cael rhyddhad treth ar eich treuliau am weithio gartref ar gyfer:
+checkYourClaimView.heading = Check and submit your claim
+checkYourClaimView.header = Check your claim details
+checkYourClaimView.text.1.1 = You are entitled to tax relief on
+checkYourClaimView.text.1.2 = a week on your expenses for working from home for:
 checkYourClaimView.text.2 = y flwyddyn dreth gyfan
-checkYourClaimView.text.3 =  Ar ddiwedd y flwyddyn dreth hon, bydd y rhyddhad treth yn dod i ben. Os bydd yn ofynnol i chi weithio gartref ar ôl 5 Ebrill 2023, bydd yn rhaid i chi hawlio eto.
+checkYourClaimView.text.3 = At the end of this tax year, the tax relief will stop. If you are required to work from home from the 6 April 2024, you will need to claim again.
+checkYourClaimView.details.heading = What to do if your extra costs are more than this
+checkYourClaimView.details.text.1 = If your extra costs are more than this you may be able to claim for more tax relief. You will need to
+checkYourClaimView.details.href.text = claim tax relief for expenses of employment
+checkYourClaimView.details.text.2 = and provide evidence, like detailed and verifiable receipts and bills.
 checkYourClaimView.text.4 = Cyflwynwch eich hawliad nawr
 checkYourClaimView.text.5 = Drwy gyflwyno’r hawliad hwn, rydych yn cadarnhau, hyd eithaf eich gwybodaeth, fod y manylion a roddir gennych yn gywir.
 checkYourClaimView.button.label = Cadarnhau a chyflwyno
 checkYourClaimView.inset.text = Gwnaethoch ddechrau gweithio gartref ar
 checkYourClaimView.changeThisDate.href.text = Newid y dyddiad hwn
 checkYourClaimView.list.item2 = {0} o flwyddyn dreth 1 Ionawr 2020 i 5 Ebrill 2020
+checkYourClaimView.list.item3 = {0} of tax year 6 April 2023 to 5 April 2024
+
+
+confirmClaimInWeeks.title = Do you want to claim for {0} weeks of working from home in the current tax year?
+confirmClaimInWeeks.hint = The claim of {0} weeks is for the current tax year from 6 April 2023 to 5 April 2024.
+confirmClaimInWeeks.error.required = Select yes if you want to claim for {0} weeks of working from home
 
 submitYourClaim.title = Cyflwynwch eich hawliad
 submitYourClaim.heading = Cyflwynwch eich hawliad
@@ -130,19 +141,24 @@ submitYourClaim.list.item4 = mae’r wybodaeth a roddwyd gennych yn gywir, hyd e
 
 selectTaxYearsToClaimFor.title = Pa flynyddoedd treth rydych yn hawlio ar eu cyfer?
 selectTaxYearsToClaimFor.heading = Pa flynyddoedd treth rydych yn hawlio ar eu cyfer?
-selectTaxYearsToClaimFor.para = Mae CThEF wedi gwirio’i gofnodion, a gallwch hawlio ar gyfer y blynyddoedd canlynol.
-selectTaxYearsToClaimFor.text = Mae CThEF wedi gwirio’i gofnodion, a gallwch hawlio ar gyfer y blynyddoedd canlynol.
 selectTaxYearsToClaimFor.hintText = Dewiswch bob un sy’n berthnasol.
 selectTaxYearsToClaimFor.option1 = Y flwyddyn dreth hon (6 Ebrill 2022 i 5 Ebrill 2023)
 selectTaxYearsToClaimFor.option2 = Y flwyddyn dreth ddiwethaf (6 Ebrill 2021 i 5 Ebrill 2022)
 selectTaxYearsToClaimFor.option3 = Blynyddoedd treth blaenorol cyn 6 Ebrill 2021
 selectTaxYearsToClaimFor.error.required = Dewiswch o leiaf un opsiwn
+selectTaxYearsToClaimFor.para = We have checked your tax records and you can claim for the following years.
+selectTaxYearsToClaimFor.hintText = Select the years that you would like to claim for.
+selectTaxYearsToClaimFor.error.required = Select at least one tax year you are claiming for
+selectTaxYearsToClaimFor.details.heading = The tax year I want to claim for is not listed
+selectTaxYearsToClaimFor.details.text.1 = If any tax years are not listed it means that you may have already claimed for them.
+selectTaxYearsToClaimFor.details.text.2 = You can continue to use this service to claim for any of the tax years listed if you are eligible or
+selectTaxYearsToClaimFor.details.href.text = you can amend your previous claims
 
-whenDidYouFirstStartWorkingFromHome.title = Pryd gwnaethoch ddechrau gweithio gartref?
-whenDidYouFirstStartWorkingFromHome.heading = Pryd gwnaethoch ddechrau gweithio gartref?
+whenDidYouFirstStartWorkingFromHome.title = When did you start working from home during 2020 to 2021?
+whenDidYouFirstStartWorkingFromHome.heading = When did you start working from home during 2020 to 2021?
 whenDidYouFirstStartWorkingFromHome.hinttext = Er enghraifft, 23 3 2020
 whenDidYouFirstStartWorkingFromHome.checkYourAnswersLabel = WhenDidYouFirstStartWorkingFromHome
-whenDidYouFirstStartWorkingFromHome.error.required.all = Nodwch y dyddiad y gwnaethoch ddechrau gweithio gartref
+whenDidYouFirstStartWorkingFromHome.error.required.all = Date you started working from home must be in the correct format, like 23 3 2020
 whenDidYouFirstStartWorkingFromHome.error.required.two = Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref gynnwys {0} a {1}
 whenDidYouFirstStartWorkingFromHome.error.required = Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref gynnwys {0}
 whenDidYouFirstStartWorkingFromHome.error.invalid =  Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref fod yn ddyddiad go iawn
@@ -161,13 +177,23 @@ cannotClaimUsingThisService.changeDate = Os gwnaethoch ddechrau gweithio gartref
 cannotClaimUsingThisService.alternative.href.text = hawliwch ryddhad treth ar gyfer treuliau cyflogaeth
 cannotClaimUsingThisService.alternative = Gallwch {0} y gwnaethoch ddechrau gweithio gartref.
 
+numberOfWeeksToClaimFor.title = How many weeks do you expect to work from home in the current tax year?
+numberOfWeeksToClaimFor.heading = How many weeks do you expect to work from home in the current tax year?
+numberOfWeeksToClaimFor.question = How many weeks do you expect to work from home in the current tax year?
+numberOfWeeksToClaimFor.para = This will be the amount of weeks you expect to work from home in the tax year from {0} to {1}.
+numberOfWeeksToClaimFor.hinttext = For example, 29.
+numberOfWeeksToClaimFor.error.required = Enter how many weeks you have worked from home in the current tax year
+numberOfWeeksToClaimFor.error.wholeNumber = How many weeks you have worked from home in the current tax year must be a whole number
+numberOfWeeksToClaimFor.error.nonNumeric = How many weeks you have worked from home in the current tax year must be a number
+numberOfWeeksToClaimFor.error.minimum = How many weeks you have worked from home in the current tax year must be one or more weeks
+numberOfWeeksToClaimFor.error.maximum = How many weeks you have worked from home in the current tax year must be {0} weeks or less
+
 confirmation.paperless.button.text = Cofrestrwch ar gyfer hysbysiadau di-bapur
 confirmation.title = Cadarnhad
 confirmation.heading = Hawliad wedi’i gwblhau
 
 #TODO Needs updated welsh
-confirmation.text = Byddwn yn newid eich cod treth
-
+confirmation.text = We will change your tax code for the current tax year
 confirmation.hmrc.text = Bydd CThEF yn gwirio’ch hawliad
 confirmation.text.footer.mail = Byddwn yn rhoi gwybod i chi am y newid i’ch cod treth drwy e-bost.
 confirmation.text.footer.post = Byddwn yn rhoi gwybod i chi am y newid i’ch cod treth drwy’r post, neu ar-lein os ydych wedi cofrestru ar gyfer hysbysiadau di-bapur.
@@ -179,7 +205,7 @@ confirmation.linkToFeedbackForm.href.postfix = (mae’n cymryd 30 eiliad)
 confirmation.paperless.header = Cael llythyrau treth ar-lein
 
 #TODO Needs updated welsh
-confirmation.paperless.paragraph.1 = Gallwch fwrw golwg drostynt, eu lawrlwytho neu eu hargraffu pryd bynnag y mynnwch. Arbedwch amser ac osgowch annibendod.
+confirmation.paperless.paragraph.1 = You can view, download or print them when you want.
 
 #TODO Needs updated welsh
 confirmation.changes.currentYear.heading = Changes for the current tax year
@@ -188,7 +214,7 @@ confirmation.changes.currentYear.bullet.2 = We will let you know about your tax 
 confirmation.changes.previousYear.heading = Changes for previous tax years
 confirmation.changes.previousYear.p.1 = We will check your claim for previous tax years and we will write to you by post or email if you have paid too much tax. There is no need to contact HMRC about this.
 
-confirmation.info.paragraph = Dylech allu gweld newidiadau i’ch cod treth yn eich cyfrif treth personol ar ôl dau ddiwrnod gwaith.
+confirmation.info.paragraph = You should be able to see changes to your tax code in your personal tax account after 2 working days.
 
 #TODO Needs updated welsh
 informClaimNowInWeeks.title = Claims on or after 6 April 2023 are now calculated in weeks
@@ -196,6 +222,7 @@ informClaimNowInWeeks.heading = Claims on or after 6 April 2023 are now calculat
 informClaimNowInWeeks.paragraph.1 = If you work at home one or more days in a week, you can claim for that whole week.
 informClaimNowInWeeks.paragraph.2 = If you are not sure how many weeks you will be eligible to claim for, we advise you to wait until you know because any further changes cannot be made using this service and may take longer to process.
 informClaimNowInWeeks.paragraph.3 = If you would like to claim now, we will check to see if you are eligible.
+informClaimNowInWeeks.button.text = Continue
 
 manualCorrespondenceIndicator.title=Ni allwch ddefnyddio’r gwasanaeth hwn ar hyn o bryd
 manualCorrespondenceIndicator.heading=Ni allwch ddefnyddio’r gwasanaeth hwn ar hyn o bryd

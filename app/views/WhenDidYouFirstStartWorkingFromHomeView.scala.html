@@ -45,7 +45,7 @@
             @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
         }
 
-        <h1 class="govuk-heading-l">@messages("whenDidYouFirstStartWorkingFromHome.heading")</h1>
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">@messages("whenDidYouFirstStartWorkingFromHome.heading")</h1>
 
         @govukDateInput(DateInput(
             id = "value",
@@ -74,6 +74,17 @@
                 )
             )
         ))
+
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                  <span class="govuk-details__summary-text">
+                    @messages("whenDidYouFirstStartWorkingFromHome.summaryText")
+                  </span>
+            </summary>
+            <div class="govuk-details__text">
+                @messages("whenDidYouFirstStartWorkingFromHome.summaryText2")
+            </div>
+        </details>
 
         @button(Button(content = Text(messages("site.continue"))))
     }

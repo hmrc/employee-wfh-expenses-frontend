@@ -23,11 +23,19 @@
     errorSummary: components.error_summary
 )
 
-@(form: Form[Boolean], numberOfWeeksToConfirm: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[Boolean], numberOfWeeksToConfirm: Int)(implicit request: Request[_], messages: Messages)
+
+@pluralOrSingularWeeks(weeks: Int) = @{
+    if (weeks == 1) {
+        messages("number.of.weeks.singular", weeks)
+    } else {
+        messages("number.of.weeks.plural", weeks)
+    }
+}
 
 @main_template(
 
-    title = s"${errorPrefix(form)} ${messages("confirmClaimInWeeks.title", numberOfWeeksToConfirm)}",
+    title = s"${errorPrefix(form)} ${messages("confirmClaimInWeeks.title", pluralOrSingularWeeks(numberOfWeeksToConfirm))}",
     beforeContentBlock = Some(backLink(BackLink(
         href = routes.NumberOfWeeksToClaimForController.onPageLoad().url,
         content = Text(messages("site.back")),
@@ -38,19 +46,17 @@
     @errorSummary(form.errors)
     @formHelper(action = ConfirmClaimInWeeksController.onSubmit(), 'autoComplete -> "off") {
 
-<div class="govuk-form-group">
-    <fieldset class="govuk-fieldset">
-        <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-            <h1 class="govuk-fieldset__heading">@messages("confirmClaimInWeeks.title", numberOfWeeksToConfirm)</h1></legend>
+    <h1 class="govuk-heading-xl">@messages("confirmClaimInWeeks.title", pluralOrSingularWeeks(numberOfWeeksToConfirm))</h1>
 
-    <p class="govuk-body">@messages("confirmClaimInWeeks.hint", numberOfWeeksToConfirm)</p>
+    <p class="govuk-body">@messages("confirmClaimInWeeks.hint", pluralOrSingularWeeks(numberOfWeeksToConfirm))</p>
 
         @inputYesNo(
             field = form("value"),
-            label = messages("")
+            headingIsLegend = false,
+            label = messages("confirmClaimInWeeks.title"),
+            labelClass = Some("govuk-visually-hidden")
         )
-        </fieldset>
-    </div>
+
         @button(Button(content = Text(messages("site.continue")), preventDoubleClick  = true))
     }
 }

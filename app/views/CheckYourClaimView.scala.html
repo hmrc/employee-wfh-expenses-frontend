@@ -100,13 +100,11 @@
         </ul>
     }
 
-    @if(yearsClaimingFor.contains("option1")) {
-        <p class="govuk-body">@messages("checkYourClaimView.text.3")</p>
+    <p class="govuk-body">@messages("checkYourClaimView.text.3")</p>
         @govukDetails(Details(
             summary = Text(messages("checkYourClaimView.details.heading")),
             content = HtmlContent(detailsContent)
-        ))
-    }
+    ))
 
     <h2 class="govuk-heading-m">@messages("checkYourClaimView.text.4")</h2>
 

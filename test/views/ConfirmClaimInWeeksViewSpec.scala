@@ -30,9 +30,9 @@ class ConfirmClaimInWeeksViewSpec extends ViewBehaviours {
   val application: Application = applicationBuilder().build
 
   val view: ConfirmClaimInWeeksView = application.injector.instanceOf[ConfirmClaimInWeeksView]
-  val form = new ConfirmClaimInWeeksFormProvider()("2")
+  val form = new ConfirmClaimInWeeksFormProvider()(2)
 
-  def createView(form: Form[Boolean]): Html = view.apply(form, "2")(fakeRequest, messages)
+  def createView(form: Form[Boolean]): Html = view.apply(form, 2)(fakeRequest, messages)
 
   val title = "Do you want to claim for 2 weeks of working from home in the current tax year?"
   val hint = "The claim of 2 weeks is for the current tax year from 6 April 2023 to 5 April 2024."

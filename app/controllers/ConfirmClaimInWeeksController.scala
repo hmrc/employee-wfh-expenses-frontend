@@ -24,6 +24,7 @@ import pages.{ConfirmClaimInWeeksPage, NumberOfWeeksToClaimForPage}
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -46,32 +47,35 @@ class ConfirmClaimInWeeksController @Inject()(
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      val numberOfWeeksToConfirm = request.userAnswers.get(NumberOfWeeksToClaimForPage).getOrElse("NO WEEKS FOUND")
+      request.userAnswers.get(NumberOfWeeksToClaimForPage).fold(Redirect(routes.SessionExpiredController.onPageLoad)){
+        numberOfWeeksToConfirm =>
+          val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm)
 
-      val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm.toString)
+          val preparedForm = request.userAnswers.get(ConfirmClaimInWeeksPage) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
 
-      val preparedForm = request.userAnswers.get(ConfirmClaimInWeeksPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+          Ok(confirmClaimInWeeksView(preparedForm, numberOfWeeksToConfirm))
       }
-
-      Ok(confirmClaimInWeeksView(preparedForm, numberOfWeeksToConfirm.toString))
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      val numberOfWeeksToConfirm = request.userAnswers.get(NumberOfWeeksToClaimForPage).getOrElse("NO WEEKS FOUND")
-      val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm.toString)
+      request.userAnswers.get(NumberOfWeeksToClaimForPage).fold(Future.successful(Redirect(routes.SessionExpiredController.onPageLoad))) {
+        numberOfWeeksToConfirm =>
+          val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm)
 
-      form.bindFromRequest().fold(
-        formWithErrors => {
-          Future.successful(BadRequest(confirmClaimInWeeksView(formWithErrors, numberOfWeeksToConfirm.toString)))
-        },
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmClaimInWeeksPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(ConfirmClaimInWeeksPage, updatedAnswers))
-      )
+          form.bindFromRequest().fold(
+            formWithErrors => {
+              Future.successful(BadRequest(confirmClaimInWeeksView(formWithErrors, numberOfWeeksToConfirm)))
+            },
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmClaimInWeeksPage, value))
+                _ <- sessionRepository.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(ConfirmClaimInWeeksPage, updatedAnswers))
+          )
+      }
   }
 }

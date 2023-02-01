@@ -110,7 +110,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
-        assert(doc.toString.contains(messages("Previous years before 5 April 2021")))
+        assert(doc.toString.contains(messages("Previous years before 6 April 2021")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.end.date.inset.text")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 4)))

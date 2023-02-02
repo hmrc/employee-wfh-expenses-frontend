@@ -53,9 +53,7 @@
         <p class="govuk-body">@messages("selectTaxYearsToClaimFor.para")</p>
         @govUkCheckboxes(Checkboxes(
             name = "value",
-            hint = if(hintText) {Some(Hint(
-                content = Text(messages("selectTaxYearsToClaimFor.hintText"))
-            ))} else None,
+            hint = Some(Hint(content = Text(messages("selectTaxYearsToClaimFor.hintText")))),
             items = SelectTaxYearsToClaimFor.options(form, availableYears),
             errorMessage = form.errors.headOption.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*))))
         ))

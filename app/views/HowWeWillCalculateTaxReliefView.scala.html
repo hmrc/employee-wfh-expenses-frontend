@@ -32,7 +32,9 @@
 
 @getYearFromYearTo(dateToken: DateLanguageTokenizerFormattedItemTuple) = {
     @if(dateToken._2.year == 2021) {
-        <h2 class="govuk-heading-m">@messages("howWeWillCalculateTaxRelief.previous.years.before.text") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</h2>
+        @defining(dateToken._2.day + 1){ lastDayPlusOne =>
+            <h2 class="govuk-heading-m">@messages("howWeWillCalculateTaxRelief.previous.years.before.text") @lastDayPlusOne @messages(dateToken._2.month) @dateToken._2.year</h2>
+        }
     } else {
         <h2 class="govuk-heading-m">@dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("howWeWillCalculateTaxRelief.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</h2>
     }

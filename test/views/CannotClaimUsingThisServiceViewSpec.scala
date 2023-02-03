@@ -24,15 +24,34 @@ import views.html.CannotClaimUsingThisServiceView
 
 class CannotClaimUsingThisServiceViewSpec extends ViewBehaviours {
 
-  "CannotClaimUsingThisService view" must {
+  object MessagesHelper {
+    val para1 = "You can only claim expenses for working from home on or after the 1 January 2020 for these tax years:"
+    val bullet2024 = "6 April 2023 to 5 April 2024 (this tax year)"
+    val bullet2023 = "6 April 2022 to 5 April 2023"
+    val bullet2022 = "6 April 2021 to 5 April 2022"
+    val bullet2021 = "6 April 2020 to 5 April 2021"
+    val bullet2020 = "1 January 2020 to 5 April 2020"
+  }
 
+  "CannotClaimUsingThisService view" must {
     val view = viewFor[CannotClaimUsingThisServiceView](Some(emptyUserAnswers))
 
     val request = FakeRequest(GET, routes.CannotClaimUsingThisServiceController.onPageLoad().url)
 
     val applyView = view.apply()(request, messages)
+    val doc = asDocument(applyView)
 
     behave like normalPage(applyView, "cannotClaimUsingThisService")
 
+    "have valid content" in {
+      assertContainsMessages(doc,
+        MessagesHelper.para1,
+        MessagesHelper.bullet2024,
+        MessagesHelper.bullet2023,
+        MessagesHelper.bullet2022,
+        MessagesHelper.bullet2021,
+        MessagesHelper.bullet2020
+      )
+    }
   }
 }

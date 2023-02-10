@@ -42,7 +42,7 @@
 
     @govukPanel(Panel(
         title = Text(messages("confirmation.heading")),
-        content = if(claimingForCurrent) HtmlContent(messages("confirmation.text")) else HtmlContent("")
+        content = if(claimingForCurrent) HtmlContent(messages("confirmation.text")) else HtmlContent(messages("confirmation.text.previous"))
     ))
 
     @if(claimingForCurrent) {

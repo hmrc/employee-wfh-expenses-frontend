@@ -197,6 +197,7 @@ confirmation.heading = Hawliad wedi’i gwblhau
 
 confirmation.text = Byddwn yn newid eich cod treth ar gyfer y flwyddyn dreth bresennol
 confirmation.hmrc.text = Bydd CThEF yn gwirio’ch hawliad
+confirmation.text.previous = Byddwn yn gwirio eich hawliad ar gyfer blynyddoedd treth blaenorol
 confirmation.text.footer.mail = Byddwn yn rhoi gwybod i chi am y newid i’ch cod treth drwy e-bost.
 confirmation.text.footer.post = Byddwn yn rhoi gwybod i chi am y newid i’ch cod treth drwy’r post, neu ar-lein os ydych wedi cofrestru ar gyfer hysbysiadau di-bapur.
 confirmation.whatHappensNext.heading = Yr hyn sy’n digwydd nesaf

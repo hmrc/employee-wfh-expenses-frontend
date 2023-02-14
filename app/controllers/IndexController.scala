@@ -108,7 +108,7 @@ trait TaiLookupHandler extends Logging {
     case ex: Exception =>
       val message = s"TaiIndexLookupService lookup failed with: ${ex.getMessage}"
       logger.error(message)
-      Future.failed(new RuntimeException(message))
+      Future.failed(ex)
   }
 
   def taiLookupSuccessHandler(alreadyClaimed2020: Boolean,

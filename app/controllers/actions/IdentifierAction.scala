@@ -44,7 +44,7 @@ class AuthenticatedIdentifierAction @Inject()(
 
     implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised(AuthProviders(AuthProvider.Verify) or (AffinityGroup.Individual and ConfidenceLevel.L200))
+    authorised(AuthProviders(AuthProvider.Verify) or (AffinityGroup.Individual and ConfidenceLevel.L200) or (AffinityGroup.Organisation and ConfidenceLevel.L200))
       .retrieve(internalId and nino and saUtr) {
         case mayBeId ~ mayBeNino ~ mayBeSaUtr =>
           block(

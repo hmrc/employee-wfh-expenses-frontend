@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ class AuthenticatedIdentifierAction @Inject()(
 
     implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised(AuthProviders(AuthProvider.Verify) or (AffinityGroup.Individual and ConfidenceLevel.L200))
+    authorised(AuthProviders(AuthProvider.Verify) or (AffinityGroup.Individual and ConfidenceLevel.L200) or (AffinityGroup.Organisation and ConfidenceLevel.L200))
       .retrieve(internalId and nino and saUtr) {
         case mayBeId ~ mayBeNino ~ mayBeSaUtr =>
           block(

@@ -27,7 +27,7 @@ import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
 import uk.gov.hmrc.auth.core.retrieve.~
-import uk.gov.hmrc.http.UnauthorizedException
+import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,13 +40,22 @@ class AuthenticatedIdentifierAction @Inject()(
                                              )
                                              (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions with Logging {
 
+  object LT200 {
+    def unapply(confLevel: ConfidenceLevel): Option[ConfidenceLevel] =
+      if (confLevel.level < ConfidenceLevel.L200.level) Some(confLevel) else None
+  }
+
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
-    implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised(AuthProviders(AuthProvider.Verify) or (AffinityGroup.Individual and ConfidenceLevel.L200) or (AffinityGroup.Organisation and ConfidenceLevel.L200))
-      .retrieve(internalId and nino and saUtr) {
-        case mayBeId ~ mayBeNino ~ mayBeSaUtr =>
+    authorised()
+      .retrieve(internalId and nino and saUtr and affinityGroup and confidenceLevel) {
+        case _ ~ _ ~ _ ~ Some(AffinityGroup.Agent) ~ _ =>
+          Future.successful(unauthorisedRoute)
+        case _ ~ _ ~ _ ~ Some(AffinityGroup.Individual | AffinityGroup.Organisation) ~ LT200(_) =>
+          Future.successful(upliftConfidenceLevel)
+        case mayBeId ~ mayBeNino ~ mayBeSaUtr ~ _ ~ _ =>
           block(
             IdentifierRequest(
               request,
@@ -60,10 +69,20 @@ class AuthenticatedIdentifierAction @Inject()(
     case _: NoActiveSession =>
       Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
     case _: InsufficientConfidenceLevel =>
-      Redirect(s"${config.ivUpliftUrl}?origin=EEWFH&confidenceLevel=200" +
-        s"&completionURL=${config.ivCompletionUrl}" +
-        s"&failureURL=${config.ivFailureUrl}")
+      upliftConfidenceLevel
     case _: AuthorisationException =>
-      Redirect(routes.UnauthorisedController.onPageLoad)
+      unauthorisedRoute
   }
+
+  def upliftConfidenceLevel: Result = {
+    Redirect(s"${config.ivUpliftUrl}?origin=EEWFH&confidenceLevel=200" +
+      s"&completionURL=${config.ivCompletionUrl}" +
+      s"&failureURL=${config.ivFailureUrl}")
+  }
+
+  def unauthorisedRoute: Result = {
+    Redirect(routes.UnauthorisedController.onPageLoad)
+  }
+
+
 }

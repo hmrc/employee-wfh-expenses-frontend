@@ -18,13 +18,17 @@ package controllers.actions
 
 import base.SpecBase
 import com.google.inject.Inject
+import config.FrontendAppConfig
 import controllers.routes
-import play.api.mvc.{BodyParsers, Results}
-import play.api.test.Helpers._
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
+import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
+import play.api.test.Helpers.{redirectLocation, _}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
+import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.RetrievalOps._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,13 +36,79 @@ import scala.concurrent.{ExecutionContext, Future}
 class AuthActionSpec extends SpecBase {
 
   class Harness(authAction: IdentifierAction) {
-    def onPageLoad() = authAction { _ => Results.Ok }
+    def onPageLoad(): Action[AnyContent] = authAction { _ => Results.Ok }
+  }
+
+  val mockAuthConnector: AuthConnector = mock[AuthConnector]
+  val mockAppConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
+  val mockBodyParsers = app.injector.instanceOf[BodyParsers.Default]
+
+  type AuthRetrievals = Option[String] ~ Option[String] ~ Option[String] ~ Option[AffinityGroup] ~ ConfidenceLevel
+
+  def retrievals(
+                           internalId: Option[String] = Some(fakeInternalId),
+                           nino: Option[String] = Some(fakeNino),
+                           saUtr: Option[String] = Some(fakeSaUtr),
+                           affinityGroup: Option[AffinityGroup] = Some(AffinityGroup.Individual),
+                           confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
+                         ): Harness = {
+
+    when(mockAuthConnector.authorise[AuthRetrievals](any(), any())(any(), any())) thenReturn Future.successful(
+      internalId ~ nino ~ saUtr ~ affinityGroup ~ confidenceLevel
+    )
+
+    val authAction = new AuthenticatedIdentifierAction(
+      mockAuthConnector,
+      mockAppConfig,
+      mockBodyParsers
+    )(implicitly)
+
+    new Harness(authAction)
   }
 
   "Auth Action" when {
 
-    "the user hasn't logged in" must {
+    "the user tries to access the service with <200 confidence level" must {
+      "redirect an Individual user to IVUplift" in {
+        val controller = retrievals(confidenceLevel = ConfidenceLevel.L50)
+        val result = controller.onPageLoad()(fakeRequest)
 
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(
+          "http://localhost:9948/iv-stub/uplift?" +
+            "origin=EEWFH&" +
+            "confidenceLevel=200&" +
+            "completionURL=http://localhost:9336/employee-working-from-home-expenses&" +
+            "failureURL=http://localhost:9336/employee-working-from-home-expenses/identity-failed"
+        )
+      }
+
+      "redirect an Org user to IVUplift" in {
+        val controller = retrievals(affinityGroup = Some(AffinityGroup.Organisation), confidenceLevel = ConfidenceLevel.L50)
+        val result = controller.onPageLoad()(fakeRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(
+          "http://localhost:9948/iv-stub/uplift?" +
+            "origin=EEWFH&" +
+            "confidenceLevel=200&" +
+            "completionURL=http://localhost:9336/employee-working-from-home-expenses&" +
+            "failureURL=http://localhost:9336/employee-working-from-home-expenses/identity-failed"
+        )
+      }
+    }
+
+    "the user tries to access the service with an Agent affinity group" must {
+      "redirect the user to the unauthorised page" in {
+        val controller = retrievals(affinityGroup = Some(AffinityGroup.Agent))
+        val result = controller.onPageLoad()(fakeRequest)
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad.url)
+      }
+    }
+
+    "the user hasn't logged in" must {
       "redirect the user to log in " in {
 
         val application = applicationBuilder(userAnswers = None).build()
@@ -56,7 +126,6 @@ class AuthActionSpec extends SpecBase {
     }
 
     "the user's session has expired" must {
-
       "redirect the user to log in " in {
 
         val application = applicationBuilder(userAnswers = None).build()
@@ -74,7 +143,6 @@ class AuthActionSpec extends SpecBase {
     }
 
     "the user doesn't have sufficient enrolments" must {
-
       "redirect the user to the unauthorised page" in {
 
         val application = applicationBuilder(userAnswers = None).build()
@@ -92,7 +160,6 @@ class AuthActionSpec extends SpecBase {
     }
 
     "the user doesn't have sufficient confidence level" must {
-
       "redirect the user to IVUplift" in {
 
         val application = applicationBuilder(userAnswers = None).build()
@@ -118,7 +185,6 @@ class AuthActionSpec extends SpecBase {
     }
 
     "the user used an unaccepted auth provider" must {
-
       "redirect the user to the unauthorised page" in {
 
         val application = applicationBuilder(userAnswers = None).build()
@@ -154,7 +220,6 @@ class AuthActionSpec extends SpecBase {
     }
 
     "the user has an unsupported credential role" must {
-
       "redirect the user to the unauthorised page" in {
 
         val application = applicationBuilder(userAnswers = None).build()

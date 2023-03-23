@@ -21,6 +21,7 @@ import controllers.actions._
 import models.UserAnswers
 import org.scalatest.TryValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import org.scalatestplus.play.guice._
 import play.api.i18n.{Messages, MessagesApi}
@@ -32,7 +33,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDate
 
-trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with ScalaFutures with IntegrationPatience {
+trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with ScalaFutures with IntegrationPatience with MockitoSugar {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -66,6 +67,10 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
       )
 
   lazy val fakeNino = "AB123456A"
+
+  lazy val fakeInternalId = "111"
+
+  lazy val fakeSaUtr = "222"
 
   lazy val etag: Int = 123
 

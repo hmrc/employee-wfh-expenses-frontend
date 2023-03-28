@@ -40,7 +40,7 @@
    )
   )
  )}else None) {
-    @formHelper(action = routes.DisclaimerController.onSubmit(), 'autoComplete -> "off") {
+    @formHelper(action = routes.DisclaimerController.onSubmit(), Symbol("autoComplete") -> "off") {
 
     <h1 class="govuk-heading-l">@messages("disclaimer.heading")</h1>
 

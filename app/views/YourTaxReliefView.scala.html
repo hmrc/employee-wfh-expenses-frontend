@@ -99,7 +99,7 @@
 
     <p class="govuk-body">@messages("yourTaxRelief.accept.text.1")</p>
 
-    @formHelper(action = YourTaxReliefController.onSubmit(), 'autoComplete -> "off") {
-        @button(Button(content = Text(messages("yourTaxRelief.button.text")), preventDoubleClick  = true))
+    @formHelper(action = YourTaxReliefController.onSubmit(), Symbol("autoComplete") -> "off") {
+        @button(Button(content = Text(messages("yourTaxRelief.button.text")), preventDoubleClick  = Some(true)))
     }
 }

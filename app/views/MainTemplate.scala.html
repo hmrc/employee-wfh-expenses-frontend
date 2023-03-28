@@ -18,12 +18,12 @@
 @import uk.gov.hmrc.hmrcfrontend.views.Aliases.ReportTechnicalIssue
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcLanguageSelect, HmrcTimeoutDialog}
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukPhaseBanner
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcStandardHeader, hmrcStandardFooter}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcStandardHeader, HmrcStandardFooter}
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language._
 
 @this(
         govukLayout: GovukLayout,
-        hmrcFooter: hmrcStandardFooter,
+        hmrcFooter: HmrcStandardFooter,
         hmrcStandardHeader: HmrcStandardHeader,
         hmrcReportTechnicalIssue: hmrcComponents.HmrcReportTechnicalIssue,
         appConfig: FrontendAppConfig,
@@ -75,7 +75,7 @@
         tag = Some(Tag(
             content = Text("beta")
         )),
-        content = HtmlContent(insetHtml)
+        content = HtmlContent(insetHtml())
     ))
     @hmrcLanguageSelect(LanguageSelect(
         if (messages.lang.code == "cy") Cy else En,
@@ -98,7 +98,7 @@
 
 @govukLayout(
     pageTitle = Some(title),
-    headBlock = Some(hmrcHead(headBlock = Some(headBlock))),
+    headBlock = Some(hmrcHead(headBlock = Some(headBlock()))),
     headerBlock = Some(
         hmrcStandardHeader(
             signOutUrl = Some(routes.SignedOutController.signOutToExitSurvey.url)

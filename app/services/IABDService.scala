@@ -23,14 +23,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.RateLimiting
 
 import javax.inject.{Inject, Named, Singleton}
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class IABDServiceImpl @Inject()(
                                  taiConnector: TaiConnector,
                                  @Named("IABD GET") rateLimiter: RateLimiting
-                               ) extends IABDService with Logging {
+                               )(implicit executionContext: ExecutionContext) extends IABDService with Logging {
 
   def alreadyClaimed(nino: String, year: Int)(implicit hc:HeaderCarrier):Future[Option[Expenses]] = {
 

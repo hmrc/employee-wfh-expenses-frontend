@@ -31,7 +31,7 @@
     title = s"${errorPrefix(form)} ${messages("selectTaxYearsToClaimFor.title")}"
 ) {
 
-    @formHelper(action = routes.SelectTaxYearsToClaimForController.onSubmit(), 'autoComplete -> "off") {
+    @formHelper(action = routes.SelectTaxYearsToClaimForController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))

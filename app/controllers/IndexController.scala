@@ -36,7 +36,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.TaxYearDates.{YEAR_2020, YEAR_2021, YEAR_2022}
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 trait TaiLookupHandler extends Logging {
@@ -54,7 +53,8 @@ trait TaiLookupHandler extends Logging {
                                    otherExpenses: Seq[IABDExpense],
                                    jobExpenses: Seq[IABDExpense],
                                    wasJobRateExpensesChecked: Boolean
-                                 )(implicit hc: HeaderCarrier): Unit = {
+                                 )(implicit hc: HeaderCarrier,
+                                   executionContext: ExecutionContext): Unit = {
 
     val json = if (wasJobRateExpensesChecked) {
       Json.obj( fields =
@@ -78,7 +78,7 @@ trait TaiLookupHandler extends Logging {
   }
 
   def handlePageRequest(successHandler: (Boolean, Boolean, Boolean) => Result)
-                       (implicit dataRequest: OptionalDataRequest[AnyContent], hc: HeaderCarrier): Future[Result] = {
+                       (implicit dataRequest: OptionalDataRequest[AnyContent], hc: HeaderCarrier, executionContext: ExecutionContext): Future[Result] = {
 
 
     val alreadyClaimed2020Future = iabdService.alreadyClaimed(dataRequest.nino, YEAR_2020)
@@ -148,8 +148,9 @@ class IndexController @Inject()(
                                  getData: DataRetrievalAction,
                                  iabdServiceInput: IABDService,
                                  appConfigInput: FrontendAppConfig,
-                                 auditConnectorInput: AuditConnector) extends FrontendBaseController
-  with TaiLookupHandler with I18nSupport {
+                                 auditConnectorInput: AuditConnector
+                               )(implicit executionContext: ExecutionContext)
+  extends FrontendBaseController with TaiLookupHandler with I18nSupport {
 
   val iabdService: IABDService = iabdServiceInput
   val navigator: Navigator = navigatorInput

@@ -82,7 +82,7 @@
 
     <p class="govuk-body">@messages("checkYourClaimView.text.5")</p>
 
-    @formHelper(action = CheckYourClaimController.onSubmit(), 'autoComplete -> "off") {
+    @formHelper(action = CheckYourClaimController.onSubmit(), Symbol("autoComplete") -> "off") {
         @button(Button(content = Text(messages("checkYourClaimView.button.label"))))
     }
 

@@ -25,14 +25,14 @@
         errorSummary: GovukErrorSummary
 )
 
-@(form: Form[_])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], isClaimingCTY: Boolean = false)(implicit request: Request[_], messages: Messages)
 
 @main_template(
     title = s"${errorPrefix(form)} ${messages("whenDidYouFirstStartWorkingFromHome.title")}",
     beforeContentBlock = Some(
         backLink(
             BackLink(
-                href = routes.SelectTaxYearsToClaimForController.onPageLoad().url,
+                href = if(isClaimingCTY) routes.ConfirmClaimInWeeksController.onPageLoad().url else routes.HowWeWillCalculateTaxReliefController.onPageLoad().url,
                 content = Text(messages("site.back")),
                 attributes = Map("id" -> "back-link")
             )
@@ -42,10 +42,14 @@
     @formHelper(action = routes.WhenDidYouFirstStartWorkingFromHomeController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
-            @errorSummary(ErrorSummary(errorList = form.errors.asTextErrorLinks, title = Text(messages("error.summary.title"))))
+            @errorSummary(
+                ErrorSummary(
+                    errorList = form.errors.asTextErrorLinks,
+                    title = Text(messages("error.summary.title"))
+            ))
         }
 
-        <h1 class="govuk-heading-l">@messages("whenDidYouFirstStartWorkingFromHome.heading")</h1>
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">@messages("whenDidYouFirstStartWorkingFromHome.heading")</h1>
 
         @govukDateInput(DateInput(
             id = "value",
@@ -74,6 +78,17 @@
                 )
             )
         ))
+
+        <details class="govuk-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                  <span class="govuk-details__summary-text">
+                    @messages("whenDidYouFirstStartWorkingFromHome.summaryText")
+                  </span>
+            </summary>
+            <div class="govuk-details__text">
+                @messages("whenDidYouFirstStartWorkingFromHome.summaryText2")
+            </div>
+        </details>
 
         @button(Button(content = Text(messages("site.continue"))))
     }

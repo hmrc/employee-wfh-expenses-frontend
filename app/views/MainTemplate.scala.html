@@ -15,11 +15,8 @@
  *@
 
 @import config.FrontendAppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.Aliases.ReportTechnicalIssue
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.{HmrcLanguageSelect, HmrcTimeoutDialog}
-@import uk.gov.hmrc.govukfrontend.views.html.components.GovukPhaseBanner
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcStandardHeader, HmrcStandardFooter}
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.language._
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels._
 
 @this(
         govukLayout: GovukLayout,
@@ -27,8 +24,8 @@
         hmrcStandardHeader: HmrcStandardHeader,
         hmrcReportTechnicalIssue: hmrcComponents.HmrcReportTechnicalIssue,
         appConfig: FrontendAppConfig,
-        hmrcTimeoutDialog: HmrcTimeoutDialog,
-        hmrcLanguageSelect: HmrcLanguageSelect,
+        hmrcTimeoutDialog: hmrcComponents.HmrcTimeoutDialog,
+        hmrcLanguageSelect: hmrcComponents.HmrcLanguageSelect,
         hmrcHead: HmrcHead,
         govukPhaseBanner : GovukPhaseBanner
 )
@@ -40,7 +37,7 @@
     <!--[if gt IE 8]><!--><link href='@controllers.routes.Assets.versioned("stylesheets/employeewfhexpensesfrontend-app.css")' media="screen" rel="stylesheet" type="text/css" /><!--<![endif]-->
     @if(hasTimeout) {
         @if(appConfig.timeoutDialogEnabled) {
-                @hmrcTimeoutDialog(hmrcComponents.TimeoutDialog(
+                @hmrcTimeoutDialog(timeoutdialog.TimeoutDialog(
                     timeout= Some(appConfig.timeoutDialogTimeout),
                     countdown= Some(appConfig.timeoutDialogTimeoutCountdown),
                     keepAliveUrl= Some(routes.KeepAliveController.keepAlive.url),
@@ -77,10 +74,10 @@
         )),
         content = HtmlContent(insetHtml())
     ))
-    @hmrcLanguageSelect(LanguageSelect(
-        if (messages.lang.code == "cy") Cy else En,
-        (En, controllers.routes.LanguageSwitchController.switchToLanguage("english").url),
-        (Cy, controllers.routes.LanguageSwitchController.switchToLanguage("cymraeg").url)
+    @hmrcLanguageSelect(language.LanguageSelect(
+        if (messages.lang.code == "cy") language.Cy else language.En,
+        (language.En, controllers.routes.LanguageSwitchController.switchToLanguage("english").url),
+        (language.Cy, controllers.routes.LanguageSwitchController.switchToLanguage("cymraeg").url)
     ))
     @beforeContentBlock
 }
@@ -90,9 +87,9 @@
         @mainContent
     </div>
 
-    @hmrcReportTechnicalIssue(ReportTechnicalIssue(
+    @hmrcReportTechnicalIssue(reporttechnicalissue.ReportTechnicalIssue(
         serviceCode = appConfig.contactFormServiceIdentifier,
-        language = if (messages.lang.code == "cy") Cy else En
+        language = if (messages.lang.code == "cy") language.Cy else language.En
     ))
 }
 

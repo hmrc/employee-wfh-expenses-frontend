@@ -34,6 +34,7 @@ import views.html.WhenDidYouFirstStartWorkingFromHomeView
 
 import java.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.data.Form
 
 import scala.concurrent.Future
 
@@ -41,22 +42,22 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
 
   val formProvider = new WhenDidYouFirstStartWorkingFromHomeFormProvider()
 
-  private def form = formProvider()
+  private def form: Form[LocalDate] = formProvider()
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
   // scalastyle:off magic.number
-  val validAnswer = LocalDate.of(2020, 1, 1)
+  val validAnswer: LocalDate = LocalDate.of(2020, 1, 1)
   // scalastyle:on magic.number
 
-  lazy val whenDidYouFirstStartWorkingFromHomeRoute = routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url
+  lazy val whenDidYouFirstStartWorkingFromHomeRoute: String = routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url
 
-  override val emptyUserAnswers = UserAnswers(userAnswersId)
+  override val emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
 
-  def getRequest(): FakeRequest[AnyContentAsEmpty.type] =
+  def getRequest: FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(GET, whenDidYouFirstStartWorkingFromHomeRoute)
 
-  def postRequest(): FakeRequest[AnyContentAsFormUrlEncoded] =
+  def postRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
     FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
       .withFormUrlEncodedBody(
         "value.day" -> validAnswer.getDayOfMonth.toString,
@@ -85,7 +86,7 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(form)(getRequest(), messages).toString
+          view(form)(getRequest, messages).toString
 
         application.stop()
       }
@@ -147,7 +148,7 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(form)(getRequest(), messages).toString
+          view(form, isClaimingCTY = true)(getRequest, messages).toString
 
         application.stop()
       }
@@ -162,7 +163,7 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
         status(result) mustEqual OK
 
         contentAsString(result) mustEqual
-          view(form.fill(validAnswer))(getRequest, messages).toString
+          view(form.fill(validAnswer), isClaimingCTY = true)(getRequest, messages).toString
 
         application.stop()
       }

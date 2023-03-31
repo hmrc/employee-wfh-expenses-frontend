@@ -17,62 +17,52 @@
 package controllers
 
 import controllers.actions._
-import models.{ClaimViewSettings, DisclaimerViewSettings}
 import navigation.Navigator
-import pages._
+import pages.{DisclaimerPage, SelectTaxYearsToClaimForPage}
+import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateLanguageTokenizer
-import utils.TaxYearDates.TAX_YEAR_2021_START_DATE
 import views.html.DisclaimerView
 
 import java.time.LocalDate
 import javax.inject.Inject
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 
 class DisclaimerController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      identify: IdentifierAction,
-                                      citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                      sessionRepository: SessionRepository,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
-                                      navigator: Navigator,
-                                      val controllerComponents: MessagesControllerComponents,
-                                      disclaimerView: DisclaimerView
-                                    ) extends FrontendBaseController with I18nSupport with UIAssembler {
+                                         override val messagesApi: MessagesApi,
+                                         identify: IdentifierAction,
+                                         citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                         getData: DataRetrievalAction,
+                                         requireData: DataRequiredAction,
+                                         navigator: Navigator,
+                                         val controllerComponents: MessagesControllerComponents,
+                                         disclaimerView: DisclaimerView
+                                       ) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
+  def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
       request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
         case Some(_) =>
-          val selectedTaxYearsAssembler = taxYearFromUIAssemblerFromRequest()
+          val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
 
-          val startDate: Option[LocalDate] = if(selectedTaxYearsAssembler.containsPrevious) {
-            request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-          } else {
-            Some(TAX_YEAR_2021_START_DATE)
-          }
+          val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
-          def buildDisclaimerPageSettings(dateList: List[(LocalDate, LocalDate)]) = {
-            if (request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).isDefined) {
-              DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))))
-            } else {
-              DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), None)))
-            }
-          }
-
-          Ok(disclaimerView(showBackLink = true, buildDisclaimerPageSettings(selectedTaxYearsAssembler.assemble), startDate))
-
+          Ok(disclaimerView(
+            tokenizerFormattedItem.month,
+            tokenizerFormattedItem.year.toString,
+            Some(tokenizerFormattedItem.month),
+            Some(tokenizerFormattedItem.year.toString),
+            selectedTaxYears.contains2022OrAfter,
+            selectedTaxYears.contains2021OrPrevious
+          ))
         case None => Redirect(routes.IndexController.onPageLoad)
       }
-
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
-    implicit request =>
-      Redirect(navigator.nextPage(DisclaimerPage, request.userAnswers))
+      implicit request =>
+        Redirect(navigator.nextPage(DisclaimerPage, request.userAnswers))
   }
 }

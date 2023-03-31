@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions._
-import pages.{CheckYourClaimPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{CheckYourClaimPage, NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -26,9 +26,10 @@ import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html._
 import utils.TaxYearDates._
-
 import java.time.LocalDate
+
 import javax.inject.Inject
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourClaimController @Inject()(
@@ -52,13 +53,20 @@ class CheckYourClaimController @Inject()(
 
           val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
 
-          val numberOfWeeksToDisplay = if (startDate.isDefined) {
+          val numberOfWeeksIn2019 = if (startDate.isDefined) {
             numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE)
           } else {
             0
           }
 
-          Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assemble), startDate, numberOfWeeksToDisplay, selectedTaxYears.checkboxYearOptions))
+          val numberOfWeeksIn2023 = if(!taxYearFromUIAssemblerFromRequest().checkboxYearOptions.contains("option1")) {
+            None
+          } else {
+            request.userAnswers.get(NumberOfWeeksToClaimForPage)
+          }
+
+          Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assembleWholeYears), startDate, numberOfWeeksIn2019,
+            numberOfWeeksIn2023, selectedTaxYears.checkboxYearOptions))
         case None => Redirect(routes.IndexController.onPageLoad)
       }
 
@@ -68,11 +76,13 @@ class CheckYourClaimController @Inject()(
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest().checkboxYearOptions
-      val startDate = if(!selectedTaxYears.contains("option3")) None else request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+      val startDate = if(!selectedTaxYears.contains("option4")) None else request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+      val numberOfWeeksOf2023 = if(!selectedTaxYears.contains("option1")) None else request.userAnswers.get(NumberOfWeeksToClaimForPage)
 
       submissionService.submitExpenses(
         startDate = startDate,
-        selectedTaxYears = selectedTaxYears
+        selectedTaxYears = selectedTaxYears,
+        numberOfWeeksOf2023 = numberOfWeeksOf2023
       ) map {
         case Right(_) =>
           Redirect(routes.ConfirmationController.onPageLoad())

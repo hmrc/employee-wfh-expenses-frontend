@@ -1,0 +1,72 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import utils.DateLanguageTokenizer
+@import utils.TaxYearDates._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+
+@this(
+    main_template: MainTemplate,
+    formHelper: FormWithCSRF,
+    errorSummary: GovukErrorSummary,
+    backLink: GovukBackLink,
+    button: GovukButton,
+    inputNumber: components.input_number
+)
+
+@(form: Form[_])(implicit request: Request[_], messages: Messages)
+
+@currentYearContent = @{
+    val (dateFrom, dateTo) = DateLanguageTokenizer.convertDate(TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE)
+    val dateFromString = s"${dateFrom.day} ${messages(dateFrom.month)} ${dateFrom.year}"
+    val dateToString = s"${dateTo.day} ${messages(dateTo.month)} ${dateTo.year}"
+    messages("numberOfWeeksToClaimFor.para", dateFromString, dateToString)
+}
+
+@main_template(
+    title = s"${errorPrefix(form)} ${messages("numberOfWeeksToClaimFor.title")}",
+    beforeContentBlock = Some(backLink(BackLink(
+        href = routes.InformClaimNowInWeeksController.onPageLoad().url,
+        content = Text(messages("site.back")),
+        attributes = Map("id" -> "back-link")
+    )))
+) {
+
+    @if(form.errors.nonEmpty) {
+        @errorSummary(ErrorSummary(
+            errorList = form.errors.asTextErrorLinks,
+            title = Text(messages("error.summary.title"))
+        ))
+    }
+
+    <h1 class="govuk-heading-xl">@messages("numberOfWeeksToClaimFor.heading")</h1>
+
+    <p class="govuk-body">@currentYearContent</p>
+
+    @formHelper(action = NumberOfWeeksToClaimForController.onSubmit(), Symbol("autoComplete") -> "off") {
+
+        @inputNumber(
+            field = form("value"),
+            hintText = Some(messages("numberOfWeeksToClaimFor.hinttext")),
+            question = messages("numberOfWeeksToClaimFor.question"),
+            name = "value",
+            id = "value",
+            hideLabel = true
+        )
+
+        @button(Button(content = Text(messages("site.continue")), preventDoubleClick  = Some(true)))
+    }
+}

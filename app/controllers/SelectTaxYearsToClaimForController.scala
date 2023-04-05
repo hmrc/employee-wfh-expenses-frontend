@@ -69,20 +69,23 @@ class SelectTaxYearsToClaimForController @Inject()(
     request.userAnswers.get(HasSelfAssessmentEnrolment) match {
       case Some(true) => handleSAFlow(WfhDueToCovidStatusWrapper(1))
       case _ =>
-        (request.userAnswers.get(ClaimedForTaxYear2020), request.userAnswers.get(ClaimedForTaxYear2021), request.userAnswers.get(ClaimedForTaxYear2022)) match {
-          case (Some(claimed2020), Some(claimed2021), Some(claimed2022)) =>
-            val availableYears = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022)
+        (request.userAnswers.get(ClaimedForTaxYear2020),
+          request.userAnswers.get(ClaimedForTaxYear2021),
+          request.userAnswers.get(ClaimedForTaxYear2022),
+          request.userAnswers.get(ClaimedForTaxYear2023)) match {
+          case (Some(claimed2020), Some(claimed2021), Some(claimed2022), Some(claimed2023)) =>
+            val availableYears = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022, claimed2023)
 
             val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
               case None => form
               case Some(value) => form.fill(value)
             }
 
-            val showHintText = !hasSingleUnclaimedYear(claimed2020, claimed2021, claimed2022)
+            val showHintText = !hasSingleUnclaimedYear(claimed2020, claimed2021, claimed2022, claimed2023)
 
             Future.successful(Ok(view(preparedForm, availableYears, showHintText)))
 
-          case (_, _, _) => Future.successful(Redirect(routes.IndexController.onPageLoad))
+          case (_, _, _, _) => Future.successful(Redirect(routes.IndexController.onPageLoad))
         }
     }
   }
@@ -117,7 +120,8 @@ class SelectTaxYearsToClaimForController @Inject()(
       val availableYearsUserCanClaim = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(
         request.userAnswers.get(ClaimedForTaxYear2020).getOrElse(false),
         request.userAnswers.get(ClaimedForTaxYear2021).getOrElse(false),
-        request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(false)
+        request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(false),
+        request.userAnswers.get(ClaimedForTaxYear2023).getOrElse(false)
       )
 
       request.userAnswers.eligibilityCheckerSessionIdOpt match {
@@ -158,13 +162,14 @@ class SelectTaxYearsToClaimForController @Inject()(
     val overrideList: Set[SelectTaxYearsToClaimFor] = SelectTaxYearsToClaimFor
       .getValuesFromClaimedBooleans(request.userAnswers.get(ClaimedForTaxYear2020).getOrElse(false),
         request.userAnswers.get(ClaimedForTaxYear2021).getOrElse(false),
-        request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(false)).toSet
+        request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(false),
+        request.userAnswers.get(ClaimedForTaxYear2023).getOrElse(false)).toSet
 
     Some(overrideList)
   }
 
-  def hasSingleUnclaimedYear(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean): Boolean = {
-    (claimed2020 && !claimed2021 && claimed2022) || (claimed2020 && claimed2021 && !claimed2022) || (!claimed2020 && claimed2021 && claimed2022)
+  def hasSingleUnclaimedYear(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean, claimed2023: Boolean): Boolean = {
+    Seq(claimed2020, claimed2021, claimed2022, claimed2023).count(_ == false) == 1
   }
 
 }

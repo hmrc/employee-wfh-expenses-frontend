@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.TooManyRequestException
 
 class RateLimiting(rateLimitConfig: RateLimitConfig, tooManyRequestsMsg: String = "Rate limit detected") {
 
-  val bucket: RateLimiter = new RateLimiter(rateLimitConfig.bucketSize, rateLimitConfig.ratePerSecond)
+  val bucket: RateLimiter = new RateLimiter(rateLimitConfig.bucketSize, rateLimitConfig.ratePerSecond.toFloat)
 
   val enabled: Boolean = rateLimitConfig.enabled
 

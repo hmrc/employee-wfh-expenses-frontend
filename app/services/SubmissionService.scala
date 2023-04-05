@@ -49,11 +49,11 @@ class SubmissionService @Inject()
 
   val ZERO      = 0
 
-  def submitExpenses(startDate: Option[LocalDate], selectedTaxYears: List[String])
+  def submitExpenses(startDate: Option[LocalDate], selectedTaxYears: List[String], numberOfWeeksOf2023: Option[Int])
                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] = {
 
 
-    rateLimiter.withToken(() => submit(startDate, selectedTaxYears) map {
+    rateLimiter.withToken(() => submit(startDate, selectedTaxYears, numberOfWeeksOf2023) map {
       case Right(submittedDetails) =>
         logger.info(s"[SubmissionService][submitExpenses] Submission successful")
         auditSubmissionSuccess(submittedDetails)
@@ -67,90 +67,36 @@ class SubmissionService @Inject()
     })
   }
 
-  private def submit(startDate: Option[LocalDate], selectedTaxYears: List[String])
+  private def submit(startDate: Option[LocalDate], selectedTaxYears: List[String], numberOfWeeksOf2023: Option[Int])
                      (implicit dataRequest: DataRequest[AnyContent],
                       hc: HeaderCarrier,
                       ec: ExecutionContext) = {
 
     val assembler = TaxYearFromUIAssembler(selectedTaxYears)
 
-    val flatRateItems: Seq[FlatRateItem] = startDate match {
-      case None => selectedTaxYears match {
-        case assembler.claiming2022Only =>
-          Seq[FlatRateItem](
-            FlatRateItem(year = YEAR_2022, amount = calculate2022FlatRate())
-          )
-        case assembler.claiming2022And2021 =>
-          Seq[FlatRateItem](
-            FlatRateItem(year = YEAR_2022, amount = calculate2022FlatRate()),
-            FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate())
-          )
-        case assembler.claiming2021Only =>
-          Seq[FlatRateItem](
-            FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate())
-          )
-        case e =>
-          logger.error(s"[SubmissionService][submit](no startDate found) Unexpected case match $e")
-          Seq.empty[FlatRateItem]
+    val wholeYearItems: Seq[FlatRateItem] = Seq(
+      if(assembler.contains2021) Some(FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate())) else None,
+      if(assembler.contains2022) Some(FlatRateItem(year = YEAR_2022, amount = calculate2022FlatRate())) else None
+    ).flatten
+
+    val previousYearItems: Seq[FlatRateItem] = startDate match {
+      case Some(date) if assembler.containsPrevious => Seq(
+        Some(FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())),
+        if(date.isBefore(TAX_YEAR_2019_END_DATE)) {
+          Some(FlatRateItem(year = YEAR_2019, amount = calculate2019FlatRate(date)))
+      } else {
+        None
       }
-      case Some(date) => selectedTaxYears match {
-        case assembler.claimingAllYears =>
-          if(date.isAfter(TAX_YEAR_2019_END_DATE)) {
-            Seq[FlatRateItem](
-              FlatRateItem(year = YEAR_2022, amount = calculate2022FlatRate()),
-              FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate()),
-              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())
-            )
-          } else {
-            Seq[FlatRateItem](
-              FlatRateItem(year = YEAR_2022, amount = calculate2022FlatRate()),
-              FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate()),
-              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate()),
-              FlatRateItem(year = YEAR_2019, amount = calculate2019FlatRate(date))
-            )
-          }
-        case assembler.claiming2022AndPrev =>
-          if(date.isAfter(TAX_YEAR_2019_END_DATE)) {
-            Seq[FlatRateItem](
-              FlatRateItem(year = YEAR_2022, amount = calculate2022FlatRate()),
-              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())
-            )
-          } else {
-            Seq[FlatRateItem](
-              FlatRateItem(year = YEAR_2022, amount = calculate2022FlatRate()),
-              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate()),
-              FlatRateItem(year = YEAR_2019, amount = calculate2019FlatRate(date))
-            )
-          }
-        case assembler.claiming2021AndPrev =>
-          if(date.isAfter(TAX_YEAR_2019_END_DATE)) {
-            Seq[FlatRateItem](
-              FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate()),
-              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())
-            )
-          } else {
-            Seq[FlatRateItem](
-              FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate()),
-              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate()),
-              FlatRateItem(year = YEAR_2019, amount = calculate2019FlatRate(date))
-            )
-          }
-        case assembler.claimingPrevOnly =>
-          if(date.isAfter(TAX_YEAR_2019_END_DATE)) {
-            Seq[FlatRateItem](
-              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())
-            )
-          } else {
-            Seq[FlatRateItem](
-              FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate()),
-              FlatRateItem(year = YEAR_2019, amount = calculate2019FlatRate(date))
-            )
-          }
-        case e =>
-          logger.error(s"[SubmissionService][submit](startDate found) Unexpected case match $e")
-          Seq.empty[FlatRateItem]
-      }
+      ).flatten
+      case _ => Seq.empty[FlatRateItem]
     }
+
+    val perWeekItems: Seq[FlatRateItem] = numberOfWeeksOf2023 match {
+      case Some(weeks) => Seq(FlatRateItem(year = YEAR_2023, amount = calculate2023FlatRate(weeks)))
+      case _ => Seq.empty[FlatRateItem]
+    }
+
+    val flatRateItems = wholeYearItems ++ previousYearItems ++ perWeekItems
 
     if (flatRateItems.isEmpty) {
       Future.successful(Left("Flat Rate Items sequence is empty, unable to submit"))
@@ -168,7 +114,6 @@ class SubmissionService @Inject()
         case e => Left(e.getMessage)
       }
     }
-
   }
 
   def futureSequence[I, O](inputs: Seq[I])(flatMapFunction: I => Future[O])(implicit ec: ExecutionContext): Future[Seq[O]] = {
@@ -210,6 +155,9 @@ class SubmissionService @Inject()
       case flatRateAmount: Int                                                       => flatRateAmount
     }
   }
+
+  def calculate2023FlatRate(numberOfWeeks: Int): Int =
+    (numberOfWeeks * appConfig.taxReliefPerWeek2023).min(appConfig.taxReliefMaxPerYear2023)
 
   private def auditSubmissionSuccess(submittedDetails: Seq[FlatRateItem])
                                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =

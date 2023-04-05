@@ -24,12 +24,14 @@ import java.time.temporal.ChronoUnit
 object TaxYearDates {
 
   val ONE_WEEK  = 1
+  val MAXIMUM_WEEKS_IN_A_YEAR = 52
 
   val YEAR_2019: Int = 2019
   val YEAR_2020: Int = 2020
   val YEAR_2021: Int = 2021
   val YEAR_2022: Int = 2022
   val YEAR_2023: Int = 2023
+  val YEAR_2024: Int = 2024
 
   val TAX_YEAR_2019_START_DATE: LocalDate = TaxYear(YEAR_2019).starts
 
@@ -46,6 +48,10 @@ object TaxYearDates {
   val TAX_YEAR_2022_START_DATE: LocalDate = TaxYear(YEAR_2022).starts
 
   val TAX_YEAR_2022_END_DATE: LocalDate = TaxYear(YEAR_2023).starts.minusDays(1)
+
+  val TAX_YEAR_2023_START_DATE: LocalDate = TaxYear(YEAR_2023).starts
+
+  val TAX_YEAR_2023_END_DATE: LocalDate = TaxYear(YEAR_2024).starts.minusDays(1)
 
 
   def numberOfWeeks(startDate:LocalDate, endDate:LocalDate): Long = {

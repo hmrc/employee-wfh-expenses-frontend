@@ -18,16 +18,18 @@ package controllers
 
 import controllers.actions._
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
-import models.UserAnswers
+import models.{SelectTaxYearsToClaimFor, UserAnswers}
 import navigation.Navigator
 import pages.{SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.WhenDidYouFirstStartWorkingFromHomeView
 
+import java.time.LocalDate
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,17 +46,18 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
                                         whenDidYouFirstStartWorkingFromHomeView: WhenDidYouFirstStartWorkingFromHomeView
                                       )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
-  val form = formProvider()
+  val form: Form[LocalDate] = formProvider()
 
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
       request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
-        case Some(_) =>
+        case Some(selectedTaxYears) =>
+          val isClaimingCTY = selectedTaxYears.contains(SelectTaxYearsToClaimFor.Option1)
           val preparedForm = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
             case None => form
             case Some(value) => form.fill(value)
           }
-          Ok(whenDidYouFirstStartWorkingFromHomeView(preparedForm))
+          Ok(whenDidYouFirstStartWorkingFromHomeView(preparedForm, isClaimingCTY))
         case None => Redirect(routes.IndexController.onPageLoad)
       }
   }
@@ -62,12 +65,13 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val messages = request2Messages
+      val selectedTaxYears = request.userAnswers.get(SelectTaxYearsToClaimForPage)
 
       form.bindFromRequest().fold(
         formWithErrors => {
           val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => messages(s"date.$arg").toLowerCase)))
-
-            Future.successful(BadRequest(whenDidYouFirstStartWorkingFromHomeView(formWithErrors.copy(errors = errors))))
+          val isClaimingCTY = selectedTaxYears.contains(SelectTaxYearsToClaimFor.Option1)
+            Future.successful(BadRequest(whenDidYouFirstStartWorkingFromHomeView(formWithErrors.copy(errors = errors), isClaimingCTY)))
         },
         value =>
           for {

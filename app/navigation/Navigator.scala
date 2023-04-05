@@ -17,6 +17,7 @@
 package navigation
 
 import controllers.routes
+import models.SelectTaxYearsToClaimFor._
 import models._
 import pages._
 import play.api.Logging
@@ -30,15 +31,12 @@ class Navigator @Inject()() extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
-    case SelectTaxYearsToClaimForPage => ua =>
-      val selectedOptionsCheckBoxes = ua.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
-      val selectedTaxYears = TaxYearFromUIAssembler(selectedOptionsCheckBoxes)
-      if (selectedTaxYears.containsPrevious) {
-         routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
-      } else {
-        routes.DisclaimerController.onPageLoad()
-      }
-    case DisclaimerPage => _ => disclaimerNextPage()
+    case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
+    case DisclaimerPage => _ => routes.HowWeWillCalculateTaxReliefController.onPageLoad()
+    case HowWeWillCalculateTaxReliefPage => ua => howWeWillCalculateTaxReliefNextPage(ua)
+    case InformClaimNowInWeeksPage => _ => routes.NumberOfWeeksToClaimForController.onPageLoad()
+    case NumberOfWeeksToClaimForPage => _ => routes.ConfirmClaimInWeeksController.onPageLoad()
+    case ConfirmClaimInWeeksPage => ua => confirmClaimInWeeksNextPage(ua)
     case CheckYourClaimPage => ua => checkYourClaimPage(ua)
     case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
     case _ => _ => routes.IndexController.onPageLoad
@@ -47,7 +45,7 @@ class Navigator @Inject()() extends Logging {
   def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
 
   def checkYourClaimPage(userAnswers: UserAnswers): Call = {
-    routes.YourTaxReliefController.onPageLoad()
+    routes.DisclaimerController.onPageLoad()
   }
 
   def checkStartWorkingFromHomeDate(userAnswers: UserAnswers): Call = {
@@ -58,7 +56,7 @@ class Navigator @Inject()() extends Logging {
         if (startDate.isBefore(earliestStartDate)) {
           routes.CannotClaimUsingThisServiceController.onPageLoad()
         } else {
-          routes.DisclaimerController.onPageLoad()
+          routes.CheckYourClaimController.onPageLoad()
         }
       case None => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
     }
@@ -69,16 +67,39 @@ class Navigator @Inject()() extends Logging {
     userAnswers.get(HasSelfAssessmentEnrolment) match {
       case None         => routes.IndexController.onPageLoad
       case Some(_) =>
-        (userAnswers.get(ClaimedForTaxYear2020), userAnswers.get(ClaimedForTaxYear2021), userAnswers.get(ClaimedForTaxYear2022)) match {
-          case (Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
-          case (None, None, None)                                        => routes.IndexController.onPageLoad
-          case (_, _, _)                                                 => routes.TechnicalDifficultiesController.onPageLoad
+        (userAnswers.get(ClaimedForTaxYear2020),
+          userAnswers.get(ClaimedForTaxYear2021),
+          userAnswers.get(ClaimedForTaxYear2022),
+          userAnswers.get(ClaimedForTaxYear2023)) match {
+          case (Some(_), Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
+          case (None, None, None, None)             => routes.IndexController.onPageLoad
+          case (_, _, _, _)                         => routes.TechnicalDifficultiesController.onPageLoad
         }
     }
   }
 
-  def disclaimerNextPage(): Call = {
-    routes.YourTaxReliefController.onPageLoad()
+  def howWeWillCalculateTaxReliefNextPage(userAnswers: UserAnswers): Call = {
+    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll.toSet)
+
+    if(selectedTaxYears.contains(Option1)) {routes.InformClaimNowInWeeksController.onPageLoad()}
+    else if(selectedTaxYears.contains(Option4)) {routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()}
+    else {routes.CheckYourClaimController.onPageLoad()}
+    // TODO: Will need updating to include the extra tax year when it is added
+  }
+
+  def confirmClaimInWeeksNextPage(userAnswers: UserAnswers): Call = {
+    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll.toSet)
+    val onwardRoute = if(selectedTaxYears.contains(Option4)) {
+      routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+    } else {
+      routes.CheckYourClaimController.onPageLoad()
+    }
+
+    if(userAnswers.get(ConfirmClaimInWeeksPage).getOrElse(false)) {
+      onwardRoute
+    } else {
+      routes.NumberOfWeeksToClaimForController.onPageLoad()
+    }
   }
 
 }

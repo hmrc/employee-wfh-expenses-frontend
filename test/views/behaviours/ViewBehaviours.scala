@@ -50,35 +50,6 @@ trait ViewBehaviours extends ViewSpecBase {
     }
   }
 
-  def disclaimerPage(view: HtmlFormat.Appendable,
-                 messageKeyPrefix: String,
-                 expectedGuidanceKeys: String*): Unit = {
-
-    "behave like a disclaimer page" when {
-
-      "rendered" must {
-
-        "display the correct browser title" in {
-
-          val doc = asDocument(view)
-          assertEqualsMessage(doc, "title", s"$messageKeyPrefix.title")
-        }
-
-        "display the correct page title" in {
-
-          val doc = asDocument(view)
-          assertPageTitleEqualsMessageDisclaimer(doc, s"$messageKeyPrefix.heading")
-        }
-
-        "display the correct guidance" in {
-
-          val doc = asDocument(view)
-          for (key <- expectedGuidanceKeys) assertContainsText(doc, messages(s"$messageKeyPrefix.$key"))
-        }
-      }
-    }
-  }
-
   def pageWithBackLink(view: HtmlFormat.Appendable): Unit = {
 
     "behave like a page with a back link" must {

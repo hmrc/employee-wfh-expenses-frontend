@@ -16,68 +16,56 @@
 
 package views
 
-import controllers.UIAssembler
-import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler}
 import play.api.test.FakeRequest
-import utils.DateLanguageTokenizer
 import views.behaviours.ViewBehaviours
 import views.html.DisclaimerView
 
-import java.time.LocalDate
+// scalastyle:off magic.number
+class DisclaimerViewSpec extends ViewBehaviours {
 
-class DisclaimerViewSpec extends ViewBehaviours with UIAssembler {
+  private val Disclaimer = "disclaimer"
 
-  "Disclaimer view" must {
+  "DisclaimerView" should {
 
     val view = viewFor[DisclaimerView](Some(emptyUserAnswers))
 
-    val assembler = TaxYearFromUIAssembler(List("option1"))
-
-    val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-      Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
-
-    val date = LocalDate.of(2020, 4, 1)
-
-    val applyView = view.apply(true, disclaimerViewSettings, Some(date))(fakeRequest, messages)
-
-    behave like disclaimerPage(applyView, "disclaimer")
+    val request = FakeRequest()
 
     "show content" when {
-      "when all disclaimer content is displayed before additional tax relief dates" in {
-        val view = viewFor[DisclaimerView](Some(emptyUserAnswers))
-        val request = FakeRequest()
+      "when all both sections are required" in {
 
-        val assembler = TaxYearFromUIAssembler(List("option1"))
+        val doc = asDocument(view.apply("April", "2020",
+          Some("May"), Some("2022"), true, true)(request, messages))
+        assert(doc.toString.contains(messages("Claiming tax relief on or after")))
+        assert(doc.toString.contains(messages("Claiming tax relief on or before")))
 
-        val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+        assert(doc.toString.contains(messages("disclaimer.heading.after")))
+        assert(doc.toString.contains(messages("disclaimer.info.text.1")))
+        assert(doc.toString.contains(messages("disclaimer.bullet.heading")))
+        assert(doc.toString.contains(messages("disclaimer.bullet.text.1")))
+        assert(doc.toString.contains(messages("disclaimer.bullet.text.2")))
+        assert(doc.toString.contains(messages("disclaimer.heading.before")))
+        assert(doc.toString.contains(messages("disclaimer.bullet.heading.1")))
+        assert(doc.toString.contains(messages("disclaimer.bullet.text.3")))
+        assert(doc.toString.contains(messages("disclaimer.bullet.text.4")))
+        assert(doc.toString.contains(messages("disclaimer.bullet.text.5")))
+        assert(doc.toString.contains(messages("disclaimer.bullet.text.6")))
+        assert(doc.toString.contains(messages("disclaimer.warning.text.1")))
+        assert(doc.toString.contains(messages("disclaimer.warning.text.2")))
+        assert(doc.toString.contains(messages("disclaimer.button.text")))
 
-        val date = LocalDate.of(2020, 4, 1)
-        val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
-        assert(doc.toString.contains(messages("disclaimer.heading")))
-        assert(doc.toString.contains(messages("disclaimer.your.claim.details.year.label")))
-        assert(doc.toString.contains(messages("6 April 2022 to 5 April 2023")))
-        assert(doc.toString.contains(messages("1 January 2020 to 5 April 2020")))
-        assert(doc.toString.contains(messages("disclaimer.your.claim.text.2")))
-        assert(doc.toString.contains(messages("disclaimer.your.claim.text.3")))
-        assert(doc.toString.contains(messages("disclaimer.your.claim.text.4")))
-        assert(doc.toString.contains(messages("disclaimer.your.claim.text.5")))
       }
-
-      "when all disclaimer content is displayed after additional tax relief dates" in {
-        val view = viewFor[DisclaimerView](Some(emptyUserAnswers))
-        val request = FakeRequest()
-
-        val assembler = TaxYearFromUIAssembler(List("option1"))
-
-        val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
-
-        val date = LocalDate.of(2020, 5, 1)
-        val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
-        assert(doc.toString.contains(messages("6 April 2022 to 5 April 2023")))
-        assert(!doc.toString.contains(messages("1 January 2020 to 5 April 2020")))
+      "when all both after only is required" in {
+        val doc = asDocument(view.apply("April", "2020",
+          None, None, true, false)(request, messages))
+        assert(doc.toString.contains(messages("Claiming tax relief on or after")))
+        assert(!doc.toString.contains(messages("Claiming tax relief on or before")))
       }
+    }
+
+    "behave like a normal page" when {
+      behave like normalPage(view.apply("April", "2020",
+        Some("May"), Some("2022"), true, true)(request, messages), Disclaimer)
     }
   }
 }

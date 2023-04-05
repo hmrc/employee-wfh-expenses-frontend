@@ -16,8 +16,6 @@
 
 package models
 
-import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
-
 import java.time.LocalDateTime
 import pages._
 import play.api.libs.json._

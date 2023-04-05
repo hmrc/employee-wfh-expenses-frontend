@@ -14,66 +14,91 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
-@import java.time.LocalDate
-@import utils.TaxYearDates._
-
 @this(
-        main_template: MainTemplate,
-        formHelper: FormWithCSRF,
-        backLink: GovukBackLink,
-        button: GovukButton,
-        govukWarningText : GovukWarningText,
-        frontendAppConfig: FrontendAppConfig
+    main_template:                  MainTemplate,
+formHelper:                     FormWithCSRF,
+govukNotificationBanner:        GovukNotificationBanner,
+govukInsetText:                 GovukInsetText,
+backLink:                       GovukBackLink,
+button:                         GovukButton
 )
 
-@(showBackLink: Boolean = true, disclaimerViewSettings: DisclaimerViewSettings, startDate: Option[LocalDate])( implicit request: Request[_], messages: Messages)
+@(
+    taxMonthAfterText: String, taxYearAfterText: String,
+    taxMonthBeforeText: Option[String],
+    taxYearBeforeText: Option[String],
+    showFirstMessageBlock: Boolean,
+    showSecondMessageBlock: Boolean
+)(implicit request: Request[_], messages: Messages)
+
+@afterDateStringFormatted = {
+    @messages("disclaimer.heading.after") @messages(taxMonthAfterText) @messages(taxYearAfterText)
+}
+
+@beforeDateStringFormatted = {
+    @messages("disclaimer.heading.before") @messages(taxMonthBeforeText.getOrElse("")) @messages(taxYearBeforeText.getOrElse(""))
+}
+
+@notificationHtml = {
+    <p class="govuk-notification-banner__heading">
+        @messages("disclaimer.notification.text")
+    </p>
+}
 
 @main_template(
- title = messages("disclaimer.title"),
- beforeContentBlock = if(showBackLink){Some(
-  backLink(
-   BackLink(
-    href = routes.SelectTaxYearsToClaimForController.onPageLoad().url,
-    content = Text(messages("site.back")),
-    attributes = Map("id" -> "back-link")
-   )
-  )
- )}else None) {
-    @formHelper(action = routes.DisclaimerController.onSubmit(), Symbol("autoComplete") -> "off") {
+    title = messages("disclaimer.title"),
+    beforeContentBlock = Some(backLink(BackLink(
+        href = routes.SelectTaxYearsToClaimForController.onPageLoad().url,
+        content = Text(messages("site.back")),
+        attributes = Map("id" -> "back-link")
+    )))
+) {
 
-    <h1 class="govuk-heading-l">@messages("disclaimer.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("disclaimer.heading")</h1>
 
+    @if(showFirstMessageBlock) {
+        @govukNotificationBanner(NotificationBanner(
+            title = HtmlContent(messages("disclaimer.notification.title")),
+            content = HtmlContent(notificationHtml)
+        ))
 
-    <h1 class="govuk-heading-m">@messages("disclaimer.your.claim.details.header")</h1>
+        <h2 class="govuk-heading-m">@afterDateStringFormatted</h2>
 
-    @if(disclaimerViewSettings.claimViewSettings.get.datesToClaim != List.empty) {
+        <p class="govuk-body">@messages("disclaimer.info.text.1")</p>
+        <p class="govuk-body">@messages("disclaimer.info.text.2")</p>
 
-        <p class="govuk-body">@messages("disclaimer.your.claim.details.year.label")</p>
-
+        <p class="govuk-body">@messages("disclaimer.bullet.heading")</p>
         <ul class="govuk-list govuk-list--bullet">
-        @for(dateToken <- disclaimerViewSettings.claimViewSettings.get.datesToClaim) {
-            <li>@dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("disclaimer.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</li>
-        }
+            <li>@messages("disclaimer.bullet.text.1")</li>
+            <li>@messages("disclaimer.bullet.text.2")</li>
+            <li>@messages("disclaimer.bullet.text.3")</li>
+        </ul>
+
+    }
+
+    @if(showSecondMessageBlock) {
+        <h2 class="govuk-heading-m">@beforeDateStringFormatted</h2>
+
+        <p class="govuk-body">@messages("disclaimer.bullet.heading.1")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("disclaimer.bullet.text.4")</li>
+            <li>@messages("disclaimer.bullet.text.5")</li>
+            <li>@messages("disclaimer.bullet.text.6")</li>
         </ul>
     }
 
-    @if(disclaimerViewSettings.claimViewSettings.get.additionalTaxReliefDates.isDefined) {
-        @if(startDate.get.isBefore(TAX_YEAR_2020_START_DATE)) {
-            <p class="govuk-body">@messages("disclaimer.your.claim.text.1")</p>
-            <ul class="govuk-list govuk-list--bullet">
-                <li>@messages("disclaimer.your.claim.text.date.bullet")</li>
-            </ul>
-        }
-    }
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-warning-text__assistive">Warning</span>
+            @if(showFirstMessageBlock) {@messages("disclaimer.warning.text.1")<br>}
+            @messages("disclaimer.warning.text.2")<br>
+        </strong>
+    </div>
 
-    <p class="govuk-body">
-    @messages("disclaimer.your.claim.text.2")
-    @messages("disclaimer.your.claim.text.3")
-    <a href=@frontendAppConfig.p87DigitalFormUrl>@messages("disclaimer.your.claim.text.4")</a>
-    @messages("disclaimer.your.claim.text.5")
-    </p>
+    <p class="govuk-body">@messages("disclaimer.accept.text.1")</p>
 
-     @button(Button(content = Text(messages("disclaimer.submit.button"))))
+    @formHelper(action = DisclaimerController.onSubmit(), Symbol("autoComplete") -> "off") {
+        @button(Button(content = Text(messages("disclaimer.button.text")), preventDoubleClick  = Some(true)))
     }
 }

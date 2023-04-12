@@ -74,7 +74,8 @@ trait StringViewBehaviours extends QuestionViewBehaviours[String] {
         "show an error prefix in the browser title" in {
 
           val doc = asDocument(createView(form.withError(error(messageKeyPrefix))))
-          assertEqualsValue(doc, "title", s"""${messages("error.browser.title.prefix")} ${messages(s"$messageKeyPrefix.title")}""")
+          val title = s"${messages(s"$messageKeyPrefix.title")} - ${messages("service.name")} - GOV.UK"
+          assertEqualsValue(doc, "title", s"""${messages("error.browser.title.prefix")} $title""")
         }
       }
     }

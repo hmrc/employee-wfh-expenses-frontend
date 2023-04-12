@@ -23,17 +23,12 @@ import views.html.WeSignedYouOutPageView
 class SignedOutViewSpec extends ViewBehaviours {
 
   "Session Expired view" must {
-    "Show sign out page" in {
+    val application = applicationBuilder().build()
 
-      val application = applicationBuilder().build()
+    val view = application.injector.instanceOf[WeSignedYouOutPageView]
 
-      val view = application.injector.instanceOf[WeSignedYouOutPageView]
+    val applyView = view.apply()(FakeRequest(), messages)
 
-      val applyView = view.apply()(FakeRequest(), messages)
-
-      val doc = asDocument(applyView)
-
-      doc.title() mustBe "For your security, we signed you out"
-    }
+    behave like normalPage(applyView, "signoutpage")
   }
 }

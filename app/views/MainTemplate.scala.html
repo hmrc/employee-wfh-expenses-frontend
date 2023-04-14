@@ -94,7 +94,7 @@
 }
 
 @govukLayout(
-    pageTitle = Some(title),
+    pageTitle = Some(s"$title - ${messages("service.name")} - GOV.UK"),
     headBlock = Some(hmrcHead(headBlock = Some(headBlock()))),
     headerBlock = Some(
         hmrcStandardHeader(

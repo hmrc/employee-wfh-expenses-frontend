@@ -57,7 +57,7 @@ site.getHelpWithThisPage=Help gyda’r dudalen hon
 
 unauthorised.title=Ni allwch ddefnyddio’r Dynodydd Defnyddiwr (ID) hwn ar gyfer Porth y Llywodraeth i hawlio rhyddhad treth ar eich treuliau
 unauthorised.heading=Ni allwch ddefnyddio’r Dynodydd Defnyddiwr (ID) hwn ar gyfer Porth y Llywodraeth i hawlio rhyddhad treth ar eich treuliau
-unauthorised.paragraph.one=Y rheswm am hyn yw’ch bod wedi mewngofnodi â’ch Dynodydd Defnyddiwr (ID) ar gyfer Porth y Llywodraeth eich busnes neu’ch asiant.
+unauthorised.paragraph.one=Mae hyn oherwydd eich bod wedi mewngofnodi gan ddefnyddio’ch Dynodydd Defnyddiwr (ID) asiant ar gyfer Porth y Llywodraeth.
 unauthorised.paragraph.two=I ddefnyddio’r gwasanaeth hwn, bydd angen i chi
 unauthorised.signIn.text=fewngofnodi gan ddefnyddio Dynodydd Defnyddiwr (ID) unigolyn ar gyfer Porth y Llywodraeth.
 

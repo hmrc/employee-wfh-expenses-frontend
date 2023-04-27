@@ -23,9 +23,9 @@
 
 @()(implicit request: Request[_], messages: Messages)
 
-@linkToP87PostalForm = {<a href=@appConfig.p87PostalFormUrl>@messages("ivfailed.postalForm.href.text")</a>}
-@linkToHelpline = {<a href=@appConfig.incomeTaxGeneralEnquiriesUrl>@messages("ivfailed.helpline.href.text")</a>}
-@linkToTryAgain = {<a href=@{appConfig.loginUrl}?continue=@{appConfig.loginContinueUrl}>@messages("ivfailed.tryAgain.href.text")</a>}
+@linkToP87PostalForm = {<a class="govuk-link" href=@appConfig.p87PostalFormUrl>@messages("ivfailed.postalForm.href.text")</a>}
+@linkToHelpline = {<a class="govuk-link" href=@appConfig.incomeTaxGeneralEnquiriesUrl>@messages("ivfailed.helpline.href.text")</a>}
+@linkToTryAgain = {<a class="govuk-link" href=@{appConfig.loginUrl}?continue=@{appConfig.loginContinueUrl}>@messages("ivfailed.tryAgain.href.text")</a>}
 
 @main_template(title = messages("ivfailed.title")) {
 

@@ -1,5 +1,29 @@
-
 # employee-wfh-expenses-frontend
+
+## Info
+
+The employee-wfh-expenses-frontend service allows individuals to claim tax relief on expenses for working from home
+
+The service uses TAI to update the user's tax account via IABD 59
+
+### Dependencies
+
+|Service               |Link                                                                    |
+|----------------------|------------------------------------------------------------------------|
+|Tai                   |https://github.com/hmrc/tai                                             |
+|Citizen Details       |https://github.com/hmrc/citizen-details                                 |
+|Preferences           |https://github.com/hmrc/preferences-frontend                            |
+|EE Eligibility        |https://github.com/hmrc/employment-expenses-tax-relief-guidance-frontend|
+
+### Endpoints used
+
+|Service        |HTTP Method |Route                                  |Purpose |
+|---------------|--- |----------------|----------------------------------|
+|Tai            |GET |/tai/$nino/tax-account/$year /expenses/employee-expenses/$iabd| Returns details of a users tax account specifically that of IABD 59 |
+|Tai            |POST|/tai/$nino/tax-account/$year /expenses/working-from-home-employee-expenses/$iabd| Updates a users tax account specifically that of IABD 59  |
+|Citizen Details|GET |/citizen-details/$nino/$etag|Retrieves the users etag which is added to their update request to NPS to ensure optimistic locking|
+|Preferences    |GET |/preferences-frontend/paperless|Retrieves the users paperless preference status|
+|EE Eligibility |GET |/claim-tax-relief-expenses/pay-or-will-pay-tax-in-year-status/$sessionId|Retrieves a users SA enrolment answer if redirected from service|
 
 ## Running the service locally
 

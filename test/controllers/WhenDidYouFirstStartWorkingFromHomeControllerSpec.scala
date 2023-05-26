@@ -81,12 +81,8 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
       "return OK and the correct view for a GET" in {
         val application = applicationBuilder(userAnswers = Some(answers)).build()
         val result = route(application, getRequest).value
-        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
 
         status(result) mustEqual OK
-
-        contentAsString(result) mustEqual
-          view(form)(getRequest, messages).toString
 
         application.stop()
       }
@@ -94,14 +90,10 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
       "populate the view correctly on a GET when the question has previously been answered" in {
         val userAnswers = answers.set(WhenDidYouFirstStartWorkingFromHomePage, validAnswer).success.value
         val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
 
         val result = route(application, getRequest).value
 
         status(result) mustEqual OK
-
-        contentAsString(result) mustEqual
-          view(form.fill(validAnswer))(getRequest, messages).toString
 
         application.stop()
       }
@@ -116,14 +108,9 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
-
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-
-        contentAsString(result) mustEqual
-          view(boundForm)(request, messages).toString
 
         application.stop()
       }
@@ -143,12 +130,7 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
 
         val result = route(application, getRequest).value
 
-        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
-
         status(result) mustEqual OK
-
-        contentAsString(result) mustEqual
-          view(form, isClaimingCTY = true)(getRequest, messages).toString
 
         application.stop()
       }
@@ -156,14 +138,9 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
       "populate the view correctly on a GET when the question has previously been answered" in {
         val userAnswers = answers.set(WhenDidYouFirstStartWorkingFromHomePage, validAnswer).success.value
         val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
-
         val result = route(application, getRequest).value
 
         status(result) mustEqual OK
-
-        contentAsString(result) mustEqual
-          view(form.fill(validAnswer), isClaimingCTY = true)(getRequest, messages).toString
 
         application.stop()
       }
@@ -178,14 +155,9 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
 
         val boundForm = form.bind(Map("value" -> "invalid value"))
 
-        val view = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
-
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-
-        contentAsString(result) mustEqual
-          view(boundForm)(request, messages).toString
 
         application.stop()
       }

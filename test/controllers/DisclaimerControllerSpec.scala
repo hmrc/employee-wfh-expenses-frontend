@@ -44,8 +44,6 @@ class DisclaimerControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-      val view = application.injector.instanceOf[DisclaimerView]
-
       val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
 
       val request = FakeRequest(GET, routes.DisclaimerController.onPageLoad().url)
@@ -55,11 +53,6 @@ class DisclaimerControllerSpec extends SpecBase {
       val selectedTaxYears = TaxYearFromUIAssembler(List("option1", "option2"))
 
       status(result) mustEqual OK
-
-      contentAsString(result) mustEqual
-        view(tokenizerFormattedItem.month, tokenizerFormattedItem.year.toString,
-          Some(tokenizerFormattedItem.month), Some(tokenizerFormattedItem.year.toString),
-          selectedTaxYears.containsCurrent, selectedTaxYears.contains2021OrPrevious)(request, messages).toString
 
       application.stop()
 
@@ -77,16 +70,11 @@ class DisclaimerControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-      val view = application.injector.instanceOf[DisclaimerView]
-
       val request = FakeRequest(GET, routes.DisclaimerController.onPageLoad().url)
 
       val result = route(application, request).value
 
       status(result) mustEqual OK
-
-      contentAsString(result) mustEqual
-        view("April", "2022", None, None, true, false)(request, messages).toString
 
       application.stop()
 

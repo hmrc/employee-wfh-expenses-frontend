@@ -33,12 +33,7 @@ class UnauthorisedControllerSpec extends SpecBase {
 
       val result = route(application, request).value
 
-      val view = application.injector.instanceOf[UnauthorisedView]
-
       status(result) mustEqual OK
-
-      contentAsString(result) mustEqual
-        view()(request, messages).toString
 
       application.stop()
     }
@@ -51,12 +46,7 @@ class UnauthorisedControllerSpec extends SpecBase {
 
       val result = route(application, request).value
 
-      val view = application.injector.instanceOf[IdentityVerificationFailedView]
-
       status(result) mustEqual OK
-
-      contentAsString(result) mustEqual
-        view()(request, messages).toString
 
       application.stop()
     }

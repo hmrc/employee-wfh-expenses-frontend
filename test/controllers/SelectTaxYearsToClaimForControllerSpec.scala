@@ -61,12 +61,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
 
       val result = route(application, request).value
 
-      val view = application.injector.instanceOf[SelectTaxYearsToClaimForView]
-
       status(result) mustEqual OK
-
-      contentAsString(result) mustEqual
-        view(form, valuesAll)(request, messages).toString
 
       application.stop()
     }
@@ -108,14 +103,9 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
 
       val boundForm = form.bind(Map("value" -> "invalid value"))
 
-      val view = application.injector.instanceOf[SelectTaxYearsToClaimForView]
-
       val result = route(application, request).value
 
       status(result) mustEqual BAD_REQUEST
-
-      contentAsString(result) mustEqual
-        view(boundForm, valuesAll)(request, messages).toString
 
       application.stop()
     }

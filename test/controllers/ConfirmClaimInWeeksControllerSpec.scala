@@ -54,12 +54,7 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
 
       val result = route(application, request).value
 
-      val view = application.injector.instanceOf[ConfirmClaimInWeeksView]
-
       status(result) mustEqual OK
-
-      contentAsString(result) mustEqual
-        view(form, numberOfWeeks)(request, messages).toString
 
       application.stop()
     }

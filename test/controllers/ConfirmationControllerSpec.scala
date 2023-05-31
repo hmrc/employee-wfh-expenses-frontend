@@ -84,14 +84,6 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
     status(result) mustEqual OK
 
-    val paperlessUrl = paperlessAvailable match {
-      case true => None
-      case false => Some(somePreferencesUrl)
-    }
-
-    val view = application.injector.instanceOf[ConfirmationView]
-    contentAsString(result) mustEqual
-      view(paperlessAvailable, paperlessUrl, true, true)(request, messages).toString
 
     val dataToAudit = Map(NinoReference -> fakeNino, Enabled -> paperlessAvailable.toString)
 

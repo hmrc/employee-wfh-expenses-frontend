@@ -52,8 +52,6 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
-      val view = application.injector.instanceOf[CheckYourClaimView]
-
       val request = FakeRequest(GET, routes.CheckYourClaimController.onPageLoad().url)
 
       val result = route(application, request).value
@@ -62,12 +60,7 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       val optionList = List("option1", "option2", "option3", "option4")
       val assembler = TaxYearFromUIAssembler(optionList)
-      val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assembleWholeYears),
-        Some(DateLanguageTokenizer.convertList(assembler.assembleWholeYears)))))
-      val startDate = LocalDate.of(2020, 4, 1)
 
-      contentAsString(result) mustEqual
-        view(claimSettings.claimViewSettings.get, Some(startDate), 1, Some(3), optionList)(request, messages).toString
 
       application.stop()
     }

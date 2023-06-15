@@ -22,10 +22,10 @@ import controllers.PaperlessAuditConst._
 import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
 import models.UserAnswers
 import models.paperless.{PaperlessStatus, PaperlessStatusResponse, Url}
-import org.mockito.Matchers.{any, eq => eqm}
+import org.mockito.ArgumentMatchers.{any, eq => eqm}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{CheckYourClaimPage, ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, SubmittedClaim, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, SubmittedClaim, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest

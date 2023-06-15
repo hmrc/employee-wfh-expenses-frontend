@@ -22,7 +22,7 @@ import models.requests.OptionalDataRequest
 import models.{Expenses, IABDExpense}
 import navigation.Navigator
 import org.junit.Assert.{assertEquals, assertTrue}
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.BeforeAndAfter

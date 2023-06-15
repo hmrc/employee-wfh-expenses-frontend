@@ -23,7 +23,7 @@ import connectors.{CitizenDetailsConnector, TaiConnector}
 import models.auditing.AuditEventType.{UpdateWorkingFromHomeFlatRateFailure, UpdateWorkingFromHomeFlatRateSuccess}
 import models.requests.DataRequest
 import models.{AuditData, ETag, UserAnswers}
-import org.mockito.Matchers.{any, eq => eqm}
+import org.mockito.ArgumentMatchers.{any, eq => eqm}
 import org.mockito.Mockito.{times, verify, when}
 import org.mockito.{InOrder, Mockito}
 import org.scalatest.BeforeAndAfter

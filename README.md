@@ -27,9 +27,17 @@ The service uses TAI to update the user's tax account via IABD 59
 
 ## Running the service locally
 
-Service manager: sm --start EE_ALL --> sm --stop EE_WFH_FRONTEND
+##### `run.sh`
 
-Start the service locally: sbt "run 9336"
+* Starts the Play! server on [localhost:9336](http://localhost:9336) with test routes enabled.
+
+### Start dependencies via Service Manager
+
+To start all dependencies and services for Employee Expenses WFH, use one of the following commands:
+```
+sm --start EE_ALL -r
+sm --start EE_DEP -r (starts only dependencies).
+```
 
 Navigate to login stub (http://localhost:9949/auth-login-stub/) 
 

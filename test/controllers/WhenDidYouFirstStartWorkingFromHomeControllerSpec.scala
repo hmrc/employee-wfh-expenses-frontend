@@ -21,7 +21,7 @@ import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
 import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.inject.bind

@@ -88,4 +88,10 @@ class FrontendAppConfig @Inject()(configuration: Configuration, val servicesConf
 
   def routeToSwitchLanguage: String => Call =
     (lang: String) => routes.LanguageSwitchController.switchToLanguage(lang)
+
+  val collectionName: String = "user-answers"
+
+  val cacheTtl = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 }
+
+

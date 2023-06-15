@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{status => _}
 import config.FrontendAppConfig
 import models.requests.IdentifierRequest
 import models.{Expenses, IABDExpense}
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter

@@ -19,7 +19,6 @@ package config
 import com.google.inject.{AbstractModule, Provides}
 import connectors.{PaperlessPreferenceConnector, PaperlessPreferenceConnectorImpl}
 import controllers.actions._
-import repositories.{DefaultSessionRepository, SessionRepository}
 import services.{IABDService, IABDServiceImpl}
 import utils.RateLimiting
 
@@ -35,7 +34,6 @@ class Module extends AbstractModule {
 
     // For session based storage instead of cred based, change to SessionIdentifierAction
     bind(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).asEagerSingleton()
-    bind(classOf[SessionRepository]).to(classOf[DefaultSessionRepository]).asEagerSingleton()
     bind(classOf[PaperlessPreferenceConnector]).to(classOf[PaperlessPreferenceConnectorImpl]).asEagerSingleton()
 
     bind(classOf[IABDService]).to(classOf[IABDServiceImpl]).asEagerSingleton()

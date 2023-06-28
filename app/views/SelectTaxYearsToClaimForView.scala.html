@@ -18,7 +18,7 @@
 @import models.SelectTaxYearsToClaimFor
 
 @this(
-        main_template: MainTemplate,
+        layout: views.templates.LayoutProvider,
         button: GovukButton,
         errorSummary: GovukErrorSummary,
         govUkCheckboxes: GovukCheckboxes,
@@ -36,8 +36,8 @@
     </p>
 }
 
-@main_template(
-    title = s"${errorPrefix(form)} ${messages("selectTaxYearsToClaimFor.title")}"
+@layout(
+    pageTitle = s"${errorPrefix(form)} ${messages("selectTaxYearsToClaimFor.title")}"
 ) {
 
     @formHelper(action = routes.SelectTaxYearsToClaimForController.onSubmit(), Symbol("autoComplete") -> "off") {

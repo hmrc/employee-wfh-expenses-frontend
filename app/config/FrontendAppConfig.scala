@@ -76,6 +76,8 @@ class FrontendAppConfig @Inject()(configuration: Configuration, val servicesConf
   lazy val rateLimitTaiGets = configuration.get[RateLimitConfig]("rateLimit.taiGets")
   lazy val rateLimitTaiPosts = configuration.get[RateLimitConfig]("rateLimit.taiPosts")
 
+  lazy val scaWrapperEnabled = configuration.get[Boolean]("microservice.services.features.sca-wrapper")
+
   lazy val optimizelyId: String = configuration.getOptional[String]("optimizely.projectId").getOrElse("18916851035")
 
   lazy val languageTranslationEnabled: Boolean =

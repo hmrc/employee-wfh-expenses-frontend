@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
 @this(
-        main_template: MainTemplate,
+        layout: views.templates.LayoutProvider,
         formHelper: FormWithCSRF,
         button: GovukButton,
         backLink: GovukBackLink,
@@ -27,8 +27,8 @@
 
 @(form: Form[_], isClaimingCTY: Boolean = false)(implicit request: Request[_], messages: Messages)
 
-@main_template(
-    title = s"${errorPrefix(form)} ${messages("whenDidYouFirstStartWorkingFromHome.title")}",
+@layout(
+    pageTitle = s"${errorPrefix(form)} ${messages("whenDidYouFirstStartWorkingFromHome.title")}",
     beforeContentBlock = Some(
         backLink(
             BackLink(

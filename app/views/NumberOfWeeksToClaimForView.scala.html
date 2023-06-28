@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
 @this(
-    main_template: MainTemplate,
+    layout: views.templates.LayoutProvider,
     formHelper: FormWithCSRF,
     errorSummary: GovukErrorSummary,
     backLink: GovukBackLink,
@@ -36,8 +36,8 @@
     messages("numberOfWeeksToClaimFor.para", dateFromString, dateToString)
 }
 
-@main_template(
-    title = s"${errorPrefix(form)} ${messages("numberOfWeeksToClaimFor.title")}",
+@layout(
+    pageTitle = s"${errorPrefix(form)} ${messages("numberOfWeeksToClaimFor.title")}",
     beforeContentBlock = Some(backLink(BackLink(
         href = routes.InformClaimNowInWeeksController.onPageLoad().url,
         content = Text(messages("site.back")),

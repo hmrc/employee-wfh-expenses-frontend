@@ -15,7 +15,7 @@
  *@
 
 @this(
-    main_template: MainTemplate,
+    layout: views.templates.LayoutProvider,
     formHelper: FormWithCSRF,
     backLink: GovukBackLink,
     inputYesNo: components.input_yes_no,
@@ -33,9 +33,8 @@
     }
 }
 
-@main_template(
-
-    title = s"${errorPrefix(form)} ${messages("confirmClaimInWeeks.title", pluralOrSingularWeeks(numberOfWeeksToConfirm))}",
+@layout(
+    pageTitle = s"${errorPrefix(form)} ${messages("confirmClaimInWeeks.title", pluralOrSingularWeeks(numberOfWeeksToConfirm))}",
     beforeContentBlock = Some(backLink(BackLink(
         href = routes.NumberOfWeeksToClaimForController.onPageLoad().url,
         content = Text(messages("site.back")),

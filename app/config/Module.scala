@@ -19,12 +19,16 @@ package config
 import com.google.inject.{AbstractModule, Provides}
 import connectors.{PaperlessPreferenceConnector, PaperlessPreferenceConnectorImpl}
 import controllers.actions._
+import play.api.{Configuration, Environment}
 import services.{IABDService, IABDServiceImpl}
 import utils.RateLimiting
+import views.templates.{LayoutProvider, NewLayoutProvider, OldLayoutProvider}
 
 import javax.inject.Named
 
-class Module extends AbstractModule {
+class Module(environment: Environment, config: Configuration) extends AbstractModule {
+
+  val scaWrapperEnabled: Boolean = config.getOptional[Boolean]("microservice.services.features.sca-wrapper").getOrElse(false)
 
   override def configure(): Unit = {
     bind(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).asEagerSingleton()
@@ -37,6 +41,12 @@ class Module extends AbstractModule {
     bind(classOf[PaperlessPreferenceConnector]).to(classOf[PaperlessPreferenceConnectorImpl]).asEagerSingleton()
 
     bind(classOf[IABDService]).to(classOf[IABDServiceImpl]).asEagerSingleton()
+
+    if (scaWrapperEnabled) {
+      bind(classOf[LayoutProvider]).to(classOf[NewLayoutProvider]).asEagerSingleton()
+    } else {
+      bind(classOf[LayoutProvider]).to(classOf[OldLayoutProvider]).asEagerSingleton()
+    }
 
     @Provides
     @Named("IABD GET")

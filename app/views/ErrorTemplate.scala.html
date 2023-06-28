@@ -17,13 +17,13 @@
 @import config.FrontendAppConfig
 
 @this(
-        mainTemplate: MainTemplate,
+        layout: views.templates.LayoutProvider,
         appConfig: FrontendAppConfig
 )
 
 @(pageTitle: String, heading: String, message: String)(implicit request: Request[_], messages: Messages)
 
-@mainTemplate(title = heading) {
+@layout(pageTitle = heading) {
 <h1 class="govuk-heading-xl">@heading</h1>
 <p class="govuk-body">@messages(message)</p>
 }

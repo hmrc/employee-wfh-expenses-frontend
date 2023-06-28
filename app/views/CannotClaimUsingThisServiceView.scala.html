@@ -17,7 +17,7 @@
 @import config.FrontendAppConfig
 
 @this(
-        main_template: MainTemplate,
+        layout: views.templates.LayoutProvider,
         frontendAppConfig: FrontendAppConfig
 )
 
@@ -26,8 +26,8 @@
     @linkToChangeDate = {<a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("cannotClaimUsingThisService.changeDate.href.text")</a>}
     @linkToP87 = {<a href=@frontendAppConfig.p87DigitalFormUrl>@messages("cannotClaimUsingThisService.alternative.href.text")</a>}
 
-@main_template(
-    title = messages("cannotClaimUsingThisService.title")
+@layout(
+    pageTitle = messages("cannotClaimUsingThisService.title")
 ) {
 
     <h1 class="govuk-heading-xl">@messages("cannotClaimUsingThisService.heading")</h1>

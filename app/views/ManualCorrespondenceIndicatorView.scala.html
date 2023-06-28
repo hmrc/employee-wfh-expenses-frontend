@@ -18,14 +18,14 @@
 
 @this(
         appConfig:     FrontendAppConfig,
-        main_template: MainTemplate,
+        layout:        views.templates.LayoutProvider,
         backLink:      GovukBackLink
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
-    @main_template(
-        title = messages("manualCorrespondenceIndicator.title"),
+    @layout(
+        pageTitle = messages("manualCorrespondenceIndicator.title"),
         beforeContentBlock = Some(backLink(BackLink(
             href = routes.IndexController.onPageLoad.url,
             content = Text(messages("site.back")),

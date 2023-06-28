@@ -15,12 +15,12 @@
  *@
 
 @this(
-    main_template: MainTemplate
+  layout: views.templates.LayoutProvider,
 )
 
 @()(implicit request: Request[_], messages: Messages)
 
-@main_template(title = messages("index.title")) {
+@layout(pageTitle = messages("index.title")) {
 
     <h1 class="govuk-heading-xl">@messages("index.heading")</h1>
 

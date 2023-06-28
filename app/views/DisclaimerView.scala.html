@@ -15,12 +15,12 @@
  *@
 
 @this(
-    main_template:                  MainTemplate,
-formHelper:                     FormWithCSRF,
-govukNotificationBanner:        GovukNotificationBanner,
-govukInsetText:                 GovukInsetText,
-backLink:                       GovukBackLink,
-button:                         GovukButton
+    layout:                         views.templates.LayoutProvider,
+    formHelper:                     FormWithCSRF,
+    govukNotificationBanner:        GovukNotificationBanner,
+    govukInsetText:                 GovukInsetText,
+    backLink:                       GovukBackLink,
+    button:                         GovukButton
 )
 
 @(
@@ -45,8 +45,8 @@ button:                         GovukButton
     </p>
 }
 
-@main_template(
-    title = messages("disclaimer.title"),
+@layout(
+    pageTitle = messages("disclaimer.title"),
     beforeContentBlock = Some(backLink(BackLink(
         href = routes.SelectTaxYearsToClaimForController.onPageLoad().url,
         content = Text(messages("site.back")),

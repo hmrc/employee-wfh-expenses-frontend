@@ -19,7 +19,7 @@
 @import utils.DateLanguageTokenizer.DateLanguageTokenizerFormattedItemTuple
 
 @this(
-        main_template: MainTemplate,
+        layout: views.templates.LayoutProvider,
         formHelper: FormWithCSRF,
         backLink: GovukBackLink,
         button: GovukButton,
@@ -39,8 +39,8 @@
     }
 }
 
-@main_template(
-    title = messages("howWeWillCalculateTaxRelief.title"),
+@layout(
+    pageTitle = messages("howWeWillCalculateTaxRelief.title"),
     beforeContentBlock = if(showBackLink){Some(
         backLink(
             BackLink(

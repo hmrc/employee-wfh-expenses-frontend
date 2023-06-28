@@ -17,7 +17,7 @@
 @import config.FrontendAppConfig
 
 @this(
-        main_template: MainTemplate,
+        layout: views.templates.LayoutProvider,
         frontendAppConfig: FrontendAppConfig,
         formHelper: FormWithCSRF,
         backLink: GovukBackLink,
@@ -38,7 +38,7 @@
 
 @linkToFeedbackForm = {<a  class="govuk-link" rel="noreferrer noopener" target="_blank" href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
 
-@main_template(title = messages("confirmation.title"), isConfirmationPage = true) {
+@layout(pageTitle = messages("confirmation.title"), showBackLink = false) {
 
     @govukPanel(Panel(
         title = Text(messages("confirmation.heading")),

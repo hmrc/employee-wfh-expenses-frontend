@@ -14,20 +14,8 @@
  * limitations under the License.
  *@
 
-@this(
-        layout: views.templates.LayoutProvider,
-        button: GovukButton
-)
-
-@()(implicit request: Request[_], messages: Messages)
-
-@layout(pageTitle = messages("signoutpage.title"), timeout = false) {
-
-<h1 class="govuk-heading-xl">@messages("signoutpage.heading")</h1>
-
-@button(Button(
-       href = Some(routes.IndexController.onPageLoad.url),
-       content = Text(messages("signoutpage.start-again.text"))
-))
-
-}
+@this()
+<link href='@routes.Assets.versioned("stylesheets/application.css")'
+      media="all"
+      rel="stylesheet"
+      type="text/css" />

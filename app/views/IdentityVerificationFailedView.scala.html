@@ -17,7 +17,7 @@
 @import config.FrontendAppConfig
 
 @this(
-    main_template:  MainTemplate,
+    layout: views.templates.LayoutProvider,
     appConfig:      FrontendAppConfig
 )
 
@@ -27,7 +27,7 @@
 @linkToHelpline = {<a class="govuk-link" href=@appConfig.incomeTaxGeneralEnquiriesUrl>@messages("ivfailed.helpline.href.text")</a>}
 @linkToTryAgain = {<a class="govuk-link" href=@{appConfig.loginUrl}?continue=@{appConfig.loginContinueUrl}>@messages("ivfailed.tryAgain.href.text")</a>}
 
-@main_template(title = messages("ivfailed.title")) {
+@layout(pageTitle = messages("ivfailed.title")) {
 
     <h1 class="govuk-heading-xl">@messages("ivfailed.heading")</h1>
     <p class="govuk-body">@messages("ivFailed.paragraph.one")</p>

@@ -2,8 +2,8 @@ import sbt._
 
 object AppDependencies {
 
-  val bootstrapVersion = "7.15.0"
-  val mongoPlayVersion = "1.2.0"
+  val bootstrapVersion = "7.19.0"
+  val mongoPlayVersion = "1.3.0"
 
   val compile = Seq(
     play.sbt.PlayImport.ws,
@@ -11,10 +11,11 @@ object AppDependencies {
     "uk.gov.hmrc.mongo"   %% "hmrc-mongo-play-28"             % mongoPlayVersion,
     "uk.gov.hmrc"         %% "play-conditional-form-mapping"  % "1.12.0-play-28",
     "uk.gov.hmrc"         %% "bootstrap-frontend-play-28"     % bootstrapVersion,
-    "uk.gov.hmrc"         %% "play-partials"                  % "8.4.0-play-28",
     "uk.gov.hmrc"         %% "tax-year"                       % "3.2.0",
-    "uk.gov.hmrc"         %% "play-frontend-hmrc"             % "7.7.0-play-28",
-    "com.digitaltangible" %% "play-guard"                     % "2.5.0"
+    "uk.gov.hmrc"         %% "play-frontend-hmrc"             % "7.13.0-play-28",
+    "com.digitaltangible" %% "play-guard"                     % "2.5.0",
+    "uk.gov.hmrc"         %% "sca-wrapper"                    % "1.0.37"
+
   )
 
   val test = Seq(

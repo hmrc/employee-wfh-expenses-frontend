@@ -106,7 +106,7 @@ disclaimer.warning.text.2 = Mae’n rhaid i chi sicrhau eich bod yn bodloni’r 
 disclaimer.accept.text.1 = Drwy glicio ar ‘Derbyn ac yn eich blaen’, rydych yn derbyn eich bod yn bodloni’r rheolau ar gyfer y blynyddoedd rydych yn hawlio amdanynt.
 disclaimer.button.text = Derbyn ac yn eich blaen
 
-checkYourClaimView.title = Gwiriwch eich hawliad
+checkYourClaimView.title = Gwirio a chyflwyno eich hawliad
 checkYourClaimView.heading = Gwirio a chyflwyno eich hawliad
 checkYourClaimView.header = Gwirio manylion eich hawliad
 checkYourClaimView.text.1.1 = Mae hawl gennych i ryddhad treth ar

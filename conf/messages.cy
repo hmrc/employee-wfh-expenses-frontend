@@ -193,7 +193,7 @@ numberOfWeeksToClaimFor.error.minimum = Mae’n rhaid i nifer yr wythnosau rydyc
 numberOfWeeksToClaimFor.error.maximum = Mae’n rhaid i nifer yr wythnosau rydych wedi gweithio gartref yn ystod y flwyddyn dreth bresennol fod {0} o wythnosau neu lai
 
 confirmation.paperless.button.text = Cofrestrwch ar gyfer hysbysiadau di-bapur
-confirmation.title = Cadarnhad
+confirmation.title = Hawliad wedi’i gwblhau
 confirmation.heading = Hawliad wedi’i gwblhau
 
 confirmation.text = Byddwn yn newid eich cod treth ar gyfer y flwyddyn dreth bresennol

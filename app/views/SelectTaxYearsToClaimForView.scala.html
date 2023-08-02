@@ -52,6 +52,13 @@
         <h1 class="govuk-heading-xl">@messages("selectTaxYearsToClaimFor.title")</h1>
         <p class="govuk-body">@messages("selectTaxYearsToClaimFor.para")</p>
         @govUkCheckboxes(Checkboxes(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(messages("selectTaxYearsToClaimFor.title")),
+                    classes = "govuk-visually-hidden",
+                    isPageHeading = false
+                ))
+            )),
             name = "value",
             hint = Some(Hint(content = Text(messages("selectTaxYearsToClaimFor.hintText")))),
             items = SelectTaxYearsToClaimFor.options(form, availableYears),

@@ -15,24 +15,23 @@
  *@
 
 @import config.FrontendAppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcHead, HmrcStandardHeader, HmrcStandardFooter}
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels._
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 
 @this(
-        govukLayout: GovukLayout,
-        hmrcFooter: HmrcStandardFooter,
-        hmrcStandardHeader: HmrcStandardHeader,
-        hmrcReportTechnicalIssue: hmrcComponents.HmrcReportTechnicalIssue,
+        hmrcStandardPage: HmrcStandardPage,
+        standardBetaBanner: StandardBetaBanner,
+        hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
         appConfig: FrontendAppConfig,
         hmrcTimeoutDialog: hmrcComponents.HmrcTimeoutDialog,
         hmrcLanguageSelect: hmrcComponents.HmrcLanguageSelect,
-        hmrcHead: HmrcHead,
         govukPhaseBanner : GovukPhaseBanner
 )
 
-@(title: String, beforeContentBlock: Option[Html] = None, hasTimeout: Boolean = true, isConfirmationPage: Boolean = false)(mainContent: Html)(implicit request: Request[_], messages: Messages)
+@(title: String, beforeContentBlock: Option[Html] = None, hasTimeout: Boolean = true, showBackLink: Boolean = true)(mainContent: Html)(implicit request: Request[_], messages: Messages)
 
-@headBlock() = {
+@headBlock = {
     @if(hasTimeout) {
         @if(appConfig.timeoutDialogEnabled) {
                 @hmrcTimeoutDialog(timeoutdialog.TimeoutDialog(
@@ -44,37 +43,6 @@
                 ))
          }
     }
-
-    @if(isConfirmationPage) {
-        <script type="text/javascript">
-        function disableBack() { window. history. forward(); }
-        setTimeout("disableBack()", 0);
-        window. onunload = function () { null };
-        </script>
-    }
-}
-
-@scripts = {
-
-}
-
-@insetHtml() = {
-    @messages("phaseBanner.text.part1") <a class="govuk-link" href="@appConfig.betaFeedbackUnauthenticatedUrl">@messages("phaseBanner.linkText")</a> @messages("phaseBanner.text.part2")
-}
-
-@beforeContentBlockWithLanguageToggle = {
-    @govukPhaseBanner(PhaseBanner(
-        tag = Some(Tag(
-            content = Text("beta")
-        )),
-        content = HtmlContent(insetHtml())
-    ))
-    @hmrcLanguageSelect(language.LanguageSelect(
-        if (messages.lang.code == "cy") language.Cy else language.En,
-        (language.En, controllers.routes.LanguageSwitchController.switchToLanguage("english").url),
-        (language.Cy, controllers.routes.LanguageSwitchController.switchToLanguage("cymraeg").url)
-    ))
-    @beforeContentBlock
 }
 
 @content = {
@@ -82,22 +50,26 @@
         @mainContent
     </div>
 
-    @hmrcReportTechnicalIssue(reporttechnicalissue.ReportTechnicalIssue(
-        serviceCode = appConfig.contactFormServiceIdentifier,
-        language = if (messages.lang.code == "cy") language.Cy else language.En
-    ))
+    @hmrcReportTechnicalIssueHelper()
 }
 
-@govukLayout(
-    pageTitle = Some(s"$title - ${messages("service.name")} - GOV.UK"),
-    headBlock = Some(hmrcHead(headBlock = Some(headBlock()))),
-    headerBlock = Some(
-        hmrcStandardHeader(
-            signOutUrl = Some(routes.SignedOutController.signOutToExitSurvey.url)
-        )
-    ),
-    beforeContentBlock = Some(beforeContentBlockWithLanguageToggle),
-    bodyEndBlock = None,
-    scriptsBlock = Some(scripts),
-    footerBlock = Some(hmrcFooter())
+@hmrcStandardPage(
+    HmrcStandardPageParams(
+        serviceURLs = ServiceURLs(
+            serviceUrl = Some(routes.IndexController.onPageLoad.url),
+            signOutUrl = Some(routes.SignedOutController.signedOut.url)
+        ),
+        banners = Banners(
+            phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUnauthenticatedUrl))
+        ),
+        templateOverrides = TemplateOverrides(
+            additionalHeadBlock = Some(headBlock)
+        ),
+        serviceName = Some(messages("service.name")),
+        isWelshTranslationAvailable = appConfig.languageTranslationEnabled,
+        pageTitle = Some(s"$title - ${messages("service.name")} - GOV.UK"),
+        backLink = Option.when(showBackLink) {
+            BackLink.mimicsBrowserBackButtonViaJavaScript
+        },
+    )
 )(content)

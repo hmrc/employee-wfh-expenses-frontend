@@ -10,7 +10,7 @@ object AppDependencies {
     "uk.gov.hmrc"         %% "play-conditional-form-mapping"  % "1.13.0-play-28",
     "uk.gov.hmrc.mongo"   %% "hmrc-mongo-play-28"             % mongoPlayVersion,
     "uk.gov.hmrc"         %% "bootstrap-frontend-play-28"     % bootstrapVersion,
-    "uk.gov.hmrc"         %% "tax-year"                       % "3.2.0",
+    "uk.gov.hmrc"         %% "tax-year"                       % "3.3.0",
     "com.digitaltangible" %% "play-guard"                     % "2.5.0",
     "uk.gov.hmrc"         %% "sca-wrapper"                    % "1.0.45"
   )
@@ -22,7 +22,7 @@ object AppDependencies {
     "org.scalatestplus"           %% "scalatestplus-scalacheck"   % "3.1.0.0-RC2",
     "org.mockito"                  % "mockito-core"               % "5.3.1",
     "org.scalatestplus"           %% "scalatestplus-mockito"      % "1.0.0-M2",
-    "org.jsoup"                    % "jsoup"                      % "1.13.1"
+    "org.jsoup"                    % "jsoup"                      % "1.15.4"
   ).map(_ % Test)
 
   def apply(): Seq[ModuleID] = compile ++ test

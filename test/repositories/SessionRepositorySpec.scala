@@ -19,7 +19,6 @@ package repositories
 import base.SpecBase
 import config.FrontendAppConfig
 import models.UserAnswers
-import org.mockito.Mockito
 import org.scalatest.BeforeAndAfterEach
 import play.api.libs.json.Json
 import play.api.test.{DefaultAwaitTimeout, FutureAwaits}

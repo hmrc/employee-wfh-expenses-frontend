@@ -62,16 +62,6 @@ case class UserAnswers(id: String,
     }
   }
 
-  def eligibilityCheckerSessionIdOpt: Option[String] = get(EligibilityCheckerSessionId) match{
-    case Some(sessionIdAsString) =>
-      if (sessionIdAsString.length > 0) {
-        Some(sessionIdAsString)
-      } else {
-        None
-      }
-    case None => None
-  }
-
 }
 
 object UserAnswers {

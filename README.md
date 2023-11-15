@@ -23,7 +23,6 @@ The service uses TAI to update the user's tax account via IABD 59
 |Tai            |POST|/tai/$nino/tax-account/$year /expenses/working-from-home-employee-expenses/$iabd| Updates a users tax account specifically that of IABD 59  |
 |Citizen Details|GET |/citizen-details/$nino/$etag|Retrieves the users etag which is added to their update request to NPS to ensure optimistic locking|
 |Preferences    |GET |/preferences-frontend/paperless|Retrieves the users paperless preference status|
-|EE Eligibility |GET |/claim-tax-relief-expenses/pay-or-will-pay-tax-in-year-status/$sessionId|Retrieves a users SA enrolment answer if redirected from service|
 
 ## Running the service locally
 

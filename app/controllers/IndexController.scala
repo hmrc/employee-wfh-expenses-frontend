@@ -117,11 +117,6 @@ trait TaiLookupHandler extends Logging {
                               alreadyClaimed2023: Boolean)
                              (implicit request: OptionalDataRequest[AnyContent]): Result = {
 
-    val eligibilityCheckerSessionIdString = request.queryString.get("eligibilityCheckerSessionId") match {
-      case Some(sessionIdSeq) => sessionIdSeq.head
-      case None => ""
-    }
-
     val answers = UserAnswers(
       request.internalId,
       Json.obj(
@@ -129,8 +124,7 @@ trait TaiLookupHandler extends Logging {
         ClaimedForTaxYear2021.toString -> alreadyClaimed2021,
         ClaimedForTaxYear2022.toString -> alreadyClaimed2022,
         ClaimedForTaxYear2023.toString -> alreadyClaimed2023,
-        HasSelfAssessmentEnrolment.toString -> (if(appConfig.saLookupEnabled) request.saUtr.isDefined else false),
-        EligibilityCheckerSessionId.toString() -> eligibilityCheckerSessionIdString
+        HasSelfAssessmentEnrolment.toString -> (if(appConfig.saLookupEnabled) request.saUtr.isDefined else false)
       )
     )
 

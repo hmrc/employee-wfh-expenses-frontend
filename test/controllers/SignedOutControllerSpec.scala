@@ -19,8 +19,7 @@ package controllers
 import base.SpecBase
 import play.api.http.Status
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, contentAsString, defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty}
-import views.html.WeSignedYouOutPageView
+import play.api.test.Helpers.{GET, defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty}
 
 class SignedOutControllerSpec extends SpecBase {
 

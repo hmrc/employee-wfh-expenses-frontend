@@ -16,7 +16,7 @@
 
 package utils
 
-import com.digitaltangible.playguard.RateLimiter
+import com.digitaltangible.ratelimit.RateLimiter
 import config.RateLimitConfig
 import uk.gov.hmrc.http.TooManyRequestException
 

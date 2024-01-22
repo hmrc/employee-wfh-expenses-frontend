@@ -18,15 +18,11 @@ package controllers
 
 import base.SpecBase
 import models.SelectTaxYearsToClaimFor.{Option1, Option2}
-import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler, UserAnswers}
+import models.UserAnswers
 import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import utils.DateLanguageTokenizer
-import views.html.HowWeWillCalculateTaxReliefView
-
-import java.time.LocalDate
 
 class HowWeWillCalculateTaxReliefControllerSpec extends SpecBase {
 
@@ -94,7 +90,7 @@ class HowWeWillCalculateTaxReliefControllerSpec extends SpecBase {
           List(Option1.toString)
         )
       )
-      for((desc, userAnswer, backLinkEnabled, selectedDatesAsOptions: List[String]) <- tests) {
+      for((desc, userAnswer, _, _) <- tests) {
         s"$desc" in {
           val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
@@ -103,12 +99,6 @@ class HowWeWillCalculateTaxReliefControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual OK
-
-          val assembler = TaxYearFromUIAssembler(selectedDatesAsOptions)
-
-          val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble), None)))
-
-          val date = LocalDate.of(2021, 4, 1)
 
           application.stop()
         }

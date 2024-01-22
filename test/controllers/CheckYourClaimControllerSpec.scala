@@ -16,21 +16,20 @@
 
 package controllers
 
+import java.time.LocalDate
+
 import base.SpecBase
 import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3, Option4}
-import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler, UserAnswers}
+import models.{TaxYearFromUIAssembler, UserAnswers}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages._
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.SubmissionService
-import utils.DateLanguageTokenizer
-import views.html.CheckYourClaimView
 
-import java.time.LocalDate
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
@@ -59,7 +58,6 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
       status(result) mustEqual OK
 
       val optionList = List("option1", "option2", "option3", "option4")
-      val assembler = TaxYearFromUIAssembler(optionList)
 
 
       application.stop()

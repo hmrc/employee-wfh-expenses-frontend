@@ -17,10 +17,9 @@
 package forms
 
 import forms.mappings.Mappings
-import play.api.data.{Form, Forms}
-import utils.TaxYearDates.{ONE_WEEK, MAXIMUM_WEEKS_IN_A_YEAR}
-
 import javax.inject.Inject
+import play.api.data.Form
+import utils.TaxYearDates.{MAXIMUM_WEEKS_IN_A_YEAR, ONE_WEEK}
 
 class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
 

@@ -17,7 +17,7 @@
 package services
 
 import base.SpecBase
-import com.digitaltangible.playguard.RateLimiter
+import com.digitaltangible.ratelimit.RateLimiter
 import config.RateLimitConfig
 import connectors.TaiConnector
 import models.{Expenses, IABDExpense}

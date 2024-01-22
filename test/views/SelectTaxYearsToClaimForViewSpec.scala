@@ -17,9 +17,8 @@
 package views
 
 import forms.SelectTaxYearsToClaimForFormProvider
+import models.SelectTaxYearsToClaimFor
 import models.SelectTaxYearsToClaimFor.values2022Only
-import models.{NormalMode, SelectTaxYearsToClaimFor}
-import play.api.Application
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 import views.behaviours.CheckboxViewBehaviours

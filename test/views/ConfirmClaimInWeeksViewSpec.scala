@@ -27,7 +27,7 @@ import views.html.ConfirmClaimInWeeksView
 class ConfirmClaimInWeeksViewSpec extends ViewBehaviours {
 
 
-  val application: Application = applicationBuilder().build
+  val application: Application = applicationBuilder().build()
 
   val view: ConfirmClaimInWeeksView = application.injector.instanceOf[ConfirmClaimInWeeksView]
   val form = new ConfirmClaimInWeeksFormProvider()(2)

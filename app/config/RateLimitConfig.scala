@@ -18,7 +18,6 @@ package config
 
 import play.api.{ConfigLoader, Configuration}
 
-import scala.language.implicitConversions
 
 final case class RateLimitConfig(bucketSize: Int, ratePerSecond: Int, enabled: Boolean)
 

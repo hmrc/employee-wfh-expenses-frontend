@@ -16,10 +16,9 @@
 
 package models
 
-import utils.TaxYearDates._
 import java.time.LocalDate
 
-import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3, Option4}
+import utils.TaxYearDates._
 
 case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
 

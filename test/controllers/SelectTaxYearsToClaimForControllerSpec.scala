@@ -18,12 +18,12 @@ package controllers
 
 import base.SpecBase
 import forms.SelectTaxYearsToClaimForFormProvider
-import models.{SelectTaxYearsToClaimFor, UserAnswers, WfhDueToCovidStatusWrapper}
+import models.{SelectTaxYearsToClaimFor, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, ClaimedForTaxYear2023, EligibilityCheckerSessionId}
+import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, ClaimedForTaxYear2023}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.Call

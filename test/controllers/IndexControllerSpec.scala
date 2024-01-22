@@ -26,7 +26,6 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.BeforeAndAfter
-import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.inject.bind
 import play.api.mvc.Results.Ok
 import play.api.mvc.{AnyContent, Call, Results}
@@ -36,8 +35,8 @@ import repositories.SessionRepository
 import services.IABDService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 

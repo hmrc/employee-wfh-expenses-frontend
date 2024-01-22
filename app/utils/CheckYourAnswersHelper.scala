@@ -19,12 +19,12 @@ package utils
 import java.time.format.DateTimeFormatter
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages._
 import play.api.i18n.Messages
 import play.twirl.api.{Html, HtmlFormat}
+import utils.CheckYourAnswersHelper._
 import viewmodels.AnswerRow
-import CheckYourAnswersHelper._
 
 class CheckYourAnswersHelper(userAnswers: UserAnswers)(implicit messages: Messages) {
 

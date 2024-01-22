@@ -27,7 +27,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Results.Ok
 import play.api.mvc.{AnyContent, Result}
 import play.api.test.Helpers.{status, _}
-import uk.gov.hmrc.auth.core.ConfidenceLevel
 import utils.WireMockHelper
 
 import scala.concurrent.Future

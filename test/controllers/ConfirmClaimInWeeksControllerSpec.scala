@@ -32,6 +32,7 @@ import scala.concurrent.Future
 import play.api.inject.bind
 import navigation.{FakeNavigator, Navigator}
 import play.api.mvc.Call
+import services.SessionService
 
 class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
 
@@ -60,9 +61,9 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
 
     "redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionService: SessionService = mock[SessionService]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionService.set(any())(any())) thenReturn Future.successful(true)
 
       val userAnswer = UserAnswers(userAnswersId, Json.obj(
         NumberOfWeeksToClaimForPage.toString -> numberOfWeeks
@@ -72,7 +73,7 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
         applicationBuilder(userAnswers = Some(userAnswer))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionService].toInstance(mockSessionService)
           )
           .build()
 

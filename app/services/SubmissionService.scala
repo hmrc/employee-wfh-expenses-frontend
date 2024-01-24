@@ -24,7 +24,6 @@ import models.{AuditData, FlatRateItem, TaxYearFromUIAssembler}
 import pages.SubmittedClaim
 import play.api.Logging
 import play.api.mvc.AnyContent
-import repositories.SessionRepository
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.RateLimiting
@@ -37,15 +36,13 @@ import scala.language.postfixOps
 
 
 @Singleton
-class SubmissionService @Inject()
-(
-  citizenDetailsConnector:  CitizenDetailsConnector,
-  taiConnector:             TaiConnector,
-  auditConnector:           AuditConnector,
-  sessionRepository:        SessionRepository,
-  appConfig:                FrontendAppConfig,
-  @Named("IABD POST") rateLimiter: RateLimiting
-) extends Logging {
+class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnector,
+                                  taiConnector: TaiConnector,
+                                  auditConnector: AuditConnector,
+                                  sessionService: SessionService,
+                                  appConfig: FrontendAppConfig,
+                                  @Named("IABD POST") rateLimiter: RateLimiting
+                                 ) extends Logging {
 
   val ZERO      = 0
 
@@ -57,7 +54,7 @@ class SubmissionService @Inject()
       case Right(submittedDetails) =>
         logger.info(s"[SubmissionService][submitExpenses] Submission successful")
         auditSubmissionSuccess(submittedDetails)
-        dataRequest.userAnswers.set(SubmittedClaim, value = true).map(sessionRepository.set)
+        dataRequest.userAnswers.set(SubmittedClaim, value = true).map(sessionService.set)
         Right(())
 
       case Left(error) =>

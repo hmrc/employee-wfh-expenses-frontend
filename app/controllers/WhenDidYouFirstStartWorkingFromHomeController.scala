@@ -16,11 +16,8 @@
 
 package controllers
 
-import java.time.LocalDate
-
 import controllers.actions._
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
-import javax.inject.Inject
 import models.SelectTaxYearsToClaimFor
 import navigation.Navigator
 import pages.{SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
@@ -28,24 +25,25 @@ import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
+import services.SessionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.WhenDidYouFirstStartWorkingFromHomeView
 
+import java.time.LocalDate
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: WhenDidYouFirstStartWorkingFromHomeFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        whenDidYouFirstStartWorkingFromHomeView: WhenDidYouFirstStartWorkingFromHomeView
-                                      )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+class WhenDidYouFirstStartWorkingFromHomeController @Inject()(override val messagesApi: MessagesApi,
+                                                              sessionService: SessionService,
+                                                              navigator: Navigator,
+                                                              identify: IdentifierAction,
+                                                              citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                                              getData: DataRetrievalAction,
+                                                              requireData: DataRequiredAction,
+                                                              formProvider: WhenDidYouFirstStartWorkingFromHomeFormProvider,
+                                                              val controllerComponents: MessagesControllerComponents,
+                                                              whenDidYouFirstStartWorkingFromHomeView: WhenDidYouFirstStartWorkingFromHomeView
+                                                             )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
   val form: Form[LocalDate] = formProvider()
 
@@ -59,7 +57,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
             case Some(value) => form.fill(value)
           }
           Ok(whenDidYouFirstStartWorkingFromHomeView(preparedForm, isClaimingCTY))
-        case None => Redirect(routes.IndexController.onPageLoad)
+        case None => Redirect(routes.IndexController.onPageLoad())
       }
   }
 
@@ -72,12 +70,12 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(
         formWithErrors => {
           val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => messages(s"date.$arg").toLowerCase)))
           val isClaimingCTY = selectedTaxYears.contains(SelectTaxYearsToClaimFor.Option1)
-            Future.successful(BadRequest(whenDidYouFirstStartWorkingFromHomeView(formWithErrors.copy(errors = errors), isClaimingCTY)))
+          Future.successful(BadRequest(whenDidYouFirstStartWorkingFromHomeView(formWithErrors.copy(errors = errors), isClaimingCTY)))
         },
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(WhenDidYouFirstStartWorkingFromHomePage, value))
-            _              <- sessionRepository.set(updatedAnswers)
+            _ <- sessionService.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(WhenDidYouFirstStartWorkingFromHomePage, updatedAnswers))
       )
   }

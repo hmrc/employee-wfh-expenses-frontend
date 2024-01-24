@@ -2,7 +2,7 @@
 
 # microservice specific routes
 
-GET        /                                            controllers.IndexController.onPageLoad
+GET        /                                            controllers.IndexController.onPageLoad(isMergedJourney: Boolean ?= false)
 
 GET        /keepAlive                                   controllers.KeepAliveController.keepAlive
 GET        /signed-out-and-saved                        controllers.SignedOutController.signedOut

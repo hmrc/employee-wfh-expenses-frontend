@@ -18,35 +18,34 @@ package controllers
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
 import forms.ConfirmClaimInWeeksFormProvider
-import javax.inject.Inject
 import navigation.Navigator
 import pages.{ConfirmClaimInWeeksPage, NumberOfWeeksToClaimForPage}
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
+import services.SessionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ConfirmClaimInWeeksView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConfirmClaimInWeeksController @Inject()(
-                                                 override val messagesApi: MessagesApi,
-                                                 sessionRepository: SessionRepository,
-                                                 identify: IdentifierAction,
-                                                 citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                                 getData: DataRetrievalAction,
-                                                 requireData: DataRequiredAction,
-                                                 navigator: Navigator,
-                                                 confirmClaimInWeeksView: ConfirmClaimInWeeksView,
-                                                 formProvider: ConfirmClaimInWeeksFormProvider,
-                                                 val controllerComponents: MessagesControllerComponents
-                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
+class ConfirmClaimInWeeksController @Inject()(override val messagesApi: MessagesApi,
+                                              sessionService: SessionService,
+                                              identify: IdentifierAction,
+                                              citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                              getData: DataRetrievalAction,
+                                              requireData: DataRequiredAction,
+                                              navigator: Navigator,
+                                              confirmClaimInWeeksView: ConfirmClaimInWeeksView,
+                                              formProvider: ConfirmClaimInWeeksFormProvider,
+                                              val controllerComponents: MessagesControllerComponents
+                                             )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      request.userAnswers.get(NumberOfWeeksToClaimForPage).fold(Redirect(routes.SessionExpiredController.onPageLoad)){
+      request.userAnswers.get(NumberOfWeeksToClaimForPage).fold(Redirect(routes.SessionExpiredController.onPageLoad)) {
         numberOfWeeksToConfirm =>
           val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm)
 
@@ -72,7 +71,7 @@ class ConfirmClaimInWeeksController @Inject()(
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmClaimInWeeksPage, value))
-                _ <- sessionRepository.set(updatedAnswers)
+                _ <- sessionService.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(ConfirmClaimInWeeksPage, updatedAnswers))
           )
       }

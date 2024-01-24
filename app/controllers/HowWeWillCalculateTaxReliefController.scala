@@ -63,7 +63,7 @@ class HowWeWillCalculateTaxReliefController @Inject()(
 
           Ok(howWeWillCalculateTaxReliefView(showBackLink = true, buildDisclaimerPageSettings(selectedTaxYearsAssembler.assemble), startDate))
 
-        case None => Redirect(routes.IndexController.onPageLoad)
+        case None => Redirect(routes.IndexController.onPageLoad())
       }
 
   }

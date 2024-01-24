@@ -56,7 +56,7 @@
 @hmrcStandardPage(
     HmrcStandardPageParams(
         serviceURLs = ServiceURLs(
-            serviceUrl = Some(routes.IndexController.onPageLoad.url),
+            serviceUrl = Some(routes.IndexController.onPageLoad().url),
             signOutUrl = Some(routes.SignedOutController.signedOut.url)
         ),
         banners = Banners(

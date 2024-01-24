@@ -22,14 +22,14 @@ import models.requests.{IdentifierRequest, OptionalDataRequest}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
-import repositories.SessionRepository
+import services.SessionService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DataRetrievalActionSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
-  class Harness(sessionRepository: SessionRepository) extends DataRetrievalActionImpl(sessionRepository) {
+  class Harness(mockSessionService: SessionService) extends DataRetrievalActionImpl(mockSessionService) {
     def callTransform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = transform(request)
   }
 
@@ -39,9 +39,9 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with ScalaFutur
 
       "set userAnswers to 'None' in the request" in {
 
-        val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get("id")) thenReturn Future(None)
-        val action = new Harness(sessionRepository)
+        val mockSessionService: SessionService = mock[SessionService]
+        when(mockSessionService.get("id")) thenReturn Future(None)
+        val action = new Harness(mockSessionService)
 
         val futureResult = action.callTransform(new IdentifierRequest(fakeRequest, "id", fakeNino))
 
@@ -55,9 +55,9 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar with ScalaFutur
 
       "build a userAnswers object and add it to the request" in {
 
-        val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get("id")) thenReturn Future(Some(new UserAnswers("id")))
-        val action = new Harness(sessionRepository)
+        val mockSessionService: SessionService = mock[SessionService]
+        when(mockSessionService.get("id")) thenReturn Future(Some(new UserAnswers("id")))
+        val action = new Harness(mockSessionService)
 
         val futureResult = action.callTransform(new IdentifierRequest(fakeRequest, "id", fakeNino))
 

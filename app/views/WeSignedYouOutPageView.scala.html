@@ -26,7 +26,7 @@
 <h1 class="govuk-heading-xl">@messages("signoutpage.heading")</h1>
 
 @button(Button(
-       href = Some(routes.IndexController.onPageLoad.url),
+       href = Some(routes.IndexController.onPageLoad().url),
        content = Text(messages("signoutpage.start-again.text"))
 ))
 

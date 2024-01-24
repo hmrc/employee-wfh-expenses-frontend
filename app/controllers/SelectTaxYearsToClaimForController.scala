@@ -16,36 +16,35 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import controllers.actions._
 import forms.SelectTaxYearsToClaimForFormProvider
-import javax.inject.Inject
 import models.SelectTaxYearsToClaimFor
 import navigation.Navigator
 import pages._
 import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
+import services.SessionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SelectTaxYearsToClaimForView
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-class SelectTaxYearsToClaimForController @Inject()(
-                                                    override val messagesApi: MessagesApi,
-                                                    sessionRepository: SessionRepository,
-                                                    navigator: Navigator,
-                                                    identify: IdentifierAction,
-                                                    getData: DataRetrievalAction,
-                                                    requireData: DataRequiredAction,
-                                                    formProvider: SelectTaxYearsToClaimForFormProvider,
-                                                    val controllerComponents: MessagesControllerComponents,
-                                                    view: SelectTaxYearsToClaimForView,
-                                                    appConfig: FrontendAppConfig
+@Singleton
+class SelectTaxYearsToClaimForController @Inject()(override val messagesApi: MessagesApi,
+                                                   sessionService: SessionService,
+                                                   navigator: Navigator,
+                                                   identify: IdentifierAction,
+                                                   getData: DataRetrievalAction,
+                                                   requireData: DataRequiredAction,
+                                                   formProvider: SelectTaxYearsToClaimForFormProvider,
+                                                   val controllerComponents: MessagesControllerComponents,
+                                                   view: SelectTaxYearsToClaimForView
                                                   )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
-  val form = formProvider()
+  val form: Form[Set[SelectTaxYearsToClaimFor]] = formProvider()
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -68,7 +67,7 @@ class SelectTaxYearsToClaimForController @Inject()(
 
               Future.successful(Ok(view(preparedForm, availableYears, showHintText)))
 
-            case (_, _, _, _) => Future.successful(Redirect(routes.IndexController.onPageLoad))
+            case (_, _, _, _) => Future.successful(Redirect(routes.IndexController.onPageLoad()))
           }
       }
 
@@ -90,12 +89,12 @@ class SelectTaxYearsToClaimForController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, value))
-            _ <- sessionRepository.set(updatedAnswers)
+            _ <- sessionService.set(updatedAnswers)
           } yield {
             Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
           }
       )
-      }
+  }
 
   def hasSingleUnclaimedYear(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean, claimed2023: Boolean): Boolean = {
     Seq(claimed2020, claimed2021, claimed2022, claimed2023).count(_ == false) == 1

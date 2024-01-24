@@ -71,7 +71,7 @@
     <logger name="io.netty" level="INFO"/>
     <logger name="sun.net.www.protocol.http" level="INFO"/>
 
-    <logger name="play.shaded.ahc.org.asynchttpclient.netty.handler.HttpHandler" level="DEBUG"/>
+    <logger name="play.shaded.ahc.org.asynchttpclient.netty.handler.HttpHandler" level="INFO"/>
     <logger name="play.api.mvc.LegacySessionCookieBaker" level="ERROR"/>
 
     <logger name="connector" level="INFO">

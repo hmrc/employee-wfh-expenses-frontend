@@ -54,7 +54,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   val mockTaiConnector: TaiConnector = mock[TaiConnector]
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
   val mockThrottler: RateLimiting = mock[RateLimiting]
-  val mockSessionRepository: SessionRepository = mock[SessionRepository]
+  val mockSessionService: SessionService = mock[SessionService]
 
   val testNino: String = "AA112233A"
 
@@ -63,11 +63,11 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   val userAnswersArgumentCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
   class Setup {
-    val serviceUnderTest = new SubmissionService(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockSessionRepository, frontendAppConfig, mockThrottler)
+    val serviceUnderTest = new SubmissionService(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockSessionService, frontendAppConfig, mockThrottler)
   }
 
   before {
-    Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockThrottler, mockSessionRepository)
+    Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockThrottler, mockSessionService)
   }
 
   "calculate2019FlatRate" should {
@@ -163,12 +163,12 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     val claimingFor2023AndPrev = List("option1", "option4")
 
     def verifySessionGotSubmittedState = {
-      verify(mockSessionRepository).set(userAnswersArgumentCaptor.capture())
+      verify(mockSessionService).set(userAnswersArgumentCaptor.capture())(any())
       userAnswersArgumentCaptor.getValue.get(SubmittedClaim).isDefined mustBe true
     }
 
     def verifyNoSubmittedStateUpdate = {
-      verify(mockSessionRepository, times(0)).set(any())
+      verify(mockSessionService, times(0)).set(any())(any())
     }
 
     "only claiming for 2022/23 tax year" should {

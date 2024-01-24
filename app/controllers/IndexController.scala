@@ -28,8 +28,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
-import repositories.SessionRepository
-import services.IABDService
+import services.{IABDService, SessionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -42,7 +41,7 @@ trait TaiLookupHandler extends Logging {
 
   val iabdService: IABDService
   val navigator: Navigator
-  val sessionRepository: SessionRepository
+  val sessionService: SessionService
   val appConfig: FrontendAppConfig
   val auditConnector: AuditConnector
 
@@ -111,15 +110,17 @@ trait TaiLookupHandler extends Logging {
       Future.failed(ex)
   }
 
-  def taiLookupSuccessHandler(alreadyClaimed2020: Boolean,
+  def taiLookupSuccessHandler(isMergedJourney: Boolean)
+                             (alreadyClaimed2020: Boolean,
                               alreadyClaimed2021: Boolean,
                               alreadyClaimed2022: Boolean,
                               alreadyClaimed2023: Boolean)
-                             (implicit request: OptionalDataRequest[AnyContent]): Result = {
+                             (implicit request: OptionalDataRequest[AnyContent], hc: HeaderCarrier): Result = {
 
     val answers = UserAnswers(
       request.internalId,
       Json.obj(
+        MergedJourneyFlag.toString -> (isMergedJourney && appConfig.mergedJourneyEnabled),
         ClaimedForTaxYear2020.toString -> alreadyClaimed2020,
         ClaimedForTaxYear2021.toString -> alreadyClaimed2021,
         ClaimedForTaxYear2022.toString -> alreadyClaimed2022,
@@ -128,7 +129,7 @@ trait TaiLookupHandler extends Logging {
       )
     )
 
-    sessionRepository.set(answers)
+    sessionService.set(answers)
 
     val navigatorPageResult: Call = navigator.nextPage(ClaimedForTaxYear2020, answers)
 
@@ -137,29 +138,21 @@ trait TaiLookupHandler extends Logging {
 }
 
 
-
-class IndexController @Inject()(
-                                 val controllerComponents: MessagesControllerComponents,
-                                 sessionRepositoryInput: SessionRepository,
-                                 identify: IdentifierAction,
-                                 citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                 navigatorInput: Navigator,
-                                 getData: DataRetrievalAction,
-                                 iabdServiceInput: IABDService,
-                                 appConfigInput: FrontendAppConfig,
-                                 auditConnectorInput: AuditConnector
+class IndexController @Inject()(val controllerComponents: MessagesControllerComponents,
+                                val sessionService: SessionService,
+                                identify: IdentifierAction,
+                                citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                val navigator: Navigator,
+                                getData: DataRetrievalAction,
+                                val iabdService: IABDService,
+                                val appConfig: FrontendAppConfig,
+                                val auditConnector: AuditConnector
                                )(implicit executionContext: ExecutionContext)
   extends FrontendBaseController with TaiLookupHandler with I18nSupport {
 
-  val iabdService: IABDService = iabdServiceInput
-  val navigator: Navigator = navigatorInput
-  val sessionRepository: SessionRepository = sessionRepositoryInput
-  val appConfig: FrontendAppConfig = appConfigInput
-  val auditConnector: AuditConnector = auditConnectorInput
-
-  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData).async {
+  def onPageLoad(isMergedJourney: Boolean = false): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData).async {
     implicit request => {
-      handlePageRequest(taiLookupSuccessHandler)
+      handlePageRequest(taiLookupSuccessHandler(isMergedJourney))
     }
   }
 

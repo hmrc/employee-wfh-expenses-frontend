@@ -32,7 +32,7 @@ import play.api.mvc.{AnyContent, Call, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import services.IABDService
+import services.{IABDService, SessionService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,7 +42,7 @@ import scala.language.postfixOps
 
 case class TaiLookupHandlerImpl(override val iabdService: IABDService,
                                 override val navigator: Navigator,
-                                override val sessionRepository: SessionRepository,
+                                override val sessionService: SessionService,
                                 override val appConfig: FrontendAppConfig,
                                 override val auditConnector: AuditConnector)
   extends TaiLookupHandler
@@ -57,11 +57,11 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
 
   val mockIABDService: IABDService = mock[IABDService]
   val mockNavigator: Navigator = mock[Navigator]
-  val mockSessionRepository: SessionRepository = mock[SessionRepository]
+  val mockSessionService: SessionService = mock[SessionService]
   val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
 
-  val taiIndexLookupServiceUnderTest: TaiLookupHandlerImpl = TaiLookupHandlerImpl(mockIABDService, mockNavigator, mockSessionRepository, mockAppConfig, mockAuditConnector)
+  val taiIndexLookupServiceUnderTest: TaiLookupHandlerImpl = TaiLookupHandlerImpl(mockIABDService, mockNavigator, mockSessionService, mockAppConfig, mockAuditConnector)
 
   implicit val defaultOptionalDataRequest: OptionalDataRequest[AnyContent] = OptionalDataRequest(
     FakeRequest("GET", "?eligibilityCheckerSessionId=qqq"), "XXX", None, "XX", None)
@@ -92,7 +92,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
             .overrides(bind[IABDService].toInstance(mockIABDService))
             .build()
 
-          val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
+          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
           val result = route(application, request).value
 
@@ -134,7 +134,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
 
       when(mockNavigator.nextPage(any(), any())).thenReturn(Call("method-1", "url-123", "fragment-string"))
 
-      val result = taiIndexLookupServiceUnderTest.taiLookupSuccessHandler(alreadyClaimed2020 = true,
+      val result = taiIndexLookupServiceUnderTest.taiLookupSuccessHandler(isMergedJourney = false)(alreadyClaimed2020 = true,
         alreadyClaimed2021 = true, alreadyClaimed2022 = true, alreadyClaimed2023 = true)
 
       verify(mockNavigator, times(1)).nextPage(any(), any())

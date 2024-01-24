@@ -23,23 +23,24 @@ import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
+import org.scalatestplus.mockito.MockitoSugar
 import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
+import services.SessionService
 
 import java.time.LocalDate
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.data.Form
-
 import scala.concurrent.Future
 
 class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new WhenDidYouFirstStartWorkingFromHomeFormProvider()
+
+  private def form: Form[LocalDate] = formProvider()
 
   def onwardRoute: Call = Call("GET", "/foo")
 
@@ -103,6 +104,8 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
           FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
+        val boundForm = form.bind(Map("value" -> "invalid value"))
+
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
@@ -148,6 +151,8 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
           FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
+        val boundForm = form.bind(Map("value" -> "invalid value"))
+
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
@@ -158,9 +163,9 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
 
     "redirect to the next page when valid data is submitted" in {
 
-      val mockSessionRepository = mock[SessionRepository]
+      val mockSessionService: SessionService = mock[SessionService]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionService.set(any())(any())) thenReturn Future.successful(true)
 
       val userAnswers = UserAnswers(
         userAnswersId,
@@ -175,7 +180,7 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
         applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionService].toInstance(mockSessionService)
           )
           .build()
 

@@ -56,7 +56,7 @@ class DisclaimerController @Inject()(
             selectedTaxYears.contains2022OrAfter,
             selectedTaxYears.contains2021OrPrevious
           ))
-        case None => Redirect(routes.IndexController.onPageLoad)
+        case None => Redirect(routes.IndexController.onPageLoad())
       }
   }
 

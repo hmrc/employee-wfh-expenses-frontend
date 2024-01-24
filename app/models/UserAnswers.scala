@@ -27,6 +27,8 @@ case class UserAnswers(id: String,
                        data: JsObject = Json.obj(),
                        lastUpdated: Instant = Instant.now()) {
 
+  def isMergedJourney: Boolean = get(MergedJourneyFlag).getOrElse(false)
+
   def get[A](page: QuestionPage[A])(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(page.path)).reads(data).getOrElse(None)
 

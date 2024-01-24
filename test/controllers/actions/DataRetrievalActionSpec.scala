@@ -23,7 +23,6 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import repositories.SessionRepository
-import uk.gov.hmrc.auth.core.ConfidenceLevel
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

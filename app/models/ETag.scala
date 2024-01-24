@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.{Format, Json, JsonValidationError, OFormat, Reads, Writes, __}
+import play.api.libs.json._
 
 import scala.util.{Success, Try}
 

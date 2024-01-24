@@ -28,7 +28,7 @@ class WhenDidYouFirstStartWorkingFromHomeViewSpec extends ViewBehaviours {
 
   val messageKeyPrefix = s"whenDidYouFirstStartWorkingFromHome"
 
-  val application: Application = applicationBuilder().build
+  val application: Application = applicationBuilder().build()
 
   val view: WhenDidYouFirstStartWorkingFromHomeView = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
 

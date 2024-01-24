@@ -26,13 +26,11 @@ import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.Status.OK
 import play.api.mvc.Results._
 import play.api.mvc.{AnyContent, Result}
 import play.api.test.Helpers._
 import services.IABDServiceImpl
-import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global

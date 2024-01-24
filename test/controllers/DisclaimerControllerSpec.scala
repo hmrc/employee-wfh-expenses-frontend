@@ -17,16 +17,12 @@
 package controllers
 
 import base.SpecBase
-import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3}
-import models.{TaxYearFromUIAssembler, UserAnswers}
+import models.SelectTaxYearsToClaimFor.{Option1, Option2}
+import models.UserAnswers
 import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import utils.DateLanguageTokenizer
-import views.html.DisclaimerView
-
-import java.time.LocalDate
 
 class DisclaimerControllerSpec extends SpecBase {
 
@@ -44,13 +40,9 @@ class DisclaimerControllerSpec extends SpecBase {
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
-      val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
-
       val request = FakeRequest(GET, routes.DisclaimerController.onPageLoad().url)
 
       val result = route(application, request).value
-
-      val selectedTaxYears = TaxYearFromUIAssembler(List("option1", "option2"))
 
       status(result) mustEqual OK
 

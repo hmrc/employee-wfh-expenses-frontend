@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
+import javax.inject.Inject
 import navigation.Navigator
 import pages.InformClaimNowInWeeksPage
 import play.api.Logging
@@ -24,9 +25,6 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.InformClaimNowInWeeksView
-
-import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class InformClaimNowInWeeksController @Inject()(
                                                  override val messagesApi: MessagesApi,

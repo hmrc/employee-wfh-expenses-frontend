@@ -16,9 +16,12 @@
 
 package controllers
 
+import java.time.LocalDate
+
 import controllers.actions._
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
-import models.{SelectTaxYearsToClaimFor, UserAnswers}
+import javax.inject.Inject
+import models.SelectTaxYearsToClaimFor
 import navigation.Navigator
 import pages.{SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
@@ -29,8 +32,6 @@ import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.WhenDidYouFirstStartWorkingFromHomeView
 
-import java.time.LocalDate
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class WhenDidYouFirstStartWorkingFromHomeController @Inject()(

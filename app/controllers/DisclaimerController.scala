@@ -16,7 +16,10 @@
 
 package controllers
 
+import java.time.LocalDate
+
 import controllers.actions._
+import javax.inject.Inject
 import navigation.Navigator
 import pages.{DisclaimerPage, SelectTaxYearsToClaimForPage}
 import play.api.Logging
@@ -25,10 +28,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateLanguageTokenizer
 import views.html.DisclaimerView
-
-import java.time.LocalDate
-import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class DisclaimerController @Inject()(
                                          override val messagesApi: MessagesApi,

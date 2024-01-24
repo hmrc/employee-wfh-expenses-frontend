@@ -19,18 +19,17 @@ package controllers
 import config.FrontendAppConfig
 import controllers.actions._
 import forms.SelectTaxYearsToClaimForFormProvider
-import models.requests.DataRequest
-import models.{SelectTaxYearsToClaimFor, WfhDueToCovidStatusWrapper}
+import javax.inject.Inject
+import models.SelectTaxYearsToClaimFor
 import navigation.Navigator
 import pages._
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.SelectTaxYearsToClaimForView
 
-import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SelectTaxYearsToClaimForController @Inject()(

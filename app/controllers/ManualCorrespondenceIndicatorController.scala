@@ -23,8 +23,6 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ManualCorrespondenceIndicatorView
 
-import scala.concurrent.ExecutionContext
-
 class ManualCorrespondenceIndicatorController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        identify: IdentifierAction,

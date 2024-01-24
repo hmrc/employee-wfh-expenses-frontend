@@ -16,20 +16,19 @@
 
 package controllers
 
+import java.time.LocalDate
+
 import controllers.actions._
+import javax.inject.Inject
 import models.{ClaimViewSettings, DisclaimerViewSettings}
 import navigation.Navigator
 import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.DateLanguageTokenizer
 import utils.TaxYearDates.TAX_YEAR_2021_START_DATE
 import views.html.HowWeWillCalculateTaxReliefView
-
-import java.time.LocalDate
-import javax.inject.Inject
 
 class HowWeWillCalculateTaxReliefController @Inject()(
                                       override val messagesApi: MessagesApi,

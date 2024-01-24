@@ -30,7 +30,6 @@ import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.WhenDidYouFirstStartWorkingFromHomeView
 
 import java.time.LocalDate
 import org.scalatestplus.mockito.MockitoSugar
@@ -41,8 +40,6 @@ import scala.concurrent.Future
 class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new WhenDidYouFirstStartWorkingFromHomeFormProvider()
-
-  private def form: Form[LocalDate] = formProvider()
 
   def onwardRoute: Call = Call("GET", "/foo")
 
@@ -106,8 +103,6 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
           FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
-
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
@@ -152,8 +147,6 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
         val request =
           FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
-
-        val boundForm = form.bind(Map("value" -> "invalid value"))
 
         val result = route(application, request).value
 

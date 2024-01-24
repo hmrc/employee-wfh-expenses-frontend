@@ -21,7 +21,7 @@ import models.TaxYearFromUIAssembler
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.time.TaxYear
-import utils.TaxYearDates.{TAX_YEAR_2021_END_DATE, TAX_YEAR_2021_START_DATE, TAX_YEAR_2022_END_DATE, TAX_YEAR_2022_START_DATE, YEAR_2020, YEAR_2021, YEAR_2022, YEAR_2023}
+import utils.TaxYearDates.{YEAR_2020, YEAR_2021, YEAR_2022, YEAR_2023}
 
 class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
 

@@ -16,9 +16,7 @@
 
 package views
 
-import controllers.routes
 import play.api.test.FakeRequest
-import play.api.test.Helpers.GET
 import views.behaviours.ViewBehaviours
 import views.html.IdentityVerificationFailedView
 

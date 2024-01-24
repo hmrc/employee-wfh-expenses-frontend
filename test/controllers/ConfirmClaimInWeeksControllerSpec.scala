@@ -27,7 +27,6 @@ import pages.NumberOfWeeksToClaimForPage
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.SessionRepository
-import views.html.ConfirmClaimInWeeksView
 
 import scala.concurrent.Future
 import play.api.inject.bind

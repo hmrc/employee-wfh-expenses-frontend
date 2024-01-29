@@ -30,7 +30,7 @@ class IndexViewSpec extends ViewBehaviours {
 
     val view = application.injector.instanceOf[IndexView]
 
-    val request = FakeRequest(GET, routes.IndexController.onPageLoad.url)
+    val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
     val applyView = view.apply()(request, messages)
 

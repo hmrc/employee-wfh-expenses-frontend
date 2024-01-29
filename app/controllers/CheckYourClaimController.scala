@@ -16,24 +16,21 @@
 
 package controllers
 
-import java.time.LocalDate
-
 import controllers.actions._
-import javax.inject.Inject
 import pages.{NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.TaxYearDates._
 import views.html._
 
+import java.time.LocalDate
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class CheckYourClaimController @Inject()(
-                                         override val messagesApi: MessagesApi,
+class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
                                          identify: IdentifierAction,
                                          citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
                                          getData: DataRetrievalAction,
@@ -41,8 +38,7 @@ class CheckYourClaimController @Inject()(
                                          submissionService: SubmissionService,
                                          val controllerComponents: MessagesControllerComponents,
                                          checkYourClaimView: CheckYourClaimView,
-                                         sessionRepository: SessionRepository
-                                     )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
+                                        )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
@@ -59,7 +55,7 @@ class CheckYourClaimController @Inject()(
             0
           }
 
-          val numberOfWeeksIn2023 = if(!taxYearFromUIAssemblerFromRequest().checkboxYearOptions.contains("option1")) {
+          val numberOfWeeksIn2023 = if (!taxYearFromUIAssemblerFromRequest().checkboxYearOptions.contains("option1")) {
             None
           } else {
             request.userAnswers.get(NumberOfWeeksToClaimForPage)
@@ -67,7 +63,7 @@ class CheckYourClaimController @Inject()(
 
           Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assembleWholeYears), startDate, numberOfWeeksIn2019,
             numberOfWeeksIn2023, selectedTaxYears.checkboxYearOptions))
-        case None => Redirect(routes.IndexController.onPageLoad)
+        case None => Redirect(routes.IndexController.onPageLoad())
       }
 
 
@@ -76,8 +72,8 @@ class CheckYourClaimController @Inject()(
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest().checkboxYearOptions
-      val startDate = if(!selectedTaxYears.contains("option4")) None else request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-      val numberOfWeeksOf2023 = if(!selectedTaxYears.contains("option1")) None else request.userAnswers.get(NumberOfWeeksToClaimForPage)
+      val startDate = if (!selectedTaxYears.contains("option4")) None else request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+      val numberOfWeeksOf2023 = if (!selectedTaxYears.contains("option1")) None else request.userAnswers.get(NumberOfWeeksToClaimForPage)
 
       submissionService.submitExpenses(
         startDate = startDate,

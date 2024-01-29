@@ -25,25 +25,25 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.NumberOfWeeksToClaimForView
 import forms.NumberOfWeeksToClaimForFormProvider
-import repositories.SessionRepository
+import play.api.data.Form
+import services.SessionService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class NumberOfWeeksToClaimForController @Inject()(
-                                                 override val messagesApi: MessagesApi,
-                                                 sessionRepository: SessionRepository,
-                                                 identify: IdentifierAction,
-                                                 citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                                 getData: DataRetrievalAction,
-                                                 requireData: DataRequiredAction,
-                                                 navigator: Navigator,
-                                                 numberOfWeeksToClaimForView: NumberOfWeeksToClaimForView,
-                                                 formProvider: NumberOfWeeksToClaimForFormProvider,
-                                                 val controllerComponents: MessagesControllerComponents
-                                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
+class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: MessagesApi,
+                                                  sessionService: SessionService,
+                                                  identify: IdentifierAction,
+                                                  citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+                                                  getData: DataRetrievalAction,
+                                                  requireData: DataRequiredAction,
+                                                  navigator: Navigator,
+                                                  numberOfWeeksToClaimForView: NumberOfWeeksToClaimForView,
+                                                  formProvider: NumberOfWeeksToClaimForFormProvider,
+                                                  val controllerComponents: MessagesControllerComponents
+                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
-  val form = formProvider()
+  val form: Form[Int] = formProvider()
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
@@ -64,7 +64,7 @@ class NumberOfWeeksToClaimForController @Inject()(
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(NumberOfWeeksToClaimForPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
+            _              <- sessionService.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(NumberOfWeeksToClaimForPage, updatedAnswers))
       )
   }

@@ -16,20 +16,19 @@
 
 package controllers.actions
 
-import javax.inject.Inject
 import models.requests.{IdentifierRequest, OptionalDataRequest}
 import play.api.mvc.ActionTransformer
-import repositories.SessionRepository
+import services.SessionService
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class DataRetrievalActionImpl @Inject()(
-                                         val sessionRepository: SessionRepository
+class DataRetrievalActionImpl @Inject()(val sessionService: SessionService
                                        )(implicit val executionContext: ExecutionContext) extends DataRetrievalAction {
 
   override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = {
-    
-    sessionRepository.get(request.identifier).map {
+
+    sessionService.get(request.identifier).map {
       case None =>
         OptionalDataRequest(request.request, request.identifier, None, request.nino, request.saUtr)
       case Some(userAnswers) =>

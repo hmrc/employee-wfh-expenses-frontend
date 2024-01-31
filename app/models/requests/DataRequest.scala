@@ -22,11 +22,9 @@ import play.api.mvc.{Request, WrappedRequest}
 case class OptionalDataRequest[A](request: Request[A],
                                   internalId: String,
                                   userAnswers: Option[UserAnswers],
-                                  nino: String,
-                                  saUtr: Option[String]) extends WrappedRequest[A](request)
+                                  nino: String) extends WrappedRequest[A](request)
 
 case class DataRequest[A](request: Request[A],
                           internalId: String,
                           userAnswers: UserAnswers,
-                          nino: String,
-                          saUtr: Option[String]) extends WrappedRequest[A](request)
+                          nino: String) extends WrappedRequest[A](request)

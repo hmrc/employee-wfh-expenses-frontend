@@ -64,17 +64,13 @@ class Navigator @Inject()() extends Logging {
   }
 
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
-    userAnswers.get(HasSelfAssessmentEnrolment) match {
-      case None         => routes.IndexController.onPageLoad()
-      case Some(_) =>
-        (userAnswers.get(ClaimedForTaxYear2020),
-          userAnswers.get(ClaimedForTaxYear2021),
-          userAnswers.get(ClaimedForTaxYear2022),
-          userAnswers.get(ClaimedForTaxYear2023)) match {
-          case (Some(_), Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
-          case (None, None, None, None)             => routes.IndexController.onPageLoad()
-          case (_, _, _, _)                         => routes.TechnicalDifficultiesController.onPageLoad
-        }
+    (userAnswers.get(ClaimedForTaxYear2020),
+      userAnswers.get(ClaimedForTaxYear2021),
+      userAnswers.get(ClaimedForTaxYear2022),
+      userAnswers.get(ClaimedForTaxYear2023)) match {
+      case (Some(_), Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
+      case (None, None, None, None) => routes.IndexController.onPageLoad()
+      case (_, _, _, _) => routes.TechnicalDifficultiesController.onPageLoad
     }
   }
 

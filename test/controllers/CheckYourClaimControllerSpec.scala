@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import base.SpecBase
 import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3, Option4}
-import models.{TaxYearFromUIAssembler, UserAnswers}
+import models.UserAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
@@ -42,7 +42,6 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
         userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
-          HasSelfAssessmentEnrolment.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString, Option4.toString),
           WhenDidYouFirstStartWorkingFromHomePage.toString -> LocalDate.of(2020, 4, 1),
           NumberOfWeeksToClaimForPage.toString -> 3
@@ -57,9 +56,6 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       status(result) mustEqual OK
 
-      val optionList = List("option1", "option2", "option3", "option4")
-
-
       application.stop()
     }
 
@@ -73,7 +69,6 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
         userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
-          HasSelfAssessmentEnrolment.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
         )
       )

@@ -16,13 +16,13 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OWrites, Reads}
 
 case class FlatRateItem(year:Int, amount:Int)
 
 object FlatRateItem {
 
-  implicit val flatRateItemReads = Json.reads[FlatRateItem]
-  implicit val flatRateItemWrtes = Json.writes[FlatRateItem]
+  implicit val flatRateItemReads: Reads[FlatRateItem] = Json.reads[FlatRateItem]
+  implicit val flatRateItemWrtes: OWrites[FlatRateItem] = Json.writes[FlatRateItem]
 
 }

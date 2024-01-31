@@ -25,6 +25,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import utils.WireMockHelper
 
@@ -39,7 +40,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
   with ScalaFutures with IntegrationPatience
   with ExpectedResults {
 
-  override implicit val fakeRequest = FakeRequest()
+  override implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   override implicit lazy val app: Application =
     new GuiceApplicationBuilder()

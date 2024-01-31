@@ -22,7 +22,6 @@ import controllers.routes
 import models.requests.IdentifierRequest
 import org.scalatest.concurrent.ScalaFutures
 import play.api.Application
-import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Results.Ok
 import play.api.mvc.{AnyContent, Result}
@@ -41,9 +40,6 @@ class ManualCorrespondenceIndicatorActionSpec extends SpecBase with WireMockHelp
     Future.successful(Ok("dummy block executed"))
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
-    .overrides(
-      bind(classOf[CheckAlreadyClaimedAction]).to(classOf[CheckAlreadyClaimedActionImpl])
-    )
     .configure(
       conf = "microservice.services.citizen-details.port" -> server.port
     ).build()

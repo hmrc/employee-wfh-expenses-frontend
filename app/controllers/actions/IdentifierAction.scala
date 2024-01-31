@@ -50,18 +50,17 @@ class AuthenticatedIdentifierAction @Inject()(
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised()
-      .retrieve(internalId and nino and saUtr and affinityGroup and confidenceLevel) {
-        case _ ~ _ ~ _ ~ Some(AffinityGroup.Agent) ~ _ =>
+      .retrieve(internalId and nino and affinityGroup and confidenceLevel) {
+        case _ ~ _ ~ Some(AffinityGroup.Agent) ~ _ =>
           Future.successful(unauthorisedRoute)
-        case _ ~ _ ~ _ ~ Some(AffinityGroup.Individual | AffinityGroup.Organisation) ~ LT200(_) =>
+        case _ ~ _ ~ Some(AffinityGroup.Individual | AffinityGroup.Organisation) ~ LT200(_) =>
           Future.successful(upliftConfidenceLevel)
-        case mayBeId ~ mayBeNino ~ mayBeSaUtr ~ _ ~ _ =>
+        case mayBeId ~ mayBeNino ~ _ ~ _ =>
           block(
             IdentifierRequest(
               request,
               mayBeId.getOrElse(throw new UnauthorizedException("Unable to retrieve internalId")),
-              mayBeNino.getOrElse(throw new UnauthorizedException("Unable to retrieve nino")),
-              mayBeSaUtr
+              mayBeNino.getOrElse(throw new UnauthorizedException("Unable to retrieve nino"))
             )
           )
       }

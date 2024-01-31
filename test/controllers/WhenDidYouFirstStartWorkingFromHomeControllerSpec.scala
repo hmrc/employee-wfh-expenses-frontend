@@ -24,8 +24,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
-import play.api.data.Form
+import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
@@ -39,8 +38,6 @@ import scala.concurrent.Future
 class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with MockitoSugar {
 
   val formProvider = new WhenDidYouFirstStartWorkingFromHomeFormProvider()
-
-  private def form: Form[LocalDate] = formProvider()
 
   def onwardRoute: Call = Call("GET", "/foo")
 
@@ -71,7 +68,6 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
         userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
-          HasSelfAssessmentEnrolment.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
         )
       )
@@ -104,8 +100,6 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
           FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
-
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
@@ -119,7 +113,6 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
       val answers = UserAnswers(userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
-          HasSelfAssessmentEnrolment.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString)
         ))
 
@@ -151,8 +144,6 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
           FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
             .withFormUrlEncodedBody(("value", "invalid value"))
 
-        val boundForm = form.bind(Map("value" -> "invalid value"))
-
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
@@ -171,7 +162,6 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
         userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
-          HasSelfAssessmentEnrolment.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString)
         )
       ).set(WhenDidYouFirstStartWorkingFromHomePage, validAnswer).success.value

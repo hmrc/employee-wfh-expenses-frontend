@@ -48,29 +48,24 @@ class SelectTaxYearsToClaimForController @Inject()(override val messagesApi: Mes
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      (request.userAnswers.get(ClaimedForTaxYear2020),
+        request.userAnswers.get(ClaimedForTaxYear2021),
+        request.userAnswers.get(ClaimedForTaxYear2022),
+        request.userAnswers.get(ClaimedForTaxYear2023)) match {
+        case (Some(claimed2020), Some(claimed2021), Some(claimed2022), Some(claimed2023)) =>
+          val availableYears = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022, claimed2023)
 
-      request.userAnswers.get(HasSelfAssessmentEnrolment) match {
-        case _ =>
-          (request.userAnswers.get(ClaimedForTaxYear2020),
-            request.userAnswers.get(ClaimedForTaxYear2021),
-            request.userAnswers.get(ClaimedForTaxYear2022),
-            request.userAnswers.get(ClaimedForTaxYear2023)) match {
-            case (Some(claimed2020), Some(claimed2021), Some(claimed2022), Some(claimed2023)) =>
-              val availableYears = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022, claimed2023)
-
-              val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
-                case None => form
-                case Some(value) => form.fill(value)
-              }
-
-              val showHintText = !hasSingleUnclaimedYear(claimed2020, claimed2021, claimed2022, claimed2023)
-
-              Future.successful(Ok(view(preparedForm, availableYears, showHintText)))
-
-            case (_, _, _, _) => Future.successful(Redirect(routes.IndexController.onPageLoad()))
+          val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
+            case None => form
+            case Some(value) => form.fill(value)
           }
-      }
 
+          val showHintText = !hasSingleUnclaimedYear(claimed2020, claimed2021, claimed2022, claimed2023)
+
+          Future.successful(Ok(view(preparedForm, availableYears, showHintText)))
+
+        case (_, _, _, _) => Future.successful(Redirect(routes.IndexController.onPageLoad()))
+      }
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {

@@ -51,3 +51,5 @@ POST       /select-tax-years-to-claim-for               controllers.SelectTaxYea
 
 GET        /check-your-claim                            controllers.CheckYourClaimController.onPageLoad()
 POST       /check-your-claim                            controllers.CheckYourClaimController.onSubmit()
+
+GET        /claimed-all-years-status                    controllers.ClaimedAllYearsStatusController.claimedAllYearsStatus()

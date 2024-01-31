@@ -62,7 +62,6 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers)),
-        bind[CheckAlreadyClaimedAction].to[FakeCheckAlreadyClaimedAction],
         bind[ManualCorrespondenceIndicatorAction].to[FakeManualCorrespondenceIndicatorAction]
       )
 

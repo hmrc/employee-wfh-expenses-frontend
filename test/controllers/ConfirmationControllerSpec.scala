@@ -25,7 +25,7 @@ import models.paperless.{PaperlessStatus, PaperlessStatusResponse, Url}
 import org.mockito.ArgumentMatchers.{any, eq => eqm}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage, SubmittedClaim, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, SubmittedClaim, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -57,7 +57,6 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
     val application = applicationBuilder(userAnswers = Some(
       UserAnswers(userAnswersId, Json.obj(
         ClaimedForTaxYear2020.toString -> true,
-        HasSelfAssessmentEnrolment.toString -> false,
         SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString),
         WhenDidYouFirstStartWorkingFromHomePage.toString -> earliestWorkingFromHomeDate,
         SubmittedClaim.toString -> true)))

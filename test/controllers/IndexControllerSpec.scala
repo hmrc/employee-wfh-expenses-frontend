@@ -21,31 +21,19 @@ import config.FrontendAppConfig
 import models.requests.OptionalDataRequest
 import models.{Expenses, IABDExpense}
 import navigation.Navigator
-import org.junit.Assert.{assertEquals, assertTrue}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
-import org.mockito.Mockito.{times, verify, when}
+import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
 import play.api.inject.bind
-import play.api.mvc.Results.Ok
-import play.api.mvc.{AnyContent, Call, Results}
+import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.SessionRepository
 import services.{IABDService, SessionService}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 import scala.language.postfixOps
-
-case class TaiLookupHandlerImpl(override val iabdService: IABDService,
-                                override val navigator: Navigator,
-                                override val sessionService: SessionService,
-                                override val appConfig: FrontendAppConfig,
-                                override val auditConnector: AuditConnector)
-  extends TaiLookupHandler
 
 class IndexControllerSpec extends SpecBase with BeforeAndAfter {
 
@@ -54,19 +42,16 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
   val testYear2020 = 2020
   val testYear2021 = 2021
   val testYear2022 = 2022
+  val testYear2023 = 2023
 
   val mockIABDService: IABDService = mock[IABDService]
   val mockNavigator: Navigator = mock[Navigator]
   val mockSessionService: SessionService = mock[SessionService]
   val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
-  val mockAuditConnector: AuditConnector = mock[AuditConnector]
-
-  val taiIndexLookupServiceUnderTest: TaiLookupHandlerImpl = TaiLookupHandlerImpl(mockIABDService, mockNavigator, mockSessionService, mockAppConfig, mockAuditConnector)
 
   implicit val defaultOptionalDataRequest: OptionalDataRequest[AnyContent] = OptionalDataRequest(
-    FakeRequest("GET", "?eligibilityCheckerSessionId=qqq"), "XXX", None, "XX", None)
-
-  val taiLookupSuccessHandler: (Boolean, Boolean, Boolean, Boolean) => Results.Status = (a: Boolean, b: Boolean, c: Boolean, d: Boolean) => Ok
+    FakeRequest("GET", "?eligibilityCheckerSessionId=qqq"), "XXX", None, "XX"
+  )
 
   before {
     Mockito.reset(mockIABDService)
@@ -77,71 +62,68 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
     val jobExpenses = Seq(IABDExpense(testJobExpensesAmount))
 
     "redirect to the SelectTaxYearsToClaimFor page for a GET" when {
+      "not claimed expenses for any years" in {
+        val expenses = (None, None, None, None)
+        when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))
 
-      val tests = Seq(
-        ("already claimed other expenses for 2020", Expenses(testYear2020, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false)),
-        ("already claimed job expenses for 2020", Expenses(testYear2020, Seq.empty, jobExpenses, wasJobRateExpensesChecked = true)),
-        ("already claimed other and job expenses for 2020", Expenses(testYear2020, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true))
-      )
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[IABDService].toInstance(mockIABDService))
+          .build()
 
-      for ((desc, expenses) <- tests) {
-        s"$desc" in {
-          when(mockIABDService.alreadyClaimed(any(), any())(any())).thenReturn(Future(Some(expenses)))
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
-          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
-            .overrides(bind[IABDService].toInstance(mockIABDService))
-            .build()
+        val result = route(application, request).value
+        redirectLocation(result).get mustBe routes.SelectTaxYearsToClaimForController.onPageLoad().url
 
-          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+        application.stop()
+      }
 
-          val result = route(application, request).value
+      "claimed expenses for some years" in {
+        val expenses = (
+          Some(Expenses(testYear2023, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false)),
+          None,
+          Some(Expenses(testYear2021, Seq.empty, jobExpenses, wasJobRateExpensesChecked = true)),
+          None
+        )
 
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).get.contains("digital-forms/form/tax-relief-for-expenses-of-employment/draft/guide") mustBe(true)
+        when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))
 
-          application.stop()
-        }
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[IABDService].toInstance(mockIABDService))
+          .build()
+
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+
+        val result = route(application, request).value
+        redirectLocation(result).get mustBe routes.SelectTaxYearsToClaimForController.onPageLoad().url
+
+        application.stop()
       }
     }
 
-    "TaiIndexLookupService should handle error in tai calls" when {
-      when(mockIABDService.alreadyClaimed(any(), any())(any())).thenReturn(
-        Future.failed(new RuntimeException("Error123")))
+    "redirect to P87SUB form" when {
+      "claimed expenses for all years" in {
+        val expenses = (
+          Some(Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+          Some(Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+          Some(Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+          Some(Expenses(testYear2020, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+        )
 
-      val eventualResult = taiIndexLookupServiceUnderTest.handlePageRequest(taiLookupSuccessHandler)
+        when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))
+        when(mockIABDService.allYearsClaimed(any(), any(), any())(any())).thenReturn(true)
 
-      val futureResult = Await.ready(eventualResult, 1 second)
-      assertTrue(futureResult.value.get.failed.get.getMessage.contains("Error123"))
-    }
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[IABDService].toInstance(mockIABDService))
+          .build()
 
-    "TaiIndexLookupService should handle no errors in tai calls" when {
-      when(mockIABDService.alreadyClaimed(any(), any())(any())).thenReturn(
-        Future.successful(Some(Expenses(testYear2020, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false))))
-      when(mockIABDService.alreadyClaimed(any(), any())(any())).thenReturn(
-        Future.successful(Some(Expenses(testYear2021, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false))))
-      when(mockIABDService.alreadyClaimed(any(), any())(any())).thenReturn(
-        Future.successful(Some(Expenses(testYear2022, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false))))
+        val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
-      when(mockAppConfig.p87DigitalFormUrl).thenReturn("p87DigitalFormUrl")
+        val result = route(application, request).value
+        redirectLocation(result).get.contains("digital-forms/form/tax-relief-for-expenses-of-employment/draft/guide") mustBe true
 
-      val eventualResult = taiIndexLookupServiceUnderTest.handlePageRequest(taiLookupSuccessHandler)
-
-      val futureResult = Await.ready(eventualResult, 1 second)
-      assertTrue(futureResult.value.get.get.header.status == 303)
-    }
-
-    "TaiIndexLookupService should build success result correctly" when {
-
-      when(mockNavigator.nextPage(any(), any())).thenReturn(Call("method-1", "url-123", "fragment-string"))
-
-      val result = taiIndexLookupServiceUnderTest.taiLookupSuccessHandler(isMergedJourney = false)(alreadyClaimed2020 = true,
-        alreadyClaimed2021 = true, alreadyClaimed2022 = true, alreadyClaimed2023 = true)
-
-      verify(mockNavigator, times(1)).nextPage(any(), any())
-
-      assertEquals(result.header.headers("Location"),
-        "url-123#fragment-string")
-
+        application.stop()
+      }
     }
   }
 }

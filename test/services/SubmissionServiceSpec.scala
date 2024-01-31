@@ -31,7 +31,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.SubmittedClaim
 import play.api.mvc.AnyContent
 import play.api.test.Helpers._
-import repositories.SessionRepository
 import uk.gov.hmrc.http.{TooManyRequestException, UpstreamErrorResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.RateLimiting
@@ -145,7 +144,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
   "submit" when {
 
-    implicit val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, "internalId", UserAnswers("id"), testNino, None)
+    implicit val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, "internalId", UserAnswers("id"), testNino)
 
     val etag1 = ETag(100)
     val etag2 = ETag(101)

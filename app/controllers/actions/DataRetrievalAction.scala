@@ -30,9 +30,9 @@ class DataRetrievalActionImpl @Inject()(val sessionService: SessionService
 
     sessionService.get(request.identifier).map {
       case None =>
-        OptionalDataRequest(request.request, request.identifier, None, request.nino, request.saUtr)
+        OptionalDataRequest(request.request, request.identifier, None, request.nino)
       case Some(userAnswers) =>
-        OptionalDataRequest(request.request, request.identifier, Some(userAnswers), request.nino, request.saUtr)
+        OptionalDataRequest(request.request, request.identifier, Some(userAnswers), request.nino)
     }
   }
 }

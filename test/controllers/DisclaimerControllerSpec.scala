@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import models.SelectTaxYearsToClaimFor.{Option1, Option2}
 import models.UserAnswers
-import pages.{ClaimedForTaxYear2020, HasSelfAssessmentEnrolment, SelectTaxYearsToClaimForPage}
+import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -33,7 +33,6 @@ class DisclaimerControllerSpec extends SpecBase {
         userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> true,
-          HasSelfAssessmentEnrolment.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString),
         )
       )
@@ -55,7 +54,6 @@ class DisclaimerControllerSpec extends SpecBase {
         userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> true,
-          HasSelfAssessmentEnrolment.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
         )
       )

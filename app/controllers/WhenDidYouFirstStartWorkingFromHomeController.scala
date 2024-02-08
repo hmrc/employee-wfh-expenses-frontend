@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
-import models.SelectTaxYearsToClaimFor
+import models.{Date, SelectTaxYearsToClaimFor}
 import navigation.Navigator
 import pages.{SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.Logging
@@ -29,8 +29,8 @@ import services.SessionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.WhenDidYouFirstStartWorkingFromHomeView
 
-import java.time.LocalDate
 import javax.inject.Inject
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class WhenDidYouFirstStartWorkingFromHomeController @Inject()(override val messagesApi: MessagesApi,
@@ -45,10 +45,10 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(override val messa
                                                               whenDidYouFirstStartWorkingFromHomeView: WhenDidYouFirstStartWorkingFromHomeView
                                                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
 
-  val form: Form[LocalDate] = formProvider()
-
   def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
+      val messages = request2Messages
+      val form: Form[Date] = formProvider(messages)
       request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
         case Some(selectedTaxYears) =>
           val isClaimingCTY = selectedTaxYears.contains(SelectTaxYearsToClaimFor.Option1)
@@ -65,7 +65,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(override val messa
     implicit request =>
       val messages = request2Messages
       val selectedTaxYears = request.userAnswers.get(SelectTaxYearsToClaimForPage)
-
+      val form: Form[Date] = formProvider(messages)
       form.bindFromRequest().fold(
         formWithErrors => {
           val errors = formWithErrors.errors.map(error => error.copy(args = error.args.map(arg => messages(s"date.$arg").toLowerCase)))

@@ -20,7 +20,7 @@ import java.time.LocalDate
 
 import controllers.actions._
 import javax.inject.Inject
-import models.{ClaimViewSettings, DisclaimerViewSettings}
+import models.{ClaimViewSettings, Date, DisclaimerViewSettings}
 import navigation.Navigator
 import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -47,10 +47,10 @@ class HowWeWillCalculateTaxReliefController @Inject()(
         case Some(_) =>
           val selectedTaxYearsAssembler = taxYearFromUIAssemblerFromRequest()
 
-          val startDate: Option[LocalDate] = if(selectedTaxYearsAssembler.containsPrevious) {
+          val startDate: Option[Date] = if(selectedTaxYearsAssembler.containsPrevious) {
             request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
           } else {
-            Some(TAX_YEAR_2021_START_DATE)
+            Some(Date(TAX_YEAR_2021_START_DATE))
           }
 
           def buildDisclaimerPageSettings(dateList: List[(LocalDate, LocalDate)]) = {

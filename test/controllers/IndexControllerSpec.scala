@@ -33,7 +33,6 @@ import services.{IABDService, SessionService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.language.postfixOps
 
 class IndexControllerSpec extends SpecBase with BeforeAndAfter {
 

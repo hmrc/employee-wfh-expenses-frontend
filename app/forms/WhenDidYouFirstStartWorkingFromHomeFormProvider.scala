@@ -16,23 +16,20 @@
 
 package forms
 
-import java.time.LocalDate
-
-import forms.mappings.Mappings
+import forms.mappings.{DateFormatter, Mappings}
 import javax.inject.Inject
+import models.Date
 import play.api.data.Form
+import play.api.data.Forms.{mapping, of}
+import play.api.i18n.Messages
+import utils.TaxYearDates.TAX_YEAR_2021_START_DATE
 
 class WhenDidYouFirstStartWorkingFromHomeFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[LocalDate] =
-    Form(
-      "value" -> localDate(
-        invalidKey     = "whenDidYouFirstStartWorkingFromHome.error.invalid",
-        allRequiredKey = "whenDidYouFirstStartWorkingFromHome.error.required.all",
-        twoRequiredKey = "whenDidYouFirstStartWorkingFromHome.error.required.two",
-        requiredKey    = "whenDidYouFirstStartWorkingFromHome.error.required",
-        futureDateKey  = "whenDidYouFirstStartWorkingFromHome.error.futureDateNotAllowed",
-        invalidTaxYearKey = "whenDidYouFirstStartWorkingFromHome.error.invalidTaxYearDate"
-      )
-    )
+  def apply(implicit messages: Messages): Form[Date] = Form(
+    mapping(
+      "whenDidYouFirstStartWorkingFromHome" -> of(DateFormatter("whenDidYouFirstStartWorkingFromHome", optMaxDate = Some(TAX_YEAR_2021_START_DATE)))
+    )(Date.apply)(Date.unapply)
+  )
+
 }

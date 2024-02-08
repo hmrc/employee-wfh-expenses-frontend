@@ -17,6 +17,7 @@
 @import config.FrontendAppConfig
 @import java.time.LocalDate
 @import utils.DateLanguageTokenizer.DateLanguageTokenizerFormattedItemTuple
+@import models.Date
 
 @this(
         layout: views.templates.LayoutProvider,
@@ -27,7 +28,7 @@
         frontendAppConfig: FrontendAppConfig
 )
 
-@(showBackLink: Boolean = true, disclaimerViewSettings: DisclaimerViewSettings, startDate: Option[LocalDate])( implicit request: Request[_], messages: Messages)
+@(showBackLink: Boolean = true, disclaimerViewSettings: DisclaimerViewSettings, startDate: Option[Date])( implicit request: Request[_], messages: Messages)
 
 @getYearFromYearTo(dateToken: DateLanguageTokenizerFormattedItemTuple) = {
     @if(dateToken._2.year == 2021) {

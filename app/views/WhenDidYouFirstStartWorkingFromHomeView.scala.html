@@ -15,6 +15,8 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichDateInput
+@import uk.gov.hmrc.govukfrontend.views.html.components._
 
 @this(
         layout: views.templates.LayoutProvider,
@@ -22,7 +24,8 @@
         button: GovukButton,
         backLink: GovukBackLink,
         govukDateInput: GovukDateInput,
-        errorSummary: GovukErrorSummary
+        errorSummary: components.error_summary,
+        govukDetails : GovukDetails
 )
 
 @(form: Form[_], isClaimingCTY: Boolean = false)(implicit request: Request[_], messages: Messages)
@@ -41,59 +44,24 @@
 ) {
     @formHelper(action = routes.WhenDidYouFirstStartWorkingFromHomeController.onSubmit(), Symbol("autoComplete") -> "off") {
 
-        @if(form.errors.nonEmpty) {
-            @errorSummary(
-                ErrorSummary(
-                    errorList = form.errors.asTextErrorLinks.map(errorLink => errorLink.copy(href = Some("#value-value.day"))),
-                    title = Text(messages("error.summary.title"))
-            ))
-        }
+        @errorSummary(form.errors.headOption.toList, errorSuffixes = Some(Map("whenDidYouFirstStartWorkingFromHome" -> "day")))
 
         @govukDateInput(DateInput(
+            id = "value",
+            hint = Some(Hint(content = Text(messages("whenDidYouFirstStartWorkingFromHome.hinttext")))),
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
                     content = Text(messages("whenDidYouFirstStartWorkingFromHome.heading")),
                     classes = "govuk-fieldset__legend--xl",
                     isPageHeading = true
                 ))
-            )),
-            id = "value",
-            errorMessage = form.errors.asTextErrorMessageForField(fieldKey = "value"),
-            hint = Some(Hint(
-                content = Text(messages("whenDidYouFirstStartWorkingFromHome.hinttext"))
-            )),
-            items = Seq(
-                InputItem(
-                    classes = s"govuk-input--width-2${if(form(s"value").hasErrors || form(s"value.day").hasErrors) " govuk-input--error" else ""}",
-                    name =  s"value.day",
-                    label = Some(messages("date.day")),
-                    value = form(s"value.day").value
-                ),
-                InputItem(
-                    classes = s"govuk-input--width-2${if(form(s"value").hasErrors || form(s"value.month").hasErrors) " govuk-input--error" else ""}",
-                    name = s"value.month",
-                    label = Some(messages("date.month")),
-                    value = form(s"value.month").value
-                ),
-                InputItem(
-                    classes = s"govuk-input--width-4${if(form(s"value").hasErrors || form(s"value.year").hasErrors) " govuk-input--error" else ""}",
-                    name = s"value.year",
-                    label = Some(messages("date.year")),
-                    value = form(s"value.year").value
-                )
-            )
-        ))
+            ))
+        ).withFormField(form("whenDidYouFirstStartWorkingFromHome")))
 
-        <details class="govuk-details" data-module="govuk-details">
-            <summary class="govuk-details__summary">
-                  <span class="govuk-details__summary-text">
-                    @messages("whenDidYouFirstStartWorkingFromHome.summaryText")
-                  </span>
-            </summary>
-            <div class="govuk-details__text">
-                @messages("whenDidYouFirstStartWorkingFromHome.summaryText2")
-            </div>
-        </details>
+        @govukDetails(Details(
+            summary = Text(messages("whenDidYouFirstStartWorkingFromHome.summaryText")),
+            content = Text(messages("whenDidYouFirstStartWorkingFromHome.summaryText2"))
+        ))
 
         @button(Button(content = Text(messages("site.continue"))))
     }

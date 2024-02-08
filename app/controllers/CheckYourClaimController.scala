@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.TaxYearDates._
 import views.html._
 
-import java.time.LocalDate
+import models.Date
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
@@ -47,10 +47,10 @@ class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
         case Some(_) =>
           val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
-          val startDate: Option[LocalDate] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
+          val startDate: Option[Date] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
 
           val numberOfWeeksIn2019 = if (startDate.isDefined) {
-            numberOfWeeks(startDate.get, TAX_YEAR_2019_END_DATE)
+            numberOfWeeks(startDate.get.date, TAX_YEAR_2019_END_DATE)
           } else {
             0
           }

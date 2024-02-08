@@ -16,12 +16,11 @@
 
 package views
 
-import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler}
+import models.{ClaimViewSettings, Date, DisclaimerViewSettings, TaxYearFromUIAssembler}
 import play.api.test.FakeRequest
 import utils.DateLanguageTokenizer
 import views.behaviours.ViewBehaviours
 import views.html.CheckYourClaimView
-
 import java.time.LocalDate
 
 // scalastyle:off magic.number
@@ -39,7 +38,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
         val assembler = TaxYearFromUIAssembler(optionList)
         val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assembleWholeYears),
           Some(DateLanguageTokenizer.convertList(assembler.assembleWholeYears)))))
-        val date = LocalDate.of(2000, 4, 1)
+        val date = Date(LocalDate.of(2000, 4, 1))
 
         val doc = asDocument(view.apply(claimSettings.claimViewSettings.get, Some(date), 2, Some(3), optionList)(request, messages))
         assert(doc.toString.contains(messages("checkYourClaimView.title")))
@@ -74,7 +73,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
       val assembler = TaxYearFromUIAssembler(List("option2"))
       val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assembleWholeYears),
         Some(DateLanguageTokenizer.convertList(assembler.assembleWholeYears)))))
-      val startDate = LocalDate.of(2020, 4, 1)
+      val startDate = Date(LocalDate.of(2020, 4, 1))
       behave like normalPage(view.apply(claimSettings.claimViewSettings.get, Some(startDate), 2, None, optionList)(request, messages), "checkYourClaimView")
     }
   }

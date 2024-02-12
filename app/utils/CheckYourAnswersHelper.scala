@@ -41,7 +41,7 @@ class CheckYourAnswersHelper(userAnswers: UserAnswers)(implicit messages: Messag
     x =>
       AnswerRow(
         HtmlFormat.escape(messages("whenDidYouFirstStartWorkingFromHome.checkYourAnswersLabel")),
-        HtmlFormat.escape(x.format(dateFormatter)),
+        HtmlFormat.escape(x.date.format(dateFormatter)),
         routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url
       )
   }

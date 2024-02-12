@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import forms.WhenDidYouFirstStartWorkingFromHomeFormProvider
 import models.SelectTaxYearsToClaimFor.{Option1, Option2}
-import models.UserAnswers
+import models.{Date, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -31,8 +31,8 @@ import play.api.mvc.{AnyContentAsEmpty, AnyContentAsFormUrlEncoded, Call}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.SessionService
-
 import java.time.LocalDate
+
 import scala.concurrent.Future
 
 class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with MockitoSugar {
@@ -42,7 +42,7 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
   def onwardRoute: Call = Call("GET", "/foo")
 
   // scalastyle:off magic.number
-  val validAnswer: LocalDate = LocalDate.of(2020, 1, 1)
+  val validAnswer: Date = Date(LocalDate.of(2020, 1, 1))
   // scalastyle:on magic.number
 
   lazy val whenDidYouFirstStartWorkingFromHomeRoute: String = routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad().url
@@ -55,9 +55,9 @@ class WhenDidYouFirstStartWorkingFromHomeControllerSpec extends SpecBase with Mo
   def postRequest: FakeRequest[AnyContentAsFormUrlEncoded] =
     FakeRequest(POST, whenDidYouFirstStartWorkingFromHomeRoute)
       .withFormUrlEncodedBody(
-        "value.day" -> validAnswer.getDayOfMonth.toString,
-        "value.month" -> validAnswer.getMonthValue.toString,
-        "value.year" -> validAnswer.getYear.toString
+        "whenDidYouFirstStartWorkingFromHome.day" -> validAnswer.date.getDayOfMonth.toString,
+        "whenDidYouFirstStartWorkingFromHome.month" -> validAnswer.date.getMonthValue.toString,
+        "whenDidYouFirstStartWorkingFromHome.year" -> validAnswer.date.getYear.toString
       )
 
 

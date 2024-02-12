@@ -19,10 +19,20 @@ package forms
 import java.time.LocalDate
 
 import forms.behaviours.DateBehaviours
+import org.scalatestplus.play.guice.GuiceFakeApplicationFactory
+import play.api.i18n.{Messages, MessagesApi}
+import play.api.inject.Injector
+import play.api.test.FakeRequest
 
-class WhenDidYouFirstStartWorkingFromHomeFormProviderSpec extends DateBehaviours {
+class WhenDidYouFirstStartWorkingFromHomeFormProviderSpec extends DateBehaviours with GuiceFakeApplicationFactory{
 
-  val form = new WhenDidYouFirstStartWorkingFromHomeFormProvider()()
+  def injector: Injector = fakeApplication.injector
+  def messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
+  def fakeRequest = FakeRequest("", "")
+
+  implicit def messages: Messages = messagesApi.preferred(fakeRequest)
+
+  val form = new WhenDidYouFirstStartWorkingFromHomeFormProvider()(messages)
 
   ".value" should {
 
@@ -31,8 +41,8 @@ class WhenDidYouFirstStartWorkingFromHomeFormProviderSpec extends DateBehaviours
       max = LocalDate.of(2021, 1, 1)
     )
 
-    behave like dateField(form, "value", validData)
+    behave like dateField(form, "whenDidYouFirstStartWorkingFromHome", validData)
 
-    behave like mandatoryDateField(form, "value", "whenDidYouFirstStartWorkingFromHome.error.required.all")
+    behave like mandatoryDateField(form, "whenDidYouFirstStartWorkingFromHome", "whenDidYouFirstStartWorkingFromHome.error.required")
   }
 }

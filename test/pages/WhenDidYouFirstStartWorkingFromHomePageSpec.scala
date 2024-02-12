@@ -18,6 +18,7 @@ package pages
 
 import java.time.LocalDate
 
+import models.Date
 import org.scalacheck.Arbitrary
 import pages.behaviours.PageBehaviours
 
@@ -25,14 +26,14 @@ class WhenDidYouFirstStartWorkingFromHomePageSpec extends PageBehaviours {
 
   "WhenDidYouFirstStartWorkingFromHomePage" must {
 
-    implicit lazy val arbitraryLocalDate: Arbitrary[LocalDate] = Arbitrary {
+    implicit lazy val arbitraryLocalDate: Arbitrary[Date] = Arbitrary {
       datesBetween(LocalDate.of(1900, 1, 1), LocalDate.of(2100, 1, 1))
     }
 
-    beRetrievable[LocalDate](WhenDidYouFirstStartWorkingFromHomePage)
+    beRetrievable[Date](WhenDidYouFirstStartWorkingFromHomePage)
 
-    beSettable[LocalDate](WhenDidYouFirstStartWorkingFromHomePage)
+    beSettable[Date](WhenDidYouFirstStartWorkingFromHomePage)
 
-    beRemovable[LocalDate](WhenDidYouFirstStartWorkingFromHomePage)
+    beRemovable[Date](WhenDidYouFirstStartWorkingFromHomePage)
   }
 }

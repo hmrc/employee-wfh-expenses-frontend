@@ -20,7 +20,7 @@ import config.FrontendAppConfig
 import connectors.{CitizenDetailsConnector, TaiConnector}
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
-import models.{AuditData, FlatRateItem, TaxYearFromUIAssembler}
+import models.{AuditData, Date, FlatRateItem, TaxYearFromUIAssembler}
 import pages.SubmittedClaim
 import play.api.Logging
 import play.api.mvc.AnyContent
@@ -28,9 +28,10 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.RateLimiting
 import utils.TaxYearDates._
-
 import java.time.LocalDate
+
 import javax.inject.{Inject, Named, Singleton}
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
@@ -46,7 +47,7 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
 
   val ZERO      = 0
 
-  def submitExpenses(startDate: Option[LocalDate], selectedTaxYears: List[String], numberOfWeeksOf2023: Option[Int])
+  def submitExpenses(startDate: Option[Date], selectedTaxYears: List[String], numberOfWeeksOf2023: Option[Int])
                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] = {
 
 
@@ -64,7 +65,7 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
     })
   }
 
-  private def submit(startDate: Option[LocalDate], selectedTaxYears: List[String], numberOfWeeksOf2023: Option[Int])
+  private def submit(startDate: Option[Date], selectedTaxYears: List[String], numberOfWeeksOf2023: Option[Int])
                      (implicit dataRequest: DataRequest[AnyContent],
                       hc: HeaderCarrier,
                       ec: ExecutionContext) = {
@@ -79,8 +80,8 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
     val previousYearItems: Seq[FlatRateItem] = startDate match {
       case Some(date) if assembler.containsPrevious => Seq(
         Some(FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())),
-        if(date.isBefore(TAX_YEAR_2019_END_DATE)) {
-          Some(FlatRateItem(year = YEAR_2019, amount = calculate2019FlatRate(date)))
+        if(date.date.isBefore(TAX_YEAR_2019_END_DATE)) {
+          Some(FlatRateItem(year = YEAR_2019, amount = calculate2019FlatRate(date.date)))
       } else {
         None
       }

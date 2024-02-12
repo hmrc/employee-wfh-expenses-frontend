@@ -53,7 +53,7 @@ class Navigator @Inject()() extends Logging {
 
     userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
       case Some(startDate) =>
-        if (startDate.isBefore(earliestStartDate)) {
+        if (startDate.date.isBefore(earliestStartDate)) {
           routes.CannotClaimUsingThisServiceController.onPageLoad()
         } else {
           routes.CheckYourClaimController.onPageLoad()

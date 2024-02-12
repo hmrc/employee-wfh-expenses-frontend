@@ -32,7 +32,7 @@ class WhenDidYouFirstStartWorkingFromHomeViewSpec extends ViewBehaviours {
 
   val view: WhenDidYouFirstStartWorkingFromHomeView = application.injector.instanceOf[WhenDidYouFirstStartWorkingFromHomeView]
 
-  val form = new WhenDidYouFirstStartWorkingFromHomeFormProvider()()
+  val form = new WhenDidYouFirstStartWorkingFromHomeFormProvider()(messages)
 
   def createView(form: Form[_]): Html = view.apply(form, true)(fakeRequest, messages)
 

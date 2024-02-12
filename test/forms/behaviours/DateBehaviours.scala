@@ -19,12 +19,13 @@ package forms.behaviours
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+import models.Date
 import org.scalacheck.Gen
 import play.api.data.{Form, FormError}
 
 class DateBehaviours extends FieldBehaviours {
 
-  def dateField(form: Form[_], key: String, validData: Gen[LocalDate]): Unit = {
+  def dateField(form: Form[_], key: String, validData: Gen[Date]): Unit = {
 
     "bind valid data" in {
 
@@ -32,9 +33,9 @@ class DateBehaviours extends FieldBehaviours {
         date =>
 
           val data = Map(
-            s"$key.day"   -> date.getDayOfMonth.toString,
-            s"$key.month" -> date.getMonthValue.toString,
-            s"$key.year"  -> date.getYear.toString
+            s"$key.day"   -> date.date.getDayOfMonth.toString,
+            s"$key.month" -> date.date.getMonthValue.toString,
+            s"$key.year"  -> date.date.getYear.toString
           )
 
           val result = form.bind(data)
@@ -54,9 +55,9 @@ class DateBehaviours extends FieldBehaviours {
         date =>
 
           val data = Map(
-            s"$key.day"   -> date.getDayOfMonth.toString,
-            s"$key.month" -> date.getMonthValue.toString,
-            s"$key.year"  -> date.getYear.toString
+            s"$key.day"   -> date.date.getDayOfMonth.toString,
+            s"$key.month" -> date.date.getMonthValue.toString,
+            s"$key.year"  -> date.date.getYear.toString
           )
 
           val result = form.bind(data)
@@ -76,9 +77,9 @@ class DateBehaviours extends FieldBehaviours {
         date =>
 
           val data = Map(
-            s"$key.day"   -> date.getDayOfMonth.toString,
-            s"$key.month" -> date.getMonthValue.toString,
-            s"$key.year"  -> date.getYear.toString
+            s"$key.day"   -> date.date.getDayOfMonth.toString,
+            s"$key.month" -> date.date.getMonthValue.toString,
+            s"$key.year"  -> date.date.getYear.toString
           )
 
           val result = form.bind(data)

@@ -28,7 +28,7 @@
     button:             GovukButton
 )
 
-@(claimViewSettings: ClaimViewSettings, startDate: Option[LocalDate], numberOfWeeksIn2019: Long, numberOfWeeksIn2023: Option[Int], yearsClaimingFor: List[String])(implicit request: Request[_], messages: Messages)
+@(claimViewSettings: ClaimViewSettings, startDate: Option[Date], numberOfWeeksIn2019: Long, numberOfWeeksIn2023: Option[Int], yearsClaimingFor: List[String])(implicit request: Request[_], messages: Messages)
 
 @readableDate(date: LocalDate) = {@{date.getDayOfMonth} @{messages(s"month.${date.getMonthValue}")} @{date.getYear}}
 
@@ -72,7 +72,7 @@
 
     @if(startDate.isDefined) {
         @govukInsetText(InsetText(
-            content = HtmlContent(insetHtml(startDate.get))
+            content = HtmlContent(insetHtml(startDate.get.date))
         ))
     }
     <h2 class="govuk-heading-m">@messages("checkYourClaimView.header")</h2>
@@ -89,7 +89,7 @@
         }
     </ul>
 
-    @if(startDate.isDefined && startDate.get.isBefore(TAX_YEAR_2020_START_DATE)) {
+    @if(startDate.isDefined && startDate.get.date.isBefore(TAX_YEAR_2020_START_DATE)) {
         <p class="govuk-body">@messages("checkYourClaimView.text.1.1")
             <span class="govuk-!-font-weight-bold">&pound;@appConfig.taxReliefPerWeek2019</span>
             @messages("checkYourClaimView.text.1.2")

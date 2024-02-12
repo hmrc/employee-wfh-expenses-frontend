@@ -18,6 +18,7 @@ package generators
 
 import java.time.{Instant, LocalDate, ZoneOffset}
 
+import models.Date
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen._
 import org.scalacheck.{Gen, Shrink}
@@ -107,14 +108,14 @@ trait Generators extends UserAnswersGenerator with PageGenerators with ModelGene
       choose(0, vector.size - 1).flatMap(vector(_))
     }
 
-  def datesBetween(min: LocalDate, max: LocalDate): Gen[LocalDate] = {
+  def datesBetween(min: LocalDate, max: LocalDate): Gen[Date] = {
 
     def toMillis(date: LocalDate): Long =
       date.atStartOfDay.atZone(ZoneOffset.UTC).toInstant.toEpochMilli
 
     Gen.choose(toMillis(min), toMillis(max)).map {
       millis =>
-        Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate
+        Date(Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC).toLocalDate)
     }
   }
 }

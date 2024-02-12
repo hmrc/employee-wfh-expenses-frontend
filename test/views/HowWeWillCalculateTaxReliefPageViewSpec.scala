@@ -17,12 +17,11 @@
 package views
 
 import controllers.UIAssembler
-import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler}
+import models.{ClaimViewSettings, Date, DisclaimerViewSettings, TaxYearFromUIAssembler}
 import play.api.test.FakeRequest
 import utils.DateLanguageTokenizer
 import views.behaviours.ViewBehaviours
 import views.html.HowWeWillCalculateTaxReliefView
-
 import java.time.LocalDate
 
 class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAssembler {
@@ -36,7 +35,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
     val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
       Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
 
-    val date = LocalDate.of(2020, 4, 1)
+    val date = Date(LocalDate.of(2020, 4, 1))
 
     val applyView = view.apply(true, disclaimerViewSettings, Some(date))(fakeRequest, messages)
 
@@ -52,7 +51,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
           Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
 
-        val date = LocalDate.of(2022, 4, 1)
+        val date = Date(LocalDate.of(2022, 4, 1))
         val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
@@ -70,7 +69,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
           Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
 
-        val date = LocalDate.of(2022, 4, 1)
+        val date = Date(LocalDate.of(2022, 4, 1))
         val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
@@ -88,7 +87,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
           Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
 
-        val date = LocalDate.of(2022, 4, 1)
+        val date = Date(LocalDate.of(2022, 4, 1))
         val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
@@ -106,7 +105,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
           Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
 
-        val date = LocalDate.of(2022, 4, 1)
+        val date = Date(LocalDate.of(2022, 4, 1))
         val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))

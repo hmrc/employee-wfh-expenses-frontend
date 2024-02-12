@@ -20,15 +20,17 @@
 
 @(
     errors: Seq[FormError],
-    errorKey: Option[String] = None
+    errorKey: Option[String] = None,
+    errorSuffixes: Option[Map[String, String]] = None
 )(implicit messages: Messages)
 
 @if(errors.nonEmpty) {
     @govukErrorSummary(ErrorSummary(
         title       = Text(messages("error.summary.title")),
         errorList   = for(error <- errors) yield {
+            val suffix = errorSuffixes.flatMap(_.get(error.key).map(str => s".$str")).getOrElse("")
             ErrorLink(
-                href    = errorKey.orElse(Some(error.key)).map(key => s"#$key"),
+                href    = errorKey.orElse(Some(error.key)).map(key => s"#${key + suffix}"),
                 content = Text(messages(error.message, error.args:_*))
             )
         }

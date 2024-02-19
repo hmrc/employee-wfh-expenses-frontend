@@ -11,7 +11,7 @@ object AppDependencies {
     "uk.gov.hmrc.mongo"   %% "hmrc-mongo-play-30"             % mongoPlayVersion,
     "uk.gov.hmrc"         %% "tax-year"                       % "4.0.0",
     "com.digitaltangible" %% "play-guard"                     % "3.0.0",
-    "uk.gov.hmrc"         %% "sca-wrapper-play-30"            % "1.1.0"
+    "uk.gov.hmrc"         %% "sca-wrapper-play-30"            % "1.3.0"
   )
 
   val test = Seq(

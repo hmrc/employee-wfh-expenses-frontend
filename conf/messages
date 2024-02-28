@@ -225,6 +225,15 @@ confirmation.changes.previousYear.heading = Changes for previous tax years
 confirmation.changes.previousYear.p.1 = We will check your claim for previous tax years and we will write to you by post or email if you have paid too much tax. There is no need to contact HMRC about this.
 confirmation.info.paragraph = You should be able to see changes to your tax code in your personal tax account after 2 working days.
 
+confirmation.mergeJourney.title = Claim complete for working from home
+confirmation.mergeJourney.heading = Claim complete for working from home
+confirmation.mergeJourney.whatHappensNext.heading = What happens next
+confirmation.mergeJourney.whatHappensNext.paragraph.1 = Your working from home claim does not continue automatically each year. You will need to make a new claim for the next tax year.
+confirmation.mergeJourney.whatHappensNext.paragraph.2 = Once you have completed all of your claims, you will be given more information about how you will receive your tax relief.
+confirmation.mergeJourney.paperless.header = Get tax letters online
+confirmation.mergeJourney.paperless.paragraph.1 = You can view, download or print them when you want
+
+
 informClaimNowInWeeks.title = Claims on or after 6 April 2023 are now calculated in weeks
 informClaimNowInWeeks.heading = Claims on or after 6 April 2023 are now calculated in weeks
 informClaimNowInWeeks.paragraph.1 = If you work at home one or more days in a week, you can claim for that whole week.

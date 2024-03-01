@@ -140,6 +140,7 @@ case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
   val contains2022: Boolean = checkboxYearOptions.contains("option2")
   val contains2021: Boolean = checkboxYearOptions.contains("option3")
   val containsPrevious: Boolean = checkboxYearOptions.contains("option4")
+  val containsAnyPrevious: Boolean = contains2022 || contains2021 || containsPrevious
   val contains2021OrPrevious: Boolean = contains2021 || containsPrevious
   val contains2022OrAfter: Boolean = containsCurrent || contains2022
   val yearsClaimedByWeek: List[(LocalDate, LocalDate)] = List(

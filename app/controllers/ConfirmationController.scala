@@ -20,17 +20,19 @@ import config.FrontendAppConfig
 import connectors.PaperlessPreferenceConnector
 import controllers.PaperlessAuditConst._
 import controllers.actions._
+import models.{ClaimCompleteCurrent, ClaimCompleteCurrentPrevious, ClaimCompletePrevious, ClaimStatus, ClaimUnsuccessful, TaxYearFromUIAssembler}
+
 import javax.inject.Inject
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
-import pages.SubmittedClaim
+import pages.{MergedJourneyFlag, SubmittedClaim}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ConfirmationView
+import views.html.{ConfirmationMergeJourneyView, ConfirmationView}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -49,7 +51,8 @@ class ConfirmationController @Inject()(
                                         val paperlessPreferenceConnector: PaperlessPreferenceConnector,
                                         auditConnector: AuditConnector,
                                         appConfig: FrontendAppConfig,
-                                        confirmationView: ConfirmationView)
+                                        confirmationView: ConfirmationView,
+                                        confirmationMergeJourneyView: ConfirmationMergeJourneyView)
                                       (implicit ec: ExecutionContext) extends FrontendBaseController
   with I18nSupport with Logging with UIAssembler {
 
@@ -57,22 +60,27 @@ class ConfirmationController @Inject()(
     implicit request =>
       request.userAnswers.get(SubmittedClaim) match {
         case Some(_) =>
-          paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account") map {
-            case Right(status) =>
-              auditPaperlessPreferencesCheckSuccess(paperlessEnabled = status.isPaperlessCustomer)
+            paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account") map {
+              case Right(status) =>
+                auditPaperlessPreferencesCheckSuccess(paperlessEnabled = status.isPaperlessCustomer)
+                val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
+                if(appConfig.mergedJourneyEnabled && request.userAnswers.get(MergedJourneyFlag).getOrElse(false)) {
+                  Ok(confirmationMergeJourneyView(
+                    paperLessAvailable = status.isPaperlessCustomer,
+                    continueLink = appConfig.mergedJourneyContinueUrl(getClaimStatus(selectedTaxYears))
+                  ))
+                } else {
+                  Ok(confirmationView(
+                    status.isPaperlessCustomer, Some(status.url.link),
+                    selectedTaxYears.contains2021OrPrevious,
+                    selectedTaxYears.containsCurrent
+                  ))
 
-              val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
-
-              Ok(confirmationView(
-                status.isPaperlessCustomer, Some(status.url.link),
-                selectedTaxYears.contains2021OrPrevious,
-                selectedTaxYears.containsCurrent
-              ))
-
-            case Left(error) =>
-              auditPaperlessPreferencesCheckFailure(error)
-              Redirect(routes.TechnicalDifficultiesController.onPageLoad)
-          }
+                }
+              case Left(error) =>
+                auditPaperlessPreferencesCheckFailure(error)
+                Redirect(routes.TechnicalDifficultiesController.onPageLoad)
+            }
         case None => Future.successful(Redirect(routes.IndexController.onPageLoad()))
       }
   }
@@ -96,4 +104,13 @@ class ConfirmationController @Inject()(
         FailureReason -> error
       )
     )
+
+  private def getClaimStatus(selectedTaxYears: TaxYearFromUIAssembler): ClaimStatus = {
+    (selectedTaxYears.containsCurrent, selectedTaxYears.containsAnyPrevious) match {
+      case(true, true) => ClaimCompleteCurrentPrevious
+      case(true,false) => ClaimCompleteCurrent
+      case(false,true) => ClaimCompletePrevious
+      case(_, _) => ClaimUnsuccessful
+    }
+  }
 }

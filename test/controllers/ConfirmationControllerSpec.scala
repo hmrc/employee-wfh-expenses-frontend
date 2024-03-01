@@ -25,7 +25,7 @@ import models.paperless.{PaperlessStatus, PaperlessStatusResponse, Url}
 import org.mockito.ArgumentMatchers.{any, eq => eqm}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage, SubmittedClaim, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{ClaimedForTaxYear2020, MergedJourneyFlag, SelectTaxYearsToClaimForPage, SubmittedClaim, WhenDidYouFirstStartWorkingFromHomePage}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -41,21 +41,36 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
   val somePreferencesUrl = "/change/preferences"
 
   "Confirmation Controller" must {
-    "return OK and the correct view with paper preferences available" in {
-      paperlessControllerTest(true)
+    "return OK and the correct view with paper preferences available" when {
+      "merge flag in false" in {
+        paperlessControllerTest(paperlessAvailable = true, mergeJourney = false)
+      }
     }
-    "return OK and the correct view with paper preferences unavailable" in {
-      paperlessControllerTest(false)
+    "return OK and the correct view with paper preferences unavailable" when {
+      "merge flag in false" in {
+        paperlessControllerTest(paperlessAvailable = false, mergeJourney = false)
+      }
+    }
+    "return OK and the correct view with paper preferences available" when {
+      "merge flag is true" in {
+        paperlessControllerTest(paperlessAvailable = true, mergeJourney = true)
+      }
+    }
+    "return OK and the correct view with paper preferences unavailable" when {
+      "merge flag is true" in {
+        paperlessControllerTest(paperlessAvailable = true, mergeJourney = true)
+      }
     }
   }
 
-  private def paperlessControllerTest(paperlessAvailable: Boolean): Future[_] = {
+  private def paperlessControllerTest(paperlessAvailable: Boolean, mergeJourney: Boolean): Future[_] = {
 
     val paperlessPreferenceConnector = mock[PaperlessPreferenceConnector]
     val auditConnector = mock[AuditConnector]
 
     val application = applicationBuilder(userAnswers = Some(
       UserAnswers(userAnswersId, Json.obj(
+        MergedJourneyFlag.toString -> mergeJourney,
         ClaimedForTaxYear2020.toString -> true,
         SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString),
         WhenDidYouFirstStartWorkingFromHomePage.toString -> earliestWorkingFromHomeDate,
@@ -82,6 +97,9 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
     status(result) mustEqual OK
 
+    if(mergeJourney) contentAsString(result).contains(messages("confirmation.mergeJourney.title")) mustEqual true
+    else contentAsString(result).contains(messages("confirmation.title")) mustEqual true
+
 
     val dataToAudit = Map(NinoReference -> fakeNino, Enabled -> paperlessAvailable.toString)
 
@@ -90,5 +108,4 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
     application.stop()
   }
-
 }

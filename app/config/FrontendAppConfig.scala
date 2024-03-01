@@ -18,6 +18,7 @@ package config
 
 import com.google.inject.{Inject, Singleton}
 import controllers.routes
+import models.ClaimStatus
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.Call
@@ -94,6 +95,7 @@ class FrontendAppConfig @Inject()(configuration: Configuration, val servicesConf
   val cacheTtl = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
   lazy val mergedJourneyEnabled: Boolean = configuration.getOptional[Boolean]("microservice.services.features.merged-journey").getOrElse(false)
+  def mergedJourneyContinueUrl(claimStatus: ClaimStatus): String = s"$employeeExpensesHost/employee-expenses/merged-journey-continue?journey=wfh&status=$claimStatus"
 
 }
 

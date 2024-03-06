@@ -64,9 +64,8 @@ class ConfirmationController @Inject()(
               case Right(status) =>
                 auditPaperlessPreferencesCheckSuccess(paperlessEnabled = status.isPaperlessCustomer)
                 val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
-                if(appConfig.mergedJourneyEnabled && request.userAnswers.get(MergedJourneyFlag).getOrElse(false)) {
+                if(request.userAnswers.isMergedJourney) {
                   Ok(confirmationMergeJourneyView(
-                    paperLessAvailable = status.isPaperlessCustomer,
                     continueLink = appConfig.mergedJourneyContinueUrl(getClaimStatus(selectedTaxYears))
                   ))
                 } else {

@@ -95,7 +95,9 @@ class FrontendAppConfig @Inject()(configuration: Configuration, val servicesConf
   val cacheTtl = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
   lazy val mergedJourneyEnabled: Boolean = configuration.getOptional[Boolean]("microservice.services.features.merged-journey").getOrElse(false)
-  def mergedJourneyContinueUrl(claimStatus: ClaimStatus): String = s"$employeeExpensesHost/employee-expenses/merged-journey-continue?journey=wfh&status=$claimStatus"
+
+  private val employeeExpensesUrl: String = configuration.get[String]("urls.employeeExpensesUrl")
+  def mergedJourneyContinueUrl(claimStatus: ClaimStatus): String = s"$employeeExpensesUrl/employee-expenses/merged-journey-continue?journey=wfh&status=$claimStatus"
 
 }
 

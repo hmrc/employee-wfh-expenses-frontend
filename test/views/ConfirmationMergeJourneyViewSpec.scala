@@ -31,7 +31,7 @@ class ConfirmationMergeJourneyViewSpec extends ViewBehaviours {
 
     "show content" when {
 
-      val doc = asDocument(view.apply(paperLessAvailable = true, "url-string")(request, messages))
+      val doc = asDocument(view.apply("url-string")(request, messages))
 
       "when all confirmation content is displayed" in {
         assert(doc.toString.contains(messages("confirmation.mergeJourney.whatHappensNext.heading")))
@@ -45,32 +45,9 @@ class ConfirmationMergeJourneyViewSpec extends ViewBehaviours {
       }
     }
 
-
-    "show go paperless content" when {
-
-      "when the user is not already paperless" in {
-
-        val doc = asDocument(view.apply(paperLessAvailable = false, "url-string")(request, messages))
-
-        assert(doc.toString.contains(messages("confirmation.mergeJourney.paperless.header")))
-        assert(doc.toString.contains(messages("confirmation.mergeJourney.paperless.paragraph.1")))
-      }
-    }
-
-    "not show go paperless content" when {
-
-      "when the user is already paperless" in {
-
-        val doc = asDocument(view.apply(paperLessAvailable = true, "url-string")(request, messages))
-
-        assert(!doc.toString.contains(messages("confirmation.mergeJourney.paperless.header")))
-        assert(!doc.toString.contains(messages("confirmation.mergeJourney.paperless.paragraph.1")))
-      }
-    }
-
     "behave like a normal page" when {
 
-      behave like normalPage(view.apply(paperLessAvailable = true, "url-string")(request, messages), ConfirmationMergeJourney)
+      behave like normalPage(view.apply("url-string")(request, messages), ConfirmationMergeJourney)
     }
   }
 }

@@ -27,7 +27,6 @@
 )
 
 @(
-    paperLessAvailable: Boolean,
     continueLink: String
 )(
     implicit request: Request[_],
@@ -45,11 +44,6 @@
     <h2 class="govuk-heading-m">@messages("confirmation.mergeJourney.whatHappensNext.heading")</h2>
     <p class="govuk-body">@messages("confirmation.mergeJourney.whatHappensNext.paragraph.1")</p>
     <p class="govuk-body">@messages("confirmation.mergeJourney.whatHappensNext.paragraph.2")</p>
-
-    @if(!paperLessAvailable) {
-        <h2 class="govuk-heading-m">@messages("confirmation.mergeJourney.paperless.header")</h2>
-        <p class="govuk-body">@messages("confirmation.mergeJourney.paperless.paragraph.1")</p>
-    }
 
     @button(Button(
         href = Some(continueLink),

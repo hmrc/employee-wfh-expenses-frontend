@@ -232,13 +232,11 @@ confirmation.changes.previousYear.p.1 = Byddwn yn gwirio’ch hawliad ar gyfer b
 
 confirmation.info.paragraph = Dylech allu gweld newidiadau i’ch cod treth yn eich cyfrif treth personol ar ôl dau ddiwrnod gwaith.
 
-confirmation.mergeJourney.title = Claim complete for working from home
-confirmation.mergeJourney.heading = Claim complete for working from home
+confirmation.mergeJourney.title = Hawliad wedi’i gwblhau ar gyfer gweithio o gartref
+confirmation.mergeJourney.heading = Hawliad wedi’i gwblhau ar gyfer gweithio o gartref
 confirmation.mergeJourney.whatHappensNext.heading = Yr hyn sy’n digwydd nesaf
-confirmation.mergeJourney.whatHappensNext.paragraph.1 = Your working from home claim does not continue automatically each year. You will need to make a new claim for the next tax year.
-confirmation.mergeJourney.whatHappensNext.paragraph.2 = Once you have completed all of your claims, you will be given more information about how you will receive your tax relief.
-confirmation.mergeJourney.paperless.header = Cael llythyrau treth ar-lein
-confirmation.mergeJourney.paperless.paragraph.1 = Gallwch fwrw golwg drostynt, eu lawrlwytho neu eu hargraffu pryd bynnag y mynnwch.
+confirmation.mergeJourney.whatHappensNext.paragraph.1 = Nid yw’ch hawliad o ran gweithio gartref yn parhau’n awtomatig bob blwyddyn. Bydd angen i chi wneud hawliad newydd ar gyfer y flwyddyn dreth nesaf.
+confirmation.mergeJourney.whatHappensNext.paragraph.2 = Ar ôl i chi lenwi’ch holl hawliadau, byddwch yn cael rhagor o wybodaeth ynglŷn â sut y byddwch yn cael y rhyddhad treth.
 
 informClaimNowInWeeks.title = Mae hawliadau ar neu ar ôl 6 Ebrill 2023 bellach yn cael eu cyfrifo mewn wythnosau
 informClaimNowInWeeks.heading = Mae hawliadau ar neu ar ôl 6 Ebrill 2023 bellach yn cael eu cyfrifo mewn wythnosau

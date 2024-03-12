@@ -39,7 +39,7 @@ class Navigator @Inject()() extends Logging {
     case ConfirmClaimInWeeksPage => ua => confirmClaimInWeeksNextPage(ua)
     case CheckYourClaimPage => ua => checkYourClaimPage(ua)
     case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
-    case _ => _ => routes.IndexController.onPageLoad()
+    case _ => _ => routes.IndexController.start
   }
 
   def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
@@ -69,7 +69,7 @@ class Navigator @Inject()() extends Logging {
       userAnswers.get(ClaimedForTaxYear2022),
       userAnswers.get(ClaimedForTaxYear2023)) match {
       case (Some(_), Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
-      case (None, None, None, None) => routes.IndexController.onPageLoad()
+      case (None, None, None, None) => routes.IndexController.start
       case (_, _, _, _) => routes.TechnicalDifficultiesController.onPageLoad
     }
   }

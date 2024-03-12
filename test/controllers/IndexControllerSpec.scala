@@ -25,6 +25,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
 import org.scalatest.BeforeAndAfter
+import pages.MergedJourneyFlag
 import play.api.inject.bind
 import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
@@ -56,7 +57,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
     Mockito.reset(mockIABDService)
   }
 
-  "Index Controller" must {
+  "onPageLoad" must {
     val otherExpenses = Seq(IABDExpense(testOtherExpensesAmount))
     val jobExpenses = Seq(IABDExpense(testJobExpensesAmount))
 
@@ -123,6 +124,35 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
 
         application.stop()
       }
+    }
+  }
+
+  "start" must {
+    "redirect to index with merged journey flag if user is on a merged journey" in {
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers.set(MergedJourneyFlag, true).get))
+        .overrides(bind[SessionService].toInstance(mockSessionService))
+        .build()
+
+      val request = FakeRequest(GET, routes.IndexController.start.url)
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.IndexController.onPageLoad(true).url
+
+      application.stop()
+    }
+    "redirect to index if there are no user answers" in {
+      val application = applicationBuilder(userAnswers = None)
+        .overrides(bind[SessionService].toInstance(mockSessionService))
+        .build()
+
+      val request = FakeRequest(GET, routes.IndexController.start.url)
+      val result = route(application, request).value
+
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url
+
+      application.stop()
     }
   }
 }

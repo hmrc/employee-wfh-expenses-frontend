@@ -27,7 +27,7 @@
     @layout(
         pageTitle = messages("manualCorrespondenceIndicator.title"),
         beforeContentBlock = Some(backLink(BackLink(
-            href = routes.IndexController.onPageLoad().url,
+            href = routes.IndexController.start.url,
             content = Text(messages("site.back")),
             attributes = Map("id" -> "back-link")
         )))

@@ -57,7 +57,7 @@ class WhenDidYouFirstStartWorkingFromHomeController @Inject()(override val messa
             case Some(value) => form.fill(value)
           }
           Ok(whenDidYouFirstStartWorkingFromHomeView(preparedForm, isClaimingCTY))
-        case None => Redirect(routes.IndexController.onPageLoad())
+        case None => Redirect(routes.IndexController.start)
       }
   }
 

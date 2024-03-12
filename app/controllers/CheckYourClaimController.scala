@@ -63,7 +63,7 @@ class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
 
           Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assembleWholeYears), startDate, numberOfWeeksIn2019,
             numberOfWeeksIn2023, selectedTaxYears.checkboxYearOptions))
-        case None => Redirect(routes.IndexController.onPageLoad())
+        case None => Redirect(routes.IndexController.start)
       }
 
 

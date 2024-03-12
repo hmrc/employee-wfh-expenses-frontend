@@ -87,7 +87,7 @@ class NewLayoutProvider @Inject()(
       disableSessionExpired = !timeout,
       content = contentBlock,
       pageTitle = Some(s"$pageTitle - ${messages("service.name")} - GOV.UK"),
-      serviceNameUrl = Some(controllers.routes.IndexController.onPageLoad().url),
+      serviceNameUrl = Some(controllers.routes.IndexController.start.url),
       timeOutUrl = Some(controllers.routes.SignedOutController.signedOut.url),
       keepAliveUrl = controllers.routes.KeepAliveController.keepAlive.url,
       showBackLinkJS = showBackLink,

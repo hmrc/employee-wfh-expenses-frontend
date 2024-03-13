@@ -28,7 +28,7 @@ import services.{IABDService, SessionService}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class IndexController @Inject()(val controllerComponents: MessagesControllerComponents,
                                 val sessionService: SessionService,
@@ -65,6 +65,17 @@ class IndexController @Inject()(val controllerComponents: MessagesControllerComp
           Redirect(navigatorPageResult)
         }
       }
+    }
+  }
+
+  //This is a simple redirect that can be used when we want to send the user to the start
+  //without having to check if they're on a merged journey manually
+  def start: Action[AnyContent] = (identify andThen getData).async { implicit request =>
+    request.userAnswers match {
+      case Some(answers) if answers.isMergedJourney =>
+        Future.successful(Redirect(routes.IndexController.onPageLoad(true)))
+      case _ =>
+        Future.successful(Redirect(routes.IndexController.onPageLoad()))
     }
   }
 }

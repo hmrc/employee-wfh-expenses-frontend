@@ -20,12 +20,10 @@ import config.FrontendAppConfig
 import connectors.PaperlessPreferenceConnector
 import controllers.PaperlessAuditConst._
 import controllers.actions._
-import models.{ClaimCompleteCurrent, ClaimCompleteCurrentPrevious, ClaimCompletePrevious, ClaimStatus, ClaimUnsuccessful, TaxYearFromUIAssembler}
-
-import javax.inject.Inject
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
-import pages.{MergedJourneyFlag, SubmittedClaim}
+import models.{ClaimCompleteCurrent, ClaimCompleteCurrentPrevious, ClaimCompletePrevious, ClaimStatus, ClaimUnsuccessful, TaxYearFromUIAssembler}
+import pages.SubmittedClaim
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -34,6 +32,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{ConfirmationMergeJourneyView, ConfirmationView}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 private object PaperlessAuditConst {
@@ -60,42 +59,42 @@ class ConfirmationController @Inject()(
     implicit request =>
       request.userAnswers.get(SubmittedClaim) match {
         case Some(_) =>
-            paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account") map {
-              case Right(status) =>
-                auditPaperlessPreferencesCheckSuccess(paperlessEnabled = status.isPaperlessCustomer)
-                val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
-                if(request.userAnswers.isMergedJourney) {
-                  Ok(confirmationMergeJourneyView(
-                    continueLink = appConfig.mergedJourneyContinueUrl(getClaimStatus(selectedTaxYears))
-                  ))
-                } else {
-                  Ok(confirmationView(
-                    status.isPaperlessCustomer, Some(status.url.link),
-                    selectedTaxYears.contains2021OrPrevious,
-                    selectedTaxYears.containsCurrent
-                  ))
-
-                }
-              case Left(error) =>
-                auditPaperlessPreferencesCheckFailure(error)
-                Redirect(routes.TechnicalDifficultiesController.onPageLoad)
-            }
-        case None => Future.successful(Redirect(routes.IndexController.onPageLoad()))
+          paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account") map {
+            case Right(status) =>
+              auditPaperlessPreferencesCheckSuccess(paperlessEnabled = status.isPaperlessCustomer)
+              val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
+              if (request.userAnswers.isMergedJourney) {
+                Ok(confirmationMergeJourneyView(
+                  continueLink = appConfig.mergedJourneyContinueUrl(getClaimStatus(selectedTaxYears))
+                ))
+              } else {
+                Ok(confirmationView(
+                  status.isPaperlessCustomer, Some(status.url.link),
+                  selectedTaxYears.contains2021OrPrevious,
+                  selectedTaxYears.containsCurrent
+                ))
+              }
+            case Left(error) =>
+              auditPaperlessPreferencesCheckFailure(error)
+              Redirect(routes.TechnicalDifficultiesController.onPageLoad)
+          }
+        case None =>
+          Future.successful(Redirect(routes.IndexController.start))
       }
   }
 
-  private def auditPaperlessPreferencesCheckSuccess(paperlessEnabled:Boolean)
-                                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+  private def auditPaperlessPreferencesCheckSuccess(paperlessEnabled: Boolean)
+                                                   (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       PaperlessPreferenceCheckSuccess.toString,
       Map(
         NinoReference -> dataRequest.nino,
-        Enabled       -> paperlessEnabled.toString
+        Enabled -> paperlessEnabled.toString
       )
     )
 
   private def auditPaperlessPreferencesCheckFailure(error: String)
-                                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+                                                   (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       PaperlessPreferenceCheckFailure.toString,
       Map(
@@ -106,10 +105,10 @@ class ConfirmationController @Inject()(
 
   private def getClaimStatus(selectedTaxYears: TaxYearFromUIAssembler): ClaimStatus = {
     (selectedTaxYears.containsCurrent, selectedTaxYears.containsAnyPrevious) match {
-      case(true, true) => ClaimCompleteCurrentPrevious
-      case(true,false) => ClaimCompleteCurrent
-      case(false,true) => ClaimCompletePrevious
-      case(_, _) => ClaimUnsuccessful
+      case (true, true) => ClaimCompleteCurrentPrevious
+      case (true, false) => ClaimCompleteCurrent
+      case (false, true) => ClaimCompletePrevious
+      case (_, _) => ClaimUnsuccessful
     }
   }
 }

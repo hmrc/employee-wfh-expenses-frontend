@@ -23,7 +23,7 @@ import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, ClaimedForTaxYear2023}
+import pages.{ClaimedForTaxYear2020, ClaimedForTaxYear2021, ClaimedForTaxYear2022, ClaimedForTaxYear2023, ClaimedForTaxYear2024}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.Call
@@ -50,6 +50,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
         ClaimedForTaxYear2021.toString -> false,
         ClaimedForTaxYear2022.toString -> false,
         ClaimedForTaxYear2023.toString -> false,
+        ClaimedForTaxYear2024.toString -> false
       ))
 
       val application = applicationBuilder(userAnswers = Some(userAnswer)).build()

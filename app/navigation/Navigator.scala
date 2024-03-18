@@ -67,25 +67,26 @@ class Navigator @Inject()() extends Logging {
     (userAnswers.get(ClaimedForTaxYear2020),
       userAnswers.get(ClaimedForTaxYear2021),
       userAnswers.get(ClaimedForTaxYear2022),
-      userAnswers.get(ClaimedForTaxYear2023)) match {
-      case (Some(_), Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
-      case (None, None, None, None) => routes.IndexController.start
-      case (_, _, _, _) => routes.TechnicalDifficultiesController.onPageLoad
+      userAnswers.get(ClaimedForTaxYear2023),
+      userAnswers.get(ClaimedForTaxYear2024)) match {
+      case (Some(_), Some(_), Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
+      case (None, None, None, None, None) => routes.IndexController.start
+      case (_, _, _, _, _) => routes.TechnicalDifficultiesController.onPageLoad
     }
   }
 
   def howWeWillCalculateTaxReliefNextPage(userAnswers: UserAnswers): Call = {
     val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll.toSet)
 
-    if(selectedTaxYears.contains(Option1)) {routes.InformClaimNowInWeeksController.onPageLoad()}
-    else if(selectedTaxYears.contains(Option4)) {routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()}
+    if(selectedTaxYears.contains(Option2)) {routes.InformClaimNowInWeeksController.onPageLoad()}
+    else if(selectedTaxYears.contains(Option5)) {routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()}
     else {routes.CheckYourClaimController.onPageLoad()}
     // TODO: Will need updating to include the extra tax year when it is added
   }
 
   def confirmClaimInWeeksNextPage(userAnswers: UserAnswers): Call = {
     val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll.toSet)
-    val onwardRoute = if(selectedTaxYears.contains(Option4)) {
+    val onwardRoute = if(selectedTaxYears.contains(Option5)) {
       routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
     } else {
       routes.CheckYourClaimController.onPageLoad()

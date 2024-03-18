@@ -27,7 +27,7 @@
         appConfig: config.FrontendAppConfig
 )
 
-@(form: Form[Set[SelectTaxYearsToClaimFor]], availableYears: Seq[SelectTaxYearsToClaimFor], hintText: Boolean = true)(implicit request: Request[_], messages: Messages)
+@(form: Form[Set[SelectTaxYearsToClaimFor]], availableYears: Seq[SelectTaxYearsToClaimFor])(implicit request: Request[_], messages: Messages)
 
 @detailsContent = {
     <p class="govuk-body">@messages("selectTaxYearsToClaimFor.details.text.1")</p>

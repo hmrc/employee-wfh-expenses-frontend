@@ -26,34 +26,18 @@ sealed trait SelectTaxYearsToClaimFor
 object SelectTaxYearsToClaimFor extends Enumerable.Implicits {
 
   case object Option1 extends WithName("option1") with SelectTaxYearsToClaimFor
-
   case object Option2 extends WithName("option2") with SelectTaxYearsToClaimFor
-
   case object Option3 extends WithName("option3") with SelectTaxYearsToClaimFor
-
   case object Option4 extends WithName("option4") with SelectTaxYearsToClaimFor
+  case object Option5 extends WithName("option5") with SelectTaxYearsToClaimFor
 
   val valuesAll: Seq[SelectTaxYearsToClaimFor] = Seq(
-    Option1, // 2023-2024 (CY)
-    Option2, // 2022-2023 (CY-1)
-    Option3, // 2021-2022 (CY-2)
-    Option4 // 2020-2021, 2019-2020 (CY-3, CY-4)
+    Option1, // 2024-2025 (CY)
+    Option2, // 2023-2024 (CY-1)
+    Option3, // 2022-2023 (CY-2)
+    Option4, // 2021-2022 (CY-3)
+    Option5 // 2020-2021 (CY-4)
   )
-
-  val values2023Only: Seq[SelectTaxYearsToClaimFor] = Seq(Option1)
-  val values2022Only: Seq[SelectTaxYearsToClaimFor] = Seq(Option2)
-  val values2021Only: Seq[SelectTaxYearsToClaimFor] = Seq(Option3)
-  val values2020Only: Seq[SelectTaxYearsToClaimFor] = Seq(Option4)
-  val values2023And2022: Seq[SelectTaxYearsToClaimFor] = Seq(Option1, Option2)
-  val values2023And2021: Seq[SelectTaxYearsToClaimFor] = Seq(Option1, Option3)
-  val values2023And2020: Seq[SelectTaxYearsToClaimFor] = Seq(Option1, Option4)
-  val values2022And2021: Seq[SelectTaxYearsToClaimFor] = Seq(Option2, Option3)
-  val values2022And2020: Seq[SelectTaxYearsToClaimFor] = Seq(Option2, Option4)
-  val values2021And2020: Seq[SelectTaxYearsToClaimFor] = Seq(Option3, Option4)
-  val values2023And2022And2021: Seq[SelectTaxYearsToClaimFor] = Seq(Option1, Option2, Option3)
-  val values2023And2021And2020: Seq[SelectTaxYearsToClaimFor] = Seq(Option1, Option3, Option4)
-  val values2022And2021And2020: Seq[SelectTaxYearsToClaimFor] = Seq(Option2, Option3, Option4)
-  val values2023And2022And2020: Seq[SelectTaxYearsToClaimFor] = Seq(Option1, Option2, Option4)
 
   def options(form: Form[_], values: Seq[SelectTaxYearsToClaimFor])(implicit messages: Messages): Seq[CheckboxItem] = values.map {
     value =>
@@ -72,25 +56,15 @@ object SelectTaxYearsToClaimFor extends Enumerable.Implicits {
   def getValuesFromClaimedBooleans(claimed2020: Boolean,
                                    claimed2021: Boolean,
                                    claimed2022: Boolean,
-                                   claimed2023: Boolean): Seq[SelectTaxYearsToClaimFor] = {
-    (claimed2023, claimed2022, claimed2021, claimed2020) match {
-      case (false, true, true, true) => values2023Only
-      case (true, false, true, true) => values2022Only
-      case (true, true, false, true) => values2021Only
-      case (true, true, true, false) => values2020Only
-      case (false, false, true, true) => values2023And2022
-      case (false, true, false, true) => values2023And2021
-      case (false, true, true, false) => values2023And2020
-      case (true, false, false, true) => values2022And2021
-      case (true, false, true, false) => values2022And2020
-      case (true, true, false, false) => values2021And2020
-      case (false, false, false, true) => values2023And2022And2021
-      case (false, true, false, false) => values2023And2021And2020
-      case (true, false, false, false) => values2022And2021And2020
-      case (false, false, true, false) => values2023And2022And2020
-      case (_, _, _, _) => valuesAll
-
-    }
+                                   claimed2023: Boolean,
+                                   claimed2024: Boolean): Seq[SelectTaxYearsToClaimFor] = {
+    Seq(
+      if (claimed2024) None else Some(Option1),
+      if (claimed2023) None else Some(Option2),
+      if (claimed2022) None else Some(Option3),
+      if (claimed2021) None else Some(Option4),
+      if (claimed2020) None else Some(Option5)
+    ).flatten
   }
 
 }

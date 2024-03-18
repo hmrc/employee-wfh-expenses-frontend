@@ -30,7 +30,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
     val view = viewFor[CheckYourClaimView](Some(emptyUserAnswers))
 
     val request = FakeRequest()
-    val optionList = List("option2")
+    val optionList = List("option3")
 
     "show content" when {
       "when all possible content is enabled" in {
@@ -57,7 +57,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
 
       "when content when start date is missing" in {
 
-        val assembler = TaxYearFromUIAssembler(List("option2"))
+        val assembler = TaxYearFromUIAssembler(List("option3"))
         val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assembleWholeYears),
           Some(DateLanguageTokenizer.convertList(assembler.assembleWholeYears)))))
 
@@ -70,7 +70,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
     }
 
     "behave like a normal page" when {
-      val assembler = TaxYearFromUIAssembler(List("option2"))
+      val assembler = TaxYearFromUIAssembler(List("option3"))
       val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assembleWholeYears),
         Some(DateLanguageTokenizer.convertList(assembler.assembleWholeYears)))))
       val startDate = Date(LocalDate.of(2020, 4, 1))

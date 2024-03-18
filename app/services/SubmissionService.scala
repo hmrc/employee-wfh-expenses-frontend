@@ -78,7 +78,7 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
     ).flatten
 
     val previousYearItems: Seq[FlatRateItem] = startDate match {
-      case Some(date) if assembler.containsPrevious => Seq(
+      case Some(date) if assembler.contains2020 => Seq(
         Some(FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())),
         if(date.date.isBefore(TAX_YEAR_2019_END_DATE)) {
           Some(FlatRateItem(year = YEAR_2019, amount = calculate2019FlatRate(date.date)))

@@ -32,6 +32,7 @@ object TaxYearDates {
   val YEAR_2022: Int = 2022
   val YEAR_2023: Int = 2023
   val YEAR_2024: Int = 2024
+  val YEAR_2025: Int = 2025
 
   val TAX_YEAR_2019_START_DATE: LocalDate = TaxYear(YEAR_2019).starts
 
@@ -53,6 +54,9 @@ object TaxYearDates {
 
   val TAX_YEAR_2023_END_DATE: LocalDate = TaxYear(YEAR_2024).starts.minusDays(1)
 
+  val TAX_YEAR_2024_START_DATE: LocalDate = TaxYear(YEAR_2024).starts
+
+  val TAX_YEAR_2024_END_DATE: LocalDate = TaxYear(YEAR_2025).starts.minusDays(1)
 
   def numberOfWeeks(startDate:LocalDate, endDate:LocalDate): Long = {
     if (startDate.equals(endDate)) {

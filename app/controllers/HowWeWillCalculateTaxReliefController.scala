@@ -47,7 +47,7 @@ class HowWeWillCalculateTaxReliefController @Inject()(
         case Some(_) =>
           val selectedTaxYearsAssembler = taxYearFromUIAssemblerFromRequest()
 
-          val startDate: Option[Date] = if(selectedTaxYearsAssembler.containsPrevious) {
+          val startDate: Option[Date] = if(selectedTaxYearsAssembler.contains2020) {
             request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
           } else {
             Some(Date(TAX_YEAR_2021_START_DATE))

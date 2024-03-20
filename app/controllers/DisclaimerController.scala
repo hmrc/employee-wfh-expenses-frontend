@@ -54,7 +54,7 @@ class DisclaimerController @Inject()(
             Some(tokenizerFormattedItem.month),
             Some(tokenizerFormattedItem.year.toString),
             selectedTaxYears.contains2022OrAfter,
-            selectedTaxYears.contains2021OrPrevious
+            selectedTaxYears.contains2021Or2020
           ))
         case None => Redirect(routes.IndexController.start)
       }

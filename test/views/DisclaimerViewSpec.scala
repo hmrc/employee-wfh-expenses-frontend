@@ -34,8 +34,7 @@ class DisclaimerViewSpec extends ViewBehaviours {
     "show content" when {
       "when all both sections are required" in {
 
-        val doc = asDocument(view.apply("April", "2020",
-          Some("May"), Some("2022"), true, true)(request, messages))
+        val doc = asDocument(view.apply(showFirstMessageBlock = true, showSecondMessageBlock = true)(request, messages))
         assert(doc.toString.contains(messages("Claiming tax relief on or after")))
         assert(doc.toString.contains(messages("Claiming tax relief on or before")))
 
@@ -56,16 +55,14 @@ class DisclaimerViewSpec extends ViewBehaviours {
 
       }
       "when all both after only is required" in {
-        val doc = asDocument(view.apply("April", "2020",
-          None, None, true, false)(request, messages))
+        val doc = asDocument(view.apply(showFirstMessageBlock = true, showSecondMessageBlock = false)(request, messages))
         assert(doc.toString.contains(messages("Claiming tax relief on or after")))
         assert(!doc.toString.contains(messages("Claiming tax relief on or before")))
       }
     }
 
     "behave like a normal page" when {
-      behave like normalPage(view.apply("April", "2020",
-        Some("May"), Some("2022"), true, true)(request, messages), Disclaimer)
+      behave like normalPage(view.apply(showFirstMessageBlock = true, showSecondMessageBlock = true)(request, messages), Disclaimer)
     }
   }
 }

@@ -24,6 +24,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html._
+import utils.TaxYearFormatter
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -51,7 +52,10 @@ class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
             None
           }
 
-          Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assembleWholeYears), numberOfWeeksIn2023, selectedTaxYears.checkboxYearOptions))
+          val wholeTaxYears = selectedTaxYears.assembleWholeYears
+          val formattedWholeTaxYears = TaxYearFormatter(wholeTaxYears).formattedTaxYears
+
+          Ok(checkYourClaimView(formattedWholeTaxYears, numberOfWeeksIn2023, selectedTaxYears.checkboxYearOptions))
         case None =>
           Redirect(routes.IndexController.start)
       }

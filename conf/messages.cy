@@ -82,12 +82,10 @@ howWeWillCalculateTaxRelief.bullet.frequency.weekly.text = Mae hawliadau’n cae
 howWeWillCalculateTaxRelief.bullet.frequency.yearly.text = Mae hawliadau’n cael eu rhoi ar gyfer y flwyddyn dreth gyfan
 howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text = Mae’r rhyddhad treth yn £{0} yr wythnos
 howWeWillCalculateTaxRelief.bullet.enter.weeks.text = Mae angen i chi nodi nifer yr wythnosau rydych yn gweithio gartref ar gyfer y flwyddyn dreth hon
-howWeWillCalculateTaxRelief.bullet.enter.start.date.text = Mae angen i chi nodi’r dyddiad y dechreuoch weithio gartref a byddwn yn cyfrifo nifer yr wythnosau y gallwch hawlio ar eu cyfer
-
 
 disclaimer.title = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad
 disclaimer.heading = Mae’n rhaid i chi ddarllen y canlynol cyn gwneud hawliad
-disclaimer.heading.after = Hawlio rhyddhad treth ar neu ar ôl 6
+disclaimer.heading.after = Hawlio rhyddhad treth ar neu ar ôl 6 Ebrill 2022
 disclaimer.notification.title = Mae’r arweiniad wedi newid ers 6 Ebrill 2022
 disclaimer.notification.text = Mae’r arweiniad ynghylch hawlio rhyddhad treth am weithio gartref wedi newid ar gyfer treuliau sy’n codi ar neu ar ôl 6 Ebrill 2022.
 disclaimer.info.text.1 = Gallwch hawlio os nad yw’ch cyflogwr eisoes wedi talu’ch treuliau a’ch bod wedi mynd i gostau ychwanegol ar eich aelwyd o ganlyniad i weithio gartref.
@@ -96,7 +94,7 @@ disclaimer.bullet.heading = Mae’n rhaid i un o’r rheolau canlynol fod yn ber
 disclaimer.bullet.text.1 = nid oes cyfleusterau priodol ar gael i chi gyflawni’ch swydd ar safle’ch cyflogwr
 disclaimer.bullet.text.2 = mae natur y swydd yn mynnu eich bod yn byw mor bell o safle’ch cyflogwr fel ei bod yn afresymol i chi deithio i’r safle hwnnw’n ddyddiol
 disclaimer.bullet.text.3 = mae’n ofynnol i chi, o dan gyfyngiadau’r llywodraeth, weithio gartref
-disclaimer.heading.before = Hawlio rhyddhad treth ar neu cyn 5
+disclaimer.heading.before = Hawlio rhyddhad treth ar neu cyn 5 Ebrill 2022
 disclaimer.bullet.heading.1 = Gallwch wneud hawliad os yw pob un o’r rheolau canlynol yn berthnasol:
 disclaimer.bullet.text.4 = nid yw’ch cyflogwr wedi talu’ch treuliau’n barod
 disclaimer.bullet.text.5 = mae canllawiau’r llywodraeth neu’ch cyflogwr wedi mynnu eich bod yn gweithio gartref neu’n hunanynysu

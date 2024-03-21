@@ -16,9 +16,9 @@
 
 package views
 
-import models.{ClaimViewSettings, DisclaimerViewSettings, TaxYearFromUIAssembler}
+import models.TaxYearFromUIAssembler
 import play.api.test.FakeRequest
-import utils.DateLanguageTokenizer
+import utils.TaxYearFormatter
 import views.behaviours.ViewBehaviours
 import views.html.CheckYourClaimView
 
@@ -35,10 +35,9 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
       "when all possible content is enabled" in {
 
         val assembler = TaxYearFromUIAssembler(optionList)
-        val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assembleWholeYears),
-          Some(DateLanguageTokenizer.convertList(assembler.assembleWholeYears)))))
+        val taxYears = TaxYearFormatter(assembler.assembleWholeYears).formattedTaxYears
 
-        val doc = asDocument(view.apply(claimSettings.claimViewSettings.get, Some(3), optionList)(request, messages))
+        val doc = asDocument(view.apply(taxYears, Some(3), optionList)(request, messages))
         assert(doc.toString.contains(messages("checkYourClaimView.title")))
         assert(doc.toString.contains(messages("checkYourClaimView.heading")))
         assert(doc.toString.contains(messages("checkYourClaimView.text.1.1")))
@@ -54,9 +53,9 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
 
     "behave like a normal page" when {
       val assembler = TaxYearFromUIAssembler(List("option3"))
-      val claimSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assembleWholeYears),
-        Some(DateLanguageTokenizer.convertList(assembler.assembleWholeYears)))))
-      behave like normalPage(view.apply(claimSettings.claimViewSettings.get, None, optionList)(request, messages), "checkYourClaimView")
+      val taxYears = TaxYearFormatter(assembler.assembleWholeYears).formattedTaxYears
+
+      behave like normalPage(view.apply(taxYears, None, optionList)(request, messages), "checkYourClaimView")
     }
   }
 }

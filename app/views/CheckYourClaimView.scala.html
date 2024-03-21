@@ -28,7 +28,7 @@
     button:             GovukButton
 )
 
-@(claimViewSettings: ClaimViewSettings, numberOfWeeksIn2023: Option[Int], yearsClaimingFor: List[String])(implicit request: Request[_], messages: Messages)
+@(wholeTaxYears: List[(String, String)], numberOfWeeksIn2023: Option[Int], yearsClaimingFor: List[String])(implicit request: Request[_], messages: Messages)
 
 @pluralOrSingularWeeks(weeks: Long) = @{
     if (weeks == 1) {
@@ -70,8 +70,8 @@
 
     <ul class="govuk-list govuk-list--bullet">
         @maybeWeeksOf2023
-        @for(dateToken <- claimViewSettings.datesToClaim) {
-            <li>@messages("checkYourClaimView.text.2") @dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("howWeWillCalculateTaxRelief.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</li>
+        @for(wholeTaxYear <- wholeTaxYears) {
+            <li>@messages("checkYourClaimView.text.2") @wholeTaxYear._1 @messages("howWeWillCalculateTaxRelief.your.claim.date.to") @wholeTaxYear._2</li>
         }
     </ul>
 

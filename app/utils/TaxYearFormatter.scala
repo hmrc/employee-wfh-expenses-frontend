@@ -23,7 +23,7 @@ import java.time.format.DateTimeFormatter
 
 case class TaxYearFormatter(taxYears: List[(LocalDate, LocalDate)])(implicit val messages: Messages) {
 
-  lazy val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", messages.lang.toLocale)
+  private lazy val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", messages.lang.toLocale)
 
   def formattedTaxYears: List[(String, String)] = {
     taxYears.map {

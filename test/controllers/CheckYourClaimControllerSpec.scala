@@ -16,8 +16,6 @@
 
 package controllers
 
-import java.time.LocalDate
-
 import base.SpecBase
 import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3, Option4}
 import models.UserAnswers
@@ -43,7 +41,6 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
           SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString, Option4.toString),
-          WhenDidYouFirstStartWorkingFromHomePage.toString -> LocalDate.of(2020, 4, 1),
           NumberOfWeeksToClaimForPage.toString -> 3
         )
       )
@@ -63,7 +60,7 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSubmissionService = mock[SubmissionService]
 
-      when(mockSubmissionService.submitExpenses(any(), any(), any())(any(), any(), any())) thenReturn Future.successful(Left("dd"))
+      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Left("dd"))
 
       val userAnswer = UserAnswers(
         userAnswersId,

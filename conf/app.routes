@@ -21,11 +21,6 @@ GET        /technical-difficulties                      controllers.TechnicalDif
 GET        /how-we-will-calculate-tax-relief            controllers.HowWeWillCalculateTaxReliefController.onPageLoad()
 POST       /how-we-will-calculate-tax-relief            controllers.HowWeWillCalculateTaxReliefController.onSubmit()
 
-GET        /start-date                                  controllers.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
-POST       /start-date                                  controllers.WhenDidYouFirstStartWorkingFromHomeController.onSubmit()
-
-GET        /cannot-claim-using-this-service             controllers.CannotClaimUsingThisServiceController.onPageLoad()
-
 GET        /disclaimer                                  controllers.DisclaimerController.onPageLoad()
 POST       /disclaimer                                  controllers.DisclaimerController.onSubmit()
 

@@ -23,7 +23,6 @@ import pages._
 import play.api.Logging
 import play.api.mvc.Call
 
-import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -38,7 +37,6 @@ class Navigator @Inject()() extends Logging {
     case NumberOfWeeksToClaimForPage => _ => routes.ConfirmClaimInWeeksController.onPageLoad()
     case ConfirmClaimInWeeksPage => ua => confirmClaimInWeeksNextPage(ua)
     case CheckYourClaimPage => ua => checkYourClaimPage(ua)
-    case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
     case _ => _ => routes.IndexController.start
   }
 
@@ -46,21 +44,6 @@ class Navigator @Inject()() extends Logging {
 
   def checkYourClaimPage(userAnswers: UserAnswers): Call = {
     routes.DisclaimerController.onPageLoad()
-  }
-
-  def checkStartWorkingFromHomeDate(userAnswers: UserAnswers): Call = {
-    val earliestStartDate = LocalDate.of(2020,1,1)
-
-    userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
-      case Some(startDate) =>
-        if (startDate.date.isBefore(earliestStartDate)) {
-          routes.CannotClaimUsingThisServiceController.onPageLoad()
-        } else {
-          routes.CheckYourClaimController.onPageLoad()
-        }
-      case None => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
-    }
-
   }
 
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
@@ -79,21 +62,13 @@ class Navigator @Inject()() extends Logging {
     val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll)
 
     if(selectedTaxYears.contains(Option2)) {routes.InformClaimNowInWeeksController.onPageLoad()}
-    else if(selectedTaxYears.contains(Option5)) {routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()}
     else {routes.CheckYourClaimController.onPageLoad()}
     // TODO: Will need updating to include the extra tax year when it is added
   }
 
   def confirmClaimInWeeksNextPage(userAnswers: UserAnswers): Call = {
-    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll)
-    val onwardRoute = if(selectedTaxYears.contains(Option5)) {
-      routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
-    } else {
-      routes.CheckYourClaimController.onPageLoad()
-    }
-
     if(userAnswers.get(ConfirmClaimInWeeksPage).getOrElse(false)) {
-      onwardRoute
+      routes.CheckYourClaimController.onPageLoad()
     } else {
       routes.NumberOfWeeksToClaimForController.onPageLoad()
     }

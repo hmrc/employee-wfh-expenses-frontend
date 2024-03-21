@@ -120,9 +120,6 @@ checkYourClaimView.details.text.2 = a darparu tystiolaeth, fel derbynebau a bili
 checkYourClaimView.text.4 = Cyflwynwch eich hawliad nawr
 checkYourClaimView.text.5 = Drwy gyflwyno’r hawliad hwn, rydych yn cadarnhau, hyd eithaf eich gwybodaeth, fod y manylion a roddir gennych yn gywir.
 checkYourClaimView.button.label = Cadarnhau a chyflwyno
-checkYourClaimView.inset.text = Gwnaethoch ddechrau gweithio gartref ar
-checkYourClaimView.changeThisDate.href.text = Newid y dyddiad hwn
-checkYourClaimView.list.item2 = {0} o flwyddyn dreth 1 Ionawr 2020 i 5 Ebrill 2020
 checkYourClaimView.list.item3 = {0} o flwyddyn dreth 6 Ebrill 2023 i 5 Ebrill 2024
 
 
@@ -155,46 +152,6 @@ selectTaxYearsToClaimFor.details.heading = Nid yw’r flwyddyn dreth rwyf am haw
 selectTaxYearsToClaimFor.details.text.1 = Os nad oes un o’r blynyddoedd treth wedi’u rhestru, mae hyn yn golygu ei bod hi’n bosib eich bod eisoes wedi hawlio ar eu cyfer.
 selectTaxYearsToClaimFor.details.text.2 = Gallwch fynd yn eich blaen a defnyddio’r gwasanaeth hwn i hawlio ar gyfer unrhyw un o’r blynyddoedd treth a restrwyd os ydych yn gymwys neu
 selectTaxYearsToClaimFor.details.href.text = gallwch ddiwygio’ch hawliadau blaenorol
-
-whenDidYouFirstStartWorkingFromHome.title = Pryd gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021?
-whenDidYouFirstStartWorkingFromHome.heading = Pryd gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021?
-whenDidYouFirstStartWorkingFromHome.hinttext = Er enghraifft, 23 3 2020
-whenDidYouFirstStartWorkingFromHome.summaryText = Help gyda’ch dyddiad gweithio gartref
-whenDidYouFirstStartWorkingFromHome.summaryText2 = Mae swm y rhyddhad treth gallwch ei hawlio yn dibynnu ar pryd y gwnaethoch ddechrau gweithio gartref. Nid oes angen dyddiad dod i ben arnom.
-whenDidYouFirstStartWorkingFromHome.checkYourAnswersLabel = WhenDidYouFirstStartWorkingFromHome
-whenDidYouFirstStartWorkingFromHome.error.required = Nodwch y dyddiad y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021
-whenDidYouFirstStartWorkingFromHome.error.required.day = Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 gynnwys diwrnod
-whenDidYouFirstStartWorkingFromHome.error.required.dayMonth = Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 gynnwys diwrnod a mis
-whenDidYouFirstStartWorkingFromHome.error.required.dayYear = Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 gynnwys diwrnod a blwyddyn
-whenDidYouFirstStartWorkingFromHome.error.required.month = Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 gynnwys mis
-whenDidYouFirstStartWorkingFromHome.error.required.monthYear = Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 gynnwys mis a blwyddyn
-whenDidYouFirstStartWorkingFromHome.error.required.year = Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 gynnwys blwyddyn
-whenDidYouFirstStartWorkingFromHome.error.invalid = Nodwch ddyddiad dilys gan ddefnyddio rhifau
-whenDidYouFirstStartWorkingFromHome.error.invalid.day = Mae’n rhaid i’r diwrnod y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod yn rhif
-whenDidYouFirstStartWorkingFromHome.error.invalid.dayMonth = Mae’n rhaid i’r diwrnod a’r mis y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod yn rhif
-whenDidYouFirstStartWorkingFromHome.error.invalid.dayYear = Mae’n rhaid i’r diwrnod a’r flwyddyn y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod yn rhif
-whenDidYouFirstStartWorkingFromHome.error.invalid.month = Mae’n rhaid i’r mis y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod yn rhif
-whenDidYouFirstStartWorkingFromHome.error.invalid.monthYear = Mae’n rhaid i’r mis a’r flwyddyn y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod yn rhif
-whenDidYouFirstStartWorkingFromHome.error.invalid.year = Mae’n rhaid i’r flwyddyn y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod yn rhif
-whenDidYouFirstStartWorkingFromHome.error.notReal = Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod yn ddyddiad go iawn
-whenDidYouFirstStartWorkingFromHome.error.notReal.day = Mae’n rhaid i’r diwrnod y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod yn rhif dilys
-whenDidYouFirstStartWorkingFromHome.error.notReal.month = Mae’n rhaid i’r mis y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod yn rhif dilys
-whenDidYouFirstStartWorkingFromHome.error.notReal.year = Mae’n rhaid i’r flwyddyn y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod yn rhif dilys
-whenDidYouFirstStartWorkingFromHome.error.future = Ni all y dyddiad y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod yn y dyfodol
-whenDidYouFirstStartWorkingFromHome.error.range.max = Mae’n rhaid i’r dyddiad y gwnaethoch ddechrau gweithio gartref yn ystod 2020 i 2021 fod cyn 6 Ebrill 2021
-
-cannotClaimUsingThisService.title = Ni allwch hawlio gan ddefnyddio’r gwasanaeth hwn
-cannotClaimUsingThisService.heading = Ni allwch hawlio gan ddefnyddio’r gwasanaeth hwn
-cannotClaimUsingThisService.reason = Gallwch ond hawlio treuliau am weithio gartref ar neu ar ôl 1 Ionawr 2020 ar gyfer y blynyddoedd treth hyn:
-cannotClaimUsingThisService.reason.2024 = 6 Ebrill 2023 i 5 Ebrill 2024 (y flwyddyn dreth hon)
-cannotClaimUsingThisService.reason.2023 = 6 Ebrill 2022 i 5 Ebrill 2023
-cannotClaimUsingThisService.reason.2022 = 6 Ebrill 2021 i 5 Ebrill 2022
-cannotClaimUsingThisService.reason.2021 = 6 Ebrill 2020 i 5 Ebrill 2021
-cannotClaimUsingThisService.reason.2020 = 1 Ionawr 2020 i 5 Ebrill 2020
-cannotClaimUsingThisService.changeDate.href.text = newid y dyddiad
-cannotClaimUsingThisService.changeDate = Os gwnaethoch ddechrau gweithio gartref cyn 1 Ionawr 2020, {0}.
-cannotClaimUsingThisService.alternative.href.text = hawliwch ryddhad treth ar gyfer treuliau cyflogaeth
-cannotClaimUsingThisService.alternative = Gallwch {0} y gwnaethoch ddechrau gweithio gartref.
 
 numberOfWeeksToClaimFor.title = Sawl wythnos y flwyddyn ydych chi’n disgwyl gweithio gartref yn ystod y flwyddyn dreth bresennol?
 numberOfWeeksToClaimFor.heading = Sawl wythnos y flwyddyn ydych chi’n disgwyl gweithio gartref yn ystod y flwyddyn dreth bresennol?

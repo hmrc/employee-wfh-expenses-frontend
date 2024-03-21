@@ -29,7 +29,7 @@ class InformClaimNowInWeeksViewSpec extends ViewBehaviours{
 
   "InformClaimNowInWeeks view" must {
     val view = viewFor[InformClaimNowInWeeksView](Some(emptyUserAnswers))
-    val request = FakeRequest(GET, routes.CannotClaimUsingThisServiceController.onPageLoad().url)
+    val request = FakeRequest(GET, routes.InformClaimNowInWeeksController.onPageLoad().url)
     val applyView = view.apply()(request, messages)
 
     behave like normalPage(applyView, "informClaimNowInWeeks")

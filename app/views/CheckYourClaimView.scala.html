@@ -28,16 +28,7 @@
     button:             GovukButton
 )
 
-@(claimViewSettings: ClaimViewSettings, startDate: Option[Date], numberOfWeeksIn2019: Long, numberOfWeeksIn2023: Option[Int], yearsClaimingFor: List[String])(implicit request: Request[_], messages: Messages)
-
-@readableDate(date: LocalDate) = {@{date.getDayOfMonth} @{messages(s"month.${date.getMonthValue}")} @{date.getYear}}
-
-@insetHtml(date: LocalDate) = {
-    @messages("checkYourClaimView.inset.text")
-    <b>@readableDate(date)</b>.
-    <br>
-    <a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("checkYourClaimView.changeThisDate.href.text")</a>
-}
+@(claimViewSettings: ClaimViewSettings, numberOfWeeksIn2023: Option[Int], yearsClaimingFor: List[String])(implicit request: Request[_], messages: Messages)
 
 @pluralOrSingularWeeks(weeks: Long) = @{
     if (weeks == 1) {
@@ -70,11 +61,6 @@
 ) {
     <h1 class="govuk-heading-xl">@messages("checkYourClaimView.heading")</h1>
 
-    @if(startDate.isDefined) {
-        @govukInsetText(InsetText(
-            content = HtmlContent(insetHtml(startDate.get.date))
-        ))
-    }
     <h2 class="govuk-heading-m">@messages("checkYourClaimView.header")</h2>
 
     <p class="govuk-body">@messages("checkYourClaimView.text.1.1")
@@ -88,17 +74,6 @@
             <li>@messages("checkYourClaimView.text.2") @dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("howWeWillCalculateTaxRelief.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</li>
         }
     </ul>
-
-    @if(startDate.isDefined && startDate.get.date.isBefore(TAX_YEAR_2020_START_DATE)) {
-        <p class="govuk-body">@messages("checkYourClaimView.text.1.1")
-            <span class="govuk-!-font-weight-bold">&pound;@appConfig.taxReliefPerWeek2019</span>
-            @messages("checkYourClaimView.text.1.2")
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet">
-            <li>@messages("checkYourClaimView.list.item2", pluralOrSingularWeeks(numberOfWeeksIn2019))</li>
-        </ul>
-    }
 
     <p class="govuk-body">@messages("checkYourClaimView.text.3")</p>
         @govukDetails(Details(

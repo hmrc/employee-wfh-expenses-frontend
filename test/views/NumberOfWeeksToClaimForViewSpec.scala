@@ -37,6 +37,6 @@ class NumberOfWeeksToClaimForViewSpec extends IntViewBehaviours {
 
     behave like normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix)
 
-    behave like intPage(form, applyView, messageKeyPrefix, routes.NumberOfWeeksToClaimForController.onSubmit().url)
+    behave like intPage(form, applyView, messageKeyPrefix, routes.NumberOfWeeksToClaimForController.onSubmitSingle().url)
   }
 }

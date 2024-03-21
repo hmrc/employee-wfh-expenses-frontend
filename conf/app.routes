@@ -28,7 +28,7 @@ GET        /inform-claim-now-in-weeks                   controllers.InformClaimN
 POST       /inform-claim-now-in-weeks                   controllers.InformClaimNowInWeeksController.onSubmit()
 
 GET        /number-of-weeks-to-claim-for                controllers.NumberOfWeeksToClaimForController.onPageLoad()
-POST       /number-of-weeks-to-claim-for                controllers.NumberOfWeeksToClaimForController.onSubmit()
+POST       /number-of-weeks-to-claim-for-single         controllers.NumberOfWeeksToClaimForController.onSubmitSingle()
 
 GET        /confirm-claim-in-weeks                      controllers.ConfirmClaimInWeeksController.onPageLoad()
 POST       /confirm-claim-in-weeks                      controllers.ConfirmClaimInWeeksController.onSubmit()

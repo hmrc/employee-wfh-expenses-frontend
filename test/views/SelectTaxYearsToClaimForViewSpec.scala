@@ -17,14 +17,14 @@
 package views
 
 import forms.SelectTaxYearsToClaimForFormProvider
-import models.SelectTaxYearsToClaimFor
-import models.SelectTaxYearsToClaimFor._
+import models.TaxYearSelection
+import models.TaxYearSelection._
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 import views.behaviours.CheckboxViewBehaviours
 import views.html.SelectTaxYearsToClaimForView
 
-class SelectTaxYearsToClaimForViewSpec extends CheckboxViewBehaviours[SelectTaxYearsToClaimFor] {
+class SelectTaxYearsToClaimForViewSpec extends CheckboxViewBehaviours[TaxYearSelection] {
 
   val messageKeyPrefix = "selectTaxYearsToClaimFor"
 
@@ -34,10 +34,10 @@ class SelectTaxYearsToClaimForViewSpec extends CheckboxViewBehaviours[SelectTaxY
 
     val view = viewFor[SelectTaxYearsToClaimForView](Some(emptyUserAnswers))
 
-    def applyView(form: Form[Seq[SelectTaxYearsToClaimFor]]): HtmlFormat.Appendable = view.apply(form, valuesAll)(fakeRequest, messages)
+    def applyView(form: Form[Seq[TaxYearSelection]]): HtmlFormat.Appendable = view.apply(form, valuesAll)(fakeRequest, messages)
 
     behave like normalPage(applyView(form), messageKeyPrefix)
 
-    behave like checkboxPage(form, applyView, messageKeyPrefix, SelectTaxYearsToClaimFor.options(form, valuesAll))
+    behave like checkboxPage(form, applyView, messageKeyPrefix, TaxYearSelection.options(form, valuesAll))
   }
 }

@@ -16,17 +16,17 @@
 
 package pages
 
-import models.SelectTaxYearsToClaimFor
+import models.TaxYearSelection
 import pages.behaviours.PageBehaviours
 
 class SelectTaxYearsToClaimForPageSpec extends PageBehaviours {
 
   "SelectTaxYearsToClaimForPage" must {
 
-    beRetrievable[Seq[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
+    beRetrievable[Seq[TaxYearSelection]](SelectTaxYearsToClaimForPage)
 
-    beSettable[Seq[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
+    beSettable[Seq[TaxYearSelection]](SelectTaxYearsToClaimForPage)
 
-    beRemovable[Seq[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
+    beRemovable[Seq[TaxYearSelection]](SelectTaxYearsToClaimForPage)
   }
 }

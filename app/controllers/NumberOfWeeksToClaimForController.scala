@@ -17,20 +17,20 @@
 package controllers
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
+import forms.NumberOfWeeksToClaimForFormProvider
 import navigation.Navigator
-import pages.NumberOfWeeksToClaimForPage
+import pages.{NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SessionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.NumberOfWeeksToClaimForView
-import forms.NumberOfWeeksToClaimForFormProvider
-import play.api.data.Form
-import services.SessionService
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: MessagesApi,
                                                   sessionService: SessionService,
                                                   identify: IdentifierAction,
@@ -43,29 +43,40 @@ class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: Mess
                                                   val controllerComponents: MessagesControllerComponents
                                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
-  val form: Form[Int] = formProvider()
-
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      val preparedForm = request.userAnswers.get(NumberOfWeeksToClaimForPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+      request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
+        case Some(list) if list.size == 1 =>
+          val preparedForm = request.userAnswers
+            .get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)
+            .flatMap(_.get(list.head)) match {
+            case None => formProvider(list.head)
+            case Some(value) => formProvider(list.head).fill(value)
+          }
 
-      Ok(numberOfWeeksToClaimForView(preparedForm))
+          Ok(numberOfWeeksToClaimForView(preparedForm))
+        case _ =>
+          Redirect(routes.IndexController.start)
+      }
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
+  def onSubmitSingle: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors => {
-          Future.successful(BadRequest(numberOfWeeksToClaimForView(formWithErrors)))
-        },
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(NumberOfWeeksToClaimForPage, value))
-            _              <- sessionService.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(NumberOfWeeksToClaimForPage, updatedAnswers))
-      )
+      request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
+        case Some(list) if list.size == 1 =>
+          formProvider(list.head).bindFromRequest().fold(
+            formWithErrors => {
+              Future.successful(BadRequest(numberOfWeeksToClaimForView(formWithErrors)))
+            },
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers
+                  .set(NumberOfWeeksToClaimForPage, Map(list.head -> value))(NumberOfWeeksToClaimForPage.format))
+                _ <- sessionService.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(NumberOfWeeksToClaimForPage, updatedAnswers))
+          )
+        case _ =>
+          Future.successful(Redirect(routes.IndexController.start))
+      }
   }
 }

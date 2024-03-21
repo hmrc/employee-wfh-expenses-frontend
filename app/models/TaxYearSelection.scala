@@ -21,25 +21,25 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
-sealed trait SelectTaxYearsToClaimFor
+sealed trait TaxYearSelection
 
-object SelectTaxYearsToClaimFor extends Enumerable.Implicits {
+object TaxYearSelection extends Enumerable.Implicits {
 
-  case object Option1 extends WithName("option1") with SelectTaxYearsToClaimFor
-  case object Option2 extends WithName("option2") with SelectTaxYearsToClaimFor
-  case object Option3 extends WithName("option3") with SelectTaxYearsToClaimFor
-  case object Option4 extends WithName("option4") with SelectTaxYearsToClaimFor
-  case object Option5 extends WithName("option5") with SelectTaxYearsToClaimFor
+  case object CurrentYear extends WithName("option1") with TaxYearSelection
+  case object CurrentYearMinus1 extends WithName("option2") with TaxYearSelection
+  case object CurrentYearMinus2 extends WithName("option3") with TaxYearSelection
+  case object CurrentYearMinus3 extends WithName("option4") with TaxYearSelection
+  case object CurrentYearMinus4 extends WithName("option5") with TaxYearSelection
 
-  val valuesAll: Seq[SelectTaxYearsToClaimFor] = Seq(
-    Option1, // 2024-2025 (CY)
-    Option2, // 2023-2024 (CY-1)
-    Option3, // 2022-2023 (CY-2)
-    Option4, // 2021-2022 (CY-3)
-    Option5 // 2020-2021 (CY-4)
+  val valuesAll: Seq[TaxYearSelection] = Seq(
+    CurrentYear, // 2024-2025 (CY)
+    CurrentYearMinus1, // 2023-2024 (CY-1)
+    CurrentYearMinus2, // 2022-2023 (CY-2)
+    CurrentYearMinus3, // 2021-2022 (CY-3)
+    CurrentYearMinus4 // 2020-2021 (CY-4)
   )
 
-  def options(form: Form[_], values: Seq[SelectTaxYearsToClaimFor])(implicit messages: Messages): Seq[CheckboxItem] = values.map {
+  def options(form: Form[_], values: Seq[TaxYearSelection])(implicit messages: Messages): Seq[CheckboxItem] = values.map {
     value =>
       CheckboxItem(
         name = Some("value[]"),
@@ -50,20 +50,20 @@ object SelectTaxYearsToClaimFor extends Enumerable.Implicits {
       )
   }
 
-  implicit val enumerable: Enumerable[SelectTaxYearsToClaimFor] =
+  implicit val enumerable: Enumerable[TaxYearSelection] =
     Enumerable(valuesAll.map(v => v.toString -> v): _*)
 
   def getValuesFromClaimedBooleans(claimed2020: Boolean,
                                    claimed2021: Boolean,
                                    claimed2022: Boolean,
                                    claimed2023: Boolean,
-                                   claimed2024: Boolean): Seq[SelectTaxYearsToClaimFor] = {
+                                   claimed2024: Boolean): Seq[TaxYearSelection] = {
     Seq(
-      if (claimed2024) None else Some(Option1),
-      if (claimed2023) None else Some(Option2),
-      if (claimed2022) None else Some(Option3),
-      if (claimed2021) None else Some(Option4),
-      if (claimed2020) None else Some(Option5)
+      if (claimed2024) None else Some(CurrentYear),
+      if (claimed2023) None else Some(CurrentYearMinus1),
+      if (claimed2022) None else Some(CurrentYearMinus2),
+      if (claimed2021) None else Some(CurrentYearMinus3),
+      if (claimed2020) None else Some(CurrentYearMinus4)
     ).flatten
   }
 

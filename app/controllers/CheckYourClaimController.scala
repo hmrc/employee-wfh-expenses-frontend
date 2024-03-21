@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions._
+import models.TaxYearSelection.CurrentYearMinus1
 import pages.{NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -46,7 +47,7 @@ class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
           val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
           val numberOfWeeksIn2023 = if (selectedTaxYears.contains2023) {
-            request.userAnswers.get(NumberOfWeeksToClaimForPage)
+            request.userAnswers.get(NumberOfWeeksToClaimForPage).flatMap(_.get(CurrentYearMinus1))
           } else {
             None
           }
@@ -62,7 +63,7 @@ class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
-      val numberOfWeeksOf2023 = if (selectedTaxYears.contains2023) request.userAnswers.get(NumberOfWeeksToClaimForPage) else None
+      val numberOfWeeksOf2023 = if (selectedTaxYears.contains2023) request.userAnswers.get(NumberOfWeeksToClaimForPage).flatMap(_.get(CurrentYearMinus1)) else None
 
       submissionService.submitExpenses(
         selectedTaxYears = selectedTaxYears.checkboxYearOptions,

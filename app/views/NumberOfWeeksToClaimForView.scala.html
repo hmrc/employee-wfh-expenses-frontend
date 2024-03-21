@@ -56,7 +56,7 @@
 
     <p class="govuk-body">@currentYearContent</p>
 
-    @formHelper(action = NumberOfWeeksToClaimForController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = NumberOfWeeksToClaimForController.onSubmitSingle(), Symbol("autoComplete") -> "off") {
 
         @inputNumber(
             field = form("value"),

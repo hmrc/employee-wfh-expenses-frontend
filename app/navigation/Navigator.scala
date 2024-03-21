@@ -17,7 +17,7 @@
 package navigation
 
 import controllers.routes
-import models.SelectTaxYearsToClaimFor._
+import models.TaxYearSelection._
 import models._
 import pages._
 import play.api.Logging
@@ -59,11 +59,10 @@ class Navigator @Inject()() extends Logging {
   }
 
   def howWeWillCalculateTaxReliefNextPage(userAnswers: UserAnswers): Call = {
-    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll)
+    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(TaxYearSelection.valuesAll)
 
-    if(selectedTaxYears.contains(Option2)) {routes.InformClaimNowInWeeksController.onPageLoad()}
+    if(selectedTaxYears.contains(CurrentYear) || selectedTaxYears.contains(CurrentYearMinus1)) {routes.InformClaimNowInWeeksController.onPageLoad()}
     else {routes.CheckYourClaimController.onPageLoad()}
-    // TODO: Will need updating to include the extra tax year when it is added
   }
 
   def confirmClaimInWeeksNextPage(userAnswers: UserAnswers): Call = {

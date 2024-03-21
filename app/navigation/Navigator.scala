@@ -76,7 +76,7 @@ class Navigator @Inject()() extends Logging {
   }
 
   def howWeWillCalculateTaxReliefNextPage(userAnswers: UserAnswers): Call = {
-    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll.toSet)
+    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll)
 
     if(selectedTaxYears.contains(Option2)) {routes.InformClaimNowInWeeksController.onPageLoad()}
     else if(selectedTaxYears.contains(Option5)) {routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()}
@@ -85,7 +85,7 @@ class Navigator @Inject()() extends Logging {
   }
 
   def confirmClaimInWeeksNextPage(userAnswers: UserAnswers): Call = {
-    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll.toSet)
+    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll)
     val onwardRoute = if(selectedTaxYears.contains(Option5)) {
       routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
     } else {

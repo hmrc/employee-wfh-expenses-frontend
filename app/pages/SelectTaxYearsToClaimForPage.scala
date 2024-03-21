@@ -19,7 +19,7 @@ package pages
 import models.SelectTaxYearsToClaimFor
 import play.api.libs.json.JsPath
 
-case object SelectTaxYearsToClaimForPage extends QuestionPage[Set[SelectTaxYearsToClaimFor]] {
+case object SelectTaxYearsToClaimForPage extends QuestionPage[Seq[SelectTaxYearsToClaimFor]] {
 
   override def path: JsPath = JsPath \ toString
 

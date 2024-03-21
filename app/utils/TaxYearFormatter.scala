@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package forms
+package utils
 
-import javax.inject.Inject
+import play.api.i18n.Messages
 
-import forms.mappings.Mappings
-import play.api.data.Form
-import play.api.data.Forms.seq
-import models.SelectTaxYearsToClaimFor
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
-class SelectTaxYearsToClaimForFormProvider @Inject() extends Mappings {
+case class TaxYearFormatter(taxYears: List[(LocalDate, LocalDate)])(implicit val messages: Messages) {
 
-  def apply(): Form[Seq[SelectTaxYearsToClaimFor]] =
-    Form(
-      "value" -> seq(enumerable[SelectTaxYearsToClaimFor]("selectTaxYearsToClaimFor.error.required"))
-        .verifying(nonEmptySeq("selectTaxYearsToClaimFor.error.required"))
-    )
+  lazy val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", messages.lang.toLocale)
+
+  def formattedTaxYears: List[(String, String)] = {
+    taxYears.map {
+      case (startDate, endDate) => (startDate.format(formatter), endDate.format(formatter))
+    }
+  }
 }

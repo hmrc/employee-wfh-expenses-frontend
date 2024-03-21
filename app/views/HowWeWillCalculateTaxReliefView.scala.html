@@ -14,35 +14,37 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
-@import java.time.LocalDate
-@import utils.DateLanguageTokenizer.DateLanguageTokenizerFormattedItemTuple
-@import models.Date
+@import utils.TaxYearFormatter
+@import utils.TaxYearDates._
 
 @this(
-        layout: views.templates.LayoutProvider,
+        layout:     views.templates.LayoutProvider,
         formHelper: FormWithCSRF,
-        backLink: GovukBackLink,
-        button: GovukButton,
-        govukWarningText : GovukWarningText,
-        frontendAppConfig: FrontendAppConfig
+        backLink:   GovukBackLink,
+        button:     GovukButton
 )
 
-@(showBackLink: Boolean = true, disclaimerViewSettings: DisclaimerViewSettings, startDate: Option[Date])( implicit request: Request[_], messages: Messages)
+@(taxYears: List[(String, String)])( implicit request: Request[_], messages: Messages)
 
-@getYearFromYearTo(dateToken: DateLanguageTokenizerFormattedItemTuple) = {
-    @if(dateToken._2.year == 2021) {
-        @defining(dateToken._2.day + 1){ lastDayPlusOne =>
-            <h2 class="govuk-heading-m">@messages("howWeWillCalculateTaxRelief.previous.years.before.text") @lastDayPlusOne @messages(dateToken._2.month) @dateToken._2.year</h2>
-        }
-    } else {
-        <h2 class="govuk-heading-m">@dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("howWeWillCalculateTaxRelief.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</h2>
+@getTaxYearContent(taxYear: (String, String)) = {
+    <h2 class="govuk-heading-m">@taxYear._1 @messages("howWeWillCalculateTaxRelief.your.claim.date.to") @taxYear._2</h2>
+    @if(taxYear._1.contains(YEAR_2024.toString) || taxYear._1.contains(YEAR_2023.toString)) {
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")</li>
+            <li>@messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)</li>
+            <li>@messages("howWeWillCalculateTaxRelief.bullet.enter.weeks.text")</li>
+        </ul>
+    } else if(taxYear._1.contains(YEAR_2022.toString) || taxYear._1.contains(YEAR_2021.toString) || taxYear._1.contains(YEAR_2020.toString)) {
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("howWeWillCalculateTaxRelief.bullet.frequency.yearly.text")</li>
+            <li>@messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)</li>
+        </ul>
     }
 }
 
 @layout(
     pageTitle = messages("howWeWillCalculateTaxRelief.title"),
-    beforeContentBlock = if(showBackLink){Some(
+    beforeContentBlock = Some(
         backLink(
             BackLink(
                 href = routes.DisclaimerController.onPageLoad().url,
@@ -50,43 +52,17 @@
                 attributes = Map("id" -> "back-link")
             )
         )
-    )}
-    else None
+    )
 ) {
     @formHelper(action = routes.HowWeWillCalculateTaxReliefController.onSubmit(), Symbol("autoComplete") -> "off") {
+        <h1 class="govuk-heading-xl">@messages("howWeWillCalculateTaxRelief.heading")</h1>
 
-    <h1 class="govuk-heading-xl">@messages("howWeWillCalculateTaxRelief.heading")</h1>
+        <p class="govuk-inset-text">@messages("howWeWillCalculateTaxRelief.eligibility.inset.text")</p>
 
-    <p class="govuk-inset-text">@messages("howWeWillCalculateTaxRelief.eligibility.inset.text")</p>
-
-    @if(disclaimerViewSettings.claimViewSettings.get.datesToClaim != List.empty) {
-
-        @for(dateToken <- disclaimerViewSettings.claimViewSettings.get.datesToClaim) {
-            @getYearFromYearTo(dateToken)
-                @if(dateToken._1.year == 2023 && dateToken._2.year == 2024) {
-                    <ul class="govuk-list govuk-list--bullet">
-                        <li>@messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")</li>
-                        <li>@messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)</li>
-                        <li>@messages("howWeWillCalculateTaxRelief.bullet.enter.weeks.text")</li>
-                    </ul>
-                }
-                @if((dateToken._1.year == 2022 && dateToken._2.year == 2023) || (dateToken._1.year == 2021 && dateToken._2.year == 2022)) {
-                    <ul class="govuk-list govuk-list--bullet">
-                        <li>@messages("howWeWillCalculateTaxRelief.bullet.frequency.yearly.text")</li>
-                        <li>@messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)</li>
-                    </ul>
-                }
-                @if(dateToken._1.year == 2020 && dateToken._2.year == 2021) {
-                    <p class="govuk-inset-text">@messages("howWeWillCalculateTaxRelief.end.date.inset.text")</p>
-                    <ul class="govuk-list govuk-list--bullet">
-                        <li>@messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")</li>
-                        <li>@messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 4)</li>
-                        <li>@messages("howWeWillCalculateTaxRelief.bullet.enter.start.date.text")</li>
-                    </ul>
-                }
+        @for(taxYear <- taxYears) {
+            @getTaxYearContent(taxYear)
         }
-    }
 
-     @button(Button(content = Text(messages("site.continue"))))
+        @button(Button(content = Text(messages("site.continue"))))
     }
 }

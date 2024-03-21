@@ -45,7 +45,7 @@ class SelectTaxYearsToClaimForController @Inject()(override val messagesApi: Mes
                                                   )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport with Logging {
 
-  val form: Form[Set[SelectTaxYearsToClaimFor]] = formProvider()
+  val form: Form[Seq[SelectTaxYearsToClaimFor]] = formProvider()
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>

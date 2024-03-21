@@ -29,41 +29,40 @@ import javax.inject.{Inject, Singleton}
 class Navigator @Inject()() extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
-    case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
-    case DisclaimerPage => _ => routes.HowWeWillCalculateTaxReliefController.onPageLoad()
+    case ClaimedForTaxYear2020           => ua => claimJourneyFlow(ua)
+    case SelectTaxYearsToClaimForPage    => _  => routes.DisclaimerController.onPageLoad()
+    case DisclaimerPage                  => _  => routes.HowWeWillCalculateTaxReliefController.onPageLoad()
     case HowWeWillCalculateTaxReliefPage => ua => howWeWillCalculateTaxReliefNextPage(ua)
-    case InformClaimNowInWeeksPage => _ => routes.NumberOfWeeksToClaimForController.onPageLoad()
-    case NumberOfWeeksToClaimForPage => _ => routes.ConfirmClaimInWeeksController.onPageLoad()
-    case ConfirmClaimInWeeksPage => ua => confirmClaimInWeeksNextPage(ua)
-    case CheckYourClaimPage => ua => checkYourClaimPage(ua)
+    case InformClaimNowInWeeksPage       => _  => routes.NumberOfWeeksToClaimForController.onPageLoad()
+    case NumberOfWeeksToClaimForPage     => _  => routes.ConfirmClaimInWeeksController.onPageLoad()
+    case ConfirmClaimInWeeksPage         => ua => confirmClaimInWeeksNextPage(ua)
     case _ => _ => routes.IndexController.start
   }
 
   def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
 
-  def checkYourClaimPage(userAnswers: UserAnswers): Call = {
-    routes.DisclaimerController.onPageLoad()
-  }
-
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
-    (userAnswers.get(ClaimedForTaxYear2020),
+    (
+      userAnswers.get(ClaimedForTaxYear2020),
       userAnswers.get(ClaimedForTaxYear2021),
       userAnswers.get(ClaimedForTaxYear2022),
       userAnswers.get(ClaimedForTaxYear2023),
-      userAnswers.get(ClaimedForTaxYear2024)) match {
+      userAnswers.get(ClaimedForTaxYear2024)
+    ) match {
       case (Some(_), Some(_), Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
-      case (None, None, None, None, None) => routes.IndexController.start
-      case (_, _, _, _, _) => routes.TechnicalDifficultiesController.onPageLoad
+      case (None, None, None, None, None)                => routes.IndexController.start
+      case (_, _, _, _, _)                               => routes.TechnicalDifficultiesController.onPageLoad
     }
   }
 
   def howWeWillCalculateTaxReliefNextPage(userAnswers: UserAnswers): Call = {
     val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll)
 
-    if(selectedTaxYears.contains(Option2)) {routes.InformClaimNowInWeeksController.onPageLoad()}
-    else {routes.CheckYourClaimController.onPageLoad()}
-    // TODO: Will need updating to include the extra tax year when it is added
+    if(selectedTaxYears.contains(Option2) || selectedTaxYears.contains(Option1)) {
+      routes.InformClaimNowInWeeksController.onPageLoad()
+    } else {
+      routes.CheckYourClaimController.onPageLoad()
+    }
   }
 
   def confirmClaimInWeeksNextPage(userAnswers: UserAnswers): Call = {

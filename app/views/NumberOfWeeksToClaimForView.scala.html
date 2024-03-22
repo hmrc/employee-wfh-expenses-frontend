@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import utils.DateLanguageTokenizer
+@import utils.TaxYearFormatter
 @import utils.TaxYearDates._
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
 
@@ -30,10 +30,8 @@
 @(form: Form[_])(implicit request: Request[_], messages: Messages)
 
 @currentYearContent = @{
-    val (dateFrom, dateTo) = DateLanguageTokenizer.convertDate(TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE)
-    val dateFromString = s"${dateFrom.day} ${messages(dateFrom.month)} ${dateFrom.year}"
-    val dateToString = s"${dateTo.day} ${messages(dateTo.month)} ${dateTo.year}"
-    messages("numberOfWeeksToClaimFor.para", dateFromString, dateToString)
+    val formattedDates = TaxYearFormatter(List((TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE))).formattedTaxYears.head
+    messages("numberOfWeeksToClaimFor.para", formattedDates._1, formattedDates._2)
 }
 
 @layout(

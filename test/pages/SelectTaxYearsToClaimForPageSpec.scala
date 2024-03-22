@@ -23,10 +23,10 @@ class SelectTaxYearsToClaimForPageSpec extends PageBehaviours {
 
   "SelectTaxYearsToClaimForPage" must {
 
-    beRetrievable[Set[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
+    beRetrievable[Seq[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
 
-    beSettable[Set[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
+    beSettable[Seq[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
 
-    beRemovable[Set[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
+    beRemovable[Seq[SelectTaxYearsToClaimFor]](SelectTaxYearsToClaimForPage)
   }
 }

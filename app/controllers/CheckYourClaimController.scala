@@ -17,15 +17,14 @@
 package controllers
 
 import controllers.actions._
-import models.Date
-import pages.{NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage, WhenDidYouFirstStartWorkingFromHomePage}
+import pages.{NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.TaxYearDates._
 import views.html._
+import utils.TaxYearFormatter
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -47,22 +46,16 @@ class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
         case Some(_) =>
           val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
-          val startDate: Option[Date] = request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-
-          val numberOfWeeksIn2019 = if (startDate.isDefined) {
-            numberOfWeeks(startDate.get.date, TAX_YEAR_2019_END_DATE)
-          } else {
-            0
-          }
-
           val numberOfWeeksIn2023 = if (selectedTaxYears.contains2023) {
             request.userAnswers.get(NumberOfWeeksToClaimForPage)
           } else {
             None
           }
 
-          Ok(checkYourClaimView(claimViewSettings(selectedTaxYears.assembleWholeYears), startDate, numberOfWeeksIn2019,
-            numberOfWeeksIn2023, selectedTaxYears.checkboxYearOptions))
+          val wholeTaxYears = selectedTaxYears.assembleWholeYears
+          val formattedWholeTaxYears = TaxYearFormatter(wholeTaxYears).formattedTaxYears
+
+          Ok(checkYourClaimView(formattedWholeTaxYears, numberOfWeeksIn2023, selectedTaxYears.checkboxYearOptions))
         case None =>
           Redirect(routes.IndexController.start)
       }
@@ -73,11 +66,9 @@ class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
-      val startDate = if (selectedTaxYears.contains2020) request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) else None
       val numberOfWeeksOf2023 = if (selectedTaxYears.contains2023) request.userAnswers.get(NumberOfWeeksToClaimForPage) else None
 
       submissionService.submitExpenses(
-        startDate = startDate,
         selectedTaxYears = selectedTaxYears.checkboxYearOptions,
         numberOfWeeksOf2023 = numberOfWeeksOf2023
       ) map {

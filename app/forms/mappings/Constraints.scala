@@ -85,9 +85,9 @@ trait Constraints {
     }
 
 
-  protected def nonEmptySet(errorKey: String): Constraint[Set[_]] =
+  protected def nonEmptySeq(errorKey: String): Constraint[Seq[_]] =
     Constraint {
-      case set if set.nonEmpty =>
+      case seq if seq.nonEmpty =>
         Valid
       case _ =>
         Invalid(errorKey)

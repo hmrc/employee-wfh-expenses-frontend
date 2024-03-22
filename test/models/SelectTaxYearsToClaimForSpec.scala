@@ -26,33 +26,33 @@ import play.api.libs.json.{JsError, JsString, Json}
 
 class SelectTaxYearsToClaimForSpec extends AnyWordSpec with Matchers with ScalaCheckPropertyChecks with OptionValues with ModelGenerators {
 
-  "SelectTaxYearsToClaimFor" must {
+  "TaxYearSelection" must {
 
     "deserialise valid values" in {
 
-      val gen = arbitrary[SelectTaxYearsToClaimFor]
+      val gen = arbitrary[TaxYearSelection]
 
       forAll(gen) {
         selectTaxYearsToClaimFor =>
 
-          JsString(selectTaxYearsToClaimFor.toString).validate[SelectTaxYearsToClaimFor].asOpt.value mustEqual selectTaxYearsToClaimFor
+          JsString(selectTaxYearsToClaimFor.toString).validate[TaxYearSelection].asOpt.value mustEqual selectTaxYearsToClaimFor
       }
     }
 
     "fail to deserialise invalid values" in {
 
-      val gen = arbitrary[String] suchThat (!SelectTaxYearsToClaimFor.valuesAll.map(_.toString).contains(_))
+      val gen = arbitrary[String] suchThat (!TaxYearSelection.valuesAll.map(_.toString).contains(_))
 
       forAll(gen) {
         invalidValue =>
 
-          JsString(invalidValue).validate[SelectTaxYearsToClaimFor] mustEqual JsError("error.invalid")
+          JsString(invalidValue).validate[TaxYearSelection] mustEqual JsError("error.invalid")
       }
     }
 
     "serialise" in {
 
-      val gen = arbitrary[SelectTaxYearsToClaimFor]
+      val gen = arbitrary[TaxYearSelection]
 
       forAll(gen) {
         selectTaxYearsToClaimFor =>

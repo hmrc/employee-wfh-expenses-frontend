@@ -18,6 +18,7 @@ package controllers
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
 import forms.ConfirmClaimInWeeksFormProvider
+import models.TaxYearSelection.CurrentYearMinus1
 import navigation.Navigator
 import pages.{ConfirmClaimInWeeksPage, NumberOfWeeksToClaimForPage}
 import play.api.Logging
@@ -45,7 +46,7 @@ class ConfirmClaimInWeeksController @Inject()(override val messagesApi: Messages
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      request.userAnswers.get(NumberOfWeeksToClaimForPage).fold(Redirect(routes.SessionExpiredController.onPageLoad)) {
+      request.userAnswers.get(NumberOfWeeksToClaimForPage).flatMap(_.get(CurrentYearMinus1)).fold(Redirect(routes.SessionExpiredController.onPageLoad)) {
         numberOfWeeksToConfirm =>
           val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm)
 
@@ -60,7 +61,7 @@ class ConfirmClaimInWeeksController @Inject()(override val messagesApi: Messages
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers.get(NumberOfWeeksToClaimForPage).fold(Future.successful(Redirect(routes.SessionExpiredController.onPageLoad))) {
+      request.userAnswers.get(NumberOfWeeksToClaimForPage).flatMap(_.get(CurrentYearMinus1)).fold(Future.successful(Redirect(routes.SessionExpiredController.onPageLoad))) {
         numberOfWeeksToConfirm =>
           val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm)
 

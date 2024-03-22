@@ -17,7 +17,7 @@
 package navigation
 
 import controllers.routes
-import models.SelectTaxYearsToClaimFor._
+import models.TaxYearSelection._
 import models._
 import pages._
 import play.api.Logging
@@ -29,13 +29,13 @@ import javax.inject.{Inject, Singleton}
 class Navigator @Inject()() extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case ClaimedForTaxYear2020           => ua => claimJourneyFlow(ua)
-    case SelectTaxYearsToClaimForPage    => _  => routes.DisclaimerController.onPageLoad()
-    case DisclaimerPage                  => _  => routes.HowWeWillCalculateTaxReliefController.onPageLoad()
+    case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
+    case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
+    case DisclaimerPage => _ => routes.HowWeWillCalculateTaxReliefController.onPageLoad()
     case HowWeWillCalculateTaxReliefPage => ua => howWeWillCalculateTaxReliefNextPage(ua)
-    case InformClaimNowInWeeksPage       => _  => routes.NumberOfWeeksToClaimForController.onPageLoad()
-    case NumberOfWeeksToClaimForPage     => _  => routes.ConfirmClaimInWeeksController.onPageLoad()
-    case ConfirmClaimInWeeksPage         => ua => confirmClaimInWeeksNextPage(ua)
+    case InformClaimNowInWeeksPage => _ => routes.NumberOfWeeksToClaimForController.onPageLoad()
+    case NumberOfWeeksToClaimForPage => _ => routes.ConfirmClaimInWeeksController.onPageLoad()
+    case ConfirmClaimInWeeksPage => ua => confirmClaimInWeeksNextPage(ua)
     case _ => _ => routes.IndexController.start
   }
 
@@ -50,15 +50,15 @@ class Navigator @Inject()() extends Logging {
       userAnswers.get(ClaimedForTaxYear2024)
     ) match {
       case (Some(_), Some(_), Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
-      case (None, None, None, None, None)                => routes.IndexController.start
-      case (_, _, _, _, _)                               => routes.TechnicalDifficultiesController.onPageLoad
+      case (None, None, None, None, None) => routes.IndexController.start
+      case (_, _, _, _, _) => routes.TechnicalDifficultiesController.onPageLoad
     }
   }
 
   def howWeWillCalculateTaxReliefNextPage(userAnswers: UserAnswers): Call = {
-    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll)
+    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(TaxYearSelection.valuesAll)
 
-    if(selectedTaxYears.contains(Option2) || selectedTaxYears.contains(Option1)) {
+    if (selectedTaxYears.contains(CurrentYear) || selectedTaxYears.contains(CurrentYearMinus1)) {
       routes.InformClaimNowInWeeksController.onPageLoad()
     } else {
       routes.CheckYourClaimController.onPageLoad()
@@ -66,7 +66,7 @@ class Navigator @Inject()() extends Logging {
   }
 
   def confirmClaimInWeeksNextPage(userAnswers: UserAnswers): Call = {
-    if(userAnswers.get(ConfirmClaimInWeeksPage).getOrElse(false)) {
+    if (userAnswers.get(ConfirmClaimInWeeksPage).getOrElse(false)) {
       routes.CheckYourClaimController.onPageLoad()
     } else {
       routes.NumberOfWeeksToClaimForController.onPageLoad()

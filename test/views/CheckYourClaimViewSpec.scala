@@ -55,7 +55,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
       val assembler = TaxYearFromUIAssembler(List("option3"))
       val taxYears = TaxYearFormatter(assembler.assembleWholeYears).formattedTaxYears
 
-      behave like normalPage(view.apply(taxYears, None, optionList)(request, messages), "checkYourClaimView")
+      behave like normalPage(view.apply(taxYears, None, optionList)(request, messages), "checkYourClaimView", args = Nil)
     }
   }
 }

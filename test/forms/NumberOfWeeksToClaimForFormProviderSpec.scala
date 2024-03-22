@@ -17,14 +17,30 @@
 package forms
 
 import forms.behaviours.IntFieldBehaviours
+import models.TaxYearSelection.CurrentYear
+import org.scalatestplus.play.guice.GuiceFakeApplicationFactory
 import play.api.data.FormError
+import play.api.i18n.{Lang, Messages, MessagesApi}
 import utils.TaxYearDates.{MAXIMUM_WEEKS_IN_A_YEAR, ONE_WEEK}
 
-class NumberOfWeeksToClaimForFormProviderSpec extends IntFieldBehaviours {
+class NumberOfWeeksToClaimForFormProviderSpec extends IntFieldBehaviours with GuiceFakeApplicationFactory {
+
+  implicit val messages: Messages = fakeApplication().injector.instanceOf[MessagesApi].preferred(Seq(Lang.defaultLang))
+  val formProvider: NumberOfWeeksToClaimForFormProvider = new NumberOfWeeksToClaimForFormProvider
 
   "value" should {
-    val form = new NumberOfWeeksToClaimForFormProvider()()
-    behave like intFieldWithMinimum(form, "value", ONE_WEEK, FormError("value", "numberOfWeeksToClaimFor.error.minimum", List(1)))
-    behave like intFieldWithMaximum(form, "value", MAXIMUM_WEEKS_IN_A_YEAR, FormError("value", "numberOfWeeksToClaimFor.error.maximum", List(52)))
+    val form = formProvider(CurrentYear)
+    behave like intFieldWithMinimum(
+      form,
+      "value",
+      ONE_WEEK,
+      FormError("value", "numberOfWeeksToClaimFor.error.minimum", 1 +: CurrentYear.formattedTaxYearArgs)
+    )
+    behave like intFieldWithMaximum(
+      form,
+      "value",
+      MAXIMUM_WEEKS_IN_A_YEAR,
+      FormError("value", "numberOfWeeksToClaimFor.error.maximum", 52 +: CurrentYear.formattedTaxYearArgs)
+    )
   }
 }

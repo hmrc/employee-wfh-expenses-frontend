@@ -16,21 +16,24 @@
 
 package controllers
 
+import controllers.NumberOfWeeksToClaimForController.yearsWithoutWeeks
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
+import forms.NumberOfWeeksToClaimForFormProvider
+import models.TaxYearSelection
+import models.TaxYearSelection._
 import navigation.Navigator
-import pages.NumberOfWeeksToClaimForPage
+import pages.{NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import services.SessionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.NumberOfWeeksToClaimForView
-import forms.NumberOfWeeksToClaimForFormProvider
-import play.api.data.Form
-import services.SessionService
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: MessagesApi,
                                                   sessionService: SessionService,
                                                   identify: IdentifierAction,
@@ -41,31 +44,51 @@ class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: Mess
                                                   numberOfWeeksToClaimForView: NumberOfWeeksToClaimForView,
                                                   formProvider: NumberOfWeeksToClaimForFormProvider,
                                                   val controllerComponents: MessagesControllerComponents
-                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
-
-  val form: Form[Int] = formProvider()
+                                                 )(implicit ec: ExecutionContext)
+  extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      val preparedForm = request.userAnswers.get(NumberOfWeeksToClaimForPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+      request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(yearsWithoutWeeks.contains)) match {
+        case Some(taxYear :: Nil) =>
+          val preparedForm = request.userAnswers
+            .get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)
+            .flatMap(_.get(taxYear)) match {
+            case None => formProvider(taxYear)
+            case Some(value) => formProvider(taxYear).fill(value)
+          }
+
+          Ok(numberOfWeeksToClaimForView(preparedForm, taxYear))
+        case Some(list) if list.size > 1 =>
+          NotImplemented
+        case _ =>
+          Redirect(routes.IndexController.start)
       }
-
-      Ok(numberOfWeeksToClaimForView(preparedForm))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
+  def onSubmit: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors => {
-          Future.successful(BadRequest(numberOfWeeksToClaimForView(formWithErrors)))
-        },
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(NumberOfWeeksToClaimForPage, value))
-            _              <- sessionService.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(NumberOfWeeksToClaimForPage, updatedAnswers))
-      )
+      request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(yearsWithoutWeeks.contains)) match {
+        case Some(taxYear :: Nil) =>
+          formProvider(taxYear).bindFromRequest().fold(
+            formWithErrors => {
+              Future.successful(BadRequest(numberOfWeeksToClaimForView(formWithErrors, taxYear)))
+            },
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers
+                  .set(NumberOfWeeksToClaimForPage, Map(taxYear -> value))(NumberOfWeeksToClaimForPage.format))
+                _ <- sessionService.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(NumberOfWeeksToClaimForPage, updatedAnswers))
+          )
+        case Some(list) if list.size > 1 =>
+          Future.successful(NotImplemented)
+        case _ =>
+          Future.successful(Redirect(routes.IndexController.start))
+      }
   }
+}
+
+object NumberOfWeeksToClaimForController {
+  val yearsWithoutWeeks: Seq[TaxYearSelection] = Seq(CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4)
 }

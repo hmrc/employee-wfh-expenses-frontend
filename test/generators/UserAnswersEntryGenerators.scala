@@ -16,7 +16,7 @@
 
 package generators
 
-import models.SelectTaxYearsToClaimFor
+import models.TaxYearSelection
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import pages._
@@ -28,7 +28,7 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
     Arbitrary {
       for {
         page  <- arbitrary[SelectTaxYearsToClaimForPage.type]
-        value <- arbitrary[SelectTaxYearsToClaimFor].map(Json.toJson(_))
+        value <- arbitrary[TaxYearSelection].map(Json.toJson(_))
       } yield (page, value)
     }
 

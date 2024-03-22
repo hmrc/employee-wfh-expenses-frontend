@@ -16,11 +16,24 @@
 
 package pages
 
-import play.api.libs.json.JsPath
+import models.TaxYearSelection
+import play.api.libs.json._
 
-case object NumberOfWeeksToClaimForPage extends QuestionPage[Int] {
+case object NumberOfWeeksToClaimForPage extends QuestionPage[Map[TaxYearSelection, Int]] {
 
   override def path: JsPath = JsPath \ toString
 
   override def toString: String = "numberOfWeeksToClaimForPage"
+
+  val format: Format[Map[TaxYearSelection, Int]] = new Format[Map[TaxYearSelection, Int]] {
+    override def reads(json: JsValue): JsResult[Map[TaxYearSelection, Int]] =
+      json.validate[Map[TaxYearSelection, Int]]
+
+    override def writes(answerMap: Map[TaxYearSelection, Int]): JsValue =
+      Json.toJson(
+        answerMap.map { case (taxYear, weeks) =>
+          taxYear.toString -> weeks
+        }
+      )
+  }
 }

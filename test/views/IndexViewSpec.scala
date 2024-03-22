@@ -34,6 +34,6 @@ class IndexViewSpec extends ViewBehaviours {
 
     val applyView = view.apply()(request, messages)
 
-    behave like normalPage(applyView, "index", "heading")
+    behave like normalPage(applyView, "index", args = Nil, ("heading", Nil))
   }
 }

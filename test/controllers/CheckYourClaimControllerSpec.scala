@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.SelectTaxYearsToClaimFor.{Option1, Option2, Option3, Option4}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3}
 import models.UserAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
@@ -40,7 +40,7 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
         userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
-          SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString, Option3.toString, Option4.toString),
+          SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString, CurrentYearMinus1.toString, CurrentYearMinus2.toString, CurrentYearMinus3.toString),
           NumberOfWeeksToClaimForPage.toString -> 3
         )
       )
@@ -66,7 +66,7 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
         userAnswersId,
         Json.obj(
           ClaimedForTaxYear2020.toString -> false,
-          SelectTaxYearsToClaimForPage.toString -> Json.arr(Option2.toString)
+          SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYearMinus1.toString)
         )
       )
 

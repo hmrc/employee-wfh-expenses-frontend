@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.SelectTaxYearsToClaimFor.{Option1, Option2}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1}
 import models.UserAnswers
 import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage}
 import play.api.libs.json.Json
@@ -35,54 +35,54 @@ class HowWeWillCalculateTaxReliefControllerSpec extends SpecBase {
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> true,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString),
             )
           ),
           true,
-          List(Option1.toString)
+          List(CurrentYear.toString)
         ) ,
         (
           "not SA enrolled and has already claimed expenses for multiple years", UserAnswers(
           userAnswersId,
           Json.obj(
             ClaimedForTaxYear2020.toString -> true,
-            SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString, Option2.toString),
+            SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString, CurrentYearMinus1.toString),
           )
         ),
           true,
-          List(Option1.toString, Option2.toString)
+          List(CurrentYear.toString, CurrentYearMinus1.toString)
         ) ,
         (
           "not SA enrolled and hasn't already claimed but have chosen only to claim for 2021", UserAnswers(
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> false,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString)
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString)
             )
           ),
           true,
-          List(Option1.toString)
+          List(CurrentYear.toString)
         ),
         (
           "is SA enrolled and has already claimed expenses for 2020", UserAnswers(
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> true,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString),
             )
           ),
           true,
-          List(Option1.toString)),
+          List(CurrentYear.toString)),
         (
           "is SA enrolled and hasn't already claimed expenses for 2020", UserAnswers(
             userAnswersId,
             Json.obj(
               ClaimedForTaxYear2020.toString -> false,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(Option1.toString),
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString),
             )
           ),
           true,
-          List(Option1.toString)
+          List(CurrentYear.toString)
         )
       )
       for((desc, userAnswer, _, _) <- tests) {

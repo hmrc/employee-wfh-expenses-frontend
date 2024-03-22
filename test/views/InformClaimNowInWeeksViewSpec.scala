@@ -32,7 +32,7 @@ class InformClaimNowInWeeksViewSpec extends ViewBehaviours{
     val request = FakeRequest(GET, routes.InformClaimNowInWeeksController.onPageLoad().url)
     val applyView = view.apply()(request, messages)
 
-    behave like normalPage(applyView, "informClaimNowInWeeks")
+    behave like normalPage(applyView, "informClaimNowInWeeks", args = Nil)
     behave like pageWithBackLink(applyView)
   }
 }

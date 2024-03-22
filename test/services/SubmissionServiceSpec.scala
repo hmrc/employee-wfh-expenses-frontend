@@ -17,9 +17,9 @@
 package services
 
 import java.time.LocalDate
-
 import base.SpecBase
 import connectors.{CitizenDetailsConnector, TaiConnector}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4}
 import models.auditing.AuditEventType.{UpdateWorkingFromHomeFlatRateFailure, UpdateWorkingFromHomeFlatRateSuccess}
 import models.requests.DataRequest
 import models.{AuditData, ETag, UserAnswers}
@@ -41,7 +41,6 @@ import scala.concurrent.Future
 // scalastyle:off magic.number
 class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
 
-  val TAX_YEAR_1999_START_DATE: LocalDate = LocalDate.of(1999, 4, 6)
   val YEAR_2020_START_DATE: LocalDate = LocalDate.of(2020, 1, 1)
   val TAX_YEAR_2020_START_DATE: LocalDate = LocalDate.of(2020, 4, 6)
   val TAX_YEAR_2020_END_DATE: LocalDate = LocalDate.of(2021, 4, 5)
@@ -103,16 +102,16 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     val etag3 = ETag(102)
     val etag4 = ETag(103)
     val etag5 = ETag(104)
-    val claimingFor2024 = List("option1")
-    val claimingFor2023 = List("option2")
-    val claimingFor2022 = List("option3")
-    val claimingFor2021 = List("option4")
-    val claimingFor2020 = List("option5")
-    val claimingForAll = List("option1", "option2", "option3", "option4", "option5")
-    val claimingFor2022And2021 = List("option3", "option4")
-    val claimingFor2021And2020 = List("option4", "option5")
-    val claimingFor2022And2020 = List("option3", "option5")
-    val claimingFor2023And2020 = List("option2", "option5")
+    val claimingFor2024 = Seq(CurrentYear)
+    val claimingFor2023 = Seq(CurrentYearMinus1)
+    val claimingFor2022 = Seq(CurrentYearMinus2)
+    val claimingFor2021 = Seq(CurrentYearMinus3)
+    val claimingFor2020 = Seq(CurrentYearMinus4)
+    val claimingForAll = Seq(CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4)
+    val claimingFor2022And2021 = Seq(CurrentYearMinus2, CurrentYearMinus3)
+    val claimingFor2021And2020 = Seq(CurrentYearMinus3, CurrentYearMinus4)
+    val claimingFor2022And2020 = Seq(CurrentYearMinus2, CurrentYearMinus4)
+    val claimingFor2023And2020 = Seq(CurrentYearMinus1, CurrentYearMinus4)
 
     def verifySessionGotSubmittedState = {
       verify(mockSessionService).set(userAnswersArgumentCaptor.capture())(any())
@@ -135,7 +134,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), any(), eqm(etag4))(any(), any())).thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2022, None)).isRight mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2022, Map())).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -148,7 +147,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2022, None)).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2022, Map())).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -173,7 +172,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), eqm(etag3))(any(), any())).thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2021, None)).isRight mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2021, Map())).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -186,7 +185,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2021, None)).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2021, Map())).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -217,7 +216,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), any())(any(), any())).thenReturn(Future.successful(()))
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), any(), any())(any(), any())).thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2022And2021, None)).isRight mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2022And2021, Map())).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -230,7 +229,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2020, None)).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2020, Map())).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -258,7 +257,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), any())(any(), any())).thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2020, None)).isRight mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2020, Map())).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -271,7 +270,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2020, None)).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2020, Map())).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -298,7 +297,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any()))
           .thenReturn(Future.failed(UpstreamErrorResponse("SERVICE IS UNAVAILABLE", SERVICE_UNAVAILABLE)))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2020, None)).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2020, Map())).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -340,7 +339,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), any(), any())(any(), any())).thenReturn(Future.successful(()))
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2023), any(), any())(any(), any())).thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingForAll, Some(3))).isRight mustBe true
+        await(serviceUnderTest.submitExpenses(claimingForAll, Map(CurrentYearMinus1 -> 3))).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -353,7 +352,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2020, None)).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2020, Map())).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -391,7 +390,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), any(), any())(any(), any()))
           .thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingForAll, None)).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingForAll, Map())).isLeft mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
@@ -419,7 +418,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), any())(any(), any())).thenReturn(Future.successful(()))
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), any())(any(), any())).thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2021And2020, None)).isRight mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2021And2020, Map())).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -432,7 +431,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2021And2020, None)).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2021And2020, Map())).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -464,7 +463,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), any())(any(), any())).thenReturn(Future.successful(()))
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), any(), any())(any(), any())).thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2022And2020, None)).isRight mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2022And2020, Map())).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -477,7 +476,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2022And2020, None)).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2022And2020, Map())).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -501,7 +500,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), eqm(etag2))(any(), any()))
           .thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2021And2020, None)).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2021And2020, Map())).isLeft mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
@@ -523,7 +522,28 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2023), any(), any())(any(), any())).thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2023, Some(3))).isRight mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2023, Map(CurrentYearMinus1 -> 3))).isRight mustBe true
+
+        verify(mockAuditConnector, times(1))
+          .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
+
+        verifySessionGotSubmittedState
+      }
+    }
+
+    s"only claiming for 3 weeks of the 2024/25 tax year" should {
+      "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
+        when(mockThrottler.enabled).thenReturn(false)
+        when(mockThrottler.withToken(any())).thenCallRealMethod()
+
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.successful(
+            etag1
+          ))
+
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2024), any(), any())(any(), any())).thenReturn(Future.successful(()))
+
+        await(serviceUnderTest.submitExpenses(claimingFor2024, Map(CurrentYear -> 3))).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -551,7 +571,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), any())(any(), any())).thenReturn(Future.successful(()))
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2023), any(), any())(any(), any())).thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2023And2020, Some(3))).isRight mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2023And2020, Map(CurrentYearMinus1 -> 3))).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -564,7 +584,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2023And2020, Some(3))).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2023And2020, Map(CurrentYear -> 3))).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -585,7 +605,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockThrottler.withToken(any())).thenCallRealMethod()
 
         intercept[TooManyRequestException] {
-          await(serviceUnderTest.submitExpenses(claimingForAll, Some(5)))
+          await(serviceUnderTest.submitExpenses(claimingForAll, Map(CurrentYear -> 5, CurrentYearMinus1 -> 5)))
         }
       }
 

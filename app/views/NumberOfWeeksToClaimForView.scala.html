@@ -14,28 +14,28 @@
  * limitations under the License.
  *@
 
-@import utils.TaxYearFormatter
-@import utils.TaxYearDates._
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-
 @this(
-    layout: views.templates.LayoutProvider,
-    formHelper: FormWithCSRF,
-    errorSummary: GovukErrorSummary,
-    backLink: GovukBackLink,
-    button: GovukButton,
-    inputNumber: components.input_number
+        layout: views.templates.LayoutProvider,
+        formHelper: FormWithCSRF,
+        errorSummary: GovukErrorSummary,
+        backLink: GovukBackLink,
+        button: GovukButton,
+        inputNumber: components.input_number
 )
 
-@(form: Form[_])(implicit request: Request[_], messages: Messages)
+@(form: Form[_], taxYear: TaxYearSelection)(implicit request: Request[_], messages: Messages)
 
-@currentYearContent = @{
-    val formattedDates = TaxYearFormatter(List((TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE))).formattedTaxYears.head
-    messages("numberOfWeeksToClaimFor.para", formattedDates._1, formattedDates._2)
+
+@prefix = @{
+    if(taxYear.equals(TaxYearSelection.CurrentYear)) {
+        s"numberOfWeeksToClaimFor"
+    } else {
+        s"numberOfWeeksToClaimFor.previous"
+    }
 }
 
 @layout(
-    pageTitle = s"${errorPrefix(form)} ${messages("numberOfWeeksToClaimFor.title")}",
+    pageTitle = s"${errorPrefix(form)} ${messages(s"$prefix.title", taxYear.formattedTaxYearArgs: _*)}",
     beforeContentBlock = Some(backLink(BackLink(
         href = routes.InformClaimNowInWeeksController.onPageLoad().url,
         content = Text(messages("site.back")),
@@ -50,21 +50,20 @@
         ))
     }
 
-    <h1 class="govuk-heading-xl">@messages("numberOfWeeksToClaimFor.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages(s"$prefix.heading", taxYear.formattedTaxYearArgs: _*)</h1>
 
-    <p class="govuk-body">@currentYearContent</p>
+    <p class="govuk-body">@messages(s"$prefix.para", taxYear.formattedTaxYearArgs: _*)</p>
 
-    @formHelper(action = NumberOfWeeksToClaimForController.onSubmit(), Symbol("autoComplete") -> "off") {
-
+    @formHelper(action = routes.NumberOfWeeksToClaimForController.onSubmit(), Symbol("autoComplete") -> "off") {
         @inputNumber(
             field = form("value"),
-            hintText = Some(messages("numberOfWeeksToClaimFor.hinttext")),
-            question = messages("numberOfWeeksToClaimFor.question"),
+            hintText = Some(messages(s"$prefix.hintText")),
+            question = messages(s"$prefix.question", taxYear.formattedTaxYearArgs: _*),
             name = "value",
             id = "value",
             hideLabel = true
         )
 
-        @button(Button(content = Text(messages("site.continue")), preventDoubleClick  = Some(true)))
+        @button(Button(content = Text(messages("site.continue")), preventDoubleClick = Some(true)))
     }
 }

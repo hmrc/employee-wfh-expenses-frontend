@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.SelectTaxYearsToClaimForFormProvider
-import models.SelectTaxYearsToClaimFor
+import models.TaxYearSelection
 import navigation.Navigator
 import pages._
 import play.api.Logging
@@ -45,7 +45,7 @@ class SelectTaxYearsToClaimForController @Inject()(override val messagesApi: Mes
                                                   )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport with Logging {
 
-  val form: Form[Seq[SelectTaxYearsToClaimFor]] = formProvider()
+  val form: Form[Seq[TaxYearSelection]] = formProvider()
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -57,7 +57,7 @@ class SelectTaxYearsToClaimForController @Inject()(override val messagesApi: Mes
         request.userAnswers.get(ClaimedForTaxYear2024)
       ) match {
         case (Some(claimed2020), Some(claimed2021), Some(claimed2022), Some(claimed2023), Some(claimed2024)) =>
-          val availableYears = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022, claimed2023, claimed2024)
+          val availableYears = TaxYearSelection.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022, claimed2023, claimed2024)
 
           val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
             case None => form
@@ -72,7 +72,7 @@ class SelectTaxYearsToClaimForController @Inject()(override val messagesApi: Mes
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      val availableYearsUserCanClaim = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(
+      val availableYearsUserCanClaim = TaxYearSelection.getValuesFromClaimedBooleans(
         request.userAnswers.get(ClaimedForTaxYear2020).getOrElse(false),
         request.userAnswers.get(ClaimedForTaxYear2021).getOrElse(false),
         request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(false),

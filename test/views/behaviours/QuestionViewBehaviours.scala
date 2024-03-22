@@ -23,7 +23,7 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours {
 
   val errorKey = "value"
   val errorMessage = "error.required"
-  def error(messageKeyPrefix: String) = FormError(errorKey, s"${messageKeyPrefix}.${errorMessage}")
+  def error(messageKeyPrefix: String, args: Seq[String] = Nil) = FormError(errorKey, s"${messageKeyPrefix}.${errorMessage}", args)
 
   val form: Form[A]
 

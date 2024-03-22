@@ -35,7 +35,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
 
     val applyView = view.apply(taxYearList)(fakeRequest, messages)
 
-    behave like normalPage(applyView, "howWeWillCalculateTaxRelief")
+    behave like normalPage(applyView, "howWeWillCalculateTaxRelief", args = Nil)
 
     "show content" when {
       "when all howWeWillCalculateTaxRelief content is displayed for tax year 2024 to 2025" in {

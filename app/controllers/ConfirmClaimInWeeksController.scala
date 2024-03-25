@@ -18,7 +18,6 @@ package controllers
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
 import forms.ConfirmClaimInWeeksFormProvider
-import models.TaxYearSelection.CurrentYearMinus1
 import navigation.Navigator
 import pages.{ConfirmClaimInWeeksPage, NumberOfWeeksToClaimForPage}
 import play.api.Logging
@@ -46,28 +45,38 @@ class ConfirmClaimInWeeksController @Inject()(override val messagesApi: Messages
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      request.userAnswers.get(NumberOfWeeksToClaimForPage).flatMap(_.get(CurrentYearMinus1)).fold(Redirect(routes.SessionExpiredController.onPageLoad)) {
-        numberOfWeeksToConfirm =>
-          val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm)
+      request.userAnswers.get(NumberOfWeeksToClaimForPage) match {
+        case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.size > 1 =>
+          NotImplemented
+        case Some(numberOfWeeksToClaimFor) =>
+            val taxYear = numberOfWeeksToClaimFor.head._1
+            val numberOfWeeks = numberOfWeeksToClaimFor.head._2
+            val form: Form[Boolean] = formProvider(numberOfWeeks)
 
-          val preparedForm = request.userAnswers.get(ConfirmClaimInWeeksPage) match {
-            case None => form
-            case Some(value) => form.fill(value)
-          }
+            val preparedForm = request.userAnswers.get(ConfirmClaimInWeeksPage) match {
+              case None => form
+              case Some(value) => form.fill(value)
+            }
 
-          Ok(confirmClaimInWeeksView(preparedForm, numberOfWeeksToConfirm))
+            Ok(confirmClaimInWeeksView(preparedForm, numberOfWeeks, taxYear))
+        case _ =>
+          Redirect(routes.SessionExpiredController.onPageLoad)
       }
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers.get(NumberOfWeeksToClaimForPage).flatMap(_.get(CurrentYearMinus1)).fold(Future.successful(Redirect(routes.SessionExpiredController.onPageLoad))) {
-        numberOfWeeksToConfirm =>
-          val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm)
+      request.userAnswers.get(NumberOfWeeksToClaimForPage) match {
+        case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.size > 1 =>
+          Future.successful(NotImplemented)
+        case Some(numberOfWeeksToClaimFor) =>
+          val taxYear = numberOfWeeksToClaimFor.head._1
+          val numberOfWeeks = numberOfWeeksToClaimFor.head._2
+          val form: Form[Boolean] = formProvider(numberOfWeeks)
 
           form.bindFromRequest().fold(
             formWithErrors => {
-              Future.successful(BadRequest(confirmClaimInWeeksView(formWithErrors, numberOfWeeksToConfirm)))
+              Future.successful(BadRequest(confirmClaimInWeeksView(formWithErrors, numberOfWeeks, taxYear)))
             },
             value =>
               for {
@@ -75,6 +84,8 @@ class ConfirmClaimInWeeksController @Inject()(override val messagesApi: Messages
                 _ <- sessionService.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(ConfirmClaimInWeeksPage, updatedAnswers))
           )
+        case _ =>
+          Future.successful(Redirect(routes.SessionExpiredController.onPageLoad))
       }
   }
 }

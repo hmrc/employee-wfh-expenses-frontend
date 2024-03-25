@@ -121,9 +121,11 @@ checkYourClaimView.button.label = Cadarnhau a chyflwyno
 checkYourClaimView.list.item3 = {0} o flwyddyn dreth 6 Ebrill 2023 i 5 Ebrill 2024
 
 
-confirmClaimInWeeks.title = A ydych am hawlio am {0} o wythnosau am weithio gartref yn ystod y flwyddyn dreth bresennol?
-confirmClaimInWeeks.hint = Mae’r hawliad o {0} o wythnosau ar gyfer y flwyddyn dreth bresennol o 6 Ebrill 2023 i 5 Ebrill 2024.
-confirmClaimInWeeks.error.required = Dewiswch ‘Iawn’ os ydych am hawlio ar gyfer {0} o wythnosau o weithio gartref
+confirmClaimInWeeks.current.title = Do you want to claim for {0} of working from home in the current tax year?
+confirmClaimInWeeks.current.hint = The claim of {0} is for the current tax year between {1} to {2}.
+confirmClaimInWeeks.error.required = Select yes if you want to claim for {0} of working from home
+confirmClaimInWeeks.previous.title = Do you want to claim for {0} of working from home between {1} to {2}?
+confirmClaimInWeeks.previous.hint = The claim of {0} is for the tax year between {1} to {2}.
 
 submitYourClaim.title = Cyflwynwch eich hawliad
 submitYourClaim.heading = Cyflwynwch eich hawliad

@@ -120,10 +120,11 @@ checkYourClaimView.text.5 = By submitting this claim you are confirming that, to
 checkYourClaimView.button.label = Confirm and submit
 checkYourClaimView.list.item3 = {0} of tax year 6 April 2023 to 5 April 2024
 
-confirmClaimInWeeks.title = Do you want to claim for {0} of working from home in the current tax year?
-confirmClaimInWeeks.hint = The claim of {0} is for the current tax year from 6 April 2023 to 5 April 2024.
+confirmClaimInWeeks.current.title = Do you want to claim for {0} of working from home in the current tax year?
+confirmClaimInWeeks.current.hint = The claim of {0} is for the current tax year between {1} to {2}.
 confirmClaimInWeeks.error.required = Select yes if you want to claim for {0} of working from home
-
+confirmClaimInWeeks.previous.title = Do you want to claim for {0} of working from home between {1} to {2}?
+confirmClaimInWeeks.previous.hint = The claim of {0} is for the tax year between {1} to {2}.
 
 submitYourClaim.title = Submit your claim
 submitYourClaim.heading = Submit your claim

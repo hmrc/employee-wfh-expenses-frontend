@@ -18,6 +18,7 @@ package views
 
 import controllers.routes
 import forms.NumberOfWeeksToClaimForFormProvider
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1}
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 import views.behaviours.IntViewBehaviours
@@ -26,17 +27,29 @@ import views.html.NumberOfWeeksToClaimForView
 class NumberOfWeeksToClaimForViewSpec extends IntViewBehaviours {
 
   val messageKeyPrefix = "numberOfWeeksToClaimFor"
+  val formProvider = new NumberOfWeeksToClaimForFormProvider
+  val form: Form[Int] = formProvider(CurrentYear)
 
-  val form: Form[Int] = new NumberOfWeeksToClaimForFormProvider()()
+  "NumberOfWeeksToClaimForFormView" when {
+    "rendered for current year" must {
+      val view = viewFor[NumberOfWeeksToClaimForView](Some(emptyUserAnswers))
 
-  "NumberOfWeeksToClaimForFormView" must {
+      def applyView(form: Form[Int]): HtmlFormat.Appendable = view.apply(form, CurrentYear)(fakeRequest, messages)
 
-    val view = viewFor[NumberOfWeeksToClaimForView](Some(emptyUserAnswers))
+      behave like normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = Nil)
 
-    def applyView(form: Form[Int]): HtmlFormat.Appendable = view.apply(form)(fakeRequest, messages)
+      behave like intPage(form, applyView, messageKeyPrefix, routes.NumberOfWeeksToClaimForController.onSubmit().url)
+    }
+    "rendered for previous year" must {
+      val messageKeyPrefix = "numberOfWeeksToClaimFor.previous"
+      val view = viewFor[NumberOfWeeksToClaimForView](Some(emptyUserAnswers))
+      val form: Form[Int] = formProvider(CurrentYearMinus1)
 
-    behave like normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix)
+      def applyView(form: Form[Int]): HtmlFormat.Appendable = view.apply(form, CurrentYearMinus1)(fakeRequest, messages)
 
-    behave like intPage(form, applyView, messageKeyPrefix, routes.NumberOfWeeksToClaimForController.onSubmit().url)
+      behave like normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = CurrentYearMinus1.formattedTaxYearArgs)
+
+      behave like intPage(form, applyView, messageKeyPrefix, routes.NumberOfWeeksToClaimForController.onSubmit().url, args = CurrentYearMinus1.formattedTaxYearArgs)
+    }
   }
 }

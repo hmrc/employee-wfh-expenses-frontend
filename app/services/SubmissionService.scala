@@ -18,9 +18,10 @@ package services
 
 import config.FrontendAppConfig
 import connectors.{CitizenDetailsConnector, TaiConnector}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1}
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
-import models.{AuditData, FlatRateItem, TaxYearFromUIAssembler}
+import models.{AuditData, FlatRateItem, TaxYearFromUIAssembler, TaxYearSelection}
 import pages.SubmittedClaim
 import play.api.Logging
 import play.api.mvc.AnyContent
@@ -30,10 +31,8 @@ import utils.RateLimiting
 import utils.TaxYearDates._
 
 import javax.inject.{Inject, Named, Singleton}
-
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
-
 
 @Singleton
 class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnector,
@@ -44,11 +43,10 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
                                   @Named("IABD POST") rateLimiter: RateLimiting
                                  ) extends Logging {
 
-  def submitExpenses(selectedTaxYears: List[String], numberOfWeeksOf2023: Option[Int])
+  def submitExpenses(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: Map[TaxYearSelection, Int])
                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] = {
 
-
-    rateLimiter.withToken(() => submit(selectedTaxYears, numberOfWeeksOf2023) map {
+    rateLimiter.withToken(() => submit(selectedTaxYears, weeksForTaxYears) map {
       case Right(submittedDetails) =>
         logger.info(s"[SubmissionService][submitExpenses] Submission successful")
         auditSubmissionSuccess(submittedDetails)
@@ -62,23 +60,25 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
     })
   }
 
-  private def submit(selectedTaxYears: List[String], numberOfWeeksOf2023: Option[Int])
-                     (implicit dataRequest: DataRequest[AnyContent],
-                      hc: HeaderCarrier,
-                      ec: ExecutionContext) = {
+  // scalastyle:off cyclomatic.complexity
+  private def submit(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: Map[TaxYearSelection, Int])
+                    (implicit dataRequest: DataRequest[AnyContent],
+                     hc: HeaderCarrier,
+                     ec: ExecutionContext) = {
 
-    val assembler = TaxYearFromUIAssembler(selectedTaxYears)
+    val assembler = TaxYearFromUIAssembler(selectedTaxYears.map(_.toString).toList)
 
     val wholeYearItems: Seq[FlatRateItem] = Seq(
-      if(assembler.contains2020) Some(FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())) else None,
-      if(assembler.contains2021) Some(FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate())) else None,
-      if(assembler.contains2022) Some(FlatRateItem(year = YEAR_2022, amount = calculate2022FlatRate())) else None
+      if (assembler.contains2020) Some(FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())) else None,
+      if (assembler.contains2021) Some(FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate())) else None,
+      if (assembler.contains2022) Some(FlatRateItem(year = YEAR_2022, amount = calculate2022FlatRate())) else None
     ).flatten
 
-    val perWeekItems: Seq[FlatRateItem] = numberOfWeeksOf2023 match {
-      case Some(weeks) => Seq(FlatRateItem(year = YEAR_2023, amount = calculate2023FlatRate(weeks)))
-      case _ => Seq.empty[FlatRateItem]
-    }
+    val perWeekItems: Seq[FlatRateItem] = (weeksForTaxYears flatMap {
+      case (CurrentYear, weeks) if assembler.containsCurrent => Some(FlatRateItem(year = YEAR_2024, amount = calculate2024FlatRate(weeks)))
+      case (CurrentYearMinus1, weeks) if assembler.contains2023 => Some(FlatRateItem(year = YEAR_2023, amount = calculate2023FlatRate(weeks)))
+      case _ => None
+    }).toSeq
 
     val flatRateItems = wholeYearItems ++ perWeekItems
 
@@ -105,41 +105,44 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
       (previousFutureResult, nextInput) =>
         for {
           futureSeq <- previousFutureResult
-          future    <- flatMapFunction(nextInput)
+          future <- flatMapFunction(nextInput)
         } yield futureSeq :+ future
     )
   }
 
   def calculate2020FlatRate(): Int =
-    numberOfWeeks(TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE ) * appConfig.taxReliefPerWeek2020 toInt match {
-      case flatRateAmount: Int if flatRateAmount > appConfig.taxReliefMaxPerYear2020  => appConfig.taxReliefMaxPerYear2020
-      case flatRateAmount: Int                                                        => flatRateAmount
+    numberOfWeeks(TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE) * appConfig.taxReliefPerWeek2020 toInt match {
+      case flatRateAmount: Int if flatRateAmount > appConfig.taxReliefMaxPerYear2020 => appConfig.taxReliefMaxPerYear2020
+      case flatRateAmount: Int => flatRateAmount
     }
 
   def calculate2021FlatRate(): Int = {
-      numberOfWeeks(TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE) * appConfig.taxReliefPerWeek2021 toInt match {
-        case flatRateAmount: Int if flatRateAmount > appConfig.taxReliefMaxPerYear2021 => appConfig.taxReliefMaxPerYear2021
-        case flatRateAmount: Int                                                       => flatRateAmount
-      }
+    numberOfWeeks(TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE) * appConfig.taxReliefPerWeek2021 toInt match {
+      case flatRateAmount: Int if flatRateAmount > appConfig.taxReliefMaxPerYear2021 => appConfig.taxReliefMaxPerYear2021
+      case flatRateAmount: Int => flatRateAmount
     }
+  }
 
   def calculate2022FlatRate(): Int = {
     numberOfWeeks(TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE) * appConfig.taxReliefPerWeek2022 toInt match {
       case flatRateAmount: Int if flatRateAmount > appConfig.taxReliefMaxPerYear2022 => appConfig.taxReliefMaxPerYear2022
-      case flatRateAmount: Int                                                       => flatRateAmount
+      case flatRateAmount: Int => flatRateAmount
     }
   }
 
   def calculate2023FlatRate(numberOfWeeks: Int): Int =
     (numberOfWeeks * appConfig.taxReliefPerWeek2023).min(appConfig.taxReliefMaxPerYear2023)
 
+  def calculate2024FlatRate(numberOfWeeks: Int): Int =
+    (numberOfWeeks * appConfig.taxReliefPerWeek2024).min(appConfig.taxReliefMaxPerYear2024)
+
   private def auditSubmissionSuccess(submittedDetails: Seq[FlatRateItem])
                                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       UpdateWorkingFromHomeFlatRateSuccess.toString,
       AuditData(
-        nino          = dataRequest.nino,
-        userAnswers   = dataRequest.userAnswers.data,
+        nino = dataRequest.nino,
+        userAnswers = dataRequest.userAnswers.data,
         flatRateItems = Some(submittedDetails)
       )
     )
@@ -150,8 +153,8 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
     auditConnector.sendExplicitAudit(
       UpdateWorkingFromHomeFlatRateFailure.toString,
       AuditData(
-        nino            = dataRequest.nino,
-        userAnswers     = dataRequest.userAnswers.data,
+        nino = dataRequest.nino,
+        userAnswers = dataRequest.userAnswers.data,
         submissionError = Some(error)
       )
     )

@@ -42,7 +42,6 @@ class HowWeWillCalculateTaxReliefController @Inject()(
       request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
         case Some(_) =>
           val selectedTaxYearsAssembler = taxYearFromUIAssemblerFromRequest()
-
           val taxYears = selectedTaxYearsAssembler.assemble
           val formattedTaxYears = TaxYearFormatter(taxYears).formattedTaxYears
 

@@ -62,7 +62,7 @@ class DisclaimerViewSpec extends ViewBehaviours {
     }
 
     "behave like a normal page" when {
-      behave like normalPage(view.apply(showFirstMessageBlock = true, showSecondMessageBlock = true)(request, messages), Disclaimer)
+      behave like normalPage(view.apply(showFirstMessageBlock = true, showSecondMessageBlock = true)(request, messages), Disclaimer, args = Nil)
     }
   }
 }

@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.SelectTaxYearsToClaimForFormProvider
-import models.{SelectTaxYearsToClaimFor, UserAnswers}
+import models.{TaxYearSelection, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -80,7 +80,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
 
       val request =
         FakeRequest(POST, selectTaxYearsToClaimForRoute)
-          .withFormUrlEncodedBody(("value[0]", SelectTaxYearsToClaimFor.valuesAll.head.toString))
+          .withFormUrlEncodedBody(("value[0]", TaxYearSelection.valuesAll.head.toString))
 
       val result = route(application, request).value
 
@@ -126,7 +126,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
 
       val request =
         FakeRequest(POST, selectTaxYearsToClaimForRoute)
-          .withFormUrlEncodedBody(("value[0]", SelectTaxYearsToClaimFor.valuesAll.head.toString))
+          .withFormUrlEncodedBody(("value[0]", TaxYearSelection.valuesAll.head.toString))
 
       val result = route(application, request).value
 

@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.ConfirmClaimInWeeksFormProvider
+import models.TaxYearSelection.CurrentYearMinus1
 import models.UserAnswers
 import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.ArgumentMatchers.any
@@ -45,7 +46,7 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
   "ConfirmClaimInWeeks Controller" must {
     "return OK and the correct view for a GET" in {
       val userAnswer = UserAnswers(userAnswersId, Json.obj(
-        NumberOfWeeksToClaimForPage.toString -> numberOfWeeks
+        NumberOfWeeksToClaimForPage.toString -> Json.obj(CurrentYearMinus1.toString -> numberOfWeeks)
       ))
       val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
@@ -65,7 +66,7 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionService.set(any())(any())) thenReturn Future.successful(true)
 
       val userAnswer = UserAnswers(userAnswersId, Json.obj(
-        NumberOfWeeksToClaimForPage.toString -> numberOfWeeks
+        NumberOfWeeksToClaimForPage.toString -> Json.obj(CurrentYearMinus1.toString -> numberOfWeeks)
       ))
 
       val application =

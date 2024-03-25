@@ -162,6 +162,17 @@ numberOfWeeksToClaimFor.error.nonNumeric = Mae’n rhaid i nifer yr wythnosau ry
 numberOfWeeksToClaimFor.error.minimum = Mae’n rhaid i nifer yr wythnosau rydych wedi gweithio gartref yn ystod y flwyddyn dreth bresennol fod yn un wythnos neu fwy
 numberOfWeeksToClaimFor.error.maximum = Mae’n rhaid i nifer yr wythnosau rydych wedi gweithio gartref yn ystod y flwyddyn dreth bresennol fod {0} o wythnosau neu lai
 
+numberOfWeeksToClaimFor.previous.title = How many weeks did you work from home between {0} and {1}?
+numberOfWeeksToClaimFor.previous.heading = How many weeks did you work from home between {0} and {1}?
+numberOfWeeksToClaimFor.previous.question = How many weeks did you work from home between {0} and {1}?
+numberOfWeeksToClaimFor.previous.para = This will be the amount of weeks you have worked from home between {0} to {1}.
+numberOfWeeksToClaimFor.previous.hintText = For example, 29.
+numberOfWeeksToClaimFor.previous.error.required = Enter how many weeks you worked from home between {0} to {1}.
+numberOfWeeksToClaimFor.previous.error.wholeNumber = How many weeks you have worked from home between {0} and {1} must be a whole number
+numberOfWeeksToClaimFor.previous.error.nonNumeric = How many weeks you have worked from home between {0} and {1} must be a number
+numberOfWeeksToClaimFor.previous.error.minimum = How many weeks you have worked from home between {1} and {2} must be one or more weeks
+numberOfWeeksToClaimFor.previous.error.maximum = The number of weeks you have worked from home between {1} and {2} must be {0} weeks or less
+
 confirmation.paperless.button.text = Cofrestrwch ar gyfer hysbysiadau di-bapur
 confirmation.title = Hawliad wedi’i gwblhau
 confirmation.heading = Hawliad wedi’i gwblhau

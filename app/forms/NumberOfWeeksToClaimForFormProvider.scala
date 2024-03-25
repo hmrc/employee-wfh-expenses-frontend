@@ -17,19 +17,28 @@
 package forms
 
 import forms.mappings.Mappings
-import javax.inject.Inject
+import models.TaxYearSelection
 import play.api.data.Form
+import play.api.i18n.Messages
 import utils.TaxYearDates.{MAXIMUM_WEEKS_IN_A_YEAR, ONE_WEEK}
 
+import javax.inject.Inject
+
 class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
+  def apply(taxYear: TaxYearSelection)(implicit messages: Messages): Form[Int] = {
+    val errorPrefix: String = if (taxYear.equals(TaxYearSelection.CurrentYear)) {
+      "numberOfWeeksToClaimFor.error"
+    } else {
+      "numberOfWeeksToClaimFor.previous.error"
+    }
 
-  def apply(): Form[Int] =
     Form(
-      "value" -> int("numberOfWeeksToClaimFor.error.required",
-        "numberOfWeeksToClaimFor.error.wholeNumber",
-        "numberOfWeeksToClaimFor.error.nonNumeric"
-      ).verifying(minimumValue(ONE_WEEK, "numberOfWeeksToClaimFor.error.minimum"))
-          .verifying(maximumValue(MAXIMUM_WEEKS_IN_A_YEAR, "numberOfWeeksToClaimFor.error.maximum"))
+      "value" -> int(s"$errorPrefix.required",
+        s"$errorPrefix.wholeNumber",
+        s"$errorPrefix.nonNumeric",
+        taxYear.formattedTaxYearArgs
+      ).verifying(minimumValue(ONE_WEEK, s"$errorPrefix.minimum", taxYear.formattedTaxYearArgs))
+        .verifying(maximumValue(MAXIMUM_WEEKS_IN_A_YEAR, s"$errorPrefix.maximum", taxYear.formattedTaxYearArgs))
     )
-
+  }
 }

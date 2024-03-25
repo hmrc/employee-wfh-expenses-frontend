@@ -16,10 +16,10 @@
 
 package pages
 
-import models.SelectTaxYearsToClaimFor
+import models.TaxYearSelection
 import play.api.libs.json.JsPath
 
-case object SelectTaxYearsToClaimForPage extends QuestionPage[Seq[SelectTaxYearsToClaimFor]] {
+case object SelectTaxYearsToClaimForPage extends QuestionPage[Seq[TaxYearSelection]] {
 
   override def path: JsPath = JsPath \ toString
 

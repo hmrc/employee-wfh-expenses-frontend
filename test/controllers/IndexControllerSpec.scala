@@ -62,7 +62,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
     val otherExpenses = Seq(IABDExpense(testOtherExpensesAmount))
     val jobExpenses = Seq(IABDExpense(testJobExpensesAmount))
 
-    "redirect to the SelectTaxYearsToClaimFor page for a GET" when {
+    "redirect to the TaxYearSelection page for a GET" when {
       "not claimed expenses for any years" in {
         val expenses = (None, None, None, None, None)
         when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))

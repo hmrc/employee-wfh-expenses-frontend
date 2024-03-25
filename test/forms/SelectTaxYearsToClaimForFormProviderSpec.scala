@@ -17,7 +17,7 @@
 package forms
 
 import forms.behaviours.CheckboxFieldBehaviours
-import models.SelectTaxYearsToClaimFor
+import models.TaxYearSelection
 import play.api.data.FormError
 
 class SelectTaxYearsToClaimForFormProviderSpec extends CheckboxFieldBehaviours {
@@ -29,10 +29,10 @@ class SelectTaxYearsToClaimForFormProviderSpec extends CheckboxFieldBehaviours {
     val fieldName = "value"
     val requiredKey = "selectTaxYearsToClaimFor.error.required"
 
-    behave like checkboxField[SelectTaxYearsToClaimFor](
+    behave like checkboxField[TaxYearSelection](
       form,
       fieldName,
-      validValues  = SelectTaxYearsToClaimFor.valuesAll,
+      validValues  = TaxYearSelection.valuesAll,
       invalidError = FormError(s"$fieldName[0]", "error.invalid")
     )
 

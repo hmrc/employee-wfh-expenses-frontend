@@ -106,19 +106,19 @@ disclaimer.button.text = Accept and continue
 
 checkYourClaimView.title = Check and submit your claim
 checkYourClaimView.heading = Check and submit your claim
-checkYourClaimView.header = Check your claim details
+checkYourClaimView.subheading.1 = Check your claim details
 checkYourClaimView.text.1.1 = You are entitled to tax relief on
 checkYourClaimView.text.1.2 = a week on your expenses for working from home for:
-checkYourClaimView.text.2 = the whole of tax year
-checkYourClaimView.text.3 = At the end of this tax year, the tax relief will stop. If you are required to work from home from the 6 April 2024, you will need to claim again.
+checkYourClaimView.text.2 = At the end of this tax year, the tax relief will stop. If you are required to work from home from the {0}, you will need to claim again.
 checkYourClaimView.details.heading = What to do if your extra costs are more than this
 checkYourClaimView.details.text.1 = If your extra costs are more than this you may be able to claim for more tax relief. You will need to
 checkYourClaimView.details.href.text = claim tax relief for expenses of employment
 checkYourClaimView.details.text.2 = and provide evidence, like detailed and verifiable receipts and bills.
-checkYourClaimView.text.4 = Now submit your claim
-checkYourClaimView.text.5 = By submitting this claim you are confirming that, to the best of your knowledge, the details you are providing are correct.
+checkYourClaimView.subheading.2 = Now submit your claim
+checkYourClaimView.text.3 = By submitting this claim you are confirming that, to the best of your knowledge, the details you are providing are correct.
 checkYourClaimView.button.label = Confirm and submit
-checkYourClaimView.list.item3 = {0} of tax year 6 April 2023 to 5 April 2024
+checkYourClaimView.list.weekClaimItem = {0} of tax year {1} to {2}
+checkYourClaimView.list.wholeYearClaimItem = the whole of tax year {0} to {1}
 
 confirmClaimInWeeks.title = Do you want to claim for {0} of working from home in the current tax year?
 confirmClaimInWeeks.hint = The claim of {0} is for the current tax year from 6 April 2023 to 5 April 2024.

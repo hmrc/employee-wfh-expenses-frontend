@@ -17,12 +17,14 @@
 package controllers
 
 import base.SpecBase
-import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4}
 import models.UserAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
+import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
+import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -31,54 +33,134 @@ import services.SubmissionService
 import scala.concurrent.Future
 
 // scalastyle:off magic.number
-class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar {
+class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  "Check your claim controller" must {
-    "display when all available options are selected" in {
+  val mockSubmissionService: SubmissionService = mock[SubmissionService]
 
-      val userAnswer = UserAnswers(
-        userAnswersId,
-        Json.obj(
-          ClaimedForTaxYear2020.toString -> false,
-          SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString, CurrentYearMinus1.toString, CurrentYearMinus2.toString, CurrentYearMinus3.toString),
-          NumberOfWeeksToClaimForPage.toString -> 3
-        )
+  override def beforeEach(): Unit = {
+    reset(mockSubmissionService)
+  }
+
+  val fullUserAnswers: UserAnswers = UserAnswers(
+    userAnswersId,
+    Json.obj(
+      SelectTaxYearsToClaimForPage.toString -> Json.arr(
+        CurrentYear.toString,
+        CurrentYearMinus1.toString,
+        CurrentYearMinus2.toString,
+        CurrentYearMinus3.toString,
+        CurrentYearMinus4.toString
+      ),
+      NumberOfWeeksToClaimForPage.toString -> Json.obj(
+        CurrentYear.toString -> 1,
+        CurrentYearMinus1.toString -> 43,
       )
+    )
+  )
+  val fullUserAnswersWithoutWeeks: UserAnswers = UserAnswers(
+    userAnswersId,
+    Json.obj(
+      SelectTaxYearsToClaimForPage.toString -> Json.arr(
+        CurrentYearMinus2.toString,
+        CurrentYearMinus3.toString,
+        CurrentYearMinus4.toString
+      )
+    )
+  )
+  val incompleteUserAnswers: UserAnswers = UserAnswers(
+    userAnswersId,
+    Json.obj(
+      SelectTaxYearsToClaimForPage.toString -> Json.arr(
+        CurrentYear.toString,
+        CurrentYearMinus1.toString,
+      ),
+      NumberOfWeeksToClaimForPage.toString -> Json.obj(
+        CurrentYear.toString -> 1,
+      )
+    )
+  )
 
-      val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-
+  "CheckYourClaimController GET" must {
+    "return OK with a view when everything is selected and non whole claim years have week data" in {
+      val application = applicationBuilder(userAnswers = Some(fullUserAnswers)).build()
       val request = FakeRequest(GET, routes.CheckYourClaimController.onPageLoad().url)
-
       val result = route(application, request).value
 
-      status(result) mustEqual OK
+      status(result) mustBe OK
 
       application.stop()
     }
-
-    "submit claim should redirect to technical difficulties page if results into error" in {
-
-      val mockSubmissionService = mock[SubmissionService]
-
-      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Left("dd"))
-
-      val userAnswer = UserAnswers(
-        userAnswersId,
-        Json.obj(
-          ClaimedForTaxYear2020.toString -> false,
-          SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYearMinus1.toString)
-        )
-      )
-
-      val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-
-      val request = FakeRequest(POST, routes.CheckYourClaimController.onSubmit().url)
-
+    "return OK with a view when only whole claim years are selected" in {
+      val application = applicationBuilder(userAnswers = Some(fullUserAnswersWithoutWeeks)).build()
+      val request = FakeRequest(GET, routes.CheckYourClaimController.onPageLoad().url)
       val result = route(application, request).value
 
-      status(result) mustEqual SEE_OTHER
+      status(result) mustBe OK
 
-      redirectLocation(result).value mustEqual routes.TechnicalDifficultiesController.onPageLoad.url
+      application.stop()
+    }
+    "redirect to journey start if user does not have all expected week data" in {
+      val application = applicationBuilder(userAnswers = Some(incompleteUserAnswers)).build()
+      val request = FakeRequest(GET, routes.CheckYourClaimController.onPageLoad().url)
+      val result = route(application, request).value
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.IndexController.start.url)
+
+      application.stop()
+    }
+  }
+
+  "CheckYourClaimController POST" must {
+    "redirect to confirmation page if submission is successful" in {
+      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Right(()))
+
+      val application = applicationBuilder(userAnswers = Some(fullUserAnswers))
+        .overrides(bind[SubmissionService].toInstance(mockSubmissionService))
+        .build()
+      val request = FakeRequest(POST, routes.CheckYourClaimController.onSubmit().url)
+      val result = route(application, request).value
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe routes.ConfirmationController.onPageLoad().url
+
+      application.stop()
+    }
+    "redirect to confirmation page if submission with whole years only is successful" in {
+      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Right(()))
+
+      val application = applicationBuilder(userAnswers = Some(fullUserAnswersWithoutWeeks))
+        .overrides(bind[SubmissionService].toInstance(mockSubmissionService))
+        .build()
+      val request = FakeRequest(POST, routes.CheckYourClaimController.onSubmit().url)
+      val result = route(application, request).value
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe routes.ConfirmationController.onPageLoad().url
+
+      application.stop()
+    }
+    "redirect to technical difficulties page if an error is thrown" in {
+      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Left(""))
+
+      val application = applicationBuilder(userAnswers = Some(fullUserAnswers))
+        .overrides(bind[SubmissionService].toInstance(mockSubmissionService))
+        .build()
+      val request = FakeRequest(POST, routes.CheckYourClaimController.onSubmit().url)
+      val result = route(application, request).value
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe routes.TechnicalDifficultiesController.onPageLoad.url
+
+      application.stop()
+    }
+    "redirect to journey start if user does not have all expected week data" in {
+      val application = applicationBuilder(userAnswers = Some(incompleteUserAnswers)).build()
+      val request = FakeRequest(POST, routes.CheckYourClaimController.onPageLoad().url)
+      val result = route(application, request).value
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.IndexController.start.url)
 
       application.stop()
     }

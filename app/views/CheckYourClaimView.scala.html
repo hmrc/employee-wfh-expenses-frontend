@@ -14,34 +14,41 @@
  * limitations under the License.
  *@
 
-@import java.time.LocalDate
-@import utils.TaxYearDates._
 @import config.FrontendAppConfig
+@import models.TaxYearSelection.{NextYear, wholeYearClaims}
 
 @this(
-    layout:             views.templates.LayoutProvider,
-    appConfig:          FrontendAppConfig,
-    formHelper:         FormWithCSRF,
-    backLink:           GovukBackLink,
-    govukInsetText:     GovukInsetText,
-    govukDetails:       GovukDetails,
-    button:             GovukButton
+        layout: views.templates.LayoutProvider,
+        appConfig: FrontendAppConfig,
+        formHelper: FormWithCSRF,
+        backLink: GovukBackLink,
+        govukInsetText: GovukInsetText,
+        govukDetails: GovukDetails,
+        button: GovukButton
 )
 
-@(wholeTaxYears: List[(String, String)], numberOfWeeksIn2023: Option[Int], yearsClaimingFor: List[String])(implicit request: Request[_], messages: Messages)
+@(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: Map[TaxYearSelection, Int])(implicit request: Request[_], messages: Messages)
 
 @pluralOrSingularWeeks(weeks: Long) = @{
-    if (weeks == 1) {
+    if(weeks == 1) {
         messages("number.of.weeks.singular", weeks)
     } else {
         messages("number.of.weeks.plural", weeks)
     }
 }
 
-@maybeWeeksOf2023 = {
-    @numberOfWeeksIn2023.map { weeks =>
-        <li>@messages("checkYourClaimView.list.item3", pluralOrSingularWeeks(weeks))</li>
+@claimItems = @{
+    selectedTaxYears.map {
+        case taxYear if wholeYearClaims.contains(taxYear) => wholeYearClaimItem(taxYear)
+        case taxYear => weekClaimItem(taxYear, weeksForTaxYears.getOrElse(taxYear, 0))
     }
+}
+@weekClaimItem(taxYear: TaxYearSelection, weeks: Int) = {
+        <li>@messages("checkYourClaimView.list.weekClaimItem", pluralOrSingularWeeks(weeks) +: taxYear.formattedTaxYearArgs: _*)</li>
+}
+
+@wholeYearClaimItem(taxYear: TaxYearSelection) = {
+        <li>@messages("checkYourClaimView.list.wholeYearClaimItem", taxYear.formattedTaxYearArgs: _*)</li>
 }
 
 @detailsContent = {
@@ -61,7 +68,7 @@
 ) {
     <h1 class="govuk-heading-xl">@messages("checkYourClaimView.heading")</h1>
 
-    <h2 class="govuk-heading-m">@messages("checkYourClaimView.header")</h2>
+    <h2 class="govuk-heading-m">@messages("checkYourClaimView.subheading.1")</h2>
 
     <p class="govuk-body">@messages("checkYourClaimView.text.1.1")
         <span class="govuk-!-font-weight-bold">&pound;@appConfig.taxReliefPerWeek2020</span>
@@ -69,23 +76,21 @@
     </p>
 
     <ul class="govuk-list govuk-list--bullet">
-        @maybeWeeksOf2023
-        @for(wholeTaxYear <- wholeTaxYears) {
-            <li>@messages("checkYourClaimView.text.2") @wholeTaxYear._1 @messages("howWeWillCalculateTaxRelief.your.claim.date.to") @wholeTaxYear._2</li>
-        }
+        @claimItems
     </ul>
 
-    <p class="govuk-body">@messages("checkYourClaimView.text.3")</p>
-        @govukDetails(Details(
-            summary = Text(messages("checkYourClaimView.details.heading")),
-            content = HtmlContent(detailsContent)
+    <p class="govuk-body">@messages("checkYourClaimView.text.2", NextYear.formattedTaxYearArgs: _*)</p>
+
+    @govukDetails(Details(
+        summary = Text(messages("checkYourClaimView.details.heading")),
+        content = HtmlContent(detailsContent)
     ))
 
-    <h2 class="govuk-heading-m">@messages("checkYourClaimView.text.4")</h2>
+    <h2 class="govuk-heading-m">@messages("checkYourClaimView.subheading.2")</h2>
 
-    <p class="govuk-body">@messages("checkYourClaimView.text.5")</p>
+    <p class="govuk-body">@messages("checkYourClaimView.text.3")</p>
 
-    @formHelper(action = CheckYourClaimController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.CheckYourClaimController.onSubmit(), Symbol("autoComplete") -> "off") {
         @button(Button(content = Text(messages("checkYourClaimView.button.label"))))
     }
 

@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions._
-import models.TaxYearSelection.CurrentYearMinus1
+import models.TaxYearSelection.wholeYearClaims
 import pages.{NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -25,10 +25,9 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html._
-import utils.TaxYearFormatter
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
                                          identify: IdentifierAction,
@@ -43,38 +42,34 @@ class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
-        case Some(_) =>
-          val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
+      (request.userAnswers.get(SelectTaxYearsToClaimForPage), request.userAnswers.get(NumberOfWeeksToClaimForPage)) match {
+        case (Some(selectedTaxYears), optWeeksForTaxYears) if selectedTaxYears.nonEmpty
+          && selectedTaxYears.diff(wholeYearClaims).forall(taxYear => optWeeksForTaxYears.exists(_.contains(taxYear))) =>
 
-          val numberOfWeeksIn2023 = if (selectedTaxYears.contains2023) {
-            request.userAnswers.get(NumberOfWeeksToClaimForPage).flatMap(_.get(CurrentYearMinus1))
-          } else {
-            None
-          }
-
-          val wholeTaxYears = selectedTaxYears.assembleWholeYears
-          val formattedWholeTaxYears = TaxYearFormatter(wholeTaxYears).formattedTaxYears
-
-          Ok(checkYourClaimView(formattedWholeTaxYears, numberOfWeeksIn2023, selectedTaxYears.checkboxYearOptions))
-        case None =>
+          Ok(checkYourClaimView(selectedTaxYears, optWeeksForTaxYears.getOrElse(Map())))
+        case _ =>
           Redirect(routes.IndexController.start)
       }
-
-
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      submissionService.submitExpenses(
-        selectedTaxYears = request.userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(Nil),
-        weeksForTaxYears = request.userAnswers.get(NumberOfWeeksToClaimForPage).getOrElse(Map())
-      ) map {
-        case Right(_) =>
-          Redirect(routes.ConfirmationController.onPageLoad())
-        case Left(_) =>
-          logger.error("[SubmitYourClaimController][onSubmit] - Error submitting")
-          Redirect(routes.TechnicalDifficultiesController.onPageLoad)
+      (request.userAnswers.get(SelectTaxYearsToClaimForPage), request.userAnswers.get(NumberOfWeeksToClaimForPage)) match {
+        case (Some(selectedTaxYears), optWeeksForTaxYears) if selectedTaxYears.nonEmpty
+          && selectedTaxYears.diff(wholeYearClaims).forall(taxYear => optWeeksForTaxYears.exists(_.contains(taxYear))) =>
+
+          submissionService.submitExpenses(
+            selectedTaxYears = selectedTaxYears,
+            weeksForTaxYears = optWeeksForTaxYears.getOrElse(Map())
+          ) map {
+            case Right(_) =>
+              Redirect(routes.ConfirmationController.onPageLoad())
+            case Left(_) =>
+              logger.error("[SubmitYourClaimController][onSubmit] - Error submitting")
+              Redirect(routes.TechnicalDifficultiesController.onPageLoad)
+          }
+        case _ =>
+          Future.successful(Redirect(routes.IndexController.start))
       }
   }
 }

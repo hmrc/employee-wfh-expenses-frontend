@@ -16,10 +16,8 @@
 
 package controllers
 
-import controllers.NumberOfWeeksToClaimForController.yearsWithoutWeeks
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
 import forms.NumberOfWeeksToClaimForFormProvider
-import models.TaxYearSelection
 import models.TaxYearSelection._
 import navigation.Navigator
 import pages.{NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage}
@@ -49,7 +47,7 @@ class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: Mess
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(yearsWithoutWeeks.contains)) match {
+      request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(wholeYearClaims.contains)) match {
         case Some(taxYear :: Nil) =>
           val preparedForm = request.userAnswers
             .get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)
@@ -68,7 +66,7 @@ class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: Mess
 
   def onSubmit: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(yearsWithoutWeeks.contains)) match {
+      request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(wholeYearClaims.contains)) match {
         case Some(taxYear :: Nil) =>
           formProvider(taxYear).bindFromRequest().fold(
             formWithErrors => {
@@ -87,8 +85,4 @@ class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: Mess
           Future.successful(Redirect(routes.IndexController.start))
       }
   }
-}
-
-object NumberOfWeeksToClaimForController {
-  val yearsWithoutWeeks: Seq[TaxYearSelection] = Seq(CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4)
 }

@@ -106,20 +106,19 @@ disclaimer.button.text = Derbyn ac yn eich blaen
 
 checkYourClaimView.title = Gwirio a chyflwyno eich hawliad
 checkYourClaimView.heading = Gwirio a chyflwyno eich hawliad
-checkYourClaimView.header = Gwirio manylion eich hawliad
+checkYourClaimView.subheading.1 = Gwirio manylion eich hawliad
 checkYourClaimView.text.1.1 = Mae hawl gennych i ryddhad treth ar
 checkYourClaimView.text.1.2 = yr wythnos ar eich treuliau am weithio gartref ar gyfer:
-checkYourClaimView.text.2 = y flwyddyn dreth gyfan
-checkYourClaimView.text.3 = Ar ddiwedd y flwyddyn dreth hon, bydd y rhyddhad treth yn dod i ben. Os bydd yn ofynnol i chi weithio gartref o 6 Ebrill 2024 ymlaen, bydd yn rhaid i chi hawlio eto.
+checkYourClaimView.text.2 = Ar ddiwedd y flwyddyn dreth hon, bydd y rhyddhad treth yn dod i ben. Os bydd yn ofynnol i chi weithio gartref o {0} ymlaen, bydd yn rhaid i chi hawlio eto.
 checkYourClaimView.details.heading = Yr hyn sydd angen i chi wneud os yw’ch costau ychwanegol yn fwy na hyn
 checkYourClaimView.details.text.1 = Os yw’ch costau ychwanegol yn fwy na hyn, mae’n bosib y gallwch hawlio ragor o ryddhad treth. Bydd angen i chi
 checkYourClaimView.details.href.text = hawlio rhyddhad treth ar gyfer treuliau cyflogaeth
 checkYourClaimView.details.text.2 = a darparu tystiolaeth, fel derbynebau a biliau manwl a gwiriadwy.
-checkYourClaimView.text.4 = Cyflwynwch eich hawliad nawr
-checkYourClaimView.text.5 = Drwy gyflwyno’r hawliad hwn, rydych yn cadarnhau, hyd eithaf eich gwybodaeth, fod y manylion a roddir gennych yn gywir.
+checkYourClaimView.subheading.2 = Cyflwynwch eich hawliad nawr
+checkYourClaimView.text.3 = Drwy gyflwyno’r hawliad hwn, rydych yn cadarnhau, hyd eithaf eich gwybodaeth, fod y manylion a roddir gennych yn gywir.
 checkYourClaimView.button.label = Cadarnhau a chyflwyno
-checkYourClaimView.list.item3 = {0} o flwyddyn dreth 6 Ebrill 2023 i 5 Ebrill 2024
-
+checkYourClaimView.list.weekClaimItem = {0} o flwyddyn dreth {1} i {2}
+checkYourClaimView.list.wholeYearClaimItem = y flwyddyn dreth gyfan {0} i {1}
 
 confirmClaimInWeeks.title = A ydych am hawlio am {0} o wythnosau am weithio gartref yn ystod y flwyddyn dreth bresennol?
 confirmClaimInWeeks.hint = Mae’r hawliad o {0} o wythnosau ar gyfer y flwyddyn dreth bresennol o 6 Ebrill 2023 i 5 Ebrill 2024.

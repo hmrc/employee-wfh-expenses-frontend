@@ -16,7 +16,7 @@
 
 package models
 
-import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4}
+import models.TaxYearSelection.{NextYear, CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4}
 import play.api.data.Form
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
@@ -26,7 +26,8 @@ import uk.gov.hmrc.time.TaxYear
 import java.time.format.DateTimeFormatter
 
 sealed trait TaxYearSelection {
-  lazy val toTaxYear: TaxYear = this match {
+  def toTaxYear: TaxYear = this match {
+    case NextYear => TaxYear.current.forwards(1)
     case CurrentYear => TaxYear.current
     case CurrentYearMinus1 => TaxYear.current.back(1)
     case CurrentYearMinus2 => TaxYear.current.back(2)
@@ -47,6 +48,7 @@ sealed trait TaxYearSelection {
 
 object TaxYearSelection extends Enumerable.Implicits {
 
+  case object NextYear extends TaxYearSelection
   case object CurrentYear extends WithName("option1") with TaxYearSelection
   case object CurrentYearMinus1 extends WithName("option2") with TaxYearSelection
   case object CurrentYearMinus2 extends WithName("option3") with TaxYearSelection
@@ -88,4 +90,6 @@ object TaxYearSelection extends Enumerable.Implicits {
       if (claimed2020) None else Some(CurrentYearMinus4)
     ).flatten
   }
+
+  val wholeYearClaims: Seq[TaxYearSelection] = Seq(CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4)
 }

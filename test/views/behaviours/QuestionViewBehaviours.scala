@@ -31,6 +31,7 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours {
                          createView: Form[A] => HtmlFormat.Appendable,
                          messageKeyPrefix: String,
                          expectedFormAction: String,
+                         args: Seq[String],
                          fields: String*) = {
 
     "behave like a question page" when {
@@ -57,7 +58,7 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours {
         "show an error prefix in the browser title" in {
 
           val doc = asDocument(createView(form.withError(error(messageKeyPrefix))))
-          val title = s"${messages(s"$messageKeyPrefix.title")} - ${messages("service.name")} - GOV.UK"
+          val title = s"${messages(s"$messageKeyPrefix.title", args: _*)} - ${messages("service.name")} - GOV.UK"
           assertEqualsValue(doc, "title", s"""${messages("error.browser.title.prefix")} $title""")
         }
       }

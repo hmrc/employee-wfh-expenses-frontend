@@ -86,7 +86,9 @@ class SelectTaxYearsToClaimForController @Inject()(override val messagesApi: Mes
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, value))
-            _ <- sessionService.set(updatedAnswers)
+            updatedAnswers2 <- Future.fromTry(updatedAnswers.remove(NumberOfWeeksToClaimForPage))
+            updatedAnswers3 <- Future.fromTry(updatedAnswers2.remove(ConfirmClaimInWeeksPage))
+            _ <- sessionService.set(updatedAnswers3)
           } yield {
             Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
           }

@@ -18,27 +18,61 @@ package forms
 
 import forms.mappings.Mappings
 import models.TaxYearSelection
-import play.api.data.Form
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4}
+import play.api.data.Forms.{ignored, mapping}
+import play.api.data.{Form, Mapping}
 import play.api.i18n.Messages
 import utils.TaxYearDates.{MAXIMUM_WEEKS_IN_A_YEAR, ONE_WEEK}
 
 import javax.inject.Inject
 
 class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
-  def apply(taxYear: TaxYearSelection)(implicit messages: Messages): Form[Int] = {
-    val errorPrefix: String = if (taxYear.equals(TaxYearSelection.CurrentYear)) {
+  def apply(selectedTaxYears: Seq[TaxYearSelection])(implicit messages: Messages): Form[Map[TaxYearSelection, Int]] = {
+    def errorPrefix(taxYear: TaxYearSelection): String = if (taxYear.equals(CurrentYear)) {
       "numberOfWeeksToClaimFor.error"
     } else {
       "numberOfWeeksToClaimFor.previous.error"
     }
 
+    def weekMapping(taxYear: TaxYearSelection): (String, Mapping[Int]) =
+      taxYear.toString -> {
+        if (selectedTaxYears.contains(taxYear)) {
+          int(
+            s"${errorPrefix(taxYear)}.required",
+            s"${errorPrefix(taxYear)}.wholeNumber",
+            s"${errorPrefix(taxYear)}.nonNumeric",
+            taxYear.formattedTaxYearArgs
+          ).verifying(minimumValue(ONE_WEEK, s"${errorPrefix(taxYear)}.minimum", taxYear.formattedTaxYearArgs))
+            .verifying(maximumValue(MAXIMUM_WEEKS_IN_A_YEAR, s"${errorPrefix(taxYear)}.maximum", taxYear.formattedTaxYearArgs))
+        } else {
+          ignored[Int](0)
+        }
+      }
+
     Form(
-      "value" -> int(s"$errorPrefix.required",
-        s"$errorPrefix.wholeNumber",
-        s"$errorPrefix.nonNumeric",
-        taxYear.formattedTaxYearArgs
-      ).verifying(minimumValue(ONE_WEEK, s"$errorPrefix.minimum", taxYear.formattedTaxYearArgs))
-        .verifying(maximumValue(MAXIMUM_WEEKS_IN_A_YEAR, s"$errorPrefix.maximum", taxYear.formattedTaxYearArgs))
+      mapping(
+        weekMapping(CurrentYear),
+        weekMapping(CurrentYearMinus1),
+        weekMapping(CurrentYearMinus2),
+        weekMapping(CurrentYearMinus3),
+        weekMapping(CurrentYearMinus4)
+      )((cty, ctyMinus1, ctyMinus2, ctyMinus3, ctyMinus4) =>
+        Map[TaxYearSelection, Int](
+          CurrentYear -> cty,
+          CurrentYearMinus1 -> ctyMinus1,
+          CurrentYearMinus2 -> ctyMinus2,
+          CurrentYearMinus3 -> ctyMinus3,
+          CurrentYearMinus4 -> ctyMinus4
+        ).filter(_._2 > 0)
+      )(weekMap =>
+        Some(
+          weekMap.getOrElse(CurrentYear, 0),
+          weekMap.getOrElse(CurrentYearMinus1, 0),
+          weekMap.getOrElse(CurrentYearMinus2, 0),
+          weekMap.getOrElse(CurrentYearMinus3, 0),
+          weekMap.getOrElse(CurrentYearMinus4, 0)
+        )
+      )
     )
   }
 }

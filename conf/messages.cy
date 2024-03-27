@@ -54,6 +54,8 @@ site.continue=Yn eich blaen
 service.name=Hawlio rhyddhad treth ar dreuliau ar gyfer gweithio gartref
 site.textarea.char_limit=(Y terfyn yw {0} o gymeriadau)
 site.getHelpWithThisPage=Help gyda’r dudalen hon
+site.to = i
+site.taxYearTo = {0} i {1}
 
 unauthorised.title=Ni allwch ddefnyddio’r Dynodydd Defnyddiwr (ID) hwn ar gyfer Porth y Llywodraeth i hawlio rhyddhad treth ar eich treuliau
 unauthorised.heading=Ni allwch ddefnyddio’r Dynodydd Defnyddiwr (ID) hwn ar gyfer Porth y Llywodraeth i hawlio rhyddhad treth ar eich treuliau
@@ -76,7 +78,6 @@ howWeWillCalculateTaxRelief.title = Sut y byddwn yn cyfrifo rhyddhad treth ar gy
 howWeWillCalculateTaxRelief.heading = Sut y byddwn yn cyfrifo rhyddhad treth ar y blynyddoedd rydych wedi’u dewis
 howWeWillCalculateTaxRelief.eligibility.inset.text = I hawlio, mae’n rhaid eich bod yn bodloni’r rheolau cymhwystra ar gyfer pob un o’r blynyddoedd a restrwyd.
 howWeWillCalculateTaxRelief.previous.years.before.text = Blynyddoedd blaenorol
-howWeWillCalculateTaxRelief.your.claim.date.to = i
 howWeWillCalculateTaxRelief.end.date.inset.text = Nid oes angen dyddiad dod i ben arnom
 howWeWillCalculateTaxRelief.bullet.frequency.weekly.text = Mae hawliadau’n cael eu cyfrifo mewn wythnosau
 howWeWillCalculateTaxRelief.bullet.frequency.yearly.text = Mae hawliadau’n cael eu rhoi ar gyfer y flwyddyn dreth gyfan
@@ -171,6 +172,10 @@ numberOfWeeksToClaimFor.previous.error.wholeNumber = How many weeks you have wor
 numberOfWeeksToClaimFor.previous.error.nonNumeric = How many weeks you have worked from home between {0} and {1} must be a number
 numberOfWeeksToClaimFor.previous.error.minimum = How many weeks you have worked from home between {1} and {2} must be one or more weeks
 numberOfWeeksToClaimFor.previous.error.maximum = The number of weeks you have worked from home between {1} and {2} must be {0} weeks or less
+
+numberOfWeeksToClaimFor.multiple.title = How many weeks do you expect to, or have you worked from home for these tax years?
+numberOfWeeksToClaimFor.multiple.heading = How many weeks do you expect to, or have you worked from home for these tax years?
+numberOfWeeksToClaimFor.multiple.hintText = Enter the number of weeks, for example, 29.
 
 confirmation.paperless.button.text = Cofrestrwch ar gyfer hysbysiadau di-bapur
 confirmation.title = Hawliad wedi’i gwblhau

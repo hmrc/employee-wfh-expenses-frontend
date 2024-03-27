@@ -27,7 +27,7 @@
 @(taxYears: List[(String, String)])( implicit request: Request[_], messages: Messages)
 
 @getTaxYearContent(taxYear: (String, String)) = {
-    <h2 class="govuk-heading-m">@taxYear._1 @messages("howWeWillCalculateTaxRelief.your.claim.date.to") @taxYear._2</h2>
+    <h2 class="govuk-heading-m">@taxYear._1 @messages("site.to") @taxYear._2</h2>
     @if(taxYear._1.contains(YEAR_2024.toString) || taxYear._1.contains(YEAR_2023.toString)) {
         <ul class="govuk-list govuk-list--bullet">
             <li>@messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")</li>

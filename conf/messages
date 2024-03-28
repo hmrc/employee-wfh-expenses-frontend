@@ -126,6 +126,10 @@ confirmClaimInWeeks.current.hint = The claim of {0} is for the current tax year 
 confirmClaimInWeeks.error.required = Select yes if you want to claim for {0} of working from home
 confirmClaimInWeeks.previous.title = Do you want to claim for {0} of working from home between {1} to {2}?
 confirmClaimInWeeks.previous.hint = The claim of {0} is for the tax year between {1} to {2}.
+confirmClaimInWeeks.multiple.title = Check the number of weeks in your claim for these tax years
+confirmClaimInWeeks.multiple.heading = Check the number of weeks in your claim for these tax years
+confirmClaimInWeeks.multiple.hidden.current = the number of weeks for the current tax year {0} to {1}
+confirmClaimInWeeks.multiple.hidden.previous = the number of weeks for the previous tax year {0} to {1}
 
 submitYourClaim.title = Submit your claim
 submitYourClaim.heading = Submit your claim

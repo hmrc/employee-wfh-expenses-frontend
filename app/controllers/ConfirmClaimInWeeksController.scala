@@ -26,7 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ConfirmClaimInWeeksView
+import views.html.{ConfirmClaimInWeeksMultipleView, ConfirmClaimInWeeksView}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,26 +39,26 @@ class ConfirmClaimInWeeksController @Inject()(override val messagesApi: Messages
                                               requireData: DataRequiredAction,
                                               navigator: Navigator,
                                               confirmClaimInWeeksView: ConfirmClaimInWeeksView,
+                                              confirmClaimInWeeksMultipleView: ConfirmClaimInWeeksMultipleView,
                                               formProvider: ConfirmClaimInWeeksFormProvider,
                                               val controllerComponents: MessagesControllerComponents
                                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      request.userAnswers.get(NumberOfWeeksToClaimForPage) match {
+      request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) match {
         case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.size > 1 =>
-          NotImplemented
-        case Some(numberOfWeeksToClaimFor) =>
-            val taxYear = numberOfWeeksToClaimFor.head._1
-            val numberOfWeeks = numberOfWeeksToClaimFor.head._2
-            val form: Form[Boolean] = formProvider(numberOfWeeks)
+          Ok(confirmClaimInWeeksMultipleView(numberOfWeeksToClaimFor))
+        case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.nonEmpty =>
+          val (taxYear, numberOfWeeks) = numberOfWeeksToClaimFor.head
+          val form: Form[Boolean] = formProvider(numberOfWeeks)
 
-            val preparedForm = request.userAnswers.get(ConfirmClaimInWeeksPage) match {
-              case None => form
-              case Some(value) => form.fill(value)
-            }
+          val preparedForm = request.userAnswers.get(ConfirmClaimInWeeksPage) match {
+            case None => form
+            case Some(value) => form.fill(value)
+          }
 
-            Ok(confirmClaimInWeeksView(preparedForm, numberOfWeeks, taxYear))
+          Ok(confirmClaimInWeeksView(preparedForm, numberOfWeeks, taxYear))
         case _ =>
           Redirect(routes.SessionExpiredController.onPageLoad)
       }
@@ -66,12 +66,14 @@ class ConfirmClaimInWeeksController @Inject()(override val messagesApi: Messages
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers.get(NumberOfWeeksToClaimForPage) match {
+      request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) match {
         case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.size > 1 =>
-          Future.successful(NotImplemented)
-        case Some(numberOfWeeksToClaimFor) =>
-          val taxYear = numberOfWeeksToClaimFor.head._1
-          val numberOfWeeks = numberOfWeeksToClaimFor.head._2
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmClaimInWeeksPage, true))
+            _ <- sessionService.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ConfirmClaimInWeeksPage, updatedAnswers))
+        case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.nonEmpty =>
+          val (taxYear, numberOfWeeks) = numberOfWeeksToClaimFor.head
           val form: Form[Boolean] = formProvider(numberOfWeeks)
 
           form.bindFromRequest().fold(

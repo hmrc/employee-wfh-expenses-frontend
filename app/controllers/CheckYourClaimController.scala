@@ -27,6 +27,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html._
 
 import javax.inject.Inject
+import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
@@ -42,11 +43,11 @@ class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      (request.userAnswers.get(SelectTaxYearsToClaimForPage), request.userAnswers.get(NumberOfWeeksToClaimForPage)) match {
+      (request.userAnswers.get(SelectTaxYearsToClaimForPage), request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)) match {
         case (Some(selectedTaxYears), optWeeksForTaxYears) if selectedTaxYears.nonEmpty
           && selectedTaxYears.diff(wholeYearClaims).forall(taxYear => optWeeksForTaxYears.exists(_.contains(taxYear))) =>
 
-          Ok(checkYourClaimView(selectedTaxYears, optWeeksForTaxYears.getOrElse(Map())))
+          Ok(checkYourClaimView(selectedTaxYears, optWeeksForTaxYears.getOrElse(ListMap())))
         case _ =>
           Redirect(routes.IndexController.start)
       }
@@ -54,13 +55,13 @@ class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      (request.userAnswers.get(SelectTaxYearsToClaimForPage), request.userAnswers.get(NumberOfWeeksToClaimForPage)) match {
+      (request.userAnswers.get(SelectTaxYearsToClaimForPage), request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)) match {
         case (Some(selectedTaxYears), optWeeksForTaxYears) if selectedTaxYears.nonEmpty
           && selectedTaxYears.diff(wholeYearClaims).forall(taxYear => optWeeksForTaxYears.exists(_.contains(taxYear))) =>
 
           submissionService.submitExpenses(
             selectedTaxYears = selectedTaxYears,
-            weeksForTaxYears = optWeeksForTaxYears.getOrElse(Map())
+            weeksForTaxYears = optWeeksForTaxYears.getOrElse(ListMap())
           ) map {
             case Right(_) =>
               Redirect(routes.ConfirmationController.onPageLoad())

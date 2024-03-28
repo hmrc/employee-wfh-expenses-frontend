@@ -23,6 +23,7 @@ import views.behaviours.ViewBehaviours
 import views.html.CheckYourClaimView
 
 import java.time.format.DateTimeFormatter
+import scala.collection.immutable.ListMap
 
 // scalastyle:off magic.number
 class CheckYourClaimViewSpec extends ViewBehaviours {
@@ -39,7 +40,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
 
   val weeksCurrent = 1
   val weeksPrevious = 43
-  val weeksForTaxYears: Map[TaxYearSelection, Int] = Map[TaxYearSelection, Int](
+  val weeksForTaxYears: ListMap[TaxYearSelection, Int] = ListMap[TaxYearSelection, Int](
     CurrentYear -> weeksCurrent,
     CurrentYearMinus1 -> weeksPrevious
   )

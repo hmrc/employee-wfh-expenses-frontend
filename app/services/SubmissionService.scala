@@ -31,6 +31,7 @@ import utils.RateLimiting
 import utils.TaxYearDates._
 
 import javax.inject.{Inject, Named, Singleton}
+import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
@@ -43,7 +44,7 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
                                   @Named("IABD POST") rateLimiter: RateLimiting
                                  ) extends Logging {
 
-  def submitExpenses(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: Map[TaxYearSelection, Int])
+  def submitExpenses(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: ListMap[TaxYearSelection, Int])
                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] = {
 
     rateLimiter.withToken(() => submit(selectedTaxYears, weeksForTaxYears) map {
@@ -61,7 +62,7 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
   }
 
   // scalastyle:off cyclomatic.complexity
-  private def submit(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: Map[TaxYearSelection, Int])
+  private def submit(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: ListMap[TaxYearSelection, Int])
                     (implicit dataRequest: DataRequest[AnyContent],
                      hc: HeaderCarrier,
                      ec: ExecutionContext) = {

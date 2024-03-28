@@ -16,6 +16,7 @@
 
 @import config.FrontendAppConfig
 @import models.TaxYearSelection.{NextYear, wholeYearClaims}
+@import scala.collection.immutable.ListMap
 
 @this(
         layout: views.templates.LayoutProvider,
@@ -27,7 +28,7 @@
         button: GovukButton
 )
 
-@(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: Map[TaxYearSelection, Int])(implicit request: Request[_], messages: Messages)
+@(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: ListMap[TaxYearSelection, Int])(implicit request: Request[_], messages: Messages)
 
 @pluralOrSingularWeeks(weeks: Long) = @{
     if(weeks == 1) {

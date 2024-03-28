@@ -25,9 +25,10 @@ import play.api.i18n.Messages
 import utils.TaxYearDates.{MAXIMUM_WEEKS_IN_A_YEAR, ONE_WEEK}
 
 import javax.inject.Inject
+import scala.collection.immutable.ListMap
 
 class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
-  def apply(selectedTaxYears: Seq[TaxYearSelection])(implicit messages: Messages): Form[Map[TaxYearSelection, Int]] = {
+  def apply(selectedTaxYears: Seq[TaxYearSelection])(implicit messages: Messages): Form[ListMap[TaxYearSelection, Int]] = {
     def errorPrefix(taxYear: TaxYearSelection): String = if (taxYear.equals(CurrentYear)) {
       "numberOfWeeksToClaimFor.error"
     } else {
@@ -57,7 +58,7 @@ class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
         weekMapping(CurrentYearMinus3),
         weekMapping(CurrentYearMinus4)
       )((cty, ctyMinus1, ctyMinus2, ctyMinus3, ctyMinus4) =>
-        Map[TaxYearSelection, Int](
+        ListMap[TaxYearSelection, Int](
           CurrentYear -> cty,
           CurrentYearMinus1 -> ctyMinus1,
           CurrentYearMinus2 -> ctyMinus2,

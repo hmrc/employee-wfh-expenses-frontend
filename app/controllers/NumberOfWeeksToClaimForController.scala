@@ -50,7 +50,7 @@ class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: Mess
     implicit request =>
       request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(wholeYearClaims.contains)) match {
         case Some(list) if list.nonEmpty =>
-          val preparedForm = request.userAnswers.get(NumberOfWeeksToClaimForPage) match {
+          val preparedForm = request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) match {
             case None => formProvider(list)
             case Some(value) => formProvider(list).fill(value)
           }

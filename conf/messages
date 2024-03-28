@@ -54,6 +54,8 @@ site.continue = Continue
 service.name = Claim tax relief on expenses for working from home
 site.textarea.char_limit = (Limit is {0} characters)
 site.getHelpWithThisPage = Get help with this page
+site.to = to
+site.taxYearTo = {0} to {1}
 
 unauthorised.title = You cannot use this Government Gateway user ID to claim tax relief on your expenses
 unauthorised.heading = You cannot use this Government Gateway user ID to claim tax relief on your expenses
@@ -76,7 +78,6 @@ howWeWillCalculateTaxRelief.title = How we will calculate tax relief for the yea
 howWeWillCalculateTaxRelief.heading = How we will calculate tax relief for the years you have selected
 howWeWillCalculateTaxRelief.eligibility.inset.text = To claim, you must meet the eligibility rules for each of the listed years.
 howWeWillCalculateTaxRelief.previous.years.before.text = Previous years before
-howWeWillCalculateTaxRelief.your.claim.date.to = to
 howWeWillCalculateTaxRelief.end.date.inset.text = We do not need an end date
 howWeWillCalculateTaxRelief.bullet.frequency.weekly.text = Claims are calculated in weeks
 howWeWillCalculateTaxRelief.bullet.frequency.yearly.text = Claims are given for the entire tax year
@@ -171,6 +172,10 @@ numberOfWeeksToClaimFor.previous.error.wholeNumber = How many weeks you have wor
 numberOfWeeksToClaimFor.previous.error.nonNumeric = How many weeks you have worked from home between {0} and {1} must be a number
 numberOfWeeksToClaimFor.previous.error.minimum = How many weeks you have worked from home between {1} and {2} must be one or more weeks
 numberOfWeeksToClaimFor.previous.error.maximum = The number of weeks you have worked from home between {1} and {2} must be {0} weeks or less
+
+numberOfWeeksToClaimFor.multiple.title = How many weeks do you expect to, or have you worked from home for these tax years?
+numberOfWeeksToClaimFor.multiple.heading = How many weeks do you expect to, or have you worked from home for these tax years?
+numberOfWeeksToClaimFor.multiple.hintText = Enter the number of weeks, for example, 29.
 
 confirmation.paperless.button.text = Sign up for paperless notifications
 confirmation.title = Claim complete

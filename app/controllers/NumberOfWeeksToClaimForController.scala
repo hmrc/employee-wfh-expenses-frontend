@@ -26,7 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.NumberOfWeeksToClaimForView
+import views.html.{NumberOfWeeksToClaimForMultipleYearsView, NumberOfWeeksToClaimForView}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,6 +40,7 @@ class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: Mess
                                                   requireData: DataRequiredAction,
                                                   navigator: Navigator,
                                                   numberOfWeeksToClaimForView: NumberOfWeeksToClaimForView,
+                                                  numberOfWeeksToClaimForMultipleYearsView: NumberOfWeeksToClaimForMultipleYearsView,
                                                   formProvider: NumberOfWeeksToClaimForFormProvider,
                                                   val controllerComponents: MessagesControllerComponents
                                                  )(implicit ec: ExecutionContext)
@@ -48,17 +49,17 @@ class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: Mess
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
       request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(wholeYearClaims.contains)) match {
-        case Some(taxYear :: Nil) =>
-          val preparedForm = request.userAnswers
-            .get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)
-            .flatMap(_.get(taxYear)) match {
-            case None => formProvider(taxYear)
-            case Some(value) => formProvider(taxYear).fill(value)
+        case Some(list) if list.nonEmpty =>
+          val preparedForm = request.userAnswers.get(NumberOfWeeksToClaimForPage) match {
+            case None => formProvider(list)
+            case Some(value) => formProvider(list).fill(value)
           }
 
-          Ok(numberOfWeeksToClaimForView(preparedForm, taxYear))
-        case Some(list) if list.size > 1 =>
-          NotImplemented
+          if(list.size > 1) {
+            Ok(numberOfWeeksToClaimForMultipleYearsView(preparedForm, list))
+          } else {
+            Ok(numberOfWeeksToClaimForView(preparedForm, list.head))
+          }
         case _ =>
           Redirect(routes.IndexController.start)
       }
@@ -67,20 +68,22 @@ class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: Mess
   def onSubmit: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
       request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(wholeYearClaims.contains)) match {
-        case Some(taxYear :: Nil) =>
-          formProvider(taxYear).bindFromRequest().fold(
+        case Some(list) if list.nonEmpty =>
+          formProvider(list).bindFromRequest().fold(
             formWithErrors => {
-              Future.successful(BadRequest(numberOfWeeksToClaimForView(formWithErrors, taxYear)))
+              if(list.size > 1) {
+                Future.successful(BadRequest(numberOfWeeksToClaimForMultipleYearsView(formWithErrors, list)))
+              } else {
+                Future.successful(BadRequest(numberOfWeeksToClaimForView(formWithErrors, list.head)))
+              }
             },
             value =>
               for {
                 updatedAnswers <- Future.fromTry(request.userAnswers
-                  .set(NumberOfWeeksToClaimForPage, Map(taxYear -> value))(NumberOfWeeksToClaimForPage.format))
+                  .set(NumberOfWeeksToClaimForPage, value)(NumberOfWeeksToClaimForPage.format))
                 _ <- sessionService.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(NumberOfWeeksToClaimForPage, updatedAnswers))
           )
-        case Some(list) if list.size > 1 =>
-          Future.successful(NotImplemented)
         case _ =>
           Future.successful(Redirect(routes.IndexController.start))
       }

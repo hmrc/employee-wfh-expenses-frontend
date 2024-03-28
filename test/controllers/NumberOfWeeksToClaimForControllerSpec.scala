@@ -70,7 +70,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         val result = route(application, request).value
 
         status(result) mustBe OK
-        prepopulatedValue(result, "value") mustBe ""
+        prepopulatedValue(result, "option1") mustBe ""
 
         application.stop()
       }
@@ -85,7 +85,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         val result = route(application, request).value
 
         status(result) mustBe OK
-        prepopulatedValue(result, "value") mustBe "30"
+        prepopulatedValue(result, "option1") mustBe "30"
 
         application.stop()
       }
@@ -100,7 +100,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         val result = route(application, request).value
 
         status(result) mustBe OK
-        prepopulatedValue(result, "value") mustBe ""
+        prepopulatedValue(result, "option2") mustBe ""
 
         application.stop()
       }
@@ -115,13 +115,42 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         val result = route(application, request).value
 
         status(result) mustBe OK
-        prepopulatedValue(result, "value") mustBe "50"
+        prepopulatedValue(result, "option2") mustBe "50"
 
         application.stop()
       }
     }
     "user has selected multiple years with week based claims" must {
+      "return an OK with the view" in {
+        val userAnswer = UserAnswers(userAnswersId)
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear, CurrentYearMinus1)).success.value
 
+        val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
+        val request = FakeRequest(GET, testRoute)
+        val result = route(application, request).value
+
+        status(result) mustBe OK
+        prepopulatedValue(result, "option1") mustBe ""
+        prepopulatedValue(result, "option2") mustBe ""
+
+        application.stop()
+      }
+      "return an OK with the view with existing answer" in {
+        val prepopAnswer: Map[TaxYearSelection, Int] = Map(CurrentYear -> 52, CurrentYearMinus1 -> 50)
+        val userAnswer = UserAnswers(userAnswersId)
+          .set(NumberOfWeeksToClaimForPage, prepopAnswer)(NumberOfWeeksToClaimForPage.format).success.value
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear, CurrentYearMinus1)).success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
+        val request = FakeRequest(GET, testRoute)
+        val result = route(application, request).value
+
+        status(result) mustBe OK
+        prepopulatedValue(result, "option1") mustBe "52"
+        prepopulatedValue(result, "option2") mustBe "50"
+
+        application.stop()
+      }
     }
   }
 
@@ -133,7 +162,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
 
         val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
         val request = FakeRequest(POST, testRoute)
-          .withFormUrlEncodedBody(("value", "30"))
+          .withFormUrlEncodedBody(("option5", "30"))
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -154,7 +183,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
           .overrides(bind[SessionService].toInstance(mockSessionService))
           .build()
         val request = FakeRequest(POST, testRoute)
-          .withFormUrlEncodedBody(("value", "30"))
+          .withFormUrlEncodedBody(("option1", "30"))
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -176,7 +205,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
           .overrides(bind[SessionService].toInstance(mockSessionService))
           .build()
         val request = FakeRequest(POST, testRoute)
-          .withFormUrlEncodedBody(("value", "50"))
+          .withFormUrlEncodedBody(("option2", "50"))
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -187,7 +216,26 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
       }
     }
     "user has selected multiple years with week based claims" must {
+      "return an OK with the view" in {
+        val argCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+        when(mockSessionService.set(argCaptor.capture())(any())).thenReturn(Future.successful(true))
 
+        val userAnswer = UserAnswers(userAnswersId)
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear, CurrentYearMinus1)).success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswer))
+          .overrides(bind[SessionService].toInstance(mockSessionService))
+          .build()
+        val request = FakeRequest(POST, testRoute)
+          .withFormUrlEncodedBody(("option1", "52"), ("option2", "50"))
+        val result = route(application, request).value
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.ConfirmClaimInWeeksController.onPageLoad().url)
+        argCaptor.getValue.get(NumberOfWeeksToClaimForPage) mustBe Some(Map(CurrentYear -> 52, CurrentYearMinus1 -> 50))
+
+        application.stop()
+      }
     }
   }
 }

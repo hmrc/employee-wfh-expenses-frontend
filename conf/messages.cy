@@ -184,8 +184,8 @@ numberOfWeeksToClaimFor.multiple.heading = How many weeks do you expect to, or h
 numberOfWeeksToClaimFor.multiple.hintText = Enter the number of weeks, for example, 29.
 
 confirmation.paperless.button.text = Cofrestrwch ar gyfer hysbysiadau di-bapur
-confirmation.title = Hawliad wedi’i gwblhau
-confirmation.heading = Hawliad wedi’i gwblhau
+confirmation.title = Hawliad wedi’i gwblhau ar gyfer gweithio o gartref
+confirmation.heading = Hawliad wedi’i gwblhau ar gyfer gweithio o gartref
 
 confirmation.text = Byddwn yn newid eich cod treth ar gyfer y flwyddyn dreth bresennol
 confirmation.hmrc.text = Bydd CThEF yn gwirio’ch hawliad

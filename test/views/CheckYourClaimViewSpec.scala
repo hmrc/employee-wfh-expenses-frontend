@@ -111,5 +111,12 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
       assertContainsText(doc, detailsLink)
       assertContainsText(doc, details2)
     }
+    "not have the need to claim again text when current year is not selected" in {
+      val view = viewFor[CheckYourClaimView](Some(emptyUserAnswers))
+      val renderedView = view(selectedTaxYears.filterNot(_.equals(CurrentYear)), weeksForTaxYears.filterNot(_._1.equals(CurrentYear)))(request, messages)
+      val doc = asDocument(renderedView)
+
+      assertNotContainsText(doc, text2)
+    }
   }
 }

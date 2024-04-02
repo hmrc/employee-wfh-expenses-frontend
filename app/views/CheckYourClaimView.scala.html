@@ -17,6 +17,7 @@
 @import config.FrontendAppConfig
 @import models.TaxYearSelection.{NextYear, wholeYearClaims}
 @import scala.collection.immutable.ListMap
+@import models.TaxYearSelection.CurrentYear
 
 @this(
         layout: views.templates.LayoutProvider,
@@ -80,7 +81,9 @@
         @claimItems
     </ul>
 
-    <p class="govuk-body">@messages("checkYourClaimView.text.2", NextYear.formattedTaxYearArgs: _*)</p>
+    @if(selectedTaxYears.contains(CurrentYear)) {
+        <p class="govuk-body">@messages("checkYourClaimView.text.2", NextYear.formattedTaxYearArgs: _*)</p>
+    }
 
     @govukDetails(Details(
         summary = Text(messages("checkYourClaimView.details.heading")),

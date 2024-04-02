@@ -182,8 +182,8 @@ numberOfWeeksToClaimFor.multiple.heading = How many weeks do you expect to, or h
 numberOfWeeksToClaimFor.multiple.hintText = Enter the number of weeks, for example, 29.
 
 confirmation.paperless.button.text = Sign up for paperless notifications
-confirmation.title = Claim complete
-confirmation.heading = Claim complete
+confirmation.title = Claim complete for working from home
+confirmation.heading = Claim complete for working from home
 confirmation.text = We will change your tax code for the current tax year
 confirmation.text.previous = We will check your claim for previous tax years
 confirmation.hmrc.text = HMRC will check your claim

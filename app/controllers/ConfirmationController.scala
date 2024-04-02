@@ -70,7 +70,7 @@ class ConfirmationController @Inject()(
               } else {
                 Ok(confirmationView(
                   status.isPaperlessCustomer, Some(status.url.link),
-                  selectedTaxYears.contains2021Or2020,
+                  selectedTaxYears.containsPrevious,
                   selectedTaxYears.containsCurrent
                 ))
               }

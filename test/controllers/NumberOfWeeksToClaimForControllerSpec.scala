@@ -31,6 +31,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.SessionService
 
+import scala.collection.immutable.ListMap
 import scala.concurrent.Future
 
 class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
@@ -75,7 +76,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         application.stop()
       }
       "return an OK with the view with existing answer" in {
-        val prepopAnswer: Map[TaxYearSelection, Int] = Map(CurrentYear -> 30)
+        val prepopAnswer: ListMap[TaxYearSelection, Int] = ListMap(CurrentYear -> 30)
         val userAnswer = UserAnswers(userAnswersId)
           .set(NumberOfWeeksToClaimForPage, prepopAnswer)(NumberOfWeeksToClaimForPage.format).success.value
           .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear)).success.value
@@ -105,7 +106,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         application.stop()
       }
       "return an OK with the view with existing answer" in {
-        val prepopAnswer: Map[TaxYearSelection, Int] = Map(CurrentYearMinus1 -> 50)
+        val prepopAnswer: ListMap[TaxYearSelection, Int] = ListMap(CurrentYearMinus1 -> 50)
         val userAnswer = UserAnswers(userAnswersId)
           .set(NumberOfWeeksToClaimForPage, prepopAnswer)(NumberOfWeeksToClaimForPage.format).success.value
           .set(SelectTaxYearsToClaimForPage, Seq(CurrentYearMinus1)).success.value
@@ -136,7 +137,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         application.stop()
       }
       "return an OK with the view with existing answer" in {
-        val prepopAnswer: Map[TaxYearSelection, Int] = Map(CurrentYear -> 52, CurrentYearMinus1 -> 50)
+        val prepopAnswer: ListMap[TaxYearSelection, Int] = ListMap(CurrentYear -> 52, CurrentYearMinus1 -> 50)
         val userAnswer = UserAnswers(userAnswersId)
           .set(NumberOfWeeksToClaimForPage, prepopAnswer)(NumberOfWeeksToClaimForPage.format).success.value
           .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear, CurrentYearMinus1)).success.value
@@ -188,7 +189,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.ConfirmClaimInWeeksController.onPageLoad().url)
-        argCaptor.getValue.get(NumberOfWeeksToClaimForPage) mustBe Some(Map(CurrentYear -> 30))
+        argCaptor.getValue.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) mustBe Some(ListMap(CurrentYear -> 30))
 
         application.stop()
       }
@@ -210,7 +211,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.ConfirmClaimInWeeksController.onPageLoad().url)
-        argCaptor.getValue.get(NumberOfWeeksToClaimForPage) mustBe Some(Map(CurrentYearMinus1 -> 50))
+        argCaptor.getValue.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) mustBe Some(ListMap(CurrentYearMinus1 -> 50))
 
         application.stop()
       }
@@ -232,7 +233,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.ConfirmClaimInWeeksController.onPageLoad().url)
-        argCaptor.getValue.get(NumberOfWeeksToClaimForPage) mustBe Some(Map(CurrentYear -> 52, CurrentYearMinus1 -> 50))
+        argCaptor.getValue.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) mustBe Some(ListMap(CurrentYear -> 52, CurrentYearMinus1 -> 50))
 
         application.stop()
       }

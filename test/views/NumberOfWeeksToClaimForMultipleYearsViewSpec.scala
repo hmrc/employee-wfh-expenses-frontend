@@ -25,20 +25,22 @@ import play.twirl.api.HtmlFormat
 import views.behaviours.QuestionViewBehaviours
 import views.html.NumberOfWeeksToClaimForMultipleYearsView
 
-class NumberOfWeeksToClaimForMultipleYearsViewSpec extends QuestionViewBehaviours[Map[TaxYearSelection, Int]] {
+import scala.collection.immutable.ListMap
+
+class NumberOfWeeksToClaimForMultipleYearsViewSpec extends QuestionViewBehaviours[ListMap[TaxYearSelection, Int]] {
 
   val messageKeyPrefix = "numberOfWeeksToClaimFor"
   val formProvider = new NumberOfWeeksToClaimForFormProvider
-  val form: Form[Map[TaxYearSelection, Int]] = formProvider(Seq(CurrentYear))
+  val form: Form[ListMap[TaxYearSelection, Int]] = formProvider(Seq(CurrentYear))
 
   "NumberOfWeeksToClaimForMultipleView" when {
     "rendered for all years" must {
       val messageKeyPrefix = "numberOfWeeksToClaimFor.multiple"
       val view = viewFor[NumberOfWeeksToClaimForMultipleYearsView](Some(emptyUserAnswers))
       val taxYears = Seq(CurrentYear, CurrentYearMinus1)
-      val form: Form[Map[TaxYearSelection, Int]] = formProvider(taxYears)
+      val form: Form[ListMap[TaxYearSelection, Int]] = formProvider(taxYears)
 
-      def applyView(form: Form[Map[TaxYearSelection, Int]]): HtmlFormat.Appendable = view.apply(form, taxYears)(fakeRequest, messages)
+      def applyView(form: Form[ListMap[TaxYearSelection, Int]]): HtmlFormat.Appendable = view.apply(form, taxYears)(fakeRequest, messages)
 
       behave like normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = Nil)
 

@@ -51,9 +51,9 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with Befor
         CurrentYearMinus3.toString,
         CurrentYearMinus4.toString
       ),
-      NumberOfWeeksToClaimForPage.toString -> Json.obj(
-        CurrentYear.toString -> 1,
-        CurrentYearMinus1.toString -> 43,
+      NumberOfWeeksToClaimForPage.toString -> Json.arr(
+        Json.arr(CurrentYear.toString, 1),
+        Json.arr(CurrentYearMinus1.toString, 43),
       )
     )
   )
@@ -74,8 +74,8 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with Befor
         CurrentYear.toString,
         CurrentYearMinus1.toString,
       ),
-      NumberOfWeeksToClaimForPage.toString -> Json.obj(
-        CurrentYear.toString -> 1,
+      NumberOfWeeksToClaimForPage.toString -> Json.arr(
+        Json.arr(CurrentYear.toString, 1)
       )
     )
   )

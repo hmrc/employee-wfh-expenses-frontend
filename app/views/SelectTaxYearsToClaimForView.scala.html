@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
-@import models.SelectTaxYearsToClaimFor
+@import models.TaxYearSelection
 
 @this(
         layout: views.templates.LayoutProvider,
@@ -27,7 +27,7 @@
         appConfig: config.FrontendAppConfig
 )
 
-@(form: Form[Set[SelectTaxYearsToClaimFor]], availableYears: Seq[SelectTaxYearsToClaimFor], hintText: Boolean = true)(implicit request: Request[_], messages: Messages)
+@(form: Form[Seq[TaxYearSelection]], availableYears: Seq[TaxYearSelection])(implicit request: Request[_], messages: Messages)
 
 @detailsContent = {
     <p class="govuk-body">@messages("selectTaxYearsToClaimFor.details.text.1")</p>
@@ -61,7 +61,7 @@
             )),
             name = "value",
             hint = Some(Hint(content = Text(messages("selectTaxYearsToClaimFor.hintText")))),
-            items = SelectTaxYearsToClaimFor.options(form, availableYears),
+            items = TaxYearSelection.options(form, availableYears),
             errorMessage = form.errors.headOption.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*))))
         ))
 

@@ -70,7 +70,7 @@ class ConfirmationController @Inject()(
               } else {
                 Ok(confirmationView(
                   status.isPaperlessCustomer, Some(status.url.link),
-                  selectedTaxYears.contains2021OrPrevious,
+                  selectedTaxYears.containsPrevious,
                   selectedTaxYears.containsCurrent
                 ))
               }
@@ -104,7 +104,7 @@ class ConfirmationController @Inject()(
     )
 
   private def getClaimStatus(selectedTaxYears: TaxYearFromUIAssembler): ClaimStatus = {
-    (selectedTaxYears.containsCurrent, selectedTaxYears.containsAnyPrevious) match {
+    (selectedTaxYears.containsCurrent, selectedTaxYears.containsPrevious) match {
       case (true, true) => ClaimCompleteCurrentPrevious
       case (true, false) => ClaimCompleteCurrent
       case (false, true) => ClaimCompletePrevious

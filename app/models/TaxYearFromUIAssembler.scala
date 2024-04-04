@@ -16,134 +16,38 @@
 
 package models
 
-import java.time.LocalDate
-
 import utils.TaxYearDates._
+
+import java.time.LocalDate
 
 case class TaxYearFromUIAssembler(checkboxYearOptions: List[String]) {
 
-  val claimingAllYears           = List("option1", "option2", "option3", "option4")
-  val claiming2023Only           = List("option1")
-  val claiming2022Only           = List("option2")
-  val claiming2021Only           = List("option3")
-  val claimingPrevOnly           = List("option4")
-  val claiming2023And2022        = List("option1", "option2")
-  val claiming2023And2021        = List("option1", "option3")
-  val claiming2023AndPrev        = List("option1", "option4")
-  val claiming2022And2021        = List("option2", "option3")
-  val claiming2022AndPrev        = List("option2", "option4")
-  val claiming2021AndPrev        = List("option3", "option4")
-  val claiming2023And2022And2021 = List("option1", "option2", "option3")
-  val claiming2023And2021AndPrev = List("option1", "option3", "option4")
-  val claiming2022And2021AndPrev = List("option2", "option3", "option4")
-  val claiming2023And2022AndPrev = List("option1", "option2", "option4")
+  val mapping: Map[String, (LocalDate, LocalDate)] = Map(
+    "option1" -> (TAX_YEAR_2024_START_DATE, TAX_YEAR_2024_END_DATE),
+    "option2" -> (TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE),
+    "option3" -> (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
+    "option4" -> (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE),
+    "option5" -> (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
+  )
 
   val assemble: List[(LocalDate, LocalDate)] = {
-
-    if (checkboxYearOptions == null || checkboxYearOptions.isEmpty) {
-      throw new IllegalArgumentException("Input checkbox list is either empty or invalid")
+    checkboxYearOptions.filter(mapping.keySet.contains) match {
+      case Nil => throw new IllegalArgumentException("Input checkbox list is either empty or invalid")
+      case list => list.map(mapping)
     }
-
-    if (checkboxYearOptions == claimingAllYears) {
-      List(
-        (TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE),
-        (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
-        (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE),
-        (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
-      )
-    }
-    else if (checkboxYearOptions == claiming2023Only) {
-      List((TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE))
-    }
-    else if (checkboxYearOptions == claiming2022Only) {
-      List((TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE))
-    }
-    else if (checkboxYearOptions == claiming2021Only) {
-      List((TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE))
-    }
-    else if (checkboxYearOptions == claimingPrevOnly) {
-      List((TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE))
-    }
-
-    else if(checkboxYearOptions == claiming2023And2022) {
-      List(
-        (TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE),
-        (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE)
-      )
-    }
-    else if(checkboxYearOptions == claiming2023And2021) {
-      List(
-        (TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE),
-        (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE)
-      )
-    }
-    else if(checkboxYearOptions == claiming2023AndPrev) {
-      List(
-        (TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE),
-        (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
-      )
-    }
-    else if(checkboxYearOptions == claiming2022And2021) {
-      List(
-        (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
-        (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE)
-      )
-    }
-    else if(checkboxYearOptions == claiming2022AndPrev) {
-      List(
-        (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
-        (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
-      )
-    }
-    else if(checkboxYearOptions == claiming2021AndPrev) {
-      List(
-        (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE),
-        (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
-      )
-    }
-    else if(checkboxYearOptions == claiming2023And2022And2021) {
-      List(
-        (TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE),
-        (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
-        (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE)
-      )
-    }
-    else if(checkboxYearOptions == claiming2023And2021AndPrev) {
-      List(
-        (TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE),
-        (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE),
-        (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
-      )
-    }
-    else if(checkboxYearOptions == claiming2022And2021AndPrev) {
-      List(
-        (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
-        (TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE),
-        (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
-      )
-    }
-    else if(checkboxYearOptions == claiming2023And2022AndPrev) {
-      List(
-        (TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE),
-        (TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE),
-        (TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE)
-      )
-    }
-    else {
-      List.empty
-    }
-
   }
 
 
   val containsCurrent: Boolean = checkboxYearOptions.contains("option1")
-  val contains2022: Boolean = checkboxYearOptions.contains("option2")
-  val contains2021: Boolean = checkboxYearOptions.contains("option3")
-  val containsPrevious: Boolean = checkboxYearOptions.contains("option4")
-  val containsAnyPrevious: Boolean = contains2022 || contains2021 || containsPrevious
-  val contains2021OrPrevious: Boolean = contains2021 || containsPrevious
-  val contains2022OrAfter: Boolean = containsCurrent || contains2022
+  val contains2023: Boolean = checkboxYearOptions.contains("option2")
+  val contains2022: Boolean = checkboxYearOptions.contains("option3")
+  val contains2021: Boolean = checkboxYearOptions.contains("option4")
+  val contains2020: Boolean = checkboxYearOptions.contains("option5")
+  val containsPrevious: Boolean = contains2023 || contains2022 || contains2021 || contains2020
+  val contains2021Or2020: Boolean = contains2021 || contains2020
+  val contains2022OrAfter: Boolean = containsCurrent || contains2023 || contains2022
   val yearsClaimedByWeek: List[(LocalDate, LocalDate)] = List(
+    (TAX_YEAR_2024_START_DATE, TAX_YEAR_2024_END_DATE),
     (TAX_YEAR_2023_START_DATE, TAX_YEAR_2023_END_DATE)
   )
 

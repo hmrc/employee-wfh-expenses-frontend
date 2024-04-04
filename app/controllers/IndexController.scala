@@ -54,7 +54,8 @@ class IndexController @Inject()(val controllerComponents: MessagesControllerComp
               ClaimedForTaxYear2020.toString -> claimedYears._1.isDefined,
               ClaimedForTaxYear2021.toString -> claimedYears._2.isDefined,
               ClaimedForTaxYear2022.toString -> claimedYears._3.isDefined,
-              ClaimedForTaxYear2023.toString -> claimedYears._4.isDefined
+              ClaimedForTaxYear2023.toString -> claimedYears._4.isDefined,
+              ClaimedForTaxYear2024.toString -> claimedYears._5.isDefined
             )
           )
 

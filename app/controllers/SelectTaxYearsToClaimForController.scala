@@ -18,7 +18,7 @@ package controllers
 
 import controllers.actions._
 import forms.SelectTaxYearsToClaimForFormProvider
-import models.SelectTaxYearsToClaimFor
+import models.TaxYearSelection
 import navigation.Navigator
 import pages._
 import play.api.Logging
@@ -42,57 +42,57 @@ class SelectTaxYearsToClaimForController @Inject()(override val messagesApi: Mes
                                                    formProvider: SelectTaxYearsToClaimForFormProvider,
                                                    val controllerComponents: MessagesControllerComponents,
                                                    view: SelectTaxYearsToClaimForView
-                                                  )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging {
+                                                  )(implicit ec: ExecutionContext)
+  extends FrontendBaseController with I18nSupport with Logging {
 
-  val form: Form[Set[SelectTaxYearsToClaimFor]] = formProvider()
+  val form: Form[Seq[TaxYearSelection]] = formProvider()
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      (request.userAnswers.get(ClaimedForTaxYear2020),
+      (
+        request.userAnswers.get(ClaimedForTaxYear2020),
         request.userAnswers.get(ClaimedForTaxYear2021),
         request.userAnswers.get(ClaimedForTaxYear2022),
-        request.userAnswers.get(ClaimedForTaxYear2023)) match {
-        case (Some(claimed2020), Some(claimed2021), Some(claimed2022), Some(claimed2023)) =>
-          val availableYears = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022, claimed2023)
+        request.userAnswers.get(ClaimedForTaxYear2023),
+        request.userAnswers.get(ClaimedForTaxYear2024)
+      ) match {
+        case (Some(claimed2020), Some(claimed2021), Some(claimed2022), Some(claimed2023), Some(claimed2024)) =>
+          val availableYears = TaxYearSelection.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022, claimed2023, claimed2024)
 
           val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
             case None => form
             case Some(value) => form.fill(value)
           }
 
-          val showHintText = !hasSingleUnclaimedYear(claimed2020, claimed2021, claimed2022, claimed2023)
-
-          Future.successful(Ok(view(preparedForm, availableYears, showHintText)))
-
-        case (_, _, _, _) => Future.successful(Redirect(routes.IndexController.start))
+          Future.successful(Ok(view(preparedForm, availableYears)))
+        case _ =>
+          Future.successful(Redirect(routes.IndexController.start))
       }
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      val availableYearsUserCanClaim = SelectTaxYearsToClaimFor.getValuesFromClaimedBooleans(
+      val availableYearsUserCanClaim = TaxYearSelection.getValuesFromClaimedBooleans(
         request.userAnswers.get(ClaimedForTaxYear2020).getOrElse(false),
         request.userAnswers.get(ClaimedForTaxYear2021).getOrElse(false),
         request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(false),
-        request.userAnswers.get(ClaimedForTaxYear2023).getOrElse(false)
+        request.userAnswers.get(ClaimedForTaxYear2023).getOrElse(false),
+        request.userAnswers.get(ClaimedForTaxYear2024).getOrElse(false)
       )
 
       form.bindFromRequest().fold(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, availableYearsUserCanClaim))),
-
         value =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, value))
-            _ <- sessionService.set(updatedAnswers)
+            updatedAnswers2 <- Future.fromTry(updatedAnswers.remove(NumberOfWeeksToClaimForPage))
+            updatedAnswers3 <- Future.fromTry(updatedAnswers2.remove(ConfirmClaimInWeeksPage))
+            _ <- sessionService.set(updatedAnswers3)
           } yield {
             Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
           }
       )
-  }
-
-  def hasSingleUnclaimedYear(claimed2020: Boolean, claimed2021: Boolean, claimed2022: Boolean, claimed2023: Boolean): Boolean = {
-    Seq(claimed2020, claimed2021, claimed2022, claimed2023).count(_ == false) == 1
   }
 
 }

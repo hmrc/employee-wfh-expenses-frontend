@@ -17,13 +17,12 @@
 package navigation
 
 import controllers.routes
-import models.SelectTaxYearsToClaimFor._
+import models.TaxYearSelection._
 import models._
 import pages._
 import play.api.Logging
 import play.api.mvc.Call
 
-import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
 
 @Singleton
@@ -37,62 +36,38 @@ class Navigator @Inject()() extends Logging {
     case InformClaimNowInWeeksPage => _ => routes.NumberOfWeeksToClaimForController.onPageLoad()
     case NumberOfWeeksToClaimForPage => _ => routes.ConfirmClaimInWeeksController.onPageLoad()
     case ConfirmClaimInWeeksPage => ua => confirmClaimInWeeksNextPage(ua)
-    case CheckYourClaimPage => ua => checkYourClaimPage(ua)
-    case WhenDidYouFirstStartWorkingFromHomePage => ua => checkStartWorkingFromHomeDate(ua)
     case _ => _ => routes.IndexController.start
   }
 
   def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
 
-  def checkYourClaimPage(userAnswers: UserAnswers): Call = {
-    routes.DisclaimerController.onPageLoad()
-  }
-
-  def checkStartWorkingFromHomeDate(userAnswers: UserAnswers): Call = {
-    val earliestStartDate = LocalDate.of(2020,1,1)
-
-    userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage) match {
-      case Some(startDate) =>
-        if (startDate.date.isBefore(earliestStartDate)) {
-          routes.CannotClaimUsingThisServiceController.onPageLoad()
-        } else {
-          routes.CheckYourClaimController.onPageLoad()
-        }
-      case None => routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
-    }
-
-  }
-
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
-    (userAnswers.get(ClaimedForTaxYear2020),
+    (
+      userAnswers.get(ClaimedForTaxYear2020),
       userAnswers.get(ClaimedForTaxYear2021),
       userAnswers.get(ClaimedForTaxYear2022),
-      userAnswers.get(ClaimedForTaxYear2023)) match {
-      case (Some(_), Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
-      case (None, None, None, None) => routes.IndexController.start
-      case (_, _, _, _) => routes.TechnicalDifficultiesController.onPageLoad
+      userAnswers.get(ClaimedForTaxYear2023),
+      userAnswers.get(ClaimedForTaxYear2024)
+    ) match {
+      case (Some(_), Some(_), Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
+      case (None, None, None, None, None) => routes.IndexController.start
+      case (_, _, _, _, _) => routes.TechnicalDifficultiesController.onPageLoad
     }
   }
 
   def howWeWillCalculateTaxReliefNextPage(userAnswers: UserAnswers): Call = {
-    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll.toSet)
+    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(TaxYearSelection.valuesAll)
 
-    if(selectedTaxYears.contains(Option1)) {routes.InformClaimNowInWeeksController.onPageLoad()}
-    else if(selectedTaxYears.contains(Option4)) {routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()}
-    else {routes.CheckYourClaimController.onPageLoad()}
-    // TODO: Will need updating to include the extra tax year when it is added
-  }
-
-  def confirmClaimInWeeksNextPage(userAnswers: UserAnswers): Call = {
-    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(SelectTaxYearsToClaimFor.valuesAll.toSet)
-    val onwardRoute = if(selectedTaxYears.contains(Option4)) {
-      routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()
+    if (selectedTaxYears.contains(CurrentYear) || selectedTaxYears.contains(CurrentYearMinus1)) {
+      routes.InformClaimNowInWeeksController.onPageLoad()
     } else {
       routes.CheckYourClaimController.onPageLoad()
     }
+  }
 
-    if(userAnswers.get(ConfirmClaimInWeeksPage).getOrElse(false)) {
-      onwardRoute
+  def confirmClaimInWeeksNextPage(userAnswers: UserAnswers): Call = {
+    if (userAnswers.get(ConfirmClaimInWeeksPage).getOrElse(false)) {
+      routes.CheckYourClaimController.onPageLoad()
     } else {
       routes.NumberOfWeeksToClaimForController.onPageLoad()
     }

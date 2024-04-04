@@ -16,23 +16,14 @@
 
 package controllers
 
-import models.{ClaimViewSettings, TaxYearFromUIAssembler}
+import models.TaxYearFromUIAssembler
 import models.requests.DataRequest
 import pages.SelectTaxYearsToClaimForPage
 import play.api.mvc.AnyContent
-import utils.DateLanguageTokenizer
-
-import java.time.LocalDate
 
 trait UIAssembler {
-
   def taxYearFromUIAssemblerFromRequest()(implicit request: DataRequest[AnyContent]): TaxYearFromUIAssembler = {
     val selectedOptionsCheckBoxes = request.userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(Nil).map(_.toString).toList
     TaxYearFromUIAssembler(selectedOptionsCheckBoxes)
   }
-
-  def claimViewSettings(dateList: List[(LocalDate, LocalDate)]) = {
-    ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))
-  }
-
 }

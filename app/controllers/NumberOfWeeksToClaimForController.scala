@@ -17,20 +17,21 @@
 package controllers
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
+import forms.NumberOfWeeksToClaimForFormProvider
+import models.TaxYearSelection._
 import navigation.Navigator
-import pages.NumberOfWeeksToClaimForPage
+import pages.{NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.NumberOfWeeksToClaimForView
-import forms.NumberOfWeeksToClaimForFormProvider
-import play.api.data.Form
 import services.SessionService
+import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import views.html.{NumberOfWeeksToClaimForMultipleYearsView, NumberOfWeeksToClaimForView}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: MessagesApi,
                                                   sessionService: SessionService,
                                                   identify: IdentifierAction,
@@ -39,33 +40,52 @@ class NumberOfWeeksToClaimForController @Inject()(override val messagesApi: Mess
                                                   requireData: DataRequiredAction,
                                                   navigator: Navigator,
                                                   numberOfWeeksToClaimForView: NumberOfWeeksToClaimForView,
+                                                  numberOfWeeksToClaimForMultipleYearsView: NumberOfWeeksToClaimForMultipleYearsView,
                                                   formProvider: NumberOfWeeksToClaimForFormProvider,
                                                   val controllerComponents: MessagesControllerComponents
-                                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
-
-  val form: Form[Int] = formProvider()
+                                                 )(implicit ec: ExecutionContext)
+  extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      val preparedForm = request.userAnswers.get(NumberOfWeeksToClaimForPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
-      }
+      request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(wholeYearClaims.contains)) match {
+        case Some(list) if list.nonEmpty =>
+          val preparedForm = request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) match {
+            case None => formProvider(list)
+            case Some(value) => formProvider(list).fill(value)
+          }
 
-      Ok(numberOfWeeksToClaimForView(preparedForm))
+          if(list.size > 1) {
+            Ok(numberOfWeeksToClaimForMultipleYearsView(preparedForm, list))
+          } else {
+            Ok(numberOfWeeksToClaimForView(preparedForm, list.head))
+          }
+        case _ =>
+          Redirect(routes.IndexController.start)
+      }
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
+  def onSubmit: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      form.bindFromRequest().fold(
-        formWithErrors => {
-          Future.successful(BadRequest(numberOfWeeksToClaimForView(formWithErrors)))
-        },
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(NumberOfWeeksToClaimForPage, value))
-            _              <- sessionService.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(NumberOfWeeksToClaimForPage, updatedAnswers))
-      )
+      request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(wholeYearClaims.contains)) match {
+        case Some(list) if list.nonEmpty =>
+          formProvider(list).bindFromRequest().fold(
+            formWithErrors => {
+              if(list.size > 1) {
+                Future.successful(BadRequest(numberOfWeeksToClaimForMultipleYearsView(formWithErrors, list)))
+              } else {
+                Future.successful(BadRequest(numberOfWeeksToClaimForView(formWithErrors, list.head)))
+              }
+            },
+            value =>
+              for {
+                updatedAnswers <- Future.fromTry(request.userAnswers
+                  .set(NumberOfWeeksToClaimForPage, value)(NumberOfWeeksToClaimForPage.format))
+                _ <- sessionService.set(updatedAnswers)
+              } yield Redirect(navigator.nextPage(NumberOfWeeksToClaimForPage, updatedAnswers))
+          )
+        case _ =>
+          Future.successful(Redirect(routes.IndexController.start))
+      }
   }
 }

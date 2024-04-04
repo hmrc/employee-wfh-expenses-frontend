@@ -25,7 +25,9 @@
     name: String,
     id: String,
     hideLabel: Boolean,
-    hintText: Option[String] = None
+    labelClass: String = "govuk-label--xl",
+    describedBy: Option[String] = None,
+    hintText: Option[String] = None,
 )(implicit messages: Messages)
 
 @govukInput(Input(
@@ -34,12 +36,12 @@
     id = id,
     label = Label(
         isPageHeading = !hideLabel,
-        classes = if(hideLabel) "govuk-visually-hidden" else "govuk-label--xl",
-        content = Text(question)
+        classes = if(hideLabel) "govuk-visually-hidden" else labelClass,
+        content = Text(question),
+        attributes = if(describedBy.nonEmpty) Map("aria-describedBy" -> describedBy.get) else Map.empty
     ),
     hint = hintText.map(text => (Hint(content = Text(text)))),
     classes = "govuk-input--width-2",
     pattern = Some("[0-9]*"),
-    spellcheck = Some(false),
-    prefix = None
+    spellcheck = Some(false)
 ).withFormField(field))

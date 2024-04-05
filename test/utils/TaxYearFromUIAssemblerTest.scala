@@ -21,7 +21,7 @@ import models.TaxYearFromUIAssembler
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.time.TaxYear
-import utils.TaxYearDates.{YEAR_2020, YEAR_2021, YEAR_2022, YEAR_2023}
+import utils.TaxYearDates.{YEAR_2020, YEAR_2021, YEAR_2022, YEAR_2023, YEAR_2024}
 
 class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
 
@@ -29,13 +29,14 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
     "be translated (checkbox input marshalling)" when {
       "when ALL possible years are selected" in {
         val expectedYearsTupleList = List(
+          (TaxYear(YEAR_2024).starts, TaxYear(YEAR_2024).finishes),
           (TaxYear(YEAR_2023).starts, TaxYear(YEAR_2023).finishes),
           (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
           (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
           (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
         )
 
-        val selectedYearsOptions = List("option1", "option2", "option3", "option4")
+        val selectedYearsOptions = List("option1", "option2", "option3", "option4", "option5")
 
         val assembledResult = TaxYearFromUIAssembler(selectedYearsOptions).assemble
         assert(assembledResult == expectedYearsTupleList)
@@ -46,7 +47,7 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
           (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
           (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes)
         )
-        val selectedYearsOptions = List("option2", "option3")
+        val selectedYearsOptions = List("option3", "option4")
 
         val assembledResult = TaxYearFromUIAssembler(selectedYearsOptions).assemble
         assert(assembledResult == expectedYearsTupleList)
@@ -54,46 +55,47 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
 
       "when 2022 only year is selected" in {
         val expectedYearsTupleList = List((TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes))
-        val assembledResult = TaxYearFromUIAssembler(List("option2")).assemble
+        val assembledResult = TaxYearFromUIAssembler(List("option3")).assemble
         assert(assembledResult == expectedYearsTupleList)
       }
 
-      "when 2022 and previous year is selected" in {
+      "when 2022 and 2020 year is selected" in {
         val expectedYearsTupleList = List(
           (TaxYear(YEAR_2022).starts, TaxYear(YEAR_2022).finishes),
           (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
         )
 
-        val assembledResult = TaxYearFromUIAssembler(List("option2", "option4")).assemble
+        val assembledResult = TaxYearFromUIAssembler(List("option3", "option5")).assemble
         assert(assembledResult == expectedYearsTupleList)
       }
 
       "when 2021 only year is selected" in {
         val expectedYearsTupleList = List((TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes))
-        val assembledResult = TaxYearFromUIAssembler(List("option3")).assemble
-        assert(assembledResult == expectedYearsTupleList)
-      }
-
-      "when 2021 and previous year is selected" in {
-        val expectedYearsTupleList = List(
-          (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
-          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
-        )
-        val assembledResult = TaxYearFromUIAssembler(List("option3", "option4")).assemble
-        assert(assembledResult == expectedYearsTupleList)
-      }
-
-      "when previous year only is selected" in {
-        val expectedYearsTupleList = List(
-          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
-        )
         val assembledResult = TaxYearFromUIAssembler(List("option4")).assemble
         assert(assembledResult == expectedYearsTupleList)
       }
 
+      "when 2021 and 2020 year is selected" in {
+        val expectedYearsTupleList = List(
+          (TaxYear(YEAR_2021).starts, TaxYear(YEAR_2021).finishes),
+          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
+        )
+        val assembledResult = TaxYearFromUIAssembler(List("option4", "option5")).assemble
+        assert(assembledResult == expectedYearsTupleList)
+      }
+
+      "when 2020 year only is selected" in {
+        val expectedYearsTupleList = List(
+          (TaxYear(YEAR_2020).starts, TaxYear(YEAR_2020).finishes)
+        )
+        val assembledResult = TaxYearFromUIAssembler(List("option5")).assemble
+        assert(assembledResult == expectedYearsTupleList)
+      }
+
       "when something completely unknown is selected" in {
-        val assembledResult = TaxYearFromUIAssembler(List("XXXXXXX")).assemble
-        assert(assembledResult == Nil)
+        assertThrows[IllegalArgumentException] {
+          TaxYearFromUIAssembler(List("XXXXXXX")).assemble
+        }
       }
 
       "when empty list is selected (should never really happen)" in {
@@ -122,7 +124,7 @@ class TaxYearFromUIAssemblerTest extends PlaySpec with MockitoSugar {
         assertTrue(assembledResult.containsCurrent)
       }
       "when all years selected" in {
-        val assembledResult = TaxYearFromUIAssembler(List("option1", "option2", "option3"))
+        val assembledResult = TaxYearFromUIAssembler(List("option1", "option2", "option3", "option4", "option5"))
         assertTrue(assembledResult.containsCurrent)
       }
     }

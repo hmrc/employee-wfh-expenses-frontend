@@ -26,7 +26,8 @@ trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
   def intPage(form: Form[Int],
               createView: Form[Int] => HtmlFormat.Appendable,
               messageKeyPrefix: String,
-              expectedFormAction: String): Unit = {
+              expectedFormAction: String,
+              args: Seq[String] = Nil): Unit = {
 
     "behave like a page with an integer value field" when {
 
@@ -35,7 +36,7 @@ trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
         "contain a label for the value" in {
 
           val doc = asDocument(createView(form))
-          assertContainsLabel(doc, "value", messages(s"$messageKeyPrefix.title"))
+          assertContainsLabel(doc, "value", messages(s"$messageKeyPrefix.title", args:_*))
         }
 
         "contain an input for the value" in {
@@ -64,15 +65,15 @@ trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
 
         "show an error associated with the value field" in {
 
-          val doc = asDocument(createView(form.withError(error(messageKeyPrefix))))
+          val doc = asDocument(createView(form.withError(error(messageKeyPrefix, args))))
           val errorSpan = doc.getElementById("value-error")
-          errorSpan.text mustBe (messages("error.browser.title.prefix") + " " + messages(s"${messageKeyPrefix}.${errorMessage}"))
+          errorSpan.text mustBe (messages("error.browser.title.prefix") + " " + messages(s"${messageKeyPrefix}.${errorMessage}", args:_*))
         }
 
         "show an error prefix in the browser title" in {
 
           val doc = asDocument(createView(form.withError(error(messageKeyPrefix))))
-          val title = s"${messages(s"$messageKeyPrefix.title")} - ${messages("service.name")} - GOV.UK"
+          val title = s"${messages(s"$messageKeyPrefix.title", args:_*)} - ${messages("service.name")} - GOV.UK"
           assertEqualsValue(doc, "title", s"""${messages("error.browser.title.prefix")} $title""")
         }
       }

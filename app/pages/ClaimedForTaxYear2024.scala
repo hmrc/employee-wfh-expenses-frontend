@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package forms
+package pages
 
-import forms.mappings.{DateFormatter, Mappings}
-import javax.inject.Inject
-import models.Date
-import play.api.data.Form
-import play.api.data.Forms.{mapping, of}
-import play.api.i18n.Messages
-import utils.TaxYearDates.TAX_YEAR_2021_START_DATE
+import play.api.libs.json.JsPath
 
-class WhenDidYouFirstStartWorkingFromHomeFormProvider @Inject() extends Mappings {
+case object ClaimedForTaxYear2024 extends QuestionPage[Boolean] {
 
-  def apply(implicit messages: Messages): Form[Date] = Form(
-    mapping(
-      "whenDidYouFirstStartWorkingFromHome" -> of(DateFormatter("whenDidYouFirstStartWorkingFromHome", optMaxDate = Some(TAX_YEAR_2021_START_DATE)))
-    )(Date.apply)(Date.unapply)
-  )
+  override def path: JsPath = JsPath \ toString
 
+  override def toString: String = "claimedForTaxYear2024"
 }

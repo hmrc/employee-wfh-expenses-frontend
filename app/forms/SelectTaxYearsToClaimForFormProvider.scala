@@ -20,13 +20,14 @@ import javax.inject.Inject
 
 import forms.mappings.Mappings
 import play.api.data.Form
-import play.api.data.Forms.set
-import models.SelectTaxYearsToClaimFor
+import play.api.data.Forms.seq
+import models.TaxYearSelection
 
 class SelectTaxYearsToClaimForFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Set[SelectTaxYearsToClaimFor]] =
+  def apply(): Form[Seq[TaxYearSelection]] =
     Form(
-      "value" -> set(enumerable[SelectTaxYearsToClaimFor]("selectTaxYearsToClaimFor.error.required")).verifying(nonEmptySet("selectTaxYearsToClaimFor.error.required"))
+      "value" -> seq(enumerable[TaxYearSelection]("selectTaxYearsToClaimFor.error.required"))
+        .verifying(nonEmptySeq("selectTaxYearsToClaimFor.error.required"))
     )
 }

@@ -16,9 +16,8 @@
 
 package controllers
 
-import java.time.LocalDate
-
 import controllers.actions._
+
 import javax.inject.Inject
 import navigation.Navigator
 import pages.{DisclaimerPage, SelectTaxYearsToClaimForPage}
@@ -26,7 +25,6 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DateLanguageTokenizer
 import views.html.DisclaimerView
 
 class DisclaimerController @Inject()(
@@ -44,18 +42,9 @@ class DisclaimerController @Inject()(
     implicit request =>
       request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
         case Some(_) =>
-          val tokenizerFormattedItem = DateLanguageTokenizer.convertDate(LocalDate.of(2022, 4, 1))
-
           val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
 
-          Ok(disclaimerView(
-            tokenizerFormattedItem.month,
-            tokenizerFormattedItem.year.toString,
-            Some(tokenizerFormattedItem.month),
-            Some(tokenizerFormattedItem.year.toString),
-            selectedTaxYears.contains2022OrAfter,
-            selectedTaxYears.contains2021OrPrevious
-          ))
+          Ok(disclaimerView(selectedTaxYears.contains2022OrAfter, selectedTaxYears.contains2021Or2020))
         case None => Redirect(routes.IndexController.start)
       }
   }

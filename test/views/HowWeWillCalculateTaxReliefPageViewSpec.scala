@@ -17,12 +17,11 @@
 package views
 
 import controllers.UIAssembler
-import models.{ClaimViewSettings, Date, DisclaimerViewSettings, TaxYearFromUIAssembler}
+import models.TaxYearFromUIAssembler
 import play.api.test.FakeRequest
-import utils.DateLanguageTokenizer
+import utils.TaxYearFormatter
 import views.behaviours.ViewBehaviours
 import views.html.HowWeWillCalculateTaxReliefView
-import java.time.LocalDate
 
 class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAssembler {
 
@@ -30,29 +29,38 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
 
     val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
 
-    val assembler = TaxYearFromUIAssembler(List("option2"))
+    val assembler = TaxYearFromUIAssembler(List("option3"))
 
-    val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-      Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+    val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
 
-    val date = Date(LocalDate.of(2020, 4, 1))
+    val applyView = view.apply(taxYearList)(fakeRequest, messages)
 
-    val applyView = view.apply(true, disclaimerViewSettings, Some(date))(fakeRequest, messages)
-
-    behave like normalPage(applyView, "howWeWillCalculateTaxRelief")
+    behave like normalPage(applyView, "howWeWillCalculateTaxRelief", args = Nil)
 
     "show content" when {
-      "when all howWeWillCalculateTaxRelief content is displayed for tax year 2023 to 2024" in {
+      "when all howWeWillCalculateTaxRelief content is displayed for tax year 2024 to 2025" in {
         val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
         val request = FakeRequest()
 
         val assembler = TaxYearFromUIAssembler(List("option1"))
+        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
 
-        val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
+        val doc = asDocument(view.apply(taxYearList)(request, messages))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
+        assert(doc.toString.contains(messages("6 April 2024 to 5 April 2025")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")))
+        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)))
+      }
 
-        val date = Date(LocalDate.of(2022, 4, 1))
-        val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
+      "when all howWeWillCalculateTaxRelief content is displayed for tax year 2023 to 2024" in {
+        val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
+        val request = FakeRequest()
+
+        val assembler = TaxYearFromUIAssembler(List("option2"))
+        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
+
+        val doc = asDocument(view.apply(taxYearList)(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
         assert(doc.toString.contains(messages("6 April 2023 to 5 April 2024")))
@@ -64,13 +72,10 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
         val request = FakeRequest()
 
-        val assembler = TaxYearFromUIAssembler(List("option2"))
+        val assembler = TaxYearFromUIAssembler(List("option3"))
+        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
 
-        val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
-
-        val date = Date(LocalDate.of(2022, 4, 1))
-        val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
+        val doc = asDocument(view.apply(taxYearList)(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
         assert(doc.toString.contains(messages("6 April 2022 to 5 April 2023")))
@@ -82,38 +87,15 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
         val request = FakeRequest()
 
-        val assembler = TaxYearFromUIAssembler(List("option3"))
+        val assembler = TaxYearFromUIAssembler(List("option4"))
+        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
 
-        val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
-
-        val date = Date(LocalDate.of(2022, 4, 1))
-        val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
+        val doc = asDocument(view.apply(taxYearList)(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
         assert(doc.toString.contains(messages("6 April 2021 to 5 April 2022")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.yearly.text")))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)))
-      }
-
-      "when all howWeWillCalculateTaxRelief content is displayed for tax year before 2021" in {
-        val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
-        val request = FakeRequest()
-
-        val assembler = TaxYearFromUIAssembler(List("option4"))
-
-        val disclaimerViewSettings = DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(assembler.assemble),
-          Some(DateLanguageTokenizer.convertList(assembler.assemble)))))
-
-        val date = Date(LocalDate.of(2022, 4, 1))
-        val doc = asDocument(view.apply(true, disclaimerViewSettings, Some(date))(request, messages))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
-        assert(doc.toString.contains(messages("Previous years before 6 April 2021")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.end.date.inset.text")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 4)))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.enter.start.date.text")))
       }
     }
   }

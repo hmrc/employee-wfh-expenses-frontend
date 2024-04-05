@@ -23,19 +23,14 @@
         inputNumber: components.input_number
 )
 
-@(form: Form[_], taxYear: TaxYearSelection)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], taxYears: Seq[TaxYearSelection])(implicit request: Request[_], messages: Messages)
 
-
-@prefix = @{
-    if(taxYear.equals(TaxYearSelection.CurrentYear)) {
-        s"numberOfWeeksToClaimFor"
-    } else {
-        s"numberOfWeeksToClaimFor.previous"
-    }
+@taxYearFormatted(taxYear: TaxYearSelection) = @{
+    messages("site.taxYearTo", taxYear.formattedTaxYearArgs: _*)
 }
 
 @layout(
-    pageTitle = s"${errorPrefix(form)} ${messages(s"$prefix.title", taxYear.formattedTaxYearArgs: _*)}",
+    pageTitle = s"${errorPrefix(form)} ${messages("numberOfWeeksToClaimFor.multiple.title")}",
     beforeContentBlock = Some(backLink(BackLink(
         href = routes.InformClaimNowInWeeksController.onPageLoad().url,
         content = Text(messages("site.back")),
@@ -50,19 +45,21 @@
         ))
     }
 
-    <h1 class="govuk-heading-xl">@messages(s"$prefix.heading", taxYear.formattedTaxYearArgs: _*)</h1>
-
-    <p class="govuk-body">@messages(s"$prefix.para", taxYear.formattedTaxYearArgs: _*)</p>
+    <h1 class="govuk-heading-xl">@messages("numberOfWeeksToClaimFor.multiple.heading")</h1>
+    <p class="govuk-hint" id="number-of-weeks">@messages("numberOfWeeksToClaimFor.multiple.hintText")</p>
 
     @formHelper(action = routes.NumberOfWeeksToClaimForController.onSubmit(), Symbol("autoComplete") -> "off") {
-        @inputNumber(
-            field = form(taxYear.toString),
-            hintText = Some(messages(s"$prefix.hintText")),
-            question = messages(s"$prefix.question", taxYear.formattedTaxYearArgs: _*),
-            name = taxYear.toString,
-            id = taxYear.toString,
-            hideLabel = true
-        )
+        @for(taxYear <- taxYears) {
+            @inputNumber(
+                field = form(taxYear.toString),
+                question = taxYearFormatted(taxYear),
+                name = taxYear.toString,
+                id = taxYear.toString,
+                hideLabel = false,
+                labelClass = "govuk-label--m",
+                describedBy = Some("number-of-weeks")
+            )
+        }
 
         @button(Button(content = Text(messages("site.continue")), preventDoubleClick = Some(true)))
     }

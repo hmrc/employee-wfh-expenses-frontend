@@ -24,8 +24,8 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 trait CheckboxViewBehaviours[A] extends ViewBehaviours {
 
   //noinspection ScalaStyle
-  def checkboxPage(form: Form[Set[A]],
-                   createView: Form[Set[A]] => HtmlFormat.Appendable,
+  def checkboxPage(form: Form[Seq[A]],
+                   createView: Form[Seq[A]] => HtmlFormat.Appendable,
                    messageKeyPrefix: String,
                    options: Seq[CheckboxItem],
                    fieldKey: String = "value",

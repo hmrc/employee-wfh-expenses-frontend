@@ -24,7 +24,4 @@ trait PageGenerators {
   implicit lazy val arbitrarySelectTaxYearsToClaimForPage: Arbitrary[SelectTaxYearsToClaimForPage.type] =
     Arbitrary(SelectTaxYearsToClaimForPage)
 
-  implicit lazy val arbitraryWhenDidYouFirstStartWorkingFromHomePage: Arbitrary[WhenDidYouFirstStartWorkingFromHomePage.type] =
-    Arbitrary(WhenDidYouFirstStartWorkingFromHomePage)
-
 }

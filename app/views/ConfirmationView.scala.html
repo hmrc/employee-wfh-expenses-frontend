@@ -29,7 +29,7 @@
 @(
         paperLessAvailable: Boolean,
         paperlessSignupUrl: Option[String],
-        claimingFor2021OrPrevious: Boolean,
+        claimingForPrevious: Boolean,
         claimingForCurrent: Boolean
 )(
         implicit request: Request[_],
@@ -59,7 +59,7 @@
         </ul>
     }
 
-    @if(claimingFor2021OrPrevious) {
+    @if(claimingForPrevious) {
         <h2 class="govuk-heading-m">@messages("confirmation.changes.previousYear.heading")</h2>
         <p class="govuk-body">@messages("confirmation.changes.previousYear.p.1")</p>
     }

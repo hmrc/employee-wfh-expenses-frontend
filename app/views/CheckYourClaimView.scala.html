@@ -14,43 +14,43 @@
  * limitations under the License.
  *@
 
-@import java.time.LocalDate
-@import utils.TaxYearDates._
 @import config.FrontendAppConfig
+@import models.TaxYearSelection.{NextYear, wholeYearClaims}
+@import scala.collection.immutable.ListMap
+@import models.TaxYearSelection.CurrentYear
 
 @this(
-    layout:             views.templates.LayoutProvider,
-    appConfig:          FrontendAppConfig,
-    formHelper:         FormWithCSRF,
-    backLink:           GovukBackLink,
-    govukInsetText:     GovukInsetText,
-    govukDetails:       GovukDetails,
-    button:             GovukButton
+        layout: views.templates.LayoutProvider,
+        appConfig: FrontendAppConfig,
+        formHelper: FormWithCSRF,
+        backLink: GovukBackLink,
+        govukInsetText: GovukInsetText,
+        govukDetails: GovukDetails,
+        button: GovukButton
 )
 
-@(claimViewSettings: ClaimViewSettings, startDate: Option[Date], numberOfWeeksIn2019: Long, numberOfWeeksIn2023: Option[Int], yearsClaimingFor: List[String])(implicit request: Request[_], messages: Messages)
-
-@readableDate(date: LocalDate) = {@{date.getDayOfMonth} @{messages(s"month.${date.getMonthValue}")} @{date.getYear}}
-
-@insetHtml(date: LocalDate) = {
-    @messages("checkYourClaimView.inset.text")
-    <b>@readableDate(date)</b>.
-    <br>
-    <a href=@routes.WhenDidYouFirstStartWorkingFromHomeController.onPageLoad()>@messages("checkYourClaimView.changeThisDate.href.text")</a>
-}
+@(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: ListMap[TaxYearSelection, Int])(implicit request: Request[_], messages: Messages)
 
 @pluralOrSingularWeeks(weeks: Long) = @{
-    if (weeks == 1) {
+    if(weeks == 1) {
         messages("number.of.weeks.singular", weeks)
     } else {
         messages("number.of.weeks.plural", weeks)
     }
 }
 
-@maybeWeeksOf2023 = {
-    @numberOfWeeksIn2023.map { weeks =>
-        <li>@messages("checkYourClaimView.list.item3", pluralOrSingularWeeks(weeks))</li>
+@claimItems = @{
+    selectedTaxYears.map {
+        case taxYear if wholeYearClaims.contains(taxYear) => wholeYearClaimItem(taxYear)
+        case taxYear => weekClaimItem(taxYear, weeksForTaxYears.getOrElse(taxYear, 0))
     }
+}
+@weekClaimItem(taxYear: TaxYearSelection, weeks: Int) = {
+        <li>@messages("checkYourClaimView.list.weekClaimItem", pluralOrSingularWeeks(weeks) +: taxYear.formattedTaxYearArgs: _*)</li>
+}
+
+@wholeYearClaimItem(taxYear: TaxYearSelection) = {
+        <li>@messages("checkYourClaimView.list.wholeYearClaimItem", taxYear.formattedTaxYearArgs: _*)</li>
 }
 
 @detailsContent = {
@@ -70,12 +70,7 @@
 ) {
     <h1 class="govuk-heading-xl">@messages("checkYourClaimView.heading")</h1>
 
-    @if(startDate.isDefined) {
-        @govukInsetText(InsetText(
-            content = HtmlContent(insetHtml(startDate.get.date))
-        ))
-    }
-    <h2 class="govuk-heading-m">@messages("checkYourClaimView.header")</h2>
+    <h2 class="govuk-heading-m">@messages("checkYourClaimView.subheading.1")</h2>
 
     <p class="govuk-body">@messages("checkYourClaimView.text.1.1")
         <span class="govuk-!-font-weight-bold">&pound;@appConfig.taxReliefPerWeek2020</span>
@@ -83,34 +78,23 @@
     </p>
 
     <ul class="govuk-list govuk-list--bullet">
-        @maybeWeeksOf2023
-        @for(dateToken <- claimViewSettings.datesToClaim) {
-            <li>@messages("checkYourClaimView.text.2") @dateToken._1.day @messages(dateToken._1.month) @dateToken._1.year @messages("howWeWillCalculateTaxRelief.your.claim.date.to") @dateToken._2.day @messages(dateToken._2.month) @dateToken._2.year</li>
-        }
+        @claimItems
     </ul>
 
-    @if(startDate.isDefined && startDate.get.date.isBefore(TAX_YEAR_2020_START_DATE)) {
-        <p class="govuk-body">@messages("checkYourClaimView.text.1.1")
-            <span class="govuk-!-font-weight-bold">&pound;@appConfig.taxReliefPerWeek2019</span>
-            @messages("checkYourClaimView.text.1.2")
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet">
-            <li>@messages("checkYourClaimView.list.item2", pluralOrSingularWeeks(numberOfWeeksIn2019))</li>
-        </ul>
+    @if(selectedTaxYears.contains(CurrentYear)) {
+        <p class="govuk-body">@messages("checkYourClaimView.text.2", NextYear.formattedTaxYearArgs: _*)</p>
     }
 
-    <p class="govuk-body">@messages("checkYourClaimView.text.3")</p>
-        @govukDetails(Details(
-            summary = Text(messages("checkYourClaimView.details.heading")),
-            content = HtmlContent(detailsContent)
+    @govukDetails(Details(
+        summary = Text(messages("checkYourClaimView.details.heading")),
+        content = HtmlContent(detailsContent)
     ))
 
-    <h2 class="govuk-heading-m">@messages("checkYourClaimView.text.4")</h2>
+    <h2 class="govuk-heading-m">@messages("checkYourClaimView.subheading.2")</h2>
 
-    <p class="govuk-body">@messages("checkYourClaimView.text.5")</p>
+    <p class="govuk-body">@messages("checkYourClaimView.text.3")</p>
 
-    @formHelper(action = CheckYourClaimController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.CheckYourClaimController.onSubmit(), Symbol("autoComplete") -> "off") {
         @button(Button(content = Text(messages("checkYourClaimView.button.label"))))
     }
 

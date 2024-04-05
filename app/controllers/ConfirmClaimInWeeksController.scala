@@ -26,7 +26,7 @@ import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SessionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ConfirmClaimInWeeksView
+import views.html.{ConfirmClaimInWeeksMultipleView, ConfirmClaimInWeeksView}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,34 +39,46 @@ class ConfirmClaimInWeeksController @Inject()(override val messagesApi: Messages
                                               requireData: DataRequiredAction,
                                               navigator: Navigator,
                                               confirmClaimInWeeksView: ConfirmClaimInWeeksView,
+                                              confirmClaimInWeeksMultipleView: ConfirmClaimInWeeksMultipleView,
                                               formProvider: ConfirmClaimInWeeksFormProvider,
                                               val controllerComponents: MessagesControllerComponents
                                              )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
-      request.userAnswers.get(NumberOfWeeksToClaimForPage).fold(Redirect(routes.SessionExpiredController.onPageLoad)) {
-        numberOfWeeksToConfirm =>
-          val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm)
+      request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) match {
+        case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.size > 1 =>
+          Ok(confirmClaimInWeeksMultipleView(numberOfWeeksToClaimFor))
+        case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.nonEmpty =>
+          val (taxYear, numberOfWeeks) = numberOfWeeksToClaimFor.head
+          val form: Form[Boolean] = formProvider(numberOfWeeks)
 
           val preparedForm = request.userAnswers.get(ConfirmClaimInWeeksPage) match {
             case None => form
             case Some(value) => form.fill(value)
           }
 
-          Ok(confirmClaimInWeeksView(preparedForm, numberOfWeeksToConfirm))
+          Ok(confirmClaimInWeeksView(preparedForm, numberOfWeeks, taxYear))
+        case _ =>
+          Redirect(routes.SessionExpiredController.onPageLoad)
       }
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
     implicit request =>
-      request.userAnswers.get(NumberOfWeeksToClaimForPage).fold(Future.successful(Redirect(routes.SessionExpiredController.onPageLoad))) {
-        numberOfWeeksToConfirm =>
-          val form: Form[Boolean] = formProvider(numberOfWeeksToConfirm)
+      request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) match {
+        case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.size > 1 =>
+          for {
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmClaimInWeeksPage, true))
+            _ <- sessionService.set(updatedAnswers)
+          } yield Redirect(navigator.nextPage(ConfirmClaimInWeeksPage, updatedAnswers))
+        case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.nonEmpty =>
+          val (taxYear, numberOfWeeks) = numberOfWeeksToClaimFor.head
+          val form: Form[Boolean] = formProvider(numberOfWeeks)
 
           form.bindFromRequest().fold(
             formWithErrors => {
-              Future.successful(BadRequest(confirmClaimInWeeksView(formWithErrors, numberOfWeeksToConfirm)))
+              Future.successful(BadRequest(confirmClaimInWeeksView(formWithErrors, numberOfWeeks, taxYear)))
             },
             value =>
               for {
@@ -74,6 +86,8 @@ class ConfirmClaimInWeeksController @Inject()(override val messagesApi: Messages
                 _ <- sessionService.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(ConfirmClaimInWeeksPage, updatedAnswers))
           )
+        case _ =>
+          Future.successful(Redirect(routes.SessionExpiredController.onPageLoad))
       }
   }
 }

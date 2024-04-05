@@ -43,6 +43,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
   val testYear2021 = 2021
   val testYear2022 = 2022
   val testYear2023 = 2023
+  val testYear2024 = 2024
 
   val mockIABDService: IABDService = mock[IABDService]
   val mockNavigator: Navigator = mock[Navigator]
@@ -61,9 +62,9 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
     val otherExpenses = Seq(IABDExpense(testOtherExpensesAmount))
     val jobExpenses = Seq(IABDExpense(testJobExpensesAmount))
 
-    "redirect to the SelectTaxYearsToClaimFor page for a GET" when {
+    "redirect to the TaxYearSelection page for a GET" when {
       "not claimed expenses for any years" in {
-        val expenses = (None, None, None, None)
+        val expenses = (None, None, None, None, None)
         when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -83,6 +84,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
           Some(Expenses(testYear2023, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false)),
           None,
           Some(Expenses(testYear2021, Seq.empty, jobExpenses, wasJobRateExpensesChecked = true)),
+          None,
           None
         )
 
@@ -104,6 +106,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
     "redirect to P87SUB form" when {
       "claimed expenses for all years" in {
         val expenses = (
+          Some(Expenses(testYear2024, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
           Some(Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
           Some(Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
           Some(Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),

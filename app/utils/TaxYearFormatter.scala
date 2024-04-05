@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package models
+package utils
 
-import play.api.libs.json._
+import play.api.i18n.Messages
 
 import java.time.LocalDate
-import scala.util.{Failure, Success, Try}
+import java.time.format.DateTimeFormatter
 
-case class Date(date: LocalDate)
+case class TaxYearFormatter(taxYears: List[(LocalDate, LocalDate)])(implicit val messages: Messages) {
 
-object Date {
+  private lazy val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", messages.lang.toLocale)
 
-  val dateReads: Reads[Date] = (json: JsValue) => {
-    Try(LocalDate.parse(json.as[JsString].value)) match {
-      case Success(javaLocalDate) => JsSuccess(Date(javaLocalDate))
-      case Failure(e) => JsError(JsonValidationError(e.getMessage))
+  def formattedTaxYears: List[(String, String)] = {
+    taxYears.map {
+      case (startDate, endDate) => (startDate.format(formatter), endDate.format(formatter))
     }
   }
-
-  val dateWrites: Writes[Date] = (date: Date) => {
-    JsString(date.date.toString)
-  }
-
-  implicit val dateFormat: Format[Date] = Format(dateReads, dateWrites)
 }

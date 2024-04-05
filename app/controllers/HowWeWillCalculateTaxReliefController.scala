@@ -16,18 +16,14 @@
 
 package controllers
 
-import java.time.LocalDate
-
-import controllers.actions._
+import actions._
 import javax.inject.Inject
-import models.{ClaimViewSettings, Date, DisclaimerViewSettings}
 import navigation.Navigator
 import pages._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.DateLanguageTokenizer
-import utils.TaxYearDates.TAX_YEAR_2021_START_DATE
+import utils.TaxYearFormatter
 import views.html.HowWeWillCalculateTaxReliefView
 
 class HowWeWillCalculateTaxReliefController @Inject()(
@@ -46,22 +42,10 @@ class HowWeWillCalculateTaxReliefController @Inject()(
       request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
         case Some(_) =>
           val selectedTaxYearsAssembler = taxYearFromUIAssemblerFromRequest()
+          val taxYears = selectedTaxYearsAssembler.assemble
+          val formattedTaxYears = TaxYearFormatter(taxYears).formattedTaxYears
 
-          val startDate: Option[Date] = if(selectedTaxYearsAssembler.containsPrevious) {
-            request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage)
-          } else {
-            Some(Date(TAX_YEAR_2021_START_DATE))
-          }
-
-          def buildDisclaimerPageSettings(dateList: List[(LocalDate, LocalDate)]) = {
-            if (request.userAnswers.get(WhenDidYouFirstStartWorkingFromHomePage).isDefined) {
-              DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), Some(DateLanguageTokenizer.convertList(dateList)))))
-            } else {
-              DisclaimerViewSettings(Some(ClaimViewSettings(DateLanguageTokenizer.convertList(dateList), None)))
-            }
-          }
-
-          Ok(howWeWillCalculateTaxReliefView(showBackLink = true, buildDisclaimerPageSettings(selectedTaxYearsAssembler.assemble), startDate))
+          Ok(howWeWillCalculateTaxReliefView(formattedTaxYears))
 
         case None => Redirect(routes.IndexController.start)
       }

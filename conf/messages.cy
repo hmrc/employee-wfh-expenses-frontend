@@ -121,15 +121,15 @@ checkYourClaimView.button.label = Cadarnhau a chyflwyno
 checkYourClaimView.list.weekClaimItem = {0} o flwyddyn dreth {1} i {2}
 checkYourClaimView.list.wholeYearClaimItem = y flwyddyn dreth gyfan {0} i {1}
 
-confirmClaimInWeeks.current.title = A ydych am hawlio {0} o wythnosau am weithio gartref yn ystod y flwyddyn dreth bresennol?
-confirmClaimInWeeks.current.hint = Mae’r hawliad am {0} o wythnosau ar gyfer y flwyddyn dreth bresennol rhwng {1} a {2}.
-confirmClaimInWeeks.error.required = Dewiswch ‘Iawn’ os ydych am hawlio {0} o wythnosau o weithio gartref
-confirmClaimInWeeks.previous.title = A ydych am hawlio {0} wythnosau am weithio gartref rhwng {1} a {2}?
-confirmClaimInWeeks.previous.hint = Mae’r hawliad am {0} o wythnosau ar gyfer y flwyddyn dreth bresennol rhwng {1} i {2}.
+confirmClaimInWeeks.current.title = A ydych am hawlio {0} am weithio gartref yn ystod y flwyddyn dreth bresennol?
+confirmClaimInWeeks.current.hint = Mae’r hawliad am {0} ar gyfer y flwyddyn dreth bresennol rhwng {1} a {2}.
+confirmClaimInWeeks.error.required = Dewiswch ‘Iawn’ os ydych am hawlio {0} o weithio gartref
+confirmClaimInWeeks.previous.title = A ydych am hawlio {0} am weithio gartref rhwng {1} a {2}?
+confirmClaimInWeeks.previous.hint = Mae’r hawliad am {0} ar gyfer y flwyddyn dreth rhwng {1} i {2}.
 confirmClaimInWeeks.multiple.title = Gwiriwch y nifer o wythnosau yn eich hawliad ar gyfer y blynyddoedd treth hyn
 confirmClaimInWeeks.multiple.heading = Gwiriwch y nifer o wythnosau yn eich hawliad ar gyfer y blynyddoedd treth hyn
-confirmClaimInWeeks.multiple.hidden.current = the number of weeks for the current tax year {0} to {1}
-confirmClaimInWeeks.multiple.hidden.previous = the number of weeks for the previous tax year {0} to {1}
+confirmClaimInWeeks.multiple.hidden.current = y nifer o wythnosau ar gyfer y flwyddyn dreth bresennol {0} i {1}
+confirmClaimInWeeks.multiple.hidden.previous = y nifer o wythnosau ar gyfer y flwyddyn dreth blaenorol {0} i {1}
 
 submitYourClaim.title = Cyflwynwch eich hawliad
 submitYourClaim.heading = Cyflwynwch eich hawliad

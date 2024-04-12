@@ -81,4 +81,23 @@ class SessionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter 
       await(TestService.get(testId)) mustBe Some(testData)
     }
   }
+
+  "updateTimeToLive" must {
+    "return true on success for non merged journey" in {
+      val testData = testUserAnswers(false)
+      when(mockSessionRepository.get(eqm(testId))).thenReturn(Future.successful(Some(testData)))
+      when(mockSessionRepository.set(eqm(testData))).thenReturn(Future.successful(true))
+
+      await(TestService.updateTimeToLive(testId)) mustBe true
+    }
+
+    "return true on success for merged journey" in {
+      val testData = testUserAnswers(true)
+      when(mockSessionRepository.get(eqm(testId))).thenReturn(Future.successful(Some(testData)))
+      when(mockSessionRepository.set(eqm(testData))).thenReturn(Future.successful(true))
+      when(mockEmployeeExpensesConnector.updateMergedJourneySession(any())).thenReturn(Future.successful(true))
+
+      await(TestService.updateTimeToLive(testId)) mustBe true
+    }
+  }
 }

@@ -43,8 +43,8 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
     "return OK when user has multiple week claims" in {
       val userAnswers = UserAnswers(userAnswersId, Json.obj(
         NumberOfWeeksToClaimForPage.toString -> Json.arr(
-          Json.arr(CurrentYear.toString, numberOfWeeks),
-          Json.arr(CurrentYearMinus1.toString, numberOfWeeks)
+          Json.arr(CurrentYear.toTaxYear.startYear, numberOfWeeks),
+          Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks)
         )
       ))
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
@@ -60,7 +60,7 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
 
     "return OK when user has only one week claim" in {
       val userAnswers = UserAnswers(userAnswersId, Json.obj(
-        NumberOfWeeksToClaimForPage.toString -> Json.arr(Json.arr(CurrentYearMinus1.toString, numberOfWeeks))
+        NumberOfWeeksToClaimForPage.toString -> Json.arr(Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks))
       ))
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -97,8 +97,8 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
 
       val userAnswers = UserAnswers(userAnswersId, Json.obj(
         NumberOfWeeksToClaimForPage.toString -> Json.arr(
-          Json.arr(CurrentYear.toString, numberOfWeeks),
-          Json.arr(CurrentYearMinus1.toString, numberOfWeeks)
+          Json.arr(CurrentYear.toTaxYear.startYear, numberOfWeeks),
+          Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks)
         )
       ))
 
@@ -118,7 +118,7 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
       when(mockSessionService.set(any())(any())) thenReturn Future.successful(true)
 
       val userAnswers = UserAnswers(userAnswersId, Json.obj(
-        NumberOfWeeksToClaimForPage.toString -> Json.arr(Json.arr(CurrentYearMinus1.toString, numberOfWeeks))
+        NumberOfWeeksToClaimForPage.toString -> Json.arr(Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks))
       ))
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))

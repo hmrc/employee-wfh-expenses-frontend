@@ -35,7 +35,7 @@ class InformClaimNowInWeeksController @Inject()(
                                                  navigator: Navigator,
                                                  informClaimNowInWeeksView: InformClaimNowInWeeksView,
                                                  val controllerComponents: MessagesControllerComponents
-                                               ) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
+                                               ) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>

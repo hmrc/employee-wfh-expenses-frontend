@@ -33,7 +33,7 @@ class SelectTaxYearsToClaimForFormProviderSpec extends CheckboxFieldBehaviours {
       form,
       fieldName,
       validValues  = TaxYearSelection.valuesAll,
-      invalidError = FormError(s"$fieldName[0]", "error.invalid")
+      invalidError = FormError(s"$fieldName", requiredKey)
     )
 
     behave like mandatoryCheckboxField(

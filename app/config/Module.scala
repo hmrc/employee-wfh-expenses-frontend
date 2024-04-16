@@ -16,12 +16,13 @@
 
 package config
 
-import com.google.inject.AbstractModule
+import com.google.inject.{AbstractModule, Provides}
 import connectors.{PaperlessPreferenceConnector, PaperlessPreferenceConnectorImpl}
 import controllers.actions._
 import play.api.{Configuration, Environment}
-import services.{IABDService, IABDServiceImpl}
 import views.templates.{LayoutProvider, NewLayoutProvider, OldLayoutProvider}
+
+import javax.inject.Named
 
 class Module(environment: Environment, config: Configuration) extends AbstractModule {
 
@@ -35,8 +36,6 @@ class Module(environment: Environment, config: Configuration) extends AbstractMo
     // For session based storage instead of cred based, change to SessionIdentifierAction
     bind(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).asEagerSingleton()
     bind(classOf[PaperlessPreferenceConnector]).to(classOf[PaperlessPreferenceConnectorImpl]).asEagerSingleton()
-
-    bind(classOf[IABDService]).to(classOf[IABDServiceImpl]).asEagerSingleton()
 
     if (scaWrapperEnabled) {
       bind(classOf[LayoutProvider]).to(classOf[NewLayoutProvider]).asEagerSingleton()

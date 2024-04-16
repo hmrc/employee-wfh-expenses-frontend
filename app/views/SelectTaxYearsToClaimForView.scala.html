@@ -44,7 +44,9 @@
 
         @if(form.errors.nonEmpty) {
             @errorSummary(ErrorSummary(
-                errorList = form.errors.asTextErrorLinks.map(errorLink => errorLink.copy(href = Some("#option1"))),
+                errorList = form.errors.asTextErrorLinks.map(errorLink =>
+                    errorLink.copy(href = Some(s"#${availableYears.head.toString}"))
+                ),
                 title = Text(messages("error.summary.title"))
             ))
         }

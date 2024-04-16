@@ -16,86 +16,68 @@
 
 package views
 
-import controllers.UIAssembler
-import models.TaxYearFromUIAssembler
+import models.TaxYearSelection
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4, wholeYearClaims}
 import play.api.test.FakeRequest
-import utils.TaxYearFormatter
 import views.behaviours.ViewBehaviours
 import views.html.HowWeWillCalculateTaxReliefView
 
-class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAssembler {
+class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours {
 
   "Disclaimer view" must {
 
     val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
 
-    val assembler = TaxYearFromUIAssembler(List("option3"))
-
-    val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
+    val taxYearList = Seq(CurrentYearMinus2)
 
     val applyView = view.apply(taxYearList)(fakeRequest, messages)
+
+    object ExpectedContent {
+      val title = "How we will calculate tax relief for the years you have selected"
+      val insetText = "To claim, you must meet the eligibility rules for each of the listed years."
+      val weeklyText = "Claims are calculated in weeks"
+      val yearlyText = "Claims are given for the entire tax year"
+      def amountText(amount: Int) = s"Tax relief is £$amount per week"
+      val enterNumberOfWeeksText = "You need to enter the number of weeks you work from home for this tax year"
+    }
+
+    def checkContent(taxYear: TaxYearSelection, weekly: Boolean): Unit = {
+        import ExpectedContent._
+        val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
+        val request = FakeRequest()
+
+        val taxYearList = Seq(taxYear)
+
+        val doc = asDocument(view.apply(taxYearList)(request, messages))
+        assert(doc.toString.contains(title))
+        assert(doc.toString.contains(insetText))
+        assert(doc.toString.contains(s"${taxYear.formattedTaxYearArgs.head} to ${taxYear.formattedTaxYearArgs.last}"))
+        assert(doc.toString.contains(if(weekly) weeklyText else yearlyText))
+        assert(doc.toString.contains(amountText(frontendAppConfig.taxReliefPerWeek(taxYear))))
+        if(weekly) assert(doc.toString.contains(enterNumberOfWeeksText))
+    }
 
     behave like normalPage(applyView, "howWeWillCalculateTaxRelief", args = Nil)
 
     "show content" when {
-      "when all howWeWillCalculateTaxRelief content is displayed for tax year 2024 to 2025" in {
-        val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
-        val request = FakeRequest()
-
-        val assembler = TaxYearFromUIAssembler(List("option1"))
-        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
-
-        val doc = asDocument(view.apply(taxYearList)(request, messages))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
-        assert(doc.toString.contains(messages("6 April 2024 to 5 April 2025")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)))
+      "when all howWeWillCalculateTaxRelief weekly content is displayed for CTY" in {
+        checkContent(CurrentYear, weekly = true)
       }
 
-      "when all howWeWillCalculateTaxRelief content is displayed for tax year 2023 to 2024" in {
-        val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
-        val request = FakeRequest()
-
-        val assembler = TaxYearFromUIAssembler(List("option2"))
-        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
-
-        val doc = asDocument(view.apply(taxYearList)(request, messages))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
-        assert(doc.toString.contains(messages("6 April 2023 to 5 April 2024")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)))
+      "when all howWeWillCalculateTaxRelief weekly content is displayed for CTY-1" in {
+        checkContent(CurrentYearMinus1, weekly = true)
       }
 
-      "when all howWeWillCalculateTaxRelief content is displayed for tax year 2022 to 2023" in {
-        val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
-        val request = FakeRequest()
-
-        val assembler = TaxYearFromUIAssembler(List("option3"))
-        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
-
-        val doc = asDocument(view.apply(taxYearList)(request, messages))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
-        assert(doc.toString.contains(messages("6 April 2022 to 5 April 2023")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.yearly.text")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)))
+      "when all howWeWillCalculateTaxRelief content is displayed for CTY-2" in {
+          checkContent(CurrentYearMinus2, weekly = !wholeYearClaims.contains(CurrentYearMinus2))
       }
 
-      "when all howWeWillCalculateTaxRelief content is displayed for tax year 2021 to 2022" in {
-        val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
-        val request = FakeRequest()
+      "when all howWeWillCalculateTaxRelief content is displayed for CTY-3" in  {
+          checkContent(CurrentYearMinus3, weekly = !wholeYearClaims.contains(CurrentYearMinus3))
+      }
 
-        val assembler = TaxYearFromUIAssembler(List("option4"))
-        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
-
-        val doc = asDocument(view.apply(taxYearList)(request, messages))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.eligibility.inset.text")))
-        assert(doc.toString.contains(messages("6 April 2021 to 5 April 2022")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.frequency.yearly.text")))
-        assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)))
+      "when all howWeWillCalculateTaxRelief content is displayed for CTY-4" in  {
+          checkContent(CurrentYearMinus4, weekly = !wholeYearClaims.contains(CurrentYearMinus4))
       }
     }
   }

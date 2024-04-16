@@ -18,35 +18,35 @@ package services
 
 import config.FrontendAppConfig
 import connectors.TaiConnector
+import models.TaxYearSelection._
 import models.auditing.AuditEventType.AlreadyClaimedExpenses
 import models.{Expenses, IABDExpense}
 import play.api.Logging
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.TaxYearDates._
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class IABDServiceImpl @Inject()(
-                                 taiConnector: TaiConnector,
-                                 auditConnector: AuditConnector,
-                                 appConfig: FrontendAppConfig,
-                               )(implicit executionContext: ExecutionContext) extends IABDService with Logging {
+class IABDService @Inject()(taiConnector: TaiConnector,
+                            auditConnector: AuditConnector,
+                            appConfig: FrontendAppConfig,
+                           )(implicit executionContext: ExecutionContext)
+  extends Logging {
 
   def alreadyClaimed(nino: String, year: Int)(implicit hc: HeaderCarrier): Future[Option[Expenses]] = {
-    { for {
-      otherExpenses   <- taiConnector.getOtherExpensesData(nino, year)
+    for {
+      otherExpenses <- taiConnector.getOtherExpensesData(nino, year)
       otherRateAmount = otherExpenses.map(_.grossAmount).sum
-      jobExpenses     <-
-        if (otherRateAmount==0) {
+      jobExpenses <-
+        if (otherRateAmount == 0) {
           taiConnector.getJobExpensesData(nino, year)
         } else {
           Future.successful(Seq[IABDExpense]())
         }
-      jobRateAmount             = jobExpenses.map(_.grossAmount).sum
+      jobRateAmount = jobExpenses.map(_.grossAmount).sum
       wasJobRateExpensesChecked = if (otherRateAmount == 0) true else false
     } yield
       if (otherRateAmount > 0 || jobRateAmount > 0) {
@@ -54,34 +54,37 @@ class IABDServiceImpl @Inject()(
       } else {
         None
       }
-    }
   }
 
-  def getAlreadyClaimedStatusForAllYears(nino: String)(implicit hc: HeaderCarrier): Future[(Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses])] = {
+  def getAlreadyClaimedStatusForAllYears(nino: String)(implicit hc: HeaderCarrier): Future[Seq[Expenses]] = {
     for {
-      alreadyClaimed2020 <- alreadyClaimed(nino, YEAR_2020)
-      alreadyClaimed2021 <- alreadyClaimed(nino, YEAR_2021)
-      alreadyClaimed2022 <- alreadyClaimed(nino, YEAR_2022)
-      alreadyClaimed2023 <- alreadyClaimed(nino, YEAR_2023)
-      alreadyClaimed2024 <- alreadyClaimed(nino, YEAR_2024)
+      alreadyClaimedCy <- alreadyClaimed(nino, CurrentYear.toTaxYear.startYear)
+      alreadyClaimedCyMinus1 <- alreadyClaimed(nino, CurrentYearMinus1.toTaxYear.startYear)
+      alreadyClaimedCyMinus2 <- alreadyClaimed(nino, CurrentYearMinus2.toTaxYear.startYear)
+      alreadyClaimedCyMinus3 <- alreadyClaimed(nino, CurrentYearMinus3.toTaxYear.startYear)
+      alreadyClaimedCyMinus4 <- alreadyClaimed(nino, CurrentYearMinus4.toTaxYear.startYear)
     } yield {
-      (alreadyClaimed2020, alreadyClaimed2021, alreadyClaimed2022, alreadyClaimed2023, alreadyClaimed2024)
+      Seq(
+        alreadyClaimedCy,
+        alreadyClaimedCyMinus1,
+        alreadyClaimedCyMinus2,
+        alreadyClaimedCyMinus3,
+        alreadyClaimedCyMinus4
+      ).flatten
     }
   }
 
   def allYearsClaimed(nino: String,
-                      yearsClaimed: (Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses]),
+                      claimedYears: Seq[Expenses],
                       audit: Boolean = true)(implicit hc: HeaderCarrier): Boolean = {
-    yearsClaimed match {
-      case (Some(claimed2020), Some(claimed2021), Some(claimed2022), Some(claimed2023), Some(claimed2024)) =>
-        logger.info(s"[IABDService][hasClaimedForAllYears] Detected already claimed for" +
-          s" $YEAR_2020, $YEAR_2021, $YEAR_2022, $YEAR_2023 and $YEAR_2024; redirecting to P87 digital form")
+    claimedYears match {
+      case list if list.size == 5 =>
+        logger.info(s"[IABDService][allYearsClaimed] Detected already claimed for" +
+          s" all five tax years, redirecting to P87 digital form")
         if (audit) {
-          auditAlreadyClaimed(nino, YEAR_2020, claimed2020.otherExpenses, claimed2020.jobExpenses, claimed2020.wasJobRateExpensesChecked)
-          auditAlreadyClaimed(nino, YEAR_2021, claimed2021.otherExpenses, claimed2021.jobExpenses, claimed2021.wasJobRateExpensesChecked)
-          auditAlreadyClaimed(nino, YEAR_2022, claimed2022.otherExpenses, claimed2022.jobExpenses, claimed2022.wasJobRateExpensesChecked)
-          auditAlreadyClaimed(nino, YEAR_2023, claimed2023.otherExpenses, claimed2023.jobExpenses, claimed2023.wasJobRateExpensesChecked)
-          auditAlreadyClaimed(nino, YEAR_2024, claimed2024.otherExpenses, claimed2024.jobExpenses, claimed2024.wasJobRateExpensesChecked)
+          claimedYears.foreach(expenses =>
+            auditAlreadyClaimed(nino, expenses.year, expenses.otherExpenses, expenses.jobExpenses, expenses.wasJobRateExpensesChecked)
+          )
         }
         true
       case _ => false
@@ -90,7 +93,7 @@ class IABDServiceImpl @Inject()(
 
   def claimedAllYearsStatus(nino: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
     getAlreadyClaimedStatusForAllYears(nino).map { claimedYears =>
-      if (allYearsClaimed(nino, claimedYears, audit = false)) true else false
+      allYearsClaimed(nino, claimedYears, audit = false)
     }.recoverWith {
       case ex: Exception =>
         val message = s"[IABDService][claimedAllYearsStatus] TAI lookup failed with: ${ex.getMessage}"
@@ -99,12 +102,11 @@ class IABDServiceImpl @Inject()(
     }
   }
 
-  private def auditAlreadyClaimed(
-                                   nino: String,
-                                   year: Int,
-                                   otherExpenses: Seq[IABDExpense],
-                                   jobExpenses: Seq[IABDExpense],
-                                   wasJobRateExpensesChecked: Boolean
+  private def auditAlreadyClaimed(nino: String,
+                                  year: Int,
+                                  otherExpenses: Seq[IABDExpense],
+                                  jobExpenses: Seq[IABDExpense],
+                                  wasJobRateExpensesChecked: Boolean
                                  )(implicit hc: HeaderCarrier,
                                    executionContext: ExecutionContext): Unit = {
 
@@ -126,12 +128,4 @@ class IABDServiceImpl @Inject()(
 
     auditConnector.sendExplicitAudit(AlreadyClaimedExpenses.toString, json)
   }
-}
-
-
-trait IABDService {
-  def alreadyClaimed(nino: String, year: Int)(implicit hc: HeaderCarrier): Future[Option[Expenses]]
-  def getAlreadyClaimedStatusForAllYears(nino: String)(implicit hc: HeaderCarrier): Future[(Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses])]
-  def allYearsClaimed(nino: String, yearsClaimed: (Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses]), audit: Boolean = true)(implicit hc: HeaderCarrier): Boolean
-  def claimedAllYearsStatus(nino: String)(implicit hc: HeaderCarrier): Future[Boolean]
 }

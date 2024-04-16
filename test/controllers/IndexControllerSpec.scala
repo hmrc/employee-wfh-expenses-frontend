@@ -64,7 +64,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
 
     "redirect to the TaxYearSelection page for a GET" when {
       "not claimed expenses for any years" in {
-        val expenses = (None, None, None, None, None)
+        val expenses = Nil
         when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -80,12 +80,9 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
       }
 
       "claimed expenses for some years" in {
-        val expenses = (
-          Some(Expenses(testYear2023, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false)),
-          None,
-          Some(Expenses(testYear2021, Seq.empty, jobExpenses, wasJobRateExpensesChecked = true)),
-          None,
-          None
+        val expenses = Seq(
+          Expenses(testYear2023, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false),
+          Expenses(testYear2021, Seq.empty, jobExpenses, wasJobRateExpensesChecked = true)
         )
 
         when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))
@@ -105,12 +102,12 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
 
     "redirect to P87SUB form" when {
       "claimed expenses for all years" in {
-        val expenses = (
-          Some(Expenses(testYear2024, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-          Some(Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-          Some(Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-          Some(Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-          Some(Expenses(testYear2020, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+        val expenses = Seq(
+          Expenses(testYear2024, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+          Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+          Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+          Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+          Expenses(testYear2020, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
         )
 
         when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))

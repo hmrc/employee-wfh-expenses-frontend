@@ -17,7 +17,7 @@
 package views
 
 import models.TaxYearSelection
-import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4, NextYear}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4, NextYear, wholeYearClaims}
 import play.api.test.FakeRequest
 import views.behaviours.ViewBehaviours
 import views.html.CheckYourClaimView
@@ -30,20 +30,27 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
 
   val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
-  val selectedTaxYears: Seq[TaxYearSelection] = List(
-    CurrentYear,
-    CurrentYearMinus1,
-    CurrentYearMinus2,
-    CurrentYearMinus3,
-    CurrentYearMinus4
+  val groupedSelectedTaxYears: Seq[(Int, Seq[TaxYearSelection])] =
+    List(
+      (10, List(CurrentYear, CurrentYearMinus1)),
+      (9, List(CurrentYearMinus2, CurrentYearMinus3)),
+      (8, List(CurrentYearMinus4))
   )
 
   val weeksCurrent = 1
-  val weeksPrevious = 43
-  val weeksForTaxYears: ListMap[TaxYearSelection, Int] = ListMap[TaxYearSelection, Int](
+  val weeksCurrentMinus1 = 41
+  val weeksCurrentMinus2 = 42
+  val weeksCurrentMinus3 = 43
+  val weeksCurrentMinus4 = 44
+
+  var weeksForTaxYears: ListMap[TaxYearSelection, Int] = ListMap[TaxYearSelection, Int](
     CurrentYear -> weeksCurrent,
-    CurrentYearMinus1 -> weeksPrevious
+    CurrentYearMinus1 -> weeksCurrentMinus1
   )
+
+  if(!wholeYearClaims.contains(CurrentYearMinus2)) weeksForTaxYears += (CurrentYearMinus2 -> weeksCurrentMinus2)
+  if(!wholeYearClaims.contains(CurrentYearMinus3)) weeksForTaxYears += (CurrentYearMinus3 -> weeksCurrentMinus3)
+  if(!wholeYearClaims.contains(CurrentYearMinus4)) weeksForTaxYears += (CurrentYearMinus4 -> weeksCurrentMinus4)
 
   object ExpectedContent {
     val title = "Check and submit your claim"
@@ -51,16 +58,16 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
     val subheading1 = "Check your claim details"
     val text1_1 = "You are entitled to tax relief on"
     val text1_2 = "a week on your expenses for working from home for:"
-    val claim1: String = s"$weeksCurrent week of tax year ${CurrentYear.toTaxYear.starts.format(formatter)}" +
-      s" to ${CurrentYear.toTaxYear.finishes.format(formatter)}"
-    val claim2: String = s"$weeksPrevious weeks of tax year ${CurrentYearMinus1.toTaxYear.starts.format(formatter)}" +
-      s" to ${CurrentYearMinus1.toTaxYear.finishes.format(formatter)}"
-    val claim3: String = s"the whole of tax year ${CurrentYearMinus2.toTaxYear.starts.format(formatter)}" +
-      s" to ${CurrentYearMinus2.toTaxYear.finishes.format(formatter)}"
-    val claim4: String = s"the whole of tax year ${CurrentYearMinus3.toTaxYear.starts.format(formatter)}" +
-      s" to ${CurrentYearMinus3.toTaxYear.finishes.format(formatter)}"
-    val claim5: String = s"the whole of tax year ${CurrentYearMinus4.toTaxYear.starts.format(formatter)}" +
-      s" to ${CurrentYearMinus4.toTaxYear.finishes.format(formatter)}"
+    def claimContent(taxYear: TaxYearSelection, numOfWeeks: Option[Int]): String = {
+      if(numOfWeeks.nonEmpty){
+        s"${numOfWeeks.get} ${if(numOfWeeks.get == 1) "week" else "weeks"} of tax year ${taxYear.toTaxYear.starts.format(formatter)}" +
+          s" to ${taxYear.toTaxYear.finishes.format(formatter)}"
+      } else {
+        s"the whole of tax year ${taxYear.toTaxYear.starts.format(formatter)}" +
+          s" to ${taxYear.toTaxYear.finishes.format(formatter)}"
+      }
+    }
+
     val text2: String = s"At the end of this tax year, the tax relief will stop. If you are required to work from" +
       s" home from the ${NextYear.toTaxYear.starts.format(formatter)}, you will need to claim again."
     val detailsHeading = "What to do if your extra costs are more than this"
@@ -77,7 +84,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
     val request = FakeRequest()
 
     val view = viewFor[CheckYourClaimView](Some(emptyUserAnswers))
-    val renderedView = view(selectedTaxYears, weeksForTaxYears)(request, messages)
+    val renderedView = view(groupedSelectedTaxYears, weeksForTaxYears, currentYearContent = true)(request, messages)
     val doc = asDocument(renderedView)
 
     behave like normalPage(
@@ -99,11 +106,11 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
       assertContainsText(doc, text3)
     }
     "have the correct list content" in {
-      assertContainsText(doc, claim1)
-      assertContainsText(doc, claim2)
-      assertContainsText(doc, claim3)
-      assertContainsText(doc, claim4)
-      assertContainsText(doc, claim5)
+      assertContainsText(doc, claimContent(CurrentYear, Some(weeksCurrent)))
+      assertContainsText(doc, claimContent(CurrentYearMinus1, Some(weeksCurrentMinus1)))
+      assertContainsText(doc, claimContent(CurrentYearMinus2, if(!wholeYearClaims.contains(CurrentYearMinus2)) Some(weeksCurrentMinus2) else None))
+      assertContainsText(doc, claimContent(CurrentYearMinus3, if(!wholeYearClaims.contains(CurrentYearMinus3)) Some(weeksCurrentMinus3) else None))
+      assertContainsText(doc, claimContent(CurrentYearMinus4, if(!wholeYearClaims.contains(CurrentYearMinus4)) Some(weeksCurrentMinus4) else None))
     }
     "have the correct details content" in {
       assertContainsText(doc, detailsHeading)
@@ -113,7 +120,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
     }
     "not have the need to claim again text when current year is not selected" in {
       val view = viewFor[CheckYourClaimView](Some(emptyUserAnswers))
-      val renderedView = view(selectedTaxYears.filterNot(_.equals(CurrentYear)), weeksForTaxYears.filterNot(_._1.equals(CurrentYear)))(request, messages)
+      val renderedView = view(groupedSelectedTaxYears, weeksForTaxYears.filterNot(_._1.equals(CurrentYear)), currentYearContent = false)(request, messages)
       val doc = asDocument(renderedView)
 
       assertNotContainsText(doc, text2)

@@ -30,12 +30,11 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
 
   val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
-  val selectedTaxYears: Seq[TaxYearSelection] = List(
-    CurrentYear,
-    CurrentYearMinus1,
-    CurrentYearMinus2,
-    CurrentYearMinus3,
-    CurrentYearMinus4
+  val groupedSelectedTaxYears: Seq[(Int, Seq[TaxYearSelection])] =
+    List(
+      (10, List(CurrentYear, CurrentYearMinus1)),
+      (9, List(CurrentYearMinus2, CurrentYearMinus3)),
+      (8, List(CurrentYearMinus4))
   )
 
   val weeksCurrent = 1
@@ -77,7 +76,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
     val request = FakeRequest()
 
     val view = viewFor[CheckYourClaimView](Some(emptyUserAnswers))
-    val renderedView = view(selectedTaxYears, weeksForTaxYears)(request, messages)
+    val renderedView = view(groupedSelectedTaxYears, weeksForTaxYears, currentYearContent = true)(request, messages)
     val doc = asDocument(renderedView)
 
     behave like normalPage(
@@ -113,7 +112,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
     }
     "not have the need to claim again text when current year is not selected" in {
       val view = viewFor[CheckYourClaimView](Some(emptyUserAnswers))
-      val renderedView = view(selectedTaxYears.filterNot(_.equals(CurrentYear)), weeksForTaxYears.filterNot(_._1.equals(CurrentYear)))(request, messages)
+      val renderedView = view(groupedSelectedTaxYears, weeksForTaxYears.filterNot(_._1.equals(CurrentYear)), currentYearContent = false)(request, messages)
       val doc = asDocument(renderedView)
 
       assertNotContainsText(doc, text2)

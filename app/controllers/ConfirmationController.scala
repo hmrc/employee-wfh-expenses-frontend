@@ -20,10 +20,11 @@ import config.FrontendAppConfig
 import connectors.PaperlessPreferenceConnector
 import controllers.PaperlessAuditConst._
 import controllers.actions._
+import models.TaxYearSelection.{containsCurrent, containsPrevious}
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
-import models.{ClaimCompleteCurrent, ClaimCompleteCurrentPrevious, ClaimCompletePrevious, ClaimStatus, ClaimUnsuccessful, TaxYearFromUIAssembler}
-import pages.SubmittedClaim
+import models.{ClaimCompleteCurrent, ClaimCompleteCurrentPrevious, ClaimCompletePrevious, ClaimStatus, ClaimUnsuccessful, TaxYearSelection}
+import pages.{SelectTaxYearsToClaimForPage, SubmittedClaim}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -53,7 +54,7 @@ class ConfirmationController @Inject()(
                                         confirmationView: ConfirmationView,
                                         confirmationMergeJourneyView: ConfirmationMergeJourneyView)
                                       (implicit ec: ExecutionContext) extends FrontendBaseController
-  with I18nSupport with Logging with UIAssembler {
+  with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
@@ -62,17 +63,20 @@ class ConfirmationController @Inject()(
           paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account") map {
             case Right(status) =>
               auditPaperlessPreferencesCheckSuccess(paperlessEnabled = status.isPaperlessCustomer)
-              val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
-              if (request.userAnswers.isMergedJourney) {
-                Ok(confirmationMergeJourneyView(
-                  continueLink = appConfig.mergedJourneyContinueUrl(getClaimStatus(selectedTaxYears))
-                ))
-              } else {
-                Ok(confirmationView(
-                  status.isPaperlessCustomer, Some(status.url.link),
-                  selectedTaxYears.containsPrevious,
-                  selectedTaxYears.containsCurrent
-                ))
+              request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
+                case Some(selectedTaxYears) =>
+                  if (request.userAnswers.isMergedJourney) {
+                    Ok(confirmationMergeJourneyView(
+                      continueLink = appConfig.mergedJourneyContinueUrl(getClaimStatus(selectedTaxYears))
+                    ))
+                  } else {
+                    Ok(confirmationView(
+                      status.isPaperlessCustomer, Some(status.url.link),
+                      containsPrevious(selectedTaxYears),
+                      containsCurrent(selectedTaxYears)
+                    ))
+                  }
+                case None => Redirect(routes.IndexController.start)
               }
             case Left(error) =>
               auditPaperlessPreferencesCheckFailure(error)
@@ -103,8 +107,8 @@ class ConfirmationController @Inject()(
       )
     )
 
-  private def getClaimStatus(selectedTaxYears: TaxYearFromUIAssembler): ClaimStatus = {
-    (selectedTaxYears.containsCurrent, selectedTaxYears.containsPrevious) match {
+  private def getClaimStatus(selectedTaxYears: Seq[TaxYearSelection]): ClaimStatus = {
+    (containsCurrent(selectedTaxYears), containsPrevious(selectedTaxYears)) match {
       case (true, true) => ClaimCompleteCurrentPrevious
       case (true, false) => ClaimCompleteCurrent
       case (false, true) => ClaimCompletePrevious

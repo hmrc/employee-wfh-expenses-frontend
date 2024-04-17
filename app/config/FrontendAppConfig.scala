@@ -17,7 +17,7 @@
 package config
 
 import com.google.inject.{Inject, Singleton}
-import models.ClaimStatus
+import models.{ClaimStatus, TaxYearSelection}
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -58,19 +58,21 @@ class FrontendAppConfig @Inject()(configuration: Configuration, val servicesConf
   lazy val timeoutDialogTimeout: Int = configuration.getOptional[Int]("timeoutDialog.timeout").getOrElse(900)
   lazy val timeoutDialogTimeoutCountdown: Int = configuration.getOptional[Int]("timeoutDialog.timeoutCountdown").getOrElse(120)
 
-  lazy val taxReliefPerWeek2019: Int = configuration.getOptional[Int]("taxRelief.2019.poundsPerWeek").getOrElse(4)
   lazy val taxReliefPerWeek2020: Int = configuration.getOptional[Int]("taxRelief.2020.poundsPerWeek").getOrElse(6)
   lazy val taxReliefPerWeek2021: Int = configuration.getOptional[Int]("taxRelief.2021.poundsPerWeek").getOrElse(6)
   lazy val taxReliefPerWeek2022: Int = configuration.getOptional[Int]("taxRelief.2022.poundsPerWeek").getOrElse(6)
   lazy val taxReliefPerWeek2023: Int = configuration.getOptional[Int]("taxRelief.2023.poundsPerWeek").getOrElse(6)
   lazy val taxReliefPerWeek2024: Int = configuration.getOptional[Int]("taxRelief.2024.poundsPerWeek").getOrElse(6)
 
-  lazy val taxReliefMaxPerYear2019: Int = configuration.getOptional[Int]("taxRelief.2019.maxPerYear").getOrElse(56)
+  def taxReliefPerWeek(taxYear: TaxYearSelection) = configuration.getOptional[Int](s"taxRelief.${taxYear.toTaxYear.startYear}.poundsPerWeek").getOrElse(6)
+
   lazy val taxReliefMaxPerYear2020: Int = configuration.getOptional[Int]("taxRelief.2020.maxPerYear").getOrElse(312)
   lazy val taxReliefMaxPerYear2021: Int = configuration.getOptional[Int]("taxRelief.2021.maxPerYear").getOrElse(312)
   lazy val taxReliefMaxPerYear2022: Int = configuration.getOptional[Int]("taxRelief.2022.maxPerYear").getOrElse(312)
   lazy val taxReliefMaxPerYear2023: Int = configuration.getOptional[Int]("taxRelief.2023.maxPerYear").getOrElse(312)
   lazy val taxReliefMaxPerYear2024: Int = configuration.getOptional[Int]("taxRelief.2024.maxPerYear").getOrElse(312)
+
+  def taxReliefMaxPerYear(taxYear: TaxYearSelection) = configuration.getOptional[Int](s"taxRelief.${taxYear.toTaxYear.startYear}.maxPerYear").getOrElse(312)
 
   lazy val rateLimitTaiGets = configuration.get[RateLimitConfig]("rateLimit.taiGets")
   lazy val rateLimitTaiPosts = configuration.get[RateLimitConfig]("rateLimit.taiPosts")

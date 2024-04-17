@@ -16,22 +16,18 @@
 
 package views
 
-import controllers.UIAssembler
-import models.TaxYearFromUIAssembler
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3}
 import play.api.test.FakeRequest
-import utils.TaxYearFormatter
 import views.behaviours.ViewBehaviours
 import views.html.HowWeWillCalculateTaxReliefView
 
-class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAssembler {
+class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours {
 
   "Disclaimer view" must {
 
     val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
 
-    val assembler = TaxYearFromUIAssembler(List("option3"))
-
-    val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
+    val taxYearList = Seq(CurrentYearMinus2)
 
     val applyView = view.apply(taxYearList)(fakeRequest, messages)
 
@@ -42,8 +38,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
         val request = FakeRequest()
 
-        val assembler = TaxYearFromUIAssembler(List("option1"))
-        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
+        val taxYearList = Seq(CurrentYear)
 
         val doc = asDocument(view.apply(taxYearList)(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
@@ -57,8 +52,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
         val request = FakeRequest()
 
-        val assembler = TaxYearFromUIAssembler(List("option2"))
-        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
+        val taxYearList = Seq(CurrentYearMinus1)
 
         val doc = asDocument(view.apply(taxYearList)(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
@@ -72,8 +66,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
         val request = FakeRequest()
 
-        val assembler = TaxYearFromUIAssembler(List("option3"))
-        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
+        val taxYearList = Seq(CurrentYearMinus2)
 
         val doc = asDocument(view.apply(taxYearList)(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))
@@ -87,8 +80,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours with UIAsse
         val view = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
         val request = FakeRequest()
 
-        val assembler = TaxYearFromUIAssembler(List("option4"))
-        val taxYearList = TaxYearFormatter(assembler.assemble).formattedTaxYears
+        val taxYearList = Seq(CurrentYearMinus3)
 
         val doc = asDocument(view.apply(taxYearList)(request, messages))
         assert(doc.toString.contains(messages("howWeWillCalculateTaxRelief.heading")))

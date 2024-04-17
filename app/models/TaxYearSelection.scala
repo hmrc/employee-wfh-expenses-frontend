@@ -16,13 +16,14 @@
 
 package models
 
-import models.TaxYearSelection.{NextYear, CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4, NextYear}
 import play.api.data.Form
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.time.TaxYear
 
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 sealed trait TaxYearSelection {
@@ -91,5 +92,13 @@ object TaxYearSelection extends Enumerable.Implicits {
     ).flatten
   }
 
+  def containsCurrent(selectedTaxYears: Seq[TaxYearSelection]): Boolean = selectedTaxYears.contains(CurrentYear)
+  def containsPrevious(selectedTaxYears: Seq[TaxYearSelection]): Boolean = selectedTaxYears.contains(CurrentYearMinus1) || selectedTaxYears.contains(CurrentYearMinus2) || selectedTaxYears.contains(CurrentYearMinus3) || selectedTaxYears.contains(CurrentYearMinus4)
+
   val wholeYearClaims: Seq[TaxYearSelection] = Seq(CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4)
+
+  def contains2020or2021(selectedTaxYears: Seq[TaxYearSelection]): Boolean = selectedTaxYears.intersect(Seq(CurrentYearMinus3, CurrentYearMinus4)).nonEmpty
+
+  def contains2022orAfter(selectedTaxYears: Seq[TaxYearSelection]): Boolean = selectedTaxYears.intersect(Seq(CurrentYear, CurrentYearMinus1, CurrentYearMinus2)).nonEmpty
+
 }

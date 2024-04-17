@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions._
+import models.TaxYearSelection.{contains2020or2021, contains2022orAfter}
 
 import javax.inject.Inject
 import navigation.Navigator
@@ -36,15 +37,13 @@ class DisclaimerController @Inject()(
                                          navigator: Navigator,
                                          val controllerComponents: MessagesControllerComponents,
                                          disclaimerView: DisclaimerView
-                                       ) extends FrontendBaseController with I18nSupport with Logging with UIAssembler {
+                                       ) extends FrontendBaseController with I18nSupport with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
     implicit request =>
       request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
-        case Some(_) =>
-          val selectedTaxYears = taxYearFromUIAssemblerFromRequest()
-
-          Ok(disclaimerView(selectedTaxYears.contains2022OrAfter, selectedTaxYears.contains2021Or2020))
+        case Some(selectedTaxYears) =>
+          Ok(disclaimerView(contains2022orAfter(selectedTaxYears), contains2020or2021(selectedTaxYears)))
         case None => Redirect(routes.IndexController.start)
       }
   }

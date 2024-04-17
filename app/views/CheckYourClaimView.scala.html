@@ -17,7 +17,7 @@
 @import config.FrontendAppConfig
 @import models.TaxYearSelection.{NextYear, wholeYearClaims}
 @import scala.collection.immutable.ListMap
-@import models.TaxYearSelection.CurrentYear
+@import models.TaxYearSelection.{CurrentYear, CurrentYearMinus3}
 
 @this(
         layout: views.templates.LayoutProvider,
@@ -29,7 +29,7 @@
         button: GovukButton
 )
 
-@(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: ListMap[TaxYearSelection, Int])(implicit request: Request[_], messages: Messages)
+@(groupedSelectedTaxYears: Seq[(Int, Seq[TaxYearSelection])], weeksForTaxYears: ListMap[TaxYearSelection, Int], currentYearContent: Boolean)(implicit request: Request[_], messages: Messages)
 
 @pluralOrSingularWeeks(weeks: Long) = @{
     if(weeks == 1) {
@@ -39,12 +39,31 @@
     }
 }
 
-@claimItems = @{
+@claimDetails = @{
+    groupedSelectedTaxYears.map {
+        case (intValue, taxYearValue) => {
+            detailElement(intValue, taxYearValue)
+        }
+    }
+}
+
+@detailElement(amount: Int, selectedTaxYears: Seq[TaxYearSelection]) = {
+    <p class="govuk-body">@messages("checkYourClaimView.text.1.1")
+        <span class="govuk-!-font-weight-bold">&pound;@amount</span>
+        @messages("checkYourClaimView.text.1.2")
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+        @getClaimItems(selectedTaxYears)
+    </ul>
+}
+
+@getClaimItems(selectedTaxYears: Seq[TaxYearSelection]) = @{
     selectedTaxYears.map {
         case taxYear if wholeYearClaims.contains(taxYear) => wholeYearClaimItem(taxYear)
         case taxYear => weekClaimItem(taxYear, weeksForTaxYears.getOrElse(taxYear, 0))
     }
 }
+
 @weekClaimItem(taxYear: TaxYearSelection, weeks: Int) = {
         <li>@messages("checkYourClaimView.list.weekClaimItem", pluralOrSingularWeeks(weeks) +: taxYear.formattedTaxYearArgs: _*)</li>
 }
@@ -72,16 +91,9 @@
 
     <h2 class="govuk-heading-m">@messages("checkYourClaimView.subheading.1")</h2>
 
-    <p class="govuk-body">@messages("checkYourClaimView.text.1.1")
-        <span class="govuk-!-font-weight-bold">&pound;@appConfig.taxReliefPerWeek2020</span>
-        @messages("checkYourClaimView.text.1.2")
-    </p>
+    @claimDetails
 
-    <ul class="govuk-list govuk-list--bullet">
-        @claimItems
-    </ul>
-
-    @if(selectedTaxYears.contains(CurrentYear)) {
+    @if(currentYearContent) {
         <p class="govuk-body">@messages("checkYourClaimView.text.2", NextYear.formattedTaxYearArgs: _*)</p>
     }
 

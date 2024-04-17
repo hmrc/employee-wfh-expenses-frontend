@@ -45,15 +45,15 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with Befor
     userAnswersId,
     Json.obj(
       SelectTaxYearsToClaimForPage.toString -> Json.arr(
-        CurrentYear.toString,
-        CurrentYearMinus1.toString,
-        CurrentYearMinus2.toString,
-        CurrentYearMinus3.toString,
-        CurrentYearMinus4.toString
+        CurrentYear.toTaxYear.startYear,
+        CurrentYearMinus1.toTaxYear.startYear,
+        CurrentYearMinus2.toTaxYear.startYear,
+        CurrentYearMinus3.toTaxYear.startYear,
+        CurrentYearMinus4.toTaxYear.startYear
       ),
       NumberOfWeeksToClaimForPage.toString -> Json.arr(
-        Json.arr(CurrentYear.toString, 1),
-        Json.arr(CurrentYearMinus1.toString, 43),
+        Json.arr(CurrentYear.toTaxYear.startYear, 1),
+        Json.arr(CurrentYearMinus1.toTaxYear.startYear, 43),
       )
     )
   )
@@ -61,9 +61,9 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with Befor
     userAnswersId,
     Json.obj(
       SelectTaxYearsToClaimForPage.toString -> Json.arr(
-        CurrentYearMinus2.toString,
-        CurrentYearMinus3.toString,
-        CurrentYearMinus4.toString
+        CurrentYearMinus2.toTaxYear.startYear,
+        CurrentYearMinus3.toTaxYear.startYear,
+        CurrentYearMinus4.toTaxYear.startYear
       )
     )
   )
@@ -71,11 +71,11 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with Befor
     userAnswersId,
     Json.obj(
       SelectTaxYearsToClaimForPage.toString -> Json.arr(
-        CurrentYear.toString,
-        CurrentYearMinus1.toString,
+        CurrentYear.toTaxYear.startYear,
+        CurrentYearMinus1.toTaxYear.startYear,
       ),
       NumberOfWeeksToClaimForPage.toString -> Json.arr(
-        Json.arr(CurrentYear.toString, 1)
+        Json.arr(CurrentYear.toTaxYear.startYear, 1)
       )
     )
   )

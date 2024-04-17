@@ -18,9 +18,9 @@ package pages
 
 import play.api.libs.json.JsPath
 
-case object ClaimedForTaxYear2024 extends QuestionPage[Boolean] {
+case object ClaimedForTaxYears extends QuestionPage[Seq[Int]] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "claimedForTaxYear2024"
+  override def toString: String = "claimedForTaxYears"
 }

@@ -49,15 +49,9 @@ class SelectTaxYearsToClaimForController @Inject()(override val messagesApi: Mes
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      (
-        request.userAnswers.get(ClaimedForTaxYear2020),
-        request.userAnswers.get(ClaimedForTaxYear2021),
-        request.userAnswers.get(ClaimedForTaxYear2022),
-        request.userAnswers.get(ClaimedForTaxYear2023),
-        request.userAnswers.get(ClaimedForTaxYear2024)
-      ) match {
-        case (Some(claimed2020), Some(claimed2021), Some(claimed2022), Some(claimed2023), Some(claimed2024)) =>
-          val availableYears = TaxYearSelection.getValuesFromClaimedBooleans(claimed2020, claimed2021, claimed2022, claimed2023, claimed2024)
+      request.userAnswers.get(ClaimedForTaxYears) match {
+        case Some(years) =>
+          val availableYears = TaxYearSelection.getClaimableTaxYears(years)
 
           val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
             case None => form
@@ -72,12 +66,8 @@ class SelectTaxYearsToClaimForController @Inject()(override val messagesApi: Mes
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
-      val availableYearsUserCanClaim = TaxYearSelection.getValuesFromClaimedBooleans(
-        request.userAnswers.get(ClaimedForTaxYear2020).getOrElse(false),
-        request.userAnswers.get(ClaimedForTaxYear2021).getOrElse(false),
-        request.userAnswers.get(ClaimedForTaxYear2022).getOrElse(false),
-        request.userAnswers.get(ClaimedForTaxYear2023).getOrElse(false),
-        request.userAnswers.get(ClaimedForTaxYear2024).getOrElse(false)
+      val availableYearsUserCanClaim = TaxYearSelection.getClaimableTaxYears(
+        request.userAnswers.get(ClaimedForTaxYears).getOrElse(Nil)
       )
 
       form.bindFromRequest().fold(

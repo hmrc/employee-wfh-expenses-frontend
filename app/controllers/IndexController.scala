@@ -51,17 +51,13 @@ class IndexController @Inject()(val controllerComponents: MessagesControllerComp
             request.internalId,
             Json.obj(
               MergedJourneyFlag.toString -> (isMergedJourney && appConfig.mergedJourneyEnabled),
-              ClaimedForTaxYear2020.toString -> claimedYears._1.isDefined,
-              ClaimedForTaxYear2021.toString -> claimedYears._2.isDefined,
-              ClaimedForTaxYear2022.toString -> claimedYears._3.isDefined,
-              ClaimedForTaxYear2023.toString -> claimedYears._4.isDefined,
-              ClaimedForTaxYear2024.toString -> claimedYears._5.isDefined
+              ClaimedForTaxYears.toString -> claimedYears.map(_.year)
             )
           )
 
           sessionService.set(answers)
 
-          val navigatorPageResult: Call = navigator.nextPage(ClaimedForTaxYear2020, answers)
+          val navigatorPageResult: Call = navigator.nextPage(ClaimedForTaxYears, answers)
 
           Redirect(navigatorPageResult)
         }

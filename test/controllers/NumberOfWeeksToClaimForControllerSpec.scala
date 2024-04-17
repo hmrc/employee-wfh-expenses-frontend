@@ -71,7 +71,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         val result = route(application, request).value
 
         status(result) mustBe OK
-        prepopulatedValue(result, "option1") mustBe ""
+        prepopulatedValue(result, CurrentYear.toTaxYear.startYear.toString) mustBe ""
 
         application.stop()
       }
@@ -86,7 +86,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         val result = route(application, request).value
 
         status(result) mustBe OK
-        prepopulatedValue(result, "option1") mustBe "30"
+        prepopulatedValue(result, CurrentYear.toTaxYear.startYear.toString) mustBe "30"
 
         application.stop()
       }
@@ -101,7 +101,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         val result = route(application, request).value
 
         status(result) mustBe OK
-        prepopulatedValue(result, "option2") mustBe ""
+        prepopulatedValue(result, CurrentYearMinus1.toTaxYear.startYear.toString) mustBe ""
 
         application.stop()
       }
@@ -116,7 +116,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         val result = route(application, request).value
 
         status(result) mustBe OK
-        prepopulatedValue(result, "option2") mustBe "50"
+        prepopulatedValue(result, CurrentYearMinus1.toTaxYear.startYear.toString) mustBe "50"
 
         application.stop()
       }
@@ -131,8 +131,8 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         val result = route(application, request).value
 
         status(result) mustBe OK
-        prepopulatedValue(result, "option1") mustBe ""
-        prepopulatedValue(result, "option2") mustBe ""
+        prepopulatedValue(result, CurrentYear.toTaxYear.startYear.toString) mustBe ""
+        prepopulatedValue(result, CurrentYearMinus1.toTaxYear.startYear.toString) mustBe ""
 
         application.stop()
       }
@@ -147,8 +147,8 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         val result = route(application, request).value
 
         status(result) mustBe OK
-        prepopulatedValue(result, "option1") mustBe "52"
-        prepopulatedValue(result, "option2") mustBe "50"
+        prepopulatedValue(result, CurrentYear.toTaxYear.startYear.toString) mustBe "52"
+        prepopulatedValue(result, CurrentYearMinus1.toTaxYear.startYear.toString) mustBe "50"
 
         application.stop()
       }
@@ -163,7 +163,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
 
         val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
         val request = FakeRequest(POST, testRoute)
-          .withFormUrlEncodedBody(("option5", "30"))
+          .withFormUrlEncodedBody((CurrentYearMinus4.toTaxYear.startYear.toString, "30"))
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -184,7 +184,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
           .overrides(bind[SessionService].toInstance(mockSessionService))
           .build()
         val request = FakeRequest(POST, testRoute)
-          .withFormUrlEncodedBody(("option1", "30"))
+          .withFormUrlEncodedBody((CurrentYear.toTaxYear.startYear.toString, "30"))
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -206,7 +206,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
           .overrides(bind[SessionService].toInstance(mockSessionService))
           .build()
         val request = FakeRequest(POST, testRoute)
-          .withFormUrlEncodedBody(("option2", "50"))
+          .withFormUrlEncodedBody((CurrentYearMinus1.toTaxYear.startYear.toString, "50"))
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER
@@ -228,7 +228,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
           .overrides(bind[SessionService].toInstance(mockSessionService))
           .build()
         val request = FakeRequest(POST, testRoute)
-          .withFormUrlEncodedBody(("option1", "52"), ("option2", "50"))
+          .withFormUrlEncodedBody((CurrentYear.toTaxYear.startYear.toString, "52"), (CurrentYearMinus1.toTaxYear.startYear.toString, "50"))
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER

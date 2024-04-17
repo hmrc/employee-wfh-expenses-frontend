@@ -29,7 +29,7 @@ import javax.inject.{Inject, Singleton}
 class Navigator @Inject()() extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case ClaimedForTaxYear2020 => ua => claimJourneyFlow(ua)
+    case ClaimedForTaxYears => ua => claimJourneyFlow(ua)
     case SelectTaxYearsToClaimForPage => _ => routes.DisclaimerController.onPageLoad()
     case DisclaimerPage => _ => routes.HowWeWillCalculateTaxReliefController.onPageLoad()
     case HowWeWillCalculateTaxReliefPage => ua => howWeWillCalculateTaxReliefNextPage(ua)
@@ -42,26 +42,20 @@ class Navigator @Inject()() extends Logging {
   def nextPage(page: Page, userAnswers: UserAnswers): Call = normalRoutes(page)(userAnswers)
 
   def claimJourneyFlow(userAnswers: UserAnswers): Call = {
-    (
-      userAnswers.get(ClaimedForTaxYear2020),
-      userAnswers.get(ClaimedForTaxYear2021),
-      userAnswers.get(ClaimedForTaxYear2022),
-      userAnswers.get(ClaimedForTaxYear2023),
-      userAnswers.get(ClaimedForTaxYear2024)
-    ) match {
-      case (Some(_), Some(_), Some(_), Some(_), Some(_)) => routes.SelectTaxYearsToClaimForController.onPageLoad()
-      case (None, None, None, None, None) => routes.IndexController.start
-      case (_, _, _, _, _) => routes.TechnicalDifficultiesController.onPageLoad
+    userAnswers.get(ClaimedForTaxYears) match {
+      case Some(_) => routes.SelectTaxYearsToClaimForController.onPageLoad()
+      case None => routes.IndexController.start
     }
   }
 
   def howWeWillCalculateTaxReliefNextPage(userAnswers: UserAnswers): Call = {
-    val selectedTaxYears = userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(TaxYearSelection.valuesAll)
-
-    if (selectedTaxYears.contains(CurrentYear) || selectedTaxYears.contains(CurrentYearMinus1)) {
-      routes.InformClaimNowInWeeksController.onPageLoad()
-    } else {
-      routes.CheckYourClaimController.onPageLoad()
+    userAnswers.get(SelectTaxYearsToClaimForPage).getOrElse(Nil) match {
+      case list if list.diff(TaxYearSelection.wholeYearClaims).nonEmpty =>
+        routes.InformClaimNowInWeeksController.onPageLoad()
+      case list if list.nonEmpty =>
+        routes.CheckYourClaimController.onPageLoad()
+      case Nil =>
+        routes.IndexController.start
     }
   }
 

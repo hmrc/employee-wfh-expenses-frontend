@@ -17,9 +17,9 @@
 package controllers
 
 import base.SpecBase
-import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus4}
 import models.UserAnswers
-import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage}
+import pages.{ClaimedForTaxYears, SelectTaxYearsToClaimForPage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -31,61 +31,37 @@ class HowWeWillCalculateTaxReliefControllerSpec extends SpecBase {
     "return the content view" when {
       val tests = Seq(
         (
-          "not SA enrolled and has already claimed expenses for 2020", UserAnswers(
+          "has already claimed expenses for CY-4",
+          UserAnswers(
             userAnswersId,
             Json.obj(
-              ClaimedForTaxYear2020.toString -> true,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString),
+              ClaimedForTaxYears.toString -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear),
             )
-          ),
-          true,
-          List(CurrentYear.toString)
-        ) ,
-        (
-          "not SA enrolled and has already claimed expenses for multiple years", UserAnswers(
-          userAnswersId,
-          Json.obj(
-            ClaimedForTaxYear2020.toString -> true,
-            SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString, CurrentYearMinus1.toString),
           )
         ),
-          true,
-          List(CurrentYear.toString, CurrentYearMinus1.toString)
-        ) ,
         (
-          "not SA enrolled and hasn't already claimed but have chosen only to claim for 2021", UserAnswers(
+          "has chosen to claim expenses for multiple years and has already claimed expenses for CY-4",
+          UserAnswers(
             userAnswersId,
             Json.obj(
-              ClaimedForTaxYear2020.toString -> false,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString)
+              ClaimedForTaxYears.toString -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear, CurrentYearMinus1.toTaxYear.startYear),
             )
-          ),
-          true,
-          List(CurrentYear.toString)
+          )
         ),
         (
-          "is SA enrolled and has already claimed expenses for 2020", UserAnswers(
+          "hasn't already claimed but have chosen only to claim for CY",
+          UserAnswers(
             userAnswersId,
             Json.obj(
-              ClaimedForTaxYear2020.toString -> true,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString),
+              ClaimedForTaxYears.toString -> Json.arr(),
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear)
             )
-          ),
-          true,
-          List(CurrentYear.toString)),
-        (
-          "is SA enrolled and hasn't already claimed expenses for 2020", UserAnswers(
-            userAnswersId,
-            Json.obj(
-              ClaimedForTaxYear2020.toString -> false,
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString),
-            )
-          ),
-          true,
-          List(CurrentYear.toString)
+          )
         )
       )
-      for((desc, userAnswer, _, _) <- tests) {
+      for ((desc, userAnswer) <- tests) {
         s"$desc" in {
           val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 

@@ -44,7 +44,7 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
   def throttler(enabled: Boolean) = new RateLimiting(RateLimitConfig(10, 10, enabled), "too many requests")
 
   class Setup(throttler: RateLimiting) {
-    val serviceUnderTest = new IABDServiceImpl(mockTaiConnector, mockAuditConnector, mockAppConfig, throttler)
+    val serviceUnderTest = new IABDService(mockTaiConnector, mockAuditConnector, mockAppConfig, throttler)
   }
 
   before {
@@ -161,12 +161,8 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
         when(mockTaiConnector.getJobExpensesData(fakeNino, year)).thenReturn(Future(noExpenses))
       }
 
-      val expenses: (Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses]) = (
-        None,
-        None,
-        None,
-        None,
-        Some(Expenses(testYear2024, noExpenses, jobExpenses, wasJobRateExpensesChecked = true))
+      val expenses: Seq[Expenses] = Seq(
+        Expenses(testYear2024, noExpenses, jobExpenses, wasJobRateExpensesChecked = true)
       )
 
       await(serviceUnderTest.getAlreadyClaimedStatusForAllYears(fakeNino)) mustBe expenses
@@ -178,12 +174,12 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
       val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
       val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
 
-      val expenses: (Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses]) = (
-        Some(Expenses(testYear2020, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2024, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true))
+      val expenses: Seq[Expenses] = Seq(
+        Expenses(testYear2020, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+        Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+        Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+        Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+        Expenses(testYear2024, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)
       )
 
       serviceUnderTest.allYearsClaimed(fakeNino, expenses) mustBe true
@@ -193,12 +189,11 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
       val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
       val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
 
-      val expenses: (Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses]) = (
-        None,
-        Some(Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2024, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true))
+      val expenses: Seq[Expenses] = Seq(
+        Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+        Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+        Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+        Expenses(testYear2024, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)
       )
 
       serviceUnderTest.allYearsClaimed(fakeNino, expenses) mustBe false

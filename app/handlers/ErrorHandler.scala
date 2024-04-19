@@ -16,18 +16,17 @@
 
 package handlers
 
-import play.api.mvc.Results.Redirect
 import controllers.routes
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Messages, MessagesApi}
+import play.api.http.{HttpEntity, Writeable}
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc.Results.Redirect
 import play.api.mvc.{Request, RequestHeader, ResponseHeader, Result}
 import play.twirl.api.Html
-import uk.gov.hmrc.http.TooManyRequestException
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import views.html.ErrorTemplate
-import javax.inject.{Inject, Singleton}
-import play.api.http.{HttpEntity, Status, Writeable}
 
+import javax.inject.{Inject, Singleton}
 import scala.language.implicitConversions
 
 @Singleton
@@ -36,16 +35,11 @@ class ErrorHandler @Inject()(
                               view: ErrorTemplate
                             ) extends FrontendErrorHandler with I18nSupport with Logging {
 
-  private implicit def rhToRequest(rh: RequestHeader): Request[_] = Request(rh, "")
-
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: Request[_]): Html =
     view(pageTitle, heading, message)
 
   override def resolveError(rh: RequestHeader, ex: Throwable): Result = {
     ex match {
-      case rateLimitEx: TooManyRequestException =>
-        logger.warn(s"[ErrorHandler][resolveError] Rate limiting detected, (${rh.method})(${rh.uri})", rateLimitEx )
-        new Status(Status.TOO_MANY_REQUESTS)( serviceTooBusyTemplate(rh) )
       case e: Exception =>
         logger.warn(s"[ErrorHandler][resolveError] failed with: $e")
         Redirect(routes.TechnicalDifficultiesController.onPageLoad.url)
@@ -54,13 +48,6 @@ class ErrorHandler @Inject()(
         super.resolveError(rh, ex)
     }
   }
-
-  def serviceTooBusyTemplate(implicit request: Request[_]): Html =
-    standardErrorTemplate(
-      Messages("service.is.busy.title"),
-      Messages("service.is.busy.heading"),
-      Messages("service.is.busy.message")
-    )
 
   class Status(status: Int) extends Result(header = ResponseHeader(status), body = HttpEntity.NoEntity) {
 

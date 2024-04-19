@@ -27,10 +27,9 @@ import play.api.Logging
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.RateLimiting
 import utils.TaxYearDates._
 
-import javax.inject.{Inject, Named, Singleton}
+import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
@@ -41,13 +40,12 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
                                   auditConnector: AuditConnector,
                                   sessionService: SessionService,
                                   appConfig: FrontendAppConfig,
-                                  @Named("IABD POST") rateLimiter: RateLimiting
                                  ) extends Logging {
 
   def submitExpenses(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: ListMap[TaxYearSelection, Int])
                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] = {
 
-    rateLimiter.withToken(() => submit(selectedTaxYears, weeksForTaxYears) map {
+    submit(selectedTaxYears, weeksForTaxYears) map {
       case Right(submittedDetails) =>
         logger.info(s"[SubmissionService][submitExpenses] Submission successful")
         auditSubmissionSuccess(submittedDetails)
@@ -58,7 +56,7 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
         logger.error(s"[SubmissionService][submitExpenses] Submission failed : $error")
         auditSubmissionFailure(error)
         Left(error)
-    })
+    }
   }
 
   // scalastyle:off cyclomatic.complexity

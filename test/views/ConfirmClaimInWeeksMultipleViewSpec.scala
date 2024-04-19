@@ -17,10 +17,10 @@
 package views
 
 import models.TaxYearSelection
-import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4, NextYear}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1}
 import play.api.test.FakeRequest
 import views.behaviours.ViewBehaviours
-import views.html.{CheckYourClaimView, ConfirmClaimInWeeksMultipleView}
+import views.html.ConfirmClaimInWeeksMultipleView
 
 import java.time.format.DateTimeFormatter
 import scala.collection.immutable.ListMap

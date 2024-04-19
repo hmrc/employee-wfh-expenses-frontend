@@ -16,7 +16,6 @@
 
 package services
 
-import java.time.LocalDate
 import base.SpecBase
 import connectors.{CitizenDetailsConnector, TaiConnector}
 import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4}
@@ -42,11 +41,6 @@ import scala.concurrent.Future
 // scalastyle:off magic.number
 class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
 
-  val YEAR_2020_START_DATE: LocalDate = LocalDate.of(2020, 1, 1)
-  val TAX_YEAR_2020_START_DATE: LocalDate = LocalDate.of(2020, 4, 6)
-  val TAX_YEAR_2020_END_DATE: LocalDate = LocalDate.of(2021, 4, 5)
-  val TAX_YEAR_2021_START_DATE: LocalDate = LocalDate.of(2021, 4, 6)
-
   val mockCitizenDetailsConnector: CitizenDetailsConnector = mock[CitizenDetailsConnector]
   val mockTaiConnector: TaiConnector = mock[TaiConnector]
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
@@ -60,43 +54,26 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   val userAnswersArgumentCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
   class Setup {
-    val serviceUnderTest = new SubmissionService(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockSessionService, frontendAppConfig, mockThrottler)
+    val serviceUnderTest = new SubmissionService(
+      mockCitizenDetailsConnector,
+      mockTaiConnector,
+      mockAuditConnector,
+      mockSessionService,
+      frontendAppConfig,
+      mockThrottler
+    )
   }
 
   before {
     Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockThrottler, mockSessionService)
   }
 
-  "calculate2020FlatRate" should {
-    "calculate the total rate as £312" in new Setup {
-      serviceUnderTest.calculate2020FlatRate() mustBe 312
-    }
-  }
-
-  "calculate2021FlatRate" should {
-    "calculate the total rate as £312 for a 2021 claim" in new Setup {
-      serviceUnderTest.calculate2021FlatRate() mustBe 312
-    }
-  }
-
-  "calculate2022FlatRate" should {
-    "calculate the total rate as £312 for the 2022 claim" in new Setup {
-      serviceUnderTest.calculate2022FlatRate() mustBe 312
-    }
-  }
-
-  "calculate2023FlatRate" should {
-    "calculate the total rate as £90 for the 2023 claim (after specifying 15 weeks)" in new Setup {
-      serviceUnderTest.calculate2023FlatRate(15) mustBe 90
-    }
-    "limit the amount claimed by the maximum possible amount" in new Setup {
-      serviceUnderTest.calculate2023FlatRate(100) mustBe frontendAppConfig.taxReliefMaxPerYear2023
-    }
-  }
-
   "submit" when {
 
     implicit val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, "internalId", UserAnswers("id"), testNino)
+
+    val wholeYearClaimAmount = 312
+    val perWeekAmount = 6
 
     val etag1 = ETag(100)
     val etag2 = ETag(101)
@@ -109,6 +86,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     val claimingFor2021 = Seq(CurrentYearMinus3)
     val claimingFor2020 = Seq(CurrentYearMinus4)
     val claimingForAll = Seq(CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4)
+    val claimingFor2022And2021And2020 = Seq(CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4)
     val claimingFor2022And2021 = Seq(CurrentYearMinus2, CurrentYearMinus3)
     val claimingFor2021And2020 = Seq(CurrentYearMinus3, CurrentYearMinus4)
     val claimingFor2022And2020 = Seq(CurrentYearMinus2, CurrentYearMinus4)
@@ -133,7 +111,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             etag4
           })
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), any(), eqm(etag4))(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), eqm(wholeYearClaimAmount), eqm(etag4))(any(), any())).thenReturn(Future.successful(()))
 
         await(serviceUnderTest.submitExpenses(claimingFor2022, ListMap())).isRight mustBe true
 
@@ -171,7 +149,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             etag3
           })
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), eqm(etag3))(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), eqm(wholeYearClaimAmount), eqm(etag3))(any(), any())).thenReturn(Future.successful(()))
 
         await(serviceUnderTest.submitExpenses(claimingFor2021, ListMap())).isRight mustBe true
 
@@ -214,8 +192,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             etag4
           ))
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), any())(any(), any())).thenReturn(Future.successful(()))
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), any(), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), eqm(wholeYearClaimAmount), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), eqm(wholeYearClaimAmount), any())(any(), any())).thenReturn(Future.successful(()))
 
         await(serviceUnderTest.submitExpenses(claimingFor2022And2021, ListMap())).isRight mustBe true
 
@@ -256,7 +234,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             etag2
           ))
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), eqm(wholeYearClaimAmount), any())(any(), any())).thenReturn(Future.successful(()))
 
         await(serviceUnderTest.submitExpenses(claimingFor2020, ListMap())).isRight mustBe true
 
@@ -313,7 +291,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
     }
 
-    s"claiming for all available tax years, including 3 weeks of 2023" should {
+    s"claiming for all available tax years, including 3 weeks of 2023 and 3 weeks of 2024" should {
       "upsert 4 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockThrottler.enabled).thenReturn(false)
         when(mockThrottler.withToken(any())).thenCallRealMethod()
@@ -335,12 +313,13 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             etag5
           ))
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), any())(any(), any())).thenReturn(Future.successful(()))
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), any())(any(), any())).thenReturn(Future.successful(()))
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), any(), any())(any(), any())).thenReturn(Future.successful(()))
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2023), any(), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), eqm(wholeYearClaimAmount), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), eqm(wholeYearClaimAmount), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), eqm(wholeYearClaimAmount), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2023), eqm(3 * perWeekAmount), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2024), eqm(3 * perWeekAmount), any())(any(), any())).thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingForAll, ListMap(CurrentYearMinus1 -> 3))).isRight mustBe true
+        await(serviceUnderTest.submitExpenses(claimingForAll, ListMap(CurrentYearMinus1 -> 3, CurrentYear -> 3))).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -382,16 +361,16 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             etag4
           ))
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), any())(any(), any()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), eqm(wholeYearClaimAmount), any())(any(), any()))
           .thenReturn(Future.successful(()))
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), any(), any())(any(), any()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2021), eqm(wholeYearClaimAmount), any())(any(), any()))
           .thenReturn(Future.failed(UpstreamErrorResponse("Not found", 404)))
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), any(), any())(any(), any()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2022), eqm(wholeYearClaimAmount), any())(any(), any()))
           .thenReturn(Future.successful(()))
 
-        await(serviceUnderTest.submitExpenses(claimingForAll, ListMap())).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2022And2021And2020, ListMap())).isLeft mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
@@ -569,7 +548,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             etag5
           ))
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), any(), any())(any(), any())).thenReturn(Future.successful(()))
+        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2020), eqm(wholeYearClaimAmount), any())(any(), any())).thenReturn(Future.successful(()))
         when(mockTaiConnector.postIabdData(eqm(testNino), eqm(2023), any(), any())(any(), any())).thenReturn(Future.successful(()))
 
         await(serviceUnderTest.submitExpenses(claimingFor2023And2020, ListMap(CurrentYearMinus1 -> 3))).isRight mustBe true
@@ -585,7 +564,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingFor2023And2020, ListMap(CurrentYear -> 3))).isLeft mustBe true
+        await(serviceUnderTest.submitExpenses(claimingFor2023And2020, ListMap(CurrentYearMinus1 -> 3))).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())

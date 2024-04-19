@@ -21,7 +21,6 @@ import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1}
 import org.scalatestplus.play.guice.GuiceFakeApplicationFactory
 import play.api.data.FormError
 import play.api.i18n.{Lang, Messages, MessagesApi}
-import utils.TaxYearDates.{MAXIMUM_WEEKS_IN_A_YEAR, ONE_WEEK}
 
 class NumberOfWeeksToClaimForFormProviderSpec extends IntFieldBehaviours with GuiceFakeApplicationFactory {
 
@@ -40,13 +39,13 @@ class NumberOfWeeksToClaimForFormProviderSpec extends IntFieldBehaviours with Gu
     behave like intFieldWithMinimum(
       form,
       field,
-      ONE_WEEK,
+      formProvider.ONE_WEEK,
       FormError(field, "numberOfWeeksToClaimFor.error.minimum", 1 +: CurrentYear.formattedTaxYearArgs)
     )
     behave like intFieldWithMaximum(
       form,
       field,
-      MAXIMUM_WEEKS_IN_A_YEAR,
+      formProvider.MAXIMUM_WEEKS_IN_A_YEAR,
       FormError(field, "numberOfWeeksToClaimFor.error.maximum", 52 +: CurrentYear.formattedTaxYearArgs)
     )
   }
@@ -62,13 +61,13 @@ class NumberOfWeeksToClaimForFormProviderSpec extends IntFieldBehaviours with Gu
     behave like intFieldWithMinimum(
       form,
       field,
-      ONE_WEEK,
+      formProvider.ONE_WEEK,
       FormError(field, "numberOfWeeksToClaimFor.previous.error.minimum", 1 +: CurrentYearMinus1.formattedTaxYearArgs)
     )
     behave like intFieldWithMaximum(
       form,
       field,
-      MAXIMUM_WEEKS_IN_A_YEAR,
+      formProvider.MAXIMUM_WEEKS_IN_A_YEAR,
       FormError(field, "numberOfWeeksToClaimFor.previous.error.maximum", 52 +: CurrentYearMinus1.formattedTaxYearArgs)
     )
   }

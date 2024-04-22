@@ -48,8 +48,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
   s"NumberOfWeeksToClaimForController GET" when {
     "user has not selected any years with week claims" must {
       "redirect to journey start as the user is page hopping" in {
-        val userAnswer = UserAnswers(userAnswersId)
-          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYearMinus4)).success.value
+        val userAnswer = emptyUserAnswers
 
         val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
         val request = FakeRequest(GET, testRoute)
@@ -158,8 +157,7 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
   s"NumberOfWeeksToClaimForController POST" when {
     "user has not selected any years with week claims" must {
       "redirect to journey start as the user is page hopping" in {
-        val userAnswer = UserAnswers(userAnswersId)
-          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYearMinus4)).success.value
+        val userAnswer = emptyUserAnswers
 
         val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
         val request = FakeRequest(POST, testRoute)

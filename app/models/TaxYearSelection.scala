@@ -126,6 +126,7 @@ object TaxYearSelection {
       selectedTaxYears.contains(CurrentYearMinus3) ||
       selectedTaxYears.contains(CurrentYearMinus4)
 
+  //TODO : Remove logic for whole year tax claim after 6th April 2027
   def wholeYearClaims: Seq[TaxYearSelection] = Seq(
     optTaxYearSelection(TaxYear(2020)),
     optTaxYearSelection(TaxYear(2021)),

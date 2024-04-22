@@ -58,26 +58,18 @@ class FrontendAppConfig @Inject()(configuration: Configuration, val servicesConf
   lazy val timeoutDialogTimeout: Int = configuration.getOptional[Int]("timeoutDialog.timeout").getOrElse(900)
   lazy val timeoutDialogTimeoutCountdown: Int = configuration.getOptional[Int]("timeoutDialog.timeoutCountdown").getOrElse(120)
 
-  lazy val taxReliefPerWeek2020: Int = configuration.getOptional[Int]("taxRelief.2020.poundsPerWeek").getOrElse(6)
-  lazy val taxReliefPerWeek2021: Int = configuration.getOptional[Int]("taxRelief.2021.poundsPerWeek").getOrElse(6)
-  lazy val taxReliefPerWeek2022: Int = configuration.getOptional[Int]("taxRelief.2022.poundsPerWeek").getOrElse(6)
-  lazy val taxReliefPerWeek2023: Int = configuration.getOptional[Int]("taxRelief.2023.poundsPerWeek").getOrElse(6)
-  lazy val taxReliefPerWeek2024: Int = configuration.getOptional[Int]("taxRelief.2024.poundsPerWeek").getOrElse(6)
+  def taxReliefPerWeek(taxYear: TaxYearSelection): Int =
+    configuration.getOptional[Int](s"taxRelief.${taxYear.toString}.poundsPerWeek")
+      .getOrElse(configuration.get[Int]("taxRelief.default.poundsPerWeek"))
 
-  def taxReliefPerWeek(taxYear: TaxYearSelection) = configuration.getOptional[Int](s"taxRelief.${taxYear.toString}.poundsPerWeek").getOrElse(6)
+  def taxReliefMaxPerYear(taxYear: TaxYearSelection): Int =
+    configuration.getOptional[Int](s"taxRelief.${taxYear.toString}.maxPerYear")
+      .getOrElse(configuration.get[Int]("taxRelief.default.maxPerYear"))
 
-  lazy val taxReliefMaxPerYear2020: Int = configuration.getOptional[Int]("taxRelief.2020.maxPerYear").getOrElse(312)
-  lazy val taxReliefMaxPerYear2021: Int = configuration.getOptional[Int]("taxRelief.2021.maxPerYear").getOrElse(312)
-  lazy val taxReliefMaxPerYear2022: Int = configuration.getOptional[Int]("taxRelief.2022.maxPerYear").getOrElse(312)
-  lazy val taxReliefMaxPerYear2023: Int = configuration.getOptional[Int]("taxRelief.2023.maxPerYear").getOrElse(312)
-  lazy val taxReliefMaxPerYear2024: Int = configuration.getOptional[Int]("taxRelief.2024.maxPerYear").getOrElse(312)
+  lazy val rateLimitTaiGets: RateLimitConfig = configuration.get[RateLimitConfig]("rateLimit.taiGets")
+  lazy val rateLimitTaiPosts: RateLimitConfig = configuration.get[RateLimitConfig]("rateLimit.taiPosts")
 
-  def taxReliefMaxPerYear(taxYear: TaxYearSelection) = configuration.getOptional[Int](s"taxRelief.${taxYear.toString}.maxPerYear").getOrElse(312)
-
-  lazy val rateLimitTaiGets = configuration.get[RateLimitConfig]("rateLimit.taiGets")
-  lazy val rateLimitTaiPosts = configuration.get[RateLimitConfig]("rateLimit.taiPosts")
-
-  lazy val scaWrapperEnabled = configuration.get[Boolean]("microservice.services.features.sca-wrapper")
+  lazy val scaWrapperEnabled: Boolean = configuration.get[Boolean]("microservice.services.features.sca-wrapper")
 
   lazy val optimizelyId: String = configuration.getOptional[String]("optimizely.projectId").getOrElse("18916851035")
 
@@ -86,12 +78,13 @@ class FrontendAppConfig @Inject()(configuration: Configuration, val servicesConf
 
   val collectionName: String = "user-answers"
 
-  val cacheTtl = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+  val cacheTtl: Int = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
   lazy val mergedJourneyEnabled: Boolean = configuration.getOptional[Boolean]("microservice.services.features.merged-journey").getOrElse(false)
 
   private val employeeExpensesUrl: String = configuration.get[String]("urls.employeeExpensesUrl")
-  def mergedJourneyContinueUrl(claimStatus: ClaimStatus): String = s"$employeeExpensesUrl/employee-expenses/merged-journey-continue?journey=wfh&status=$claimStatus"
+  def mergedJourneyContinueUrl(claimStatus: ClaimStatus): String =
+    s"$employeeExpensesUrl/employee-expenses/merged-journey-continue?journey=wfh&status=$claimStatus"
 
 }
 

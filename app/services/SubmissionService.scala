@@ -18,17 +18,15 @@ package services
 
 import config.FrontendAppConfig
 import connectors.{CitizenDetailsConnector, TaiConnector}
-import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1}
 import models.auditing.AuditEventType._
 import models.requests.DataRequest
-import models.{AuditData, FlatRateItem, TaxYearFromUIAssembler, TaxYearSelection}
+import models.{AuditData, FlatRateItem, TaxYearSelection}
 import pages.SubmittedClaim
 import play.api.Logging
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.RateLimiting
-import utils.TaxYearDates._
 
 import javax.inject.{Inject, Named, Singleton}
 import scala.collection.immutable.ListMap
@@ -67,19 +65,22 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
                      hc: HeaderCarrier,
                      ec: ExecutionContext) = {
 
-    val assembler = TaxYearFromUIAssembler(selectedTaxYears.map(_.toString).toList)
+    val (wholeYearSelections, perWeekSelections) = selectedTaxYears.partition(TaxYearSelection.wholeYearClaims.contains)
 
-    val wholeYearItems: Seq[FlatRateItem] = Seq(
-      if (assembler.contains2020) Some(FlatRateItem(year = YEAR_2020, amount = calculate2020FlatRate())) else None,
-      if (assembler.contains2021) Some(FlatRateItem(year = YEAR_2021, amount = calculate2021FlatRate())) else None,
-      if (assembler.contains2022) Some(FlatRateItem(year = YEAR_2022, amount = calculate2022FlatRate())) else None
-    ).flatten
+    val wholeYearItems: Seq[FlatRateItem] = wholeYearSelections.map { taxYearSelection =>
+      FlatRateItem(taxYearSelection.toTaxYear.startYear, appConfig.taxReliefMaxPerYear(taxYearSelection))
+    }
 
-    val perWeekItems: Seq[FlatRateItem] = (weeksForTaxYears flatMap {
-      case (CurrentYear, weeks) if assembler.containsCurrent => Some(FlatRateItem(year = YEAR_2024, amount = calculate2024FlatRate(weeks)))
-      case (CurrentYearMinus1, weeks) if assembler.contains2023 => Some(FlatRateItem(year = YEAR_2023, amount = calculate2023FlatRate(weeks)))
-      case _ => None
-    }).toSeq
+    val perWeekItems: Seq[FlatRateItem] = perWeekSelections.map { taxYearSelection =>
+      val claimWeekAmount = weeksForTaxYears.getOrElse(
+        taxYearSelection,
+        throw new InternalServerException(s"[SubmissionService][submit] Week count for ${taxYearSelection.toString} is missing")
+      )
+      FlatRateItem(
+        taxYearSelection.toTaxYear.startYear,
+        (claimWeekAmount * appConfig.taxReliefPerWeek(taxYearSelection)).min(appConfig.taxReliefMaxPerYear(taxYearSelection))
+      )
+    }
 
     val flatRateItems = wholeYearItems ++ perWeekItems
 
@@ -110,32 +111,6 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
         } yield futureSeq :+ future
     )
   }
-
-  def calculate2020FlatRate(): Int =
-    numberOfWeeks(TAX_YEAR_2020_START_DATE, TAX_YEAR_2020_END_DATE) * appConfig.taxReliefPerWeek2020 toInt match {
-      case flatRateAmount: Int if flatRateAmount > appConfig.taxReliefMaxPerYear2020 => appConfig.taxReliefMaxPerYear2020
-      case flatRateAmount: Int => flatRateAmount
-    }
-
-  def calculate2021FlatRate(): Int = {
-    numberOfWeeks(TAX_YEAR_2021_START_DATE, TAX_YEAR_2021_END_DATE) * appConfig.taxReliefPerWeek2021 toInt match {
-      case flatRateAmount: Int if flatRateAmount > appConfig.taxReliefMaxPerYear2021 => appConfig.taxReliefMaxPerYear2021
-      case flatRateAmount: Int => flatRateAmount
-    }
-  }
-
-  def calculate2022FlatRate(): Int = {
-    numberOfWeeks(TAX_YEAR_2022_START_DATE, TAX_YEAR_2022_END_DATE) * appConfig.taxReliefPerWeek2022 toInt match {
-      case flatRateAmount: Int if flatRateAmount > appConfig.taxReliefMaxPerYear2022 => appConfig.taxReliefMaxPerYear2022
-      case flatRateAmount: Int => flatRateAmount
-    }
-  }
-
-  def calculate2023FlatRate(numberOfWeeks: Int): Int =
-    (numberOfWeeks * appConfig.taxReliefPerWeek2023).min(appConfig.taxReliefMaxPerYear2023)
-
-  def calculate2024FlatRate(numberOfWeeks: Int): Int =
-    (numberOfWeeks * appConfig.taxReliefPerWeek2024).min(appConfig.taxReliefMaxPerYear2024)
 
   private def auditSubmissionSuccess(submittedDetails: Seq[FlatRateItem])
                                     (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =

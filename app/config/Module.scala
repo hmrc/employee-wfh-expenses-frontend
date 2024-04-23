@@ -16,15 +16,12 @@
 
 package config
 
-import com.google.inject.{AbstractModule, Provides}
+import com.google.inject.AbstractModule
 import connectors.{PaperlessPreferenceConnector, PaperlessPreferenceConnectorImpl}
 import controllers.actions._
 import play.api.{Configuration, Environment}
 import services.{IABDService, IABDServiceImpl}
-import utils.RateLimiting
 import views.templates.{LayoutProvider, NewLayoutProvider, OldLayoutProvider}
-
-import javax.inject.Named
 
 class Module(environment: Environment, config: Configuration) extends AbstractModule {
 
@@ -45,18 +42,6 @@ class Module(environment: Environment, config: Configuration) extends AbstractMo
       bind(classOf[LayoutProvider]).to(classOf[NewLayoutProvider]).asEagerSingleton()
     } else {
       bind(classOf[LayoutProvider]).to(classOf[OldLayoutProvider]).asEagerSingleton()
-    }
-
-    @Provides
-    @Named("IABD GET")
-    def rateLimitForIabdGets(appConfig: FrontendAppConfig): RateLimiting = {
-      new RateLimiting(appConfig.rateLimitTaiGets, "IABD GET rate limit triggered")
-    }
-
-    @Provides
-    @Named("IABD POST")
-    def rateLimitForIabdPosts(appConfig: FrontendAppConfig): RateLimiting = {
-      new RateLimiting(appConfig.rateLimitTaiPosts, "IABD POST rate limited triggered")
     }
   }
 }

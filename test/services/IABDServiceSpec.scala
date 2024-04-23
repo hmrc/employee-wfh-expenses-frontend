@@ -17,19 +17,15 @@
 package services
 
 import base.SpecBase
-import com.digitaltangible.ratelimit.RateLimiter
-import config.{FrontendAppConfig, RateLimitConfig}
+import config.FrontendAppConfig
 import connectors.TaiConnector
 import models.{Expenses, IABDExpense}
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, when}
 import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.TooManyRequestException
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.RateLimiting
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,11 +36,8 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
   val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
-  //noinspection ScalaStyle
-  def throttler(enabled: Boolean) = new RateLimiting(RateLimitConfig(10, 10, enabled), "too many requests")
-
-  class Setup(throttler: RateLimiting) {
-    val serviceUnderTest = new IABDServiceImpl(mockTaiConnector, mockAuditConnector, mockAppConfig, throttler)
+  class Setup {
+    val serviceUnderTest = new IABDServiceImpl(mockTaiConnector, mockAuditConnector, mockAppConfig)
   }
 
   before {
@@ -61,7 +54,7 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
 
   "alreadyClaimed" should {
     "return None" when {
-      "there is no job or other expenses" in new Setup(throttler(true)) {
+      "there is no job or other expenses" in new Setup {
         when(mockTaiConnector.getOtherExpensesData(fakeNino, testYear2023)).thenReturn(Future(Seq.empty))
         when(mockTaiConnector.getJobExpensesData(fakeNino, testYear2023)).thenReturn(Future(Seq.empty))
 
@@ -74,7 +67,7 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
     }
 
     "return Some other expenses" when {
-      "tai returns other expense details" in new Setup(throttler(true)) {
+      "tai returns other expense details" in new Setup {
         val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
 
         when(mockTaiConnector.getOtherExpensesData(fakeNino, testYear2023)).thenReturn(Future(otherExpenses))
@@ -88,7 +81,7 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
     }
 
     "return Some job expenses" when {
-      "tai returns job expense details" in new Setup(throttler(true)) {
+      "tai returns job expense details" in new Setup {
         val otherExpenses: Seq[Nothing] = Seq.empty
         val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
 
@@ -103,128 +96,84 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
       }
     }
 
-    class FailToGetTokenRateLimiter extends RateLimiter(1,1) {
-      override def consumeAndCheck(key: Any): Boolean = false
-    }
+    "getAlreadyClaimedStatusForAllYears" should {
+      "return expenses for 2024 only when already claimed for CTY" in new Setup {
+        val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
+        val noExpenses: Seq[Nothing] = Seq.empty
 
-    "throw a TooManyRequestException exception" when {
+        when(mockTaiConnector.getOtherExpensesData(fakeNino, testYear2024)).thenReturn(Future(noExpenses))
+        when(mockTaiConnector.getJobExpensesData(fakeNino, testYear2024)).thenReturn(Future(jobExpenses))
 
-      val mockThrottler = mock[RateLimiting]
-
-      "there are no tokens left in the bucket" in new Setup(mockThrottler) {
-        when(mockThrottler.enabled).thenReturn(true)
-        when(mockThrottler.bucket).thenReturn(new FailToGetTokenRateLimiter)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
-        when(mockTaiConnector.getOtherExpensesData(fakeNino, testYear2023)).thenReturn(Future(Seq.empty))
-        when(mockTaiConnector.getJobExpensesData(fakeNino, testYear2023)).thenReturn(Future(Seq.empty))
-
-        intercept[TooManyRequestException] {
-          await(serviceUnderTest.alreadyClaimed(fakeNino, testYear2023))
+        for (year <- Seq(testYear2023, testYear2022, testYear2021, testYear2020)) {
+          when(mockTaiConnector.getOtherExpensesData(fakeNino, year)).thenReturn(Future(noExpenses))
+          when(mockTaiConnector.getJobExpensesData(fakeNino, year)).thenReturn(Future(noExpenses))
         }
 
-        Mockito.verify(mockTaiConnector, times(0)).getOtherExpensesData(fakeNino, testYear2023)
-        Mockito.verify(mockTaiConnector, times(0)).getJobExpensesData(fakeNino, testYear2023)
+        val expenses: (Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses]) = (
+          None,
+          None,
+          None,
+          None,
+          Some(Expenses(testYear2024, noExpenses, jobExpenses, wasJobRateExpensesChecked = true))
+        )
+
+        await(serviceUnderTest.getAlreadyClaimedStatusForAllYears(fakeNino)) mustBe expenses
       }
     }
 
-    "NOT throw a TooManyRequestException" when {
+    "allYearsClaimed" should {
+      "return true when data provided shows all years have been claimed" in new Setup {
+        val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
+        val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
 
-      val mockThrottler = mock[RateLimiting]
+        val expenses: (Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses]) = (
+          Some(Expenses(testYear2020, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+          Some(Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+          Some(Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+          Some(Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+          Some(Expenses(testYear2024, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true))
+        )
 
-      "the throttle is disabled" in new Setup(mockThrottler) {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.bucket).thenReturn(new FailToGetTokenRateLimiter)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
-        when(mockTaiConnector.getOtherExpensesData(fakeNino, testYear2023)).thenReturn(Future(Seq.empty))
-        when(mockTaiConnector.getJobExpensesData(fakeNino, testYear2023)).thenReturn(Future(Seq.empty))
-
-        await(serviceUnderTest.alreadyClaimed(fakeNino, testYear2023))
-
-        Mockito.verify(mockTaiConnector, times(1)).getOtherExpensesData(fakeNino, testYear2023)
-        Mockito.verify(mockTaiConnector, times(1)).getJobExpensesData(fakeNino, testYear2023)
-      }
-    }
-  }
-
-  "getAlreadyClaimedStatusForAllYears" should {
-    "return expenses for 2024 only when already claimed for CTY" in new Setup(throttler(false)) {
-      val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
-      val noExpenses: Seq[Nothing] = Seq.empty
-
-      when(mockTaiConnector.getOtherExpensesData(fakeNino, testYear2024)).thenReturn(Future(noExpenses))
-      when(mockTaiConnector.getJobExpensesData(fakeNino, testYear2024)).thenReturn(Future(jobExpenses))
-
-      for(year <- Seq(testYear2023, testYear2022, testYear2021, testYear2020)) {
-        when(mockTaiConnector.getOtherExpensesData(fakeNino, year)).thenReturn(Future(noExpenses))
-        when(mockTaiConnector.getJobExpensesData(fakeNino, year)).thenReturn(Future(noExpenses))
+        serviceUnderTest.allYearsClaimed(fakeNino, expenses) mustBe true
       }
 
-      val expenses: (Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses]) = (
-        None,
-        None,
-        None,
-        None,
-        Some(Expenses(testYear2024, noExpenses, jobExpenses, wasJobRateExpensesChecked = true))
-      )
+      "return false when data provided shows all years have NOT been claimed" in new Setup {
+        val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
+        val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
 
-      await(serviceUnderTest.getAlreadyClaimedStatusForAllYears(fakeNino)) mustBe expenses
-    }
-  }
+        val expenses: (Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses]) = (
+          None,
+          Some(Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+          Some(Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+          Some(Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
+          Some(Expenses(testYear2024, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true))
+        )
 
-  "allYearsClaimed" should {
-    "return true when data provided shows all years have been claimed" in new Setup(throttler(true)) {
-      val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
-      val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
-
-      val expenses: (Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses]) = (
-        Some(Expenses(testYear2020, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2024, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true))
-      )
-
-      serviceUnderTest.allYearsClaimed(fakeNino, expenses) mustBe true
+        serviceUnderTest.allYearsClaimed(fakeNino, expenses) mustBe false
+      }
     }
 
-    "return false when data provided shows all years have NOT been claimed" in new Setup(throttler(true)) {
-      val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
-      val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
+    "claimedAllYearsStatus" should {
+      "return a value of true if user has claimed for all years" in new Setup {
+        val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
+        val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
 
-      val expenses: (Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses], Option[Expenses]) = (
-        None,
-        Some(Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)),
-        Some(Expenses(testYear2024, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true))
-      )
+        for (year <- Seq(testYear2024, testYear2023, testYear2022, testYear2021, testYear2020)) {
+          when(mockTaiConnector.getOtherExpensesData(fakeNino, year)).thenReturn(Future(otherExpenses))
+          when(mockTaiConnector.getJobExpensesData(fakeNino, year)).thenReturn(Future(jobExpenses))
+        }
 
-      serviceUnderTest.allYearsClaimed(fakeNino, expenses) mustBe false
-    }
-  }
-
-  "claimedAllYearsStatus" should {
-    "return a value of true if user has claimed for all years" in new Setup(throttler(true)) {
-      val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
-      val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
-
-      for (year <- Seq(testYear2024, testYear2023, testYear2022, testYear2021, testYear2020)) {
-        when(mockTaiConnector.getOtherExpensesData(fakeNino, year)).thenReturn(Future(otherExpenses))
-        when(mockTaiConnector.getJobExpensesData(fakeNino, year)).thenReturn(Future(jobExpenses))
+        await(serviceUnderTest.claimedAllYearsStatus(fakeNino)) mustBe true
       }
 
-      await(serviceUnderTest.claimedAllYearsStatus(fakeNino)) mustBe true
-    }
+      "return a value of false if user has NOT claimed for all years" in new Setup {
+        for (year <- Seq(testYear2024, testYear2023, testYear2022, testYear2021, testYear2020)) {
+          when(mockTaiConnector.getOtherExpensesData(fakeNino, year)).thenReturn(Future(Seq.empty))
+          when(mockTaiConnector.getJobExpensesData(fakeNino, year)).thenReturn(Future(Seq.empty))
+        }
 
-    "return a value of false if user has NOT claimed for all years" in new Setup(throttler(true)) {
-      for (year <- Seq(testYear2024, testYear2023, testYear2022, testYear2021, testYear2020)) {
-        when(mockTaiConnector.getOtherExpensesData(fakeNino, year)).thenReturn(Future(Seq.empty))
-        when(mockTaiConnector.getJobExpensesData(fakeNino, year)).thenReturn(Future(Seq.empty))
+        await(serviceUnderTest.claimedAllYearsStatus(fakeNino)) mustBe false
       }
-
-      await(serviceUnderTest.claimedAllYearsStatus(fakeNino)) mustBe false
     }
   }
 }

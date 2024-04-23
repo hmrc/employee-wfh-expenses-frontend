@@ -72,9 +72,6 @@ class FrontendAppConfig @Inject()(configuration: Configuration, val servicesConf
   lazy val taxReliefMaxPerYear2023: Int = configuration.getOptional[Int]("taxRelief.2023.maxPerYear").getOrElse(312)
   lazy val taxReliefMaxPerYear2024: Int = configuration.getOptional[Int]("taxRelief.2024.maxPerYear").getOrElse(312)
 
-  lazy val rateLimitTaiGets = configuration.get[RateLimitConfig]("rateLimit.taiGets")
-  lazy val rateLimitTaiPosts = configuration.get[RateLimitConfig]("rateLimit.taiPosts")
-
   lazy val scaWrapperEnabled = configuration.get[Boolean]("microservice.services.features.sca-wrapper")
 
   lazy val optimizelyId: String = configuration.getOptional[String]("optimizely.projectId").getOrElse("18916851035")

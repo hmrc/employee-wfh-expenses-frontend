@@ -24,10 +24,9 @@ import play.api.Logging
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.RateLimiting
 import utils.TaxYearDates._
 
-import javax.inject.{Inject, Named, Singleton}
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -35,16 +34,15 @@ class IABDServiceImpl @Inject()(
                                  taiConnector: TaiConnector,
                                  auditConnector: AuditConnector,
                                  appConfig: FrontendAppConfig,
-                                 @Named("IABD GET") rateLimiter: RateLimiting
                                )(implicit executionContext: ExecutionContext) extends IABDService with Logging {
 
   def alreadyClaimed(nino: String, year: Int)(implicit hc: HeaderCarrier): Future[Option[Expenses]] = {
     { for {
-      otherExpenses   <- rateLimiter.withToken(() => taiConnector.getOtherExpensesData(nino, year))
+      otherExpenses   <- taiConnector.getOtherExpensesData(nino, year)
       otherRateAmount = otherExpenses.map(_.grossAmount).sum
       jobExpenses     <-
         if (otherRateAmount==0) {
-          rateLimiter.withToken(() => taiConnector.getJobExpensesData(nino, year))
+          taiConnector.getJobExpensesData(nino, year)
         } else {
           Future.successful(Seq[IABDExpense]())
         }

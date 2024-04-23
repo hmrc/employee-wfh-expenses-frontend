@@ -16,7 +16,6 @@
 
 package services
 
-import java.time.LocalDate
 import base.SpecBase
 import connectors.{CitizenDetailsConnector, TaiConnector}
 import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4}
@@ -31,10 +30,10 @@ import org.scalatestplus.mockito.MockitoSugar
 import pages.SubmittedClaim
 import play.api.mvc.AnyContent
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{TooManyRequestException, UpstreamErrorResponse}
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.RateLimiting
 
+import java.time.LocalDate
 import scala.collection.immutable.ListMap
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -50,7 +49,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   val mockCitizenDetailsConnector: CitizenDetailsConnector = mock[CitizenDetailsConnector]
   val mockTaiConnector: TaiConnector = mock[TaiConnector]
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
-  val mockThrottler: RateLimiting = mock[RateLimiting]
   val mockSessionService: SessionService = mock[SessionService]
 
   val testNino: String = "AA112233A"
@@ -60,11 +58,11 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   val userAnswersArgumentCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
   class Setup {
-    val serviceUnderTest = new SubmissionService(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockSessionService, frontendAppConfig, mockThrottler)
+    val serviceUnderTest = new SubmissionService(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockSessionService, frontendAppConfig)
   }
 
   before {
-    Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockThrottler, mockSessionService)
+    Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockSessionService)
   }
 
   "calculate2020FlatRate" should {
@@ -125,9 +123,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
     "only claiming for 2022/23 tax year" should {
       "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
           .thenReturn(Future {
             etag4
@@ -144,8 +139,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
         await(serviceUnderTest.submitExpenses(claimingFor2022, ListMap())).isLeft mustBe true
@@ -163,9 +156,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
     "only claiming for 2021/22 tax year" should {
       "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
           .thenReturn(Future {
             etag3
@@ -182,8 +172,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
         await(serviceUnderTest.submitExpenses(claimingFor2021, ListMap())).isLeft mustBe true
@@ -203,9 +191,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
     "claiming for 2022 and 2021" should {
       "upsert 2 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
           .thenReturn(Future.successful(
             etag3
@@ -226,8 +211,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
         await(serviceUnderTest.submitExpenses(claimingFor2020, ListMap())).isLeft mustBe true
@@ -245,9 +228,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
     s"only claiming for 2020 tax year" should {
       "upsert 2 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
           .thenReturn(Future.successful(
             etag1
@@ -267,8 +247,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
         await(serviceUnderTest.submitExpenses(claimingFor2020, ListMap())).isLeft mustBe true
@@ -284,9 +262,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when 1st IABD 59 POST fails and audit failure" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
           .thenReturn(Future {
             etag2
@@ -315,9 +290,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
     s"claiming for all available tax years, including 3 weeks of 2023" should {
       "upsert 4 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
           .thenReturn(Future.successful(
             etag1
@@ -349,8 +321,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
         await(serviceUnderTest.submitExpenses(claimingFor2020, ListMap())).isLeft mustBe true
@@ -366,8 +336,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when 2nd IABD 59 POST fails and audit failure" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(any())(any(), any()))
           .thenReturn(Future.successful(
             etag1
@@ -402,9 +370,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
     s"claiming for 2021 and 2020" should {
       "upsert 3 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
           .thenReturn(Future.successful(
             etag1
@@ -428,8 +393,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
         await(serviceUnderTest.submitExpenses(claimingFor2021And2020, ListMap())).isLeft mustBe true
@@ -447,9 +410,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
     s"claiming for 2022 and 2020" should {
       "upsert 3 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
           .thenReturn(Future.successful(
             etag1
@@ -473,8 +433,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
         await(serviceUnderTest.submitExpenses(claimingFor2022And2020, ListMap())).isLeft mustBe true
@@ -490,8 +448,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when 3rd ETAG call fails and audit failure" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(any())(any(), any()))
           .thenReturn(Future {
             etag2
@@ -513,9 +469,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
     s"only claiming for 3 weeks of the 2023/24 tax year" should {
       "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
           .thenReturn(Future.successful(
             etag1
@@ -534,9 +487,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
     s"only claiming for 3 weeks of the 2024/25 tax year" should {
       "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
           .thenReturn(Future.successful(
             etag1
@@ -555,9 +505,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
       s"claiming for 3 weeks of 2023 and 2020 year" should {
       "upsert 3 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
           .thenReturn(Future.successful(
             etag1
@@ -581,8 +528,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockThrottler.enabled).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
 
         await(serviceUnderTest.submitExpenses(claimingFor2023And2020, ListMap(CurrentYear -> 3))).isLeft mustBe true
@@ -596,20 +541,6 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         verifyNoSubmittedStateUpdate
       }
-    }
-
-    "rate limit has been reached (no tokens in bucket)" should {
-      "throw a TooManyRequestException" in new Setup {
-
-        when(mockThrottler.enabled).thenReturn(true)
-        when(mockThrottler.hasAToken).thenReturn(false)
-        when(mockThrottler.withToken(any())).thenCallRealMethod()
-
-        intercept[TooManyRequestException] {
-          await(serviceUnderTest.submitExpenses(claimingForAll, ListMap(CurrentYear -> 5, CurrentYearMinus1 -> 5)))
-        }
-      }
-
     }
   }
 }

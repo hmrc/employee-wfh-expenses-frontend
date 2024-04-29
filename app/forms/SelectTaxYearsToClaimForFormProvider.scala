@@ -16,18 +16,29 @@
 
 package forms
 
-import javax.inject.Inject
-
 import forms.mappings.Mappings
-import play.api.data.Form
-import play.api.data.Forms.seq
 import models.TaxYearSelection
+import play.api.data.Form
+import play.api.data.Forms.{nonEmptyText, seq}
+import uk.gov.hmrc.time.TaxYear
+
+import javax.inject.Inject
+import scala.util.Try
 
 class SelectTaxYearsToClaimForFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Seq[TaxYearSelection]] =
-    Form(
-      "value" -> seq(enumerable[TaxYearSelection]("selectTaxYearsToClaimFor.error.required"))
-        .verifying(nonEmptySeq("selectTaxYearsToClaimFor.error.required"))
-    )
+  val errorKey = "selectTaxYearsToClaimFor.error.required"
+
+  def apply(): Form[Seq[TaxYearSelection]] = Form(
+    "value" -> seq(text(errorKey))
+      .verifying(errorKey, _.nonEmpty)
+      .verifying(
+        errorKey,
+        _.forall(yearInt => Try(TaxYearSelection.mapping(TaxYear(yearInt.toInt))).toOption.nonEmpty)
+      )
+      .transform[Seq[TaxYearSelection]](
+        _.map(year => TaxYearSelection.mapping(TaxYear(year.toInt))),
+        _.map(_.toString)
+      )
+  )
 }

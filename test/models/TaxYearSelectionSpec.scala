@@ -17,47 +17,46 @@
 package models
 
 import generators.ModelGenerators
+import models.TaxYearSelection.CurrentYearMinus4
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import org.scalatest.OptionValues
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsError, JsString, Json}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import play.api.libs.json.{JsError, Json}
 
-class SelectTaxYearsToClaimForSpec extends AnyWordSpec with Matchers with ScalaCheckPropertyChecks with OptionValues with ModelGenerators {
+class TaxYearSelectionSpec extends AnyWordSpec with Matchers with ScalaCheckPropertyChecks with OptionValues with ModelGenerators {
 
   "TaxYearSelection" must {
-
     "deserialise valid values" in {
-
       val gen = arbitrary[TaxYearSelection]
 
       forAll(gen) {
         selectTaxYearsToClaimFor =>
-
-          JsString(selectTaxYearsToClaimFor.toString).validate[TaxYearSelection].asOpt.value mustEqual selectTaxYearsToClaimFor
+          Json.toJson(selectTaxYearsToClaimFor.toTaxYear.startYear).validate[TaxYearSelection].asOpt.value mustEqual selectTaxYearsToClaimFor
       }
     }
-
     "fail to deserialise invalid values" in {
+      val invalidYear = CurrentYearMinus4.toTaxYear.back(1).startYear
 
-      val gen = arbitrary[String] suchThat (!TaxYearSelection.valuesAll.map(_.toString).contains(_))
+      intercept[IllegalArgumentException](Json.toJson(invalidYear).validate[TaxYearSelection])
+    }
+    "deserialise valid list of values while discarding invalid values (in case of tax year rollover)" in {
+      val gen = arbitrary[Seq[TaxYearSelection]]
+      val invalidYear = CurrentYearMinus4.toTaxYear.back(1).startYear
 
       forAll(gen) {
-        invalidValue =>
-
-          JsString(invalidValue).validate[TaxYearSelection] mustEqual JsError("error.invalid")
+        taxYearSeq =>
+          Json.toJson(taxYearSeq.map(_.toTaxYear.startYear) :+ invalidYear).validate[Seq[TaxYearSelection]].asOpt.value mustEqual taxYearSeq
       }
     }
 
     "serialise" in {
-
       val gen = arbitrary[TaxYearSelection]
 
       forAll(gen) {
         selectTaxYearsToClaimFor =>
-
-          Json.toJson(selectTaxYearsToClaimFor) mustEqual JsString(selectTaxYearsToClaimFor.toString)
+          Json.toJson(selectTaxYearsToClaimFor) mustEqual Json.toJson(selectTaxYearsToClaimFor.toTaxYear.startYear)
       }
     }
   }

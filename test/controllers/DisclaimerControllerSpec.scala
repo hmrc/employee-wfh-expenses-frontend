@@ -17,9 +17,9 @@
 package controllers
 
 import base.SpecBase
-import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus4}
 import models.UserAnswers
-import pages.{ClaimedForTaxYear2020, SelectTaxYearsToClaimForPage}
+import pages.{ClaimedForTaxYears, SelectTaxYearsToClaimForPage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -32,8 +32,8 @@ class DisclaimerControllerSpec extends SpecBase {
       val userAnswers = UserAnswers(
         userAnswersId,
         Json.obj(
-          ClaimedForTaxYear2020.toString -> true,
-          SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString, CurrentYearMinus1.toString),
+          ClaimedForTaxYears.toString -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
+          SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear, CurrentYearMinus1.toTaxYear.startYear),
         )
       )
 
@@ -53,8 +53,8 @@ class DisclaimerControllerSpec extends SpecBase {
       val userAnswers = UserAnswers(
         userAnswersId,
         Json.obj(
-          ClaimedForTaxYear2020.toString -> true,
-          SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString),
+          ClaimedForTaxYears.toString -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
+          SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear),
         )
       )
 

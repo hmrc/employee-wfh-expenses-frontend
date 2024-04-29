@@ -18,6 +18,7 @@ package pages
 
 import models.TaxYearSelection
 import play.api.libs.json._
+import uk.gov.hmrc.time.TaxYear
 
 import scala.collection.immutable.ListMap
 
@@ -29,7 +30,12 @@ case object NumberOfWeeksToClaimForPage extends QuestionPage[ListMap[TaxYearSele
 
   implicit val format: Format[ListMap[TaxYearSelection, Int]] = new Format[ListMap[TaxYearSelection, Int]] {
     override def reads(json: JsValue): JsResult[ListMap[TaxYearSelection, Int]] =
-      json.validate[List[(TaxYearSelection, Int)]].map(list => ListMap(list: _*))
+      json
+        .validate[List[(Int, Int)]]
+        .map(_.flatMap {
+          case (intYear, amount) => TaxYearSelection.optTaxYearSelection(TaxYear(intYear)).map(yearSelection => (yearSelection, amount))
+        })
+        .map(list => ListMap(list: _*))
 
     override def writes(answerMap: ListMap[TaxYearSelection, Int]): JsValue =
       Json.toJson(

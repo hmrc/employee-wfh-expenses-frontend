@@ -19,13 +19,13 @@ package controllers
 import base.SpecBase
 import connectors.PaperlessPreferenceConnector
 import controllers.PaperlessAuditConst._
-import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus4}
 import models.UserAnswers
 import models.paperless.{PaperlessStatus, PaperlessStatusResponse, Url}
 import org.mockito.ArgumentMatchers.{any, eq => eqm}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{ClaimedForTaxYear2020, MergedJourneyFlag, SelectTaxYearsToClaimForPage, SubmittedClaim}
+import pages.{ClaimedForTaxYears, MergedJourneyFlag, SelectTaxYearsToClaimForPage, SubmittedClaim}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -71,8 +71,10 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
     val application = applicationBuilder(userAnswers = Some(
       UserAnswers(userAnswersId, Json.obj(
         MergedJourneyFlag.toString -> mergeJourney,
-        ClaimedForTaxYear2020.toString -> true,
-        SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toString, CurrentYearMinus1.toString, CurrentYearMinus2.toString),
+        ClaimedForTaxYears.toString -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
+        SelectTaxYearsToClaimForPage.toString -> Json.arr(
+          CurrentYear.toTaxYear.startYear, CurrentYearMinus1.toTaxYear.startYear, CurrentYearMinus2.toTaxYear.startYear
+        ),
         SubmittedClaim.toString -> true)))
     ).overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))
       .overrides(bind[AuditConnector].toInstance(auditConnector))

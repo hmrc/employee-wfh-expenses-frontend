@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4}
+import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4, valuesAll, wholeYearClaims}
 import models.UserAnswers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito._
@@ -25,7 +25,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
 import play.api.inject.bind
-import play.api.libs.json.Json
+import play.api.libs.json.{JsArray, Json}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.SubmissionService
@@ -41,41 +41,58 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with Befor
     reset(mockSubmissionService)
   }
 
+  val weeksClaimFor: JsArray = {
+    valuesAll.foldLeft(Json.arr()) { (acc, year) =>
+      if (!wholeYearClaims.contains(year)) {
+        acc :+ Json.arr(year.toTaxYear.startYear, 40 + valuesAll.indexOf(year))
+      } else {
+        acc
+      }
+    }
+  }
+
+  val yearlyClaimFor:  JsArray = {
+    valuesAll.foldLeft(Json.arr()) { (acc, year) =>
+      if (wholeYearClaims.contains(year)) {
+        acc :+ (Json.toJson(year.toTaxYear.startYear))
+      } else {
+        acc
+      }
+    }
+  }
+
   val fullUserAnswers: UserAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
       SelectTaxYearsToClaimForPage.toString -> Json.arr(
-        CurrentYear.toString,
-        CurrentYearMinus1.toString,
-        CurrentYearMinus2.toString,
-        CurrentYearMinus3.toString,
-        CurrentYearMinus4.toString
+        CurrentYear.toTaxYear.startYear,
+        CurrentYearMinus1.toTaxYear.startYear,
+        CurrentYearMinus2.toTaxYear.startYear,
+        CurrentYearMinus3.toTaxYear.startYear,
+        CurrentYearMinus4.toTaxYear.startYear
       ),
-      NumberOfWeeksToClaimForPage.toString -> Json.arr(
-        Json.arr(CurrentYear.toString, 1),
-        Json.arr(CurrentYearMinus1.toString, 43),
-      )
+      NumberOfWeeksToClaimForPage.toString -> weeksClaimFor
     )
   )
-  val fullUserAnswersWithoutWeeks: UserAnswers = UserAnswers(
-    userAnswersId,
-    Json.obj(
-      SelectTaxYearsToClaimForPage.toString -> Json.arr(
-        CurrentYearMinus2.toString,
-        CurrentYearMinus3.toString,
-        CurrentYearMinus4.toString
+
+  def fullUserAnswersWithoutWeeks: UserAnswers = {
+    UserAnswers(
+      userAnswersId,
+      Json.obj(
+        SelectTaxYearsToClaimForPage.toString -> yearlyClaimFor
       )
     )
-  )
+  }
+
   val incompleteUserAnswers: UserAnswers = UserAnswers(
     userAnswersId,
     Json.obj(
       SelectTaxYearsToClaimForPage.toString -> Json.arr(
-        CurrentYear.toString,
-        CurrentYearMinus1.toString,
+        CurrentYear.toTaxYear.startYear,
+        CurrentYearMinus1.toTaxYear.startYear,
       ),
       NumberOfWeeksToClaimForPage.toString -> Json.arr(
-        Json.arr(CurrentYear.toString, 1)
+        Json.arr(CurrentYear.toTaxYear.startYear, 1)
       )
     )
   )
@@ -90,14 +107,16 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with Befor
 
       application.stop()
     }
-    "return OK with a view when only whole claim years are selected" in {
-      val application = applicationBuilder(userAnswers = Some(fullUserAnswersWithoutWeeks)).build()
-      val request = FakeRequest(GET, routes.CheckYourClaimController.onPageLoad().url)
-      val result = route(application, request).value
+    if(yearlyClaimFor.value.nonEmpty){
+      "return OK with a view when only whole claim years are selected" in {
+        val application = applicationBuilder(userAnswers = Some(fullUserAnswersWithoutWeeks)).build()
+        val request = FakeRequest(GET, routes.CheckYourClaimController.onPageLoad().url)
+        val result = route(application, request).value
 
-      status(result) mustBe OK
+        status(result) mustBe OK
 
-      application.stop()
+        application.stop()
+      }
     }
     "redirect to journey start if user does not have all expected week data" in {
       val application = applicationBuilder(userAnswers = Some(incompleteUserAnswers)).build()
@@ -126,19 +145,21 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with Befor
 
       application.stop()
     }
-    "redirect to confirmation page if submission with whole years only is successful" in {
-      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Right(()))
+    if(yearlyClaimFor.value.nonEmpty) {
+      "redirect to confirmation page if submission with whole years only is successful" in {
+        when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Right(()))
 
-      val application = applicationBuilder(userAnswers = Some(fullUserAnswersWithoutWeeks))
-        .overrides(bind[SubmissionService].toInstance(mockSubmissionService))
-        .build()
-      val request = FakeRequest(POST, routes.CheckYourClaimController.onSubmit().url)
-      val result = route(application, request).value
+        val application = applicationBuilder(userAnswers = Some(fullUserAnswersWithoutWeeks))
+          .overrides(bind[SubmissionService].toInstance(mockSubmissionService))
+          .build()
+        val request = FakeRequest(POST, routes.CheckYourClaimController.onSubmit().url)
+        val result = route(application, request).value
 
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe routes.ConfirmationController.onPageLoad().url
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.ConfirmationController.onPageLoad().url
 
-      application.stop()
+        application.stop()
+      }
     }
     "redirect to technical difficulties page if an error is thrown" in {
       when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any())) thenReturn Future.successful(Left(""))

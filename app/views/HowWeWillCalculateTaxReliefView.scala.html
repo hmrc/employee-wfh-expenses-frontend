@@ -14,30 +14,31 @@
  * limitations under the License.
  *@
 
-@import utils.TaxYearFormatter
-@import utils.TaxYearDates._
+@import config.FrontendAppConfig
+@import models.TaxYearSelection
 
 @this(
+        appConfig: FrontendAppConfig,
         layout:     views.templates.LayoutProvider,
         formHelper: FormWithCSRF,
         backLink:   GovukBackLink,
         button:     GovukButton
 )
 
-@(taxYears: List[(String, String)])( implicit request: Request[_], messages: Messages)
+@(taxYears: Seq[TaxYearSelection])( implicit request: Request[_], messages: Messages)
 
-@getTaxYearContent(taxYear: (String, String)) = {
-    <h2 class="govuk-heading-m">@taxYear._1 @messages("site.to") @taxYear._2</h2>
-    @if(taxYear._1.contains(YEAR_2024.toString) || taxYear._1.contains(YEAR_2023.toString)) {
-        <ul class="govuk-list govuk-list--bullet">
-            <li>@messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")</li>
-            <li>@messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)</li>
-            <li>@messages("howWeWillCalculateTaxRelief.bullet.enter.weeks.text")</li>
-        </ul>
-    } else if(taxYear._1.contains(YEAR_2022.toString) || taxYear._1.contains(YEAR_2021.toString) || taxYear._1.contains(YEAR_2020.toString)) {
+@getTaxYearContent(taxYear: TaxYearSelection) = {
+    <h2 class="govuk-heading-m">@taxYear.formattedTaxYearArgs.head @messages("site.to") @taxYear.formattedTaxYearArgs.tail</h2>
+    @if(TaxYearSelection.wholeYearClaims.contains(taxYear)) {
         <ul class="govuk-list govuk-list--bullet">
             <li>@messages("howWeWillCalculateTaxRelief.bullet.frequency.yearly.text")</li>
-            <li>@messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", 6)</li>
+            <li>@messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", appConfig.taxReliefPerWeek(taxYear))</li>
+        </ul>
+    } else {
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("howWeWillCalculateTaxRelief.bullet.frequency.weekly.text")</li>
+            <li>@messages("howWeWillCalculateTaxRelief.bullet.tax.relief.amount.text", appConfig.taxReliefPerWeek(taxYear))</li>
+            <li>@messages("howWeWillCalculateTaxRelief.bullet.enter.weeks.text")</li>
         </ul>
     }
 }

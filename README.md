@@ -34,8 +34,7 @@ The service uses TAI to update the user's tax account via IABD 59
 
 To start all dependencies and services for Employee Expenses WFH, use one of the following commands:
 ```
-sm --start EE_ALL -r
-sm --start EE_DEP -r (starts only dependencies).
+sm2 --start EE_ALL
 ```
 
 Navigate to login stub (http://localhost:9949/auth-login-stub/) 

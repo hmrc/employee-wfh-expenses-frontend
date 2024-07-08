@@ -20,7 +20,7 @@ import play.api.Logging
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import play.twirl.api.{Html, HtmlFormat}
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.ServiceURLs
 import uk.gov.hmrc.sca.services.WrapperService
 import views.html.components.{AdditionalScript, HeadBlock}
 
@@ -83,11 +83,14 @@ class NewLayoutProvider @Inject()(
                       hideMenuBar: Boolean = false
                     )(contentBlock: Html)
                     (implicit request: Request[_], messages: Messages): HtmlFormat.Appendable = {
-    wrapperService.layout(
+    wrapperService.standardScaLayout(
       disableSessionExpired = !timeout,
       content = contentBlock,
       pageTitle = Some(s"$pageTitle - ${messages("service.name")} - GOV.UK"),
-      serviceNameUrl = Some(controllers.routes.IndexController.start.url),
+      serviceURLs = ServiceURLs(
+        serviceUrl = Some(controllers.routes.IndexController.start.url),
+        signOutUrl = Some(controllers.routes.SignedOutController.signedOut.url)
+      ),
       timeOutUrl = Some(controllers.routes.SignedOutController.signedOut.url),
       keepAliveUrl = controllers.routes.KeepAliveController.keepAlive.url,
       showBackLinkJS = showBackLink,
@@ -95,7 +98,7 @@ class NewLayoutProvider @Inject()(
       styleSheets = stylesheets.toSeq :+ headBlock(),
       fullWidth = false,
       hideMenuBar = request.session.get("authToken").isEmpty
-    )(messages, HeaderCarrierConverter.fromRequest(request), request)
+    )(messages, request)
   }
 }
 

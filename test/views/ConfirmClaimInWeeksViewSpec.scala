@@ -40,14 +40,14 @@ class ConfirmClaimInWeeksViewSpec extends ViewBehaviours {
 
     "have the correct banner title for current tax year" in {
       val doc = asDocument(createView(form, 2, CurrentYear))
-      val banner = doc.select(".hmrc-header__service-name")
+      val banner = doc.select(".govuk-header__service-name")
 
       banner.text() mustEqual messages("service.name")
     }
 
     "have the correct banner title for previous tax year" in {
       val doc = asDocument(createView(form, 2, CurrentYearMinus1))
-      val banner = doc.select(".hmrc-header__service-name")
+      val banner = doc.select(".govuk-header__service-name")
 
       banner.text() mustEqual messages("service.name")
     }

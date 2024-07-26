@@ -29,7 +29,7 @@
         govukPhaseBanner : GovukPhaseBanner
 )
 
-@(title: String, beforeContentBlock: Option[Html] = None, hasTimeout: Boolean = true, showBackLink: Boolean = true)(mainContent: Html)(implicit request: Request[_], messages: Messages)
+@(title: String, beforeContentBlock: Option[Html] = None, hasTimeout: Boolean = true, showBackLink: Boolean = true)(mainContent: Html)(implicit request: RequestHeader, messages: Messages)
 
 @headBlock = {
     @if(hasTimeout) {

@@ -30,7 +30,6 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import javax.inject.{Inject, Singleton}
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
-import scala.language.postfixOps
 
 @Singleton
 class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnector,

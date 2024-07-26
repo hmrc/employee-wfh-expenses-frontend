@@ -21,21 +21,32 @@ import config.FrontendAppConfig
 import models.ETag
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CitizenDetailsConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClient) {
+class CitizenDetailsConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClientV2) {
 
   def getAddress(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val designatoryDetailsUrl: String = s"${appConfig.citizenDetailsHost}/citizen-details/$nino/designatory-details"
-    httpClient.GET[HttpResponse](designatoryDetailsUrl)
+    httpClient
+      .get(url"$designatoryDetailsUrl")
+      .execute[HttpResponse]
+      .flatMap{ response =>
+        Future.successful(response)
+      }
   }
 
   def getETag(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ETag] = {
     val eTagUrl: String = s"${appConfig.citizenDetailsHost}/citizen-details/$nino/etag"
-    httpClient.GET[ETag](eTagUrl)
+    httpClient
+      .get(url"$eTagUrl")
+      .execute[ETag]
+      .flatMap { response =>
+        Future.successful(response)
+      }
   }
 
 }

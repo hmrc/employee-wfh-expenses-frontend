@@ -18,7 +18,7 @@ package views.templates
 
 import play.api.Logging
 import play.api.i18n.Messages
-import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.ServiceURLs
 import uk.gov.hmrc.sca.services.WrapperService
@@ -38,7 +38,7 @@ trait LayoutProvider {
              stylesheets: Option[Html] = None,
              hideMenuBar: Boolean = false
            )(contentBlock: Html)(
-             implicit request: Request[_],
+             implicit request: RequestHeader,
              messages: Messages
            ): HtmlFormat.Appendable
 }
@@ -55,7 +55,7 @@ override def apply(
                     scripts: Option[Html],
                     stylesheets: Option[Html],
                     hideMenuBar: Boolean = false
-                  )(contentBlock: Html)(implicit request: Request[_], messages: Messages): HtmlFormat.Appendable = {
+                  )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages): HtmlFormat.Appendable = {
   layout(
     pageTitle,
     beforeContentBlock,
@@ -82,7 +82,7 @@ class NewLayoutProvider @Inject()(
                       stylesheets: Option[Html],
                       hideMenuBar: Boolean = false
                     )(contentBlock: Html)
-                    (implicit request: Request[_], messages: Messages): HtmlFormat.Appendable = {
+                    (implicit request: RequestHeader, messages: Messages): HtmlFormat.Appendable = {
     wrapperService.standardScaLayout(
       disableSessionExpired = !timeout,
       content = contentBlock,
@@ -98,7 +98,7 @@ class NewLayoutProvider @Inject()(
       styleSheets = stylesheets.toSeq :+ headBlock(),
       fullWidth = false,
       hideMenuBar = request.session.get("authToken").isEmpty
-    )(messages, request)
+    )(messages, request.withBody())
   }
 }
 

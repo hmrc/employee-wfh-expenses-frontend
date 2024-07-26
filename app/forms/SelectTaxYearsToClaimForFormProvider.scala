@@ -19,7 +19,7 @@ package forms
 import forms.mappings.Mappings
 import models.TaxYearSelection
 import play.api.data.Form
-import play.api.data.Forms.{nonEmptyText, seq}
+import play.api.data.Forms.seq
 import uk.gov.hmrc.time.TaxYear
 
 import javax.inject.Inject

@@ -22,8 +22,9 @@ import models.paperless.PaperlessStatusResponse
 import play.api.Logging
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
-import uk.gov.hmrc.http.HttpClient
 import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.StringContextOps
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 import views.html.helper.urlEncode
 
@@ -31,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class PaperlessPreferenceConnectorImpl @Inject()(
                                                   appConfig: FrontendAppConfig,
-                                                  httpClient: HttpClient,
+                                                  httpClient: HttpClientV2,
                                                   applicationCrypto:  ApplicationCrypto,
                                                 )
   extends PaperlessPreferenceConnector with HeaderCarrierForPartialsConverter with Logging {
@@ -46,7 +47,10 @@ class PaperlessPreferenceConnectorImpl @Inject()(
 
     logger.debug(s"[PaperlessPreferenceConnector][getPaperlessPreference] $paperlessStatusUrl")
 
-    httpClient.GET[PaperlessStatusResponse](paperlessStatusUrl) map { Right(_) } recoverWith {
+    httpClient
+      .get(url"$paperlessStatusUrl")
+      .execute[PaperlessStatusResponse]
+      .map {Right(_)} recoverWith {
       case ex: Exception =>
         logger.error(s"[PaperlessPreferenceConnector][getPaperlessStatus] Failed with: ${ex.getMessage}")
         Future.successful(Left(ex.getMessage))

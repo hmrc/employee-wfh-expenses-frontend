@@ -33,8 +33,6 @@
     messages: Messages
 )
 
-@linkToFeedbackForm = {<a  class="govuk-link" rel="noreferrer noopener" target="_blank" href=@frontendAppConfig.feedbackSurvey>@messages("confirmation.linkToFeedbackForm.href.text")</a>}
-
 @layout(pageTitle = messages("confirmation.mergeJourney.title"), showBackLink = false) {
 
     @govukPanel(Panel(

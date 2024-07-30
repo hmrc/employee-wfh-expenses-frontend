@@ -16,13 +16,11 @@
 
 package config
 
-import com.google.inject.{AbstractModule, Provides}
+import com.google.inject.AbstractModule
 import connectors.{PaperlessPreferenceConnector, PaperlessPreferenceConnectorImpl}
 import controllers.actions._
 import play.api.{Configuration, Environment}
 import views.templates.{LayoutProvider, NewLayoutProvider, OldLayoutProvider}
-
-import javax.inject.Named
 
 class Module(environment: Environment, config: Configuration) extends AbstractModule {
 

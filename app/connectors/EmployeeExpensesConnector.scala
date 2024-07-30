@@ -20,20 +20,24 @@ import config.FrontendAppConfig
 import play.api.http.HeaderNames
 import play.api.http.Status.OK
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class EmployeeExpensesConnector @Inject()(appConfig: FrontendAppConfig,
-                                          httpClient: HttpClient)
+                                          httpClient: HttpClientV2)
                                          (implicit executionContext: ExecutionContext) {
 
   def updateMergedJourneySession(headerCarrier: HeaderCarrier): Future[Boolean] = {
     implicit val hc: HeaderCarrier = headerCarrier.copy(extraHeaders = headerCarrier.headers(Seq(HeaderNames.COOKIE)))
     val url: String = s"${appConfig.employeeExpensesHost}/employee-expenses/merged-journey-refresh-session"
-    httpClient.GET[HttpResponse](url).map { response =>
+    httpClient
+      .get(url"$url")
+      .execute[HttpResponse]
+      .map { response =>
         response.status match {
           case OK => true
           case _ => false

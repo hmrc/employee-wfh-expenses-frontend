@@ -21,28 +21,28 @@ import play.api.Logging
 import play.api.http.{HttpEntity, Writeable}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.Results.Redirect
-import play.api.mvc.{Request, RequestHeader, ResponseHeader, Result}
+import play.api.mvc.{RequestHeader, ResponseHeader, Result}
 import play.twirl.api.Html
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 import views.html.ErrorTemplate
 
 import javax.inject.{Inject, Singleton}
-import scala.language.implicitConversions
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ErrorHandler @Inject()(
                               val messagesApi: MessagesApi,
                               view: ErrorTemplate
-                            ) extends FrontendErrorHandler with I18nSupport with Logging {
+                            )(implicit val ec: ExecutionContext) extends FrontendErrorHandler with I18nSupport with Logging {
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: Request[_]): Html =
-    view(pageTitle, heading, message)
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: RequestHeader): Future[Html] =
+    Future.successful(view(pageTitle, heading, message))
 
-  override def resolveError(rh: RequestHeader, ex: Throwable): Result = {
+  override def resolveError(rh: RequestHeader, ex: Throwable): Future[Result] = {
     ex match {
       case e: Exception =>
         logger.warn(s"[ErrorHandler][resolveError] failed with: $e")
-        Redirect(routes.TechnicalDifficultiesController.onPageLoad.url)
+        Future.successful(Redirect(routes.TechnicalDifficultiesController.onPageLoad.url))
       case _ =>
         logger.error(s"[ErrorHandler][resolveError] Internal Server Error, (${rh.method})(${rh.uri})", ex)
         super.resolveError(rh, ex)

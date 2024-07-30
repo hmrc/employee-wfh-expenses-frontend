@@ -19,6 +19,7 @@ package connectors
 import base.SpecBase
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
@@ -33,7 +34,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 
 sealed trait ExpectedResults {
-  val expectedValidPreference = Some(true)
+  val expectedValidPreference: Option[Boolean] = Some(true)
 }
 
 class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHelper with GuiceOneAppPerSuite
@@ -53,7 +54,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
 
   val someReturnUrl = "/go/somewhere"
 
-  def stubForPaperlessStatus(response: ResponseDefinitionBuilder) = {
+  def stubForPaperlessStatus(response: ResponseDefinitionBuilder): StubMapping = {
     server.stubFor(
       get(urlPathMatching(s"/paperless/status"))
         .withQueryParam("returnUrl", matching(".*"))
@@ -72,7 +73,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
       whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
         res =>
           res.isRight mustBe true
-          res.right.get.isPaperlessCustomer mustBe true
+          res.toOption.get.isPaperlessCustomer mustBe true
       }
     }
 
@@ -82,7 +83,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
       whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
         res =>
           res.isRight mustBe true
-          res.right.get.isPaperlessCustomer mustBe false
+          res.toOption.get.isPaperlessCustomer mustBe false
       }
     }
 
@@ -92,7 +93,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
       whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
         res =>
           res.isLeft mustBe true
-          res.left.get must include("returned invalid json")
+          res.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")) must include("returned invalid json")
       }
     }
 
@@ -102,7 +103,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
       whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
         response =>
           response.isLeft mustBe true
-          response.left.get must include("returned 400")
+          response.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")) must include("returned 400")
       }
     }
 
@@ -112,7 +113,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
       whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
         response =>
           response.isLeft mustBe true
-          response.left.get must include("returned 500")
+          response.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")) must include("returned 500")
       }
     }
 

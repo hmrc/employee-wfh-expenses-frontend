@@ -45,8 +45,8 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar with ScalaFuture
 
         whenReady(futureResult) { result =>
           result.isLeft mustBe true
-          result.left.get.header.status mustBe SEE_OTHER
-          result.left.get.header.headers.get(LOCATION).contains(routes.SessionExpiredController.onPageLoad.url) mustBe true
+          result.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")).header.status mustBe SEE_OTHER
+          result.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")).header.headers.get(LOCATION).contains(routes.SessionExpiredController.onPageLoad.url) mustBe true
         }
       }
     }
@@ -65,8 +65,8 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar with ScalaFuture
 
         whenReady(futureResult) { result =>
           result.isLeft mustBe true
-          result.left.get.header.status mustBe SEE_OTHER
-          result.left.get.header.headers.get(LOCATION).contains(routes.ConfirmationController.onPageLoad().url) mustBe true
+          result.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")).header.status mustBe SEE_OTHER
+          result.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")).header.headers.get(LOCATION).contains(routes.ConfirmationController.onPageLoad().url) mustBe true
         }
       }
     }

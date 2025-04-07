@@ -33,7 +33,10 @@ import scala.concurrent.Future
 class ManualCorrespondenceIndicatorActionSpec extends SpecBase with WireMockHelper with ScalaFutures {
 
   private lazy val fakeIdentifier = "fake-identifier"
-  private lazy val mciAction: ManualCorrespondenceIndicatorAction = injector.instanceOf[ManualCorrespondenceIndicatorAction]
+
+  private lazy val mciAction: ManualCorrespondenceIndicatorAction =
+    injector.instanceOf[ManualCorrespondenceIndicatorAction]
+
   private lazy val identifierRequest = IdentifierRequest[AnyContent](fakeRequest, fakeIdentifier, fakeNino)
 
   private def dummyBlockToExecute(identifierRequest: IdentifierRequest[AnyContent]): Future[Result] =
@@ -42,7 +45,8 @@ class ManualCorrespondenceIndicatorActionSpec extends SpecBase with WireMockHelp
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
     .configure(
       conf = "microservice.services.citizen-details.port" -> server.port
-    ).build()
+    )
+    .build()
 
   "ManualCorrespondenceIndicatorAction" must {
 
@@ -76,9 +80,8 @@ class ManualCorrespondenceIndicatorActionSpec extends SpecBase with WireMockHelp
         val result = mciAction.invokeBlock(identifierRequest, dummyBlockToExecute)
 
         status(result) mustBe SEE_OTHER
-        whenReady(result) {
-          res =>
-            res.header.headers(LOCATION) mustBe routes.ManualCorrespondenceIndicatorController.onPageLoad().url
+        whenReady(result) { res =>
+          res.header.headers(LOCATION) mustBe routes.ManualCorrespondenceIndicatorController.onPageLoad().url
         }
       }
     }
@@ -96,13 +99,11 @@ class ManualCorrespondenceIndicatorActionSpec extends SpecBase with WireMockHelp
         val result = mciAction.invokeBlock(identifierRequest, dummyBlockToExecute)
 
         status(result) mustBe SEE_OTHER
-        whenReady(result) {
-          res =>
-            res.header.headers(LOCATION) mustBe routes.TechnicalDifficultiesController.onPageLoad.url
+        whenReady(result) { res =>
+          res.header.headers(LOCATION) mustBe routes.TechnicalDifficultiesController.onPageLoad.url
         }
       }
     }
   }
-
 
 }

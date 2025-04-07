@@ -45,9 +45,8 @@ class ConfirmationMergeJourneyViewSpec extends ViewBehaviours {
       }
     }
 
-    "behave like a normal page" when {
-
-      behave like normalPage(view.apply("url-string")(request, messages), ConfirmationMergeJourney, args = Nil)
-    }
+    "behave like a normal page" when
+      behave.like(normalPage(view.apply("url-string")(request, messages), ConfirmationMergeJourney, args = Nil))
   }
+
 }

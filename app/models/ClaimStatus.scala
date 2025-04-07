@@ -19,8 +19,9 @@ package models
 sealed trait ClaimStatus {
   val key: String = toString
 }
-abstract class ClaimComplete extends ClaimStatus
-case object ClaimCompleteCurrent extends ClaimComplete
-case object ClaimCompletePrevious extends ClaimComplete
+
+abstract class ClaimComplete             extends ClaimStatus
+case object ClaimCompleteCurrent         extends ClaimComplete
+case object ClaimCompletePrevious        extends ClaimComplete
 case object ClaimCompleteCurrentPrevious extends ClaimComplete
-case object ClaimUnsuccessful extends ClaimStatus
+case object ClaimUnsuccessful            extends ClaimStatus

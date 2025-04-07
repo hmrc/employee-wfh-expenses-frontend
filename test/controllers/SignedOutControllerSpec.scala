@@ -38,4 +38,5 @@ class SignedOutControllerSpec extends SpecBase {
       application.stop()
     }
   }
+
 }

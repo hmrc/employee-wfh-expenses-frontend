@@ -26,25 +26,27 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SessionService @Inject()(sessionRepository: SessionRepository,
-                               employeeExpensesConnector: EmployeeExpensesConnector)
-                              (implicit executionContext: ExecutionContext)
-  extends Logging {
+class SessionService @Inject() (
+    sessionRepository: SessionRepository,
+    employeeExpensesConnector: EmployeeExpensesConnector
+)(implicit executionContext: ExecutionContext)
+    extends Logging {
 
-  def set(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Boolean] = {
+  def set(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Boolean] =
     for {
       repoResponse <- sessionRepository.set(userAnswers)
-      mergedJourneyRefreshed <- if (userAnswers.isMergedJourney) employeeExpensesConnector.updateMergedJourneySession(hc) else Future.successful(true)
+      mergedJourneyRefreshed <-
+        if (userAnswers.isMergedJourney) employeeExpensesConnector.updateMergedJourneySession(hc)
+        else Future.successful(true)
       _ = if (!mergedJourneyRefreshed) logger.warn("EE merged journey session could not be refreshed")
     } yield repoResponse
-  }
 
   def get(id: String): Future[Option[UserAnswers]] = sessionRepository.get(id)
 
-  def updateTimeToLive(id: String)(implicit hc: HeaderCarrier): Future[Boolean] = {
+  def updateTimeToLive(id: String)(implicit hc: HeaderCarrier): Future[Boolean] =
     sessionRepository.get(id).flatMap {
       case Some(userAnswers) => set(userAnswers)
-      case _ => Future.successful(false)
+      case _                 => Future.successful(false)
     }
-  }
+
 }

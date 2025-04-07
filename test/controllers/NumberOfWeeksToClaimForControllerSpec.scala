@@ -36,14 +36,13 @@ import scala.concurrent.Future
 
 class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
 
-  lazy val testRoute: String = routes.NumberOfWeeksToClaimForController.onPageLoad().url
+  lazy val testRoute: String             = routes.NumberOfWeeksToClaimForController.onPageLoad().url
   val mockSessionService: SessionService = mock[SessionService]
 
   val formProvider = new SelectTaxYearsToClaimForFormProvider()
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     reset(mockSessionService)
-  }
 
   s"NumberOfWeeksToClaimForController GET" when {
     "user has not selected any years with week claims" must {
@@ -51,8 +50,8 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         val userAnswer = emptyUserAnswers
 
         val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-        val request = FakeRequest(GET, testRoute)
-        val result = route(application, request).value
+        val request     = FakeRequest(GET, testRoute)
+        val result      = route(application, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.IndexController.start.url)
@@ -63,11 +62,13 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
     "user has selected current year" must {
       "return an OK with the view" in {
         val userAnswer = UserAnswers(userAnswersId)
-          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear)).success.value
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear))
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-        val request = FakeRequest(GET, testRoute)
-        val result = route(application, request).value
+        val request     = FakeRequest(GET, testRoute)
+        val result      = route(application, request).value
 
         status(result) mustBe OK
         prepopulatedValue(result, CurrentYear.toTaxYear.startYear.toString) mustBe ""
@@ -77,12 +78,16 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
       "return an OK with the view with existing answer" in {
         val prepopAnswer: ListMap[TaxYearSelection, Int] = ListMap(CurrentYear -> 30)
         val userAnswer = UserAnswers(userAnswersId)
-          .set(NumberOfWeeksToClaimForPage, prepopAnswer)(NumberOfWeeksToClaimForPage.format).success.value
-          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear)).success.value
+          .set(NumberOfWeeksToClaimForPage, prepopAnswer)(NumberOfWeeksToClaimForPage.format)
+          .success
+          .value
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear))
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-        val request = FakeRequest(GET, testRoute)
-        val result = route(application, request).value
+        val request     = FakeRequest(GET, testRoute)
+        val result      = route(application, request).value
 
         status(result) mustBe OK
         prepopulatedValue(result, CurrentYear.toTaxYear.startYear.toString) mustBe "30"
@@ -93,11 +98,13 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
     "user has selected previous year" must {
       "return an OK with the view" in {
         val userAnswer = UserAnswers(userAnswersId)
-          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYearMinus1)).success.value
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYearMinus1))
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-        val request = FakeRequest(GET, testRoute)
-        val result = route(application, request).value
+        val request     = FakeRequest(GET, testRoute)
+        val result      = route(application, request).value
 
         status(result) mustBe OK
         prepopulatedValue(result, CurrentYearMinus1.toTaxYear.startYear.toString) mustBe ""
@@ -107,12 +114,16 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
       "return an OK with the view with existing answer" in {
         val prepopAnswer: ListMap[TaxYearSelection, Int] = ListMap(CurrentYearMinus1 -> 50)
         val userAnswer = UserAnswers(userAnswersId)
-          .set(NumberOfWeeksToClaimForPage, prepopAnswer)(NumberOfWeeksToClaimForPage.format).success.value
-          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYearMinus1)).success.value
+          .set(NumberOfWeeksToClaimForPage, prepopAnswer)(NumberOfWeeksToClaimForPage.format)
+          .success
+          .value
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYearMinus1))
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-        val request = FakeRequest(GET, testRoute)
-        val result = route(application, request).value
+        val request     = FakeRequest(GET, testRoute)
+        val result      = route(application, request).value
 
         status(result) mustBe OK
         prepopulatedValue(result, CurrentYearMinus1.toTaxYear.startYear.toString) mustBe "50"
@@ -123,11 +134,13 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
     "user has selected multiple years with week based claims" must {
       "return an OK with the view" in {
         val userAnswer = UserAnswers(userAnswersId)
-          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear, CurrentYearMinus1)).success.value
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear, CurrentYearMinus1))
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-        val request = FakeRequest(GET, testRoute)
-        val result = route(application, request).value
+        val request     = FakeRequest(GET, testRoute)
+        val result      = route(application, request).value
 
         status(result) mustBe OK
         prepopulatedValue(result, CurrentYear.toTaxYear.startYear.toString) mustBe ""
@@ -138,12 +151,16 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
       "return an OK with the view with existing answer" in {
         val prepopAnswer: ListMap[TaxYearSelection, Int] = ListMap(CurrentYear -> 52, CurrentYearMinus1 -> 50)
         val userAnswer = UserAnswers(userAnswersId)
-          .set(NumberOfWeeksToClaimForPage, prepopAnswer)(NumberOfWeeksToClaimForPage.format).success.value
-          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear, CurrentYearMinus1)).success.value
+          .set(NumberOfWeeksToClaimForPage, prepopAnswer)(NumberOfWeeksToClaimForPage.format)
+          .success
+          .value
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear, CurrentYearMinus1))
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
-        val request = FakeRequest(GET, testRoute)
-        val result = route(application, request).value
+        val request     = FakeRequest(GET, testRoute)
+        val result      = route(application, request).value
 
         status(result) mustBe OK
         prepopulatedValue(result, CurrentYear.toTaxYear.startYear.toString) mustBe "52"
@@ -176,7 +193,9 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         when(mockSessionService.set(argCaptor.capture())(any())).thenReturn(Future.successful(true))
 
         val userAnswer = UserAnswers(userAnswersId)
-          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear)).success.value
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear))
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswer))
           .overrides(bind[SessionService].toInstance(mockSessionService))
@@ -187,7 +206,9 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.ConfirmClaimInWeeksController.onPageLoad().url)
-        argCaptor.getValue.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) mustBe Some(ListMap(CurrentYear -> 30))
+        argCaptor.getValue.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) mustBe Some(
+          ListMap(CurrentYear -> 30)
+        )
 
         application.stop()
       }
@@ -198,7 +219,9 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         when(mockSessionService.set(argCaptor.capture())(any())).thenReturn(Future.successful(true))
 
         val userAnswer = UserAnswers(userAnswersId)
-          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYearMinus1)).success.value
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYearMinus1))
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswer))
           .overrides(bind[SessionService].toInstance(mockSessionService))
@@ -209,7 +232,9 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.ConfirmClaimInWeeksController.onPageLoad().url)
-        argCaptor.getValue.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) mustBe Some(ListMap(CurrentYearMinus1 -> 50))
+        argCaptor.getValue.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) mustBe Some(
+          ListMap(CurrentYearMinus1 -> 50)
+        )
 
         application.stop()
       }
@@ -220,21 +245,29 @@ class NumberOfWeeksToClaimForControllerSpec extends SpecBase with MockitoSugar w
         when(mockSessionService.set(argCaptor.capture())(any())).thenReturn(Future.successful(true))
 
         val userAnswer = UserAnswers(userAnswersId)
-          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear, CurrentYearMinus1)).success.value
+          .set(SelectTaxYearsToClaimForPage, Seq(CurrentYear, CurrentYearMinus1))
+          .success
+          .value
 
         val application = applicationBuilder(userAnswers = Some(userAnswer))
           .overrides(bind[SessionService].toInstance(mockSessionService))
           .build()
         val request = FakeRequest(POST, testRoute)
-          .withFormUrlEncodedBody((CurrentYear.toTaxYear.startYear.toString, "52"), (CurrentYearMinus1.toTaxYear.startYear.toString, "50"))
+          .withFormUrlEncodedBody(
+            (CurrentYear.toTaxYear.startYear.toString, "52"),
+            (CurrentYearMinus1.toTaxYear.startYear.toString, "50")
+          )
         val result = route(application, request).value
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(routes.ConfirmClaimInWeeksController.onPageLoad().url)
-        argCaptor.getValue.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) mustBe Some(ListMap(CurrentYear -> 52, CurrentYearMinus1 -> 50))
+        argCaptor.getValue.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) mustBe Some(
+          ListMap(CurrentYear -> 52, CurrentYearMinus1 -> 50)
+        )
 
         application.stop()
       }
     }
   }
+
 }

@@ -32,17 +32,21 @@ import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnector,
-                                  taiConnector: TaiConnector,
-                                  auditConnector: AuditConnector,
-                                  sessionService: SessionService,
-                                  appConfig: FrontendAppConfig,
-                                 ) extends Logging {
+class SubmissionService @Inject() (
+    citizenDetailsConnector: CitizenDetailsConnector,
+    taiConnector: TaiConnector,
+    auditConnector: AuditConnector,
+    sessionService: SessionService,
+    appConfig: FrontendAppConfig
+) extends Logging {
 
-  def submitExpenses(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: ListMap[TaxYearSelection, Int])
-                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Future[Either[String, Unit]] = {
+  def submitExpenses(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: ListMap[TaxYearSelection, Int])(
+      implicit dataRequest: DataRequest[AnyContent],
+      hc: HeaderCarrier,
+      ec: ExecutionContext
+  ): Future[Either[String, Unit]] =
 
-    submit(selectedTaxYears, weeksForTaxYears) map {
+    submit(selectedTaxYears, weeksForTaxYears).map {
       case Right(submittedDetails) =>
         logger.info(s"[SubmissionService][submitExpenses] Submission successful")
         auditSubmissionSuccess(submittedDetails)
@@ -54,13 +58,12 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
         auditSubmissionFailure(error)
         Left(error)
     }
-  }
 
   // scalastyle:off cyclomatic.complexity
-  private def submit(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: ListMap[TaxYearSelection, Int])
-                    (implicit dataRequest: DataRequest[AnyContent],
-                     hc: HeaderCarrier,
-                     ec: ExecutionContext) = {
+  private def submit(
+      selectedTaxYears: Seq[TaxYearSelection],
+      weeksForTaxYears: ListMap[TaxYearSelection, Int]
+  )(implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext) = {
 
     val (wholeYearSelections, perWeekSelections) = selectedTaxYears.partition(TaxYearSelection.wholeYearClaims.contains)
 
@@ -71,11 +74,14 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
     val perWeekItems: Seq[FlatRateItem] = perWeekSelections.map { taxYearSelection =>
       val claimWeekAmount = weeksForTaxYears.getOrElse(
         taxYearSelection,
-        throw new InternalServerException(s"[SubmissionService][submit] Week count for ${taxYearSelection.toString} is missing")
+        throw new InternalServerException(
+          s"[SubmissionService][submit] Week count for ${taxYearSelection.toString} is missing"
+        )
       )
       FlatRateItem(
         taxYearSelection.toTaxYear.startYear,
-        (claimWeekAmount * appConfig.taxReliefPerWeek(taxYearSelection)).min(appConfig.taxReliefMaxPerYear(taxYearSelection))
+        (claimWeekAmount * appConfig.taxReliefPerWeek(taxYearSelection))
+          .min(appConfig.taxReliefMaxPerYear(taxYearSelection))
       )
     }
 
@@ -85,32 +91,28 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
       Future.successful(Left("Flat Rate Items sequence is empty, unable to submit"))
     } else {
       logger.info("[SubmissionService][submit] Submitting")
-      futureSequence(flatRateItems) {
-        item: FlatRateItem =>
-          for {
-            etag <- citizenDetailsConnector.getETag(dataRequest.nino)
-            _ <- taiConnector.postIabdData(dataRequest.nino, item.year, item.amount, etag)
-          } yield item
-      } map {
-        submittedDetails => Right(submittedDetails)
-      } recover {
-        case e => Left(e.getMessage)
-      }
+      futureSequence(flatRateItems) { item: FlatRateItem =>
+        for {
+          etag <- citizenDetailsConnector.getETag(dataRequest.nino)
+          _    <- taiConnector.postIabdData(dataRequest.nino, item.year, item.amount, etag)
+        } yield item
+      }.map(submittedDetails => Right(submittedDetails)).recover { case e => Left(e.getMessage) }
     }
   }
 
-  private def futureSequence[I, O](inputs: Seq[I])(flatMapFunction: I => Future[O])(implicit ec: ExecutionContext): Future[Seq[O]] = {
-    inputs.foldLeft(Future.successful(Seq.empty[O]))(
-      (previousFutureResult, nextInput) =>
-        for {
-          futureSeq <- previousFutureResult
-          future <- flatMapFunction(nextInput)
-        } yield futureSeq :+ future
+  private def futureSequence[I, O](
+      inputs: Seq[I]
+  )(flatMapFunction: I => Future[O])(implicit ec: ExecutionContext): Future[Seq[O]] =
+    inputs.foldLeft(Future.successful(Seq.empty[O]))((previousFutureResult, nextInput) =>
+      for {
+        futureSeq <- previousFutureResult
+        future    <- flatMapFunction(nextInput)
+      } yield futureSeq :+ future
     )
-  }
 
-  private def auditSubmissionSuccess(submittedDetails: Seq[FlatRateItem])
-                                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+  private def auditSubmissionSuccess(
+      submittedDetails: Seq[FlatRateItem]
+  )(implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       UpdateWorkingFromHomeFlatRateSuccess.toString,
       AuditData(
@@ -120,9 +122,9 @@ class SubmissionService @Inject()(citizenDetailsConnector: CitizenDetailsConnect
       )
     )
 
-
-  private def auditSubmissionFailure(error: String)
-                                    (implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+  private def auditSubmissionFailure(
+      error: String
+  )(implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       UpdateWorkingFromHomeFlatRateFailure.toString,
       AuditData(

@@ -30,7 +30,13 @@ import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class CitizenDetailsConnectorSpec extends SpecBase with MockitoSugar with WireMockHelper with GuiceOneAppPerSuite with ScalaFutures with IntegrationPatience {
+class CitizenDetailsConnectorSpec
+    extends SpecBase
+    with MockitoSugar
+    with WireMockHelper
+    with GuiceOneAppPerSuite
+    with ScalaFutures
+    with IntegrationPatience {
 
   override implicit lazy val app: Application =
     new GuiceApplicationBuilder()

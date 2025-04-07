@@ -19,29 +19,29 @@ package models.paperless
 import play.api.libs.json.{Json, OFormat}
 
 case class PaperlessStatus(
-  name:     String
+    name: String
 )
 
-object PaperlessStatus{
+object PaperlessStatus {
   implicit val format: OFormat[PaperlessStatus] = Json.format[PaperlessStatus]
 }
 
 case class Url(
-  link: String,
-  text: String
+    link: String,
+    text: String
 )
 
-object Url{
+object Url {
   implicit val format: OFormat[Url] = Json.format[Url]
 }
 
 case class PaperlessStatusResponse(
-  status: PaperlessStatus,
-  url:    Url
+    status: PaperlessStatus,
+    url: Url
 ) {
   def isPaperlessCustomer: Boolean = status.name == "ALRIGHT"
 }
 
-object PaperlessStatusResponse{
+object PaperlessStatusResponse {
   implicit val format: OFormat[PaperlessStatusResponse] = Json.format[PaperlessStatusResponse]
 }

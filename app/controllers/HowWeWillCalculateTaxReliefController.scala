@@ -25,29 +25,30 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.HowWeWillCalculateTaxReliefView
 
-class HowWeWillCalculateTaxReliefController @Inject()(
-                                      override val messagesApi: MessagesApi,
-                                      identify: IdentifierAction,
-                                      citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                      getData: DataRetrievalAction,
-                                      requireData: DataRequiredAction,
-                                      navigator: Navigator,
-                                      val controllerComponents: MessagesControllerComponents,
-                                      howWeWillCalculateTaxReliefView: HowWeWillCalculateTaxReliefView
-                                    ) extends FrontendBaseController with I18nSupport {
+class HowWeWillCalculateTaxReliefController @Inject() (
+    override val messagesApi: MessagesApi,
+    identify: IdentifierAction,
+    citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    navigator: Navigator,
+    val controllerComponents: MessagesControllerComponents,
+    howWeWillCalculateTaxReliefView: HowWeWillCalculateTaxReliefView
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad(): Action[AnyContent] =
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { implicit request =>
       request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
         case Some(selectedTaxYears) =>
           Ok(howWeWillCalculateTaxReliefView(selectedTaxYears))
         case None => Redirect(routes.IndexController.start)
       }
 
+    }
+
+  def onSubmit(): Action[AnyContent] = identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) {
+    implicit request => Redirect(navigator.nextPage(HowWeWillCalculateTaxReliefPage, request.userAnswers))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
-    implicit request =>
-      Redirect(navigator.nextPage(HowWeWillCalculateTaxReliefPage, request.userAnswers))
-  }
 }

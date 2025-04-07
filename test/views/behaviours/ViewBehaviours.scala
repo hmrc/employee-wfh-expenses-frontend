@@ -21,10 +21,12 @@ import views.ViewSpecBase
 
 trait ViewBehaviours extends ViewSpecBase {
 
-  def normalPage(view: HtmlFormat.Appendable,
-                 messageKeyPrefix: String,
-                 args: Seq[String],
-                 guidanceKeysWithArgs: (String, Seq[String])*): Unit = {
+  def normalPage(
+      view: HtmlFormat.Appendable,
+      messageKeyPrefix: String,
+      args: Seq[String],
+      guidanceKeysWithArgs: (String, Seq[String])*
+  ): Unit =
 
     "behave like a normal page" when {
 
@@ -33,25 +35,29 @@ trait ViewBehaviours extends ViewSpecBase {
         "display the correct browser title" in {
 
           val doc = asDocument(view)
-          assertEqualsValue(doc, "title", s"${messages(s"$messageKeyPrefix.title", args:_*)} - ${messages("service.name")} - GOV.UK")
+          assertEqualsValue(
+            doc,
+            "title",
+            s"${messages(s"$messageKeyPrefix.title", args: _*)} - ${messages("service.name")} - GOV.UK"
+          )
         }
 
         "display the correct page title" in {
 
           val doc = asDocument(view)
-          assertPageTitleEqualsMessage(doc, s"$messageKeyPrefix.heading", args:_*)
+          assertPageTitleEqualsMessage(doc, s"$messageKeyPrefix.heading", args: _*)
         }
 
         "display the correct guidance" in {
 
           val doc = asDocument(view)
-          for (key <- guidanceKeysWithArgs) assertContainsText(doc, messages(s"$messageKeyPrefix.${key._1}", key._2:_*))
+          for (key <- guidanceKeysWithArgs)
+            assertContainsText(doc, messages(s"$messageKeyPrefix.${key._1}", key._2: _*))
         }
       }
     }
-  }
 
-  def pageWithBackLink(view: HtmlFormat.Appendable): Unit = {
+  def pageWithBackLink(view: HtmlFormat.Appendable): Unit =
 
     "behave like a page with a back link" must {
 
@@ -61,5 +67,5 @@ trait ViewBehaviours extends ViewSpecBase {
         assertRenderedByClass(doc, "govuk-back-link")
       }
     }
-  }
+
 }

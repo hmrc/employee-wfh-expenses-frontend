@@ -28,15 +28,19 @@ import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ManualCorrespondenceIndicatorActionImpl @Inject()(
-                                               citizenDetailsConnector: CitizenDetailsConnector,
-                                               val parser: BodyParsers.Default
-                                             )(implicit val executionContext: ExecutionContext) extends ManualCorrespondenceIndicatorAction with Logging {
+class ManualCorrespondenceIndicatorActionImpl @Inject() (
+    citizenDetailsConnector: CitizenDetailsConnector,
+    val parser: BodyParsers.Default
+)(implicit val executionContext: ExecutionContext)
+    extends ManualCorrespondenceIndicatorAction
+    with Logging {
+
   override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {
     implicit val hc = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    citizenDetailsConnector.getAddress(request.nino).map {
-      response =>
+    citizenDetailsConnector
+      .getAddress(request.nino)
+      .map { response =>
         response.status match {
           case Status.OK =>
             None
@@ -47,13 +51,14 @@ class ManualCorrespondenceIndicatorActionImpl @Inject()(
             logger.warn(s"[ManualCorrespondenceIndicatorAction][filter] - Unexpected status code: $statusCode ")
             Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad.url))
         }
-    }.recoverWith {
-      case e =>
+      }
+      .recoverWith { case e =>
         logger.error(s"[ManualCorrespondenceIndicatorAction][filter] failed: $e")
-        Future{Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad.url))}
-    }
+        Future(Some(Redirect(routes.TechnicalDifficultiesController.onPageLoad.url)))
+      }
 
   }
+
 }
 
 trait ManualCorrespondenceIndicatorAction extends ActionFilter[IdentifierRequest]

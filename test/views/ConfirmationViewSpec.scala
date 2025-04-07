@@ -70,9 +70,8 @@ class ConfirmationViewSpec extends ViewBehaviours {
       }
     }
 
-    "behave like a normal page" when {
-
-      behave like normalPage(view.apply(true, None, true, true)(request, messages), Confirmation, args = Nil)
-    }
+    "behave like a normal page" when
+      behave.like(normalPage(view.apply(true, None, true, true)(request, messages), Confirmation, args = Nil))
   }
+
 }

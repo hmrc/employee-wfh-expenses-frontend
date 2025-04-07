@@ -18,7 +18,14 @@ package services
 
 import base.SpecBase
 import connectors.{CitizenDetailsConnector, TaiConnector}
-import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4, wholeYearClaims}
+import models.TaxYearSelection.{
+  CurrentYear,
+  CurrentYearMinus1,
+  CurrentYearMinus2,
+  CurrentYearMinus3,
+  CurrentYearMinus4,
+  wholeYearClaims
+}
 import models.auditing.AuditEventType.{UpdateWorkingFromHomeFlatRateFailure, UpdateWorkingFromHomeFlatRateSuccess}
 import models.requests.DataRequest
 import models.{AuditData, ETag, TaxYearSelection, UserAnswers}
@@ -41,9 +48,9 @@ import scala.concurrent.Future
 class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
 
   val mockCitizenDetailsConnector: CitizenDetailsConnector = mock[CitizenDetailsConnector]
-  val mockTaiConnector: TaiConnector = mock[TaiConnector]
-  val mockAuditConnector: AuditConnector = mock[AuditConnector]
-  val mockSessionService: SessionService = mock[SessionService]
+  val mockTaiConnector: TaiConnector                       = mock[TaiConnector]
+  val mockAuditConnector: AuditConnector                   = mock[AuditConnector]
+  val mockSessionService: SessionService                   = mock[SessionService]
 
   val testNino: String = "AA112233A"
 
@@ -52,6 +59,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   val userAnswersArgumentCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
   class Setup {
+
     val serviceUnderTest = new SubmissionService(
       mockCitizenDetailsConnector,
       mockTaiConnector,
@@ -59,6 +67,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       mockSessionService,
       frontendAppConfig
     )
+
   }
 
   before {
@@ -67,17 +76,18 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
   "submit" when {
 
-    implicit val dataRequest: DataRequest[AnyContent] = DataRequest(fakeRequest, "internalId", UserAnswers("id"), testNino)
+    implicit val dataRequest: DataRequest[AnyContent] =
+      DataRequest(fakeRequest, "internalId", UserAnswers("id"), testNino)
 
-    val wholeYearClaimAmount = 312
+    val wholeYearClaimAmount                  = 312
     def perWeekAmount(year: TaxYearSelection) = frontendAppConfig.taxReliefPerWeek(year)
 
-    val etag1 = ETag(100)
-    val etag2 = ETag(101)
-    val etag3 = ETag(102)
-    val etag4 = ETag(103)
-    val etag5 = ETag(104)
-    val claimingForCurrent = Seq(CurrentYear)
+    val etag1                    = ETag(100)
+    val etag2                    = ETag(101)
+    val etag3                    = ETag(102)
+    val etag4                    = ETag(103)
+    val etag5                    = ETag(104)
+    val claimingForCurrent       = Seq(CurrentYear)
     val claimingForCurrentMinus1 = Seq(CurrentYearMinus1)
     val claimingForCurrentMinus2 = Seq(CurrentYearMinus2)
     val claimingForCurrentMinus3 = Seq(CurrentYearMinus3)
@@ -89,17 +99,23 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       userAnswersArgumentCaptor.getValue.get(SubmittedClaim).isDefined mustBe true
     }
 
-    def verifyNoSubmittedStateUpdate = {
+    def verifyNoSubmittedStateUpdate =
       verify(mockSessionService, times(0)).set(any())(any())
-    }
 
-    def createMockTaiConnector(taxYearSelection: TaxYearSelection, etag: Option[ETag] = None) = {
-      when(mockTaiConnector.postIabdData(eqm(testNino), eqm(taxYearSelection.toTaxYear.startYear), if(wholeYearClaims.contains(taxYearSelection)) eqm(wholeYearClaimAmount) else eqm(3 * perWeekAmount(taxYearSelection)), if (etag.nonEmpty) eqm(etag.get) else any())(any(), any())).thenReturn(Future.successful(()))
-    }
+    def createMockTaiConnector(taxYearSelection: TaxYearSelection, etag: Option[ETag] = None) =
+      when(
+        mockTaiConnector.postIabdData(
+          eqm(testNino),
+          eqm(taxYearSelection.toTaxYear.startYear),
+          if (wholeYearClaims.contains(taxYearSelection)) eqm(wholeYearClaimAmount)
+          else eqm(3 * perWeekAmount(taxYearSelection)),
+          if (etag.nonEmpty) eqm(etag.get) else any()
+        )(any(), any())
+      ).thenReturn(Future.successful(()))
 
-    def createListMap(taxYearSelection: TaxYearSelection) = {
-      if(wholeYearClaims.contains(taxYearSelection)) ListMap().asInstanceOf[ListMap[TaxYearSelection, Int]] else ListMap(taxYearSelection -> 3)
-    }
+    def createListMap(taxYearSelection: TaxYearSelection) =
+      if (wholeYearClaims.contains(taxYearSelection)) ListMap().asInstanceOf[ListMap[TaxYearSelection, Int]]
+      else ListMap(taxYearSelection -> 3)
 
     "only claiming for CTY" should {
       "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
@@ -119,7 +135,8 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.failed(new RuntimeException))
 
         await(serviceUnderTest.submitExpenses(claimingForCurrent, createListMap(CurrentYear))).isLeft mustBe true
 
@@ -142,7 +159,9 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
           })
 
         createMockTaiConnector(CurrentYearMinus1, Some(etag3))
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus1, createListMap(CurrentYearMinus1))).isRight mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus1, createListMap(CurrentYearMinus1))
+        ).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -151,9 +170,12 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus1, createListMap(CurrentYearMinus1))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus1, createListMap(CurrentYearMinus1))
+        ).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -174,7 +196,9 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
           })
 
         createMockTaiConnector(CurrentYearMinus2, Some(etag3))
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus2, createListMap(CurrentYearMinus2))).isRight mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus2, createListMap(CurrentYearMinus2))
+        ).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -183,9 +207,12 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus2, createListMap(CurrentYearMinus2))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus2, createListMap(CurrentYearMinus2))
+        ).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -201,16 +228,22 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     s"only claiming for CTY-3" should {
       "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-          .thenReturn(Future.successful(
-            etag1
-            ))
-          .thenReturn(Future.successful(
-            etag2
-          ))
+          .thenReturn(
+            Future.successful(
+              etag1
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag2
+            )
+          )
 
         createMockTaiConnector(CurrentYearMinus3)
 
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus3, createListMap(CurrentYearMinus3))).isRight mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus3, createListMap(CurrentYearMinus3))
+        ).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -219,9 +252,12 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus3, createListMap(CurrentYearMinus3))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus3, createListMap(CurrentYearMinus3))
+        ).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -242,14 +278,23 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             etag3
           })
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(CurrentYearMinus3.toTaxYear.startYear), any(), eqm(etag2))(any(), any()))
+        when(
+          mockTaiConnector.postIabdData(eqm(testNino), eqm(CurrentYearMinus3.toTaxYear.startYear), any(), eqm(etag2))(
+            any(),
+            any()
+          )
+        )
           .thenReturn(Future.failed(UpstreamErrorResponse("SERVICE IS UNAVAILABLE", SERVICE_UNAVAILABLE)))
 
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus3, createListMap(CurrentYearMinus3))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus3, createListMap(CurrentYearMinus3))
+        ).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
-        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(CurrentYearMinus3.toTaxYear.startYear), any(), eqm(etag2))(any(), any())
+        inOrder
+          .verify(mockTaiConnector)
+          .postIabdData(eqm(testNino), eqm(CurrentYearMinus3.toTaxYear.startYear), any(), eqm(etag2))(any(), any())
         inOrder.verify(mockCitizenDetailsConnector, times(0)).getETag(any())(any(), any())
         inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
 
@@ -263,16 +308,22 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     s"only claiming for CTY-4" should {
       "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-          .thenReturn(Future.successful(
-            etag1
-          ))
-          .thenReturn(Future.successful(
-            etag2
-          ))
+          .thenReturn(
+            Future.successful(
+              etag1
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag2
+            )
+          )
 
         createMockTaiConnector(CurrentYearMinus4)
 
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus4, createListMap(CurrentYearMinus4))).isRight mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus4, createListMap(CurrentYearMinus4))
+        ).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -281,9 +332,12 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus4, createListMap(CurrentYearMinus4))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus4, createListMap(CurrentYearMinus4))
+        ).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -304,14 +358,23 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
             etag3
           })
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(CurrentYearMinus4.toTaxYear.startYear), any(), eqm(etag2))(any(), any()))
+        when(
+          mockTaiConnector.postIabdData(eqm(testNino), eqm(CurrentYearMinus4.toTaxYear.startYear), any(), eqm(etag2))(
+            any(),
+            any()
+          )
+        )
           .thenReturn(Future.failed(UpstreamErrorResponse("SERVICE IS UNAVAILABLE", SERVICE_UNAVAILABLE)))
 
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus4, createListMap(CurrentYearMinus4))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus4, createListMap(CurrentYearMinus4))
+        ).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
-        inOrder.verify(mockTaiConnector).postIabdData(eqm(testNino), eqm(CurrentYearMinus4.toTaxYear.startYear), any(), eqm(etag2))(any(), any())
+        inOrder
+          .verify(mockTaiConnector)
+          .postIabdData(eqm(testNino), eqm(CurrentYearMinus4.toTaxYear.startYear), any(), eqm(etag2))(any(), any())
         inOrder.verify(mockCitizenDetailsConnector, times(0)).getETag(any())(any(), any())
         inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(any(), any())
 
@@ -325,21 +388,31 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     s"claiming for all available tax years" should {
       "upsert 4 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-          .thenReturn(Future.successful(
-            etag1
-          ))
-          .thenReturn(Future.successful(
-            etag2
-          ))
-          .thenReturn(Future.successful(
-            etag3
-          ))
-          .thenReturn(Future.successful(
-            etag4
-          ))
-          .thenReturn(Future.successful(
-            etag5
-          ))
+          .thenReturn(
+            Future.successful(
+              etag1
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag2
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag3
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag4
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag5
+            )
+          )
 
         createMockTaiConnector(CurrentYearMinus4)
         createMockTaiConnector(CurrentYearMinus3)
@@ -347,7 +420,14 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         createMockTaiConnector(CurrentYearMinus1)
         createMockTaiConnector(CurrentYear)
 
-        await(serviceUnderTest.submitExpenses(claimingForAll, createListMap(CurrentYearMinus4) ++ createListMap(CurrentYearMinus3) ++ createListMap(CurrentYearMinus2) ++ createListMap(CurrentYearMinus1) ++ createListMap(CurrentYear))).isRight mustBe true
+        await(
+          serviceUnderTest.submitExpenses(
+            claimingForAll,
+            createListMap(CurrentYearMinus4) ++ createListMap(CurrentYearMinus3) ++ createListMap(
+              CurrentYearMinus2
+            ) ++ createListMap(CurrentYearMinus1) ++ createListMap(CurrentYear)
+          )
+        ).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -356,9 +436,12 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus4, createListMap(CurrentYearMinus4))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus4, createListMap(CurrentYearMinus4))
+        ).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -372,27 +455,45 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
       "report errors when 2nd IABD 59 POST fails and audit failure" in new Setup {
         when(mockCitizenDetailsConnector.getETag(any())(any(), any()))
-          .thenReturn(Future.successful(
-            etag1
-          ))
-          .thenReturn(Future.successful(
-            etag2
-            ))
-          .thenReturn(Future.successful(
-            etag3
-          ))
-          .thenReturn(Future.successful(
-            etag4
-          ))
+          .thenReturn(
+            Future.successful(
+              etag1
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag2
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag3
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag4
+            )
+          )
 
         createMockTaiConnector(CurrentYearMinus4)
 
-        when(mockTaiConnector.postIabdData(eqm(testNino), eqm(CurrentYearMinus3.toTaxYear.startYear), any(), any())(any(), any()))
+        when(
+          mockTaiConnector.postIabdData(eqm(testNino), eqm(CurrentYearMinus3.toTaxYear.startYear), any(), any())(
+            any(),
+            any()
+          )
+        )
           .thenReturn(Future.failed(UpstreamErrorResponse("Not found", 404)))
 
         createMockTaiConnector(CurrentYearMinus2)
 
-        await(serviceUnderTest.submitExpenses(Seq(CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4), createListMap(CurrentYearMinus2) ++ createListMap(CurrentYearMinus3) ++ createListMap(CurrentYearMinus4))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(
+            Seq(CurrentYearMinus2, CurrentYearMinus3, CurrentYearMinus4),
+            createListMap(CurrentYearMinus2) ++ createListMap(CurrentYearMinus3) ++ createListMap(CurrentYearMinus4)
+          )
+        ).isLeft mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
@@ -404,20 +505,31 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     s"claiming for CTY-3 and CTY-4" should {
       "upsert 3 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-          .thenReturn(Future.successful(
-            etag1
-          ))
-          .thenReturn(Future.successful(
-            etag2
-          ))
-          .thenReturn(Future.successful(
-            etag3
-          ))
+          .thenReturn(
+            Future.successful(
+              etag1
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag2
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag3
+            )
+          )
 
         createMockTaiConnector(CurrentYearMinus4)
         createMockTaiConnector(CurrentYearMinus3)
 
-        await(serviceUnderTest.submitExpenses(Seq(CurrentYearMinus3, CurrentYearMinus4), createListMap(CurrentYearMinus4) ++ createListMap(CurrentYearMinus3))).isRight mustBe true
+        await(
+          serviceUnderTest.submitExpenses(
+            Seq(CurrentYearMinus3, CurrentYearMinus4),
+            createListMap(CurrentYearMinus4) ++ createListMap(CurrentYearMinus3)
+          )
+        ).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -426,9 +538,15 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(Seq(CurrentYearMinus3, CurrentYearMinus4), createListMap(CurrentYearMinus4) ++ createListMap(CurrentYearMinus3))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(
+            Seq(CurrentYearMinus3, CurrentYearMinus4),
+            createListMap(CurrentYearMinus4) ++ createListMap(CurrentYearMinus3)
+          )
+        ).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -444,20 +562,31 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     s"claiming for CTY-2 and CTY-4" should {
       "upsert 3 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-          .thenReturn(Future.successful(
-            etag1
-          ))
-          .thenReturn(Future.successful(
-            etag2
-          ))
-          .thenReturn(Future.successful(
-            etag4
-          ))
+          .thenReturn(
+            Future.successful(
+              etag1
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag2
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag4
+            )
+          )
 
         createMockTaiConnector(CurrentYearMinus4)
         createMockTaiConnector(CurrentYearMinus2)
 
-        await(serviceUnderTest.submitExpenses(Seq(CurrentYearMinus2, CurrentYearMinus4), createListMap(CurrentYearMinus2) ++ createListMap(CurrentYearMinus4))).isRight mustBe true
+        await(
+          serviceUnderTest.submitExpenses(
+            Seq(CurrentYearMinus2, CurrentYearMinus4),
+            createListMap(CurrentYearMinus2) ++ createListMap(CurrentYearMinus4)
+          )
+        ).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -466,9 +595,15 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(Seq(CurrentYearMinus2, CurrentYearMinus4), createListMap(CurrentYearMinus2) ++ createListMap(CurrentYearMinus4))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(
+            Seq(CurrentYearMinus2, CurrentYearMinus4),
+            createListMap(CurrentYearMinus2) ++ createListMap(CurrentYearMinus4)
+          )
+        ).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -489,7 +624,12 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
         createMockTaiConnector(CurrentYearMinus4)
 
-        await(serviceUnderTest.submitExpenses(Seq(CurrentYearMinus2, CurrentYearMinus4), createListMap(CurrentYearMinus2) ++ createListMap(CurrentYearMinus4))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(
+            Seq(CurrentYearMinus2, CurrentYearMinus4),
+            createListMap(CurrentYearMinus2) ++ createListMap(CurrentYearMinus4)
+          )
+        ).isLeft mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateFailure.toString), any[AuditData]())(any(), any(), any())
@@ -501,13 +641,17 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     s"only claiming for 3 weeks of the CTY-1" should {
       "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-          .thenReturn(Future.successful(
-            etag1
-          ))
+          .thenReturn(
+            Future.successful(
+              etag1
+            )
+          )
 
         createMockTaiConnector(CurrentYearMinus1)
 
-        await(serviceUnderTest.submitExpenses(claimingForCurrentMinus1, createListMap(CurrentYearMinus1))).isRight mustBe true
+        await(
+          serviceUnderTest.submitExpenses(claimingForCurrentMinus1, createListMap(CurrentYearMinus1))
+        ).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -519,9 +663,11 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
     s"only claiming for 3 weeks of the CTY" should {
       "upsert 1 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-          .thenReturn(Future.successful(
-            etag1
-          ))
+          .thenReturn(
+            Future.successful(
+              etag1
+            )
+          )
 
         createMockTaiConnector(CurrentYear)
 
@@ -534,23 +680,34 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
     }
 
-      s"claiming for  CTY-1 and CTY-4 year" should {
+    s"claiming for  CTY-1 and CTY-4 year" should {
       "upsert 3 IABD 59, audit success and set submitted status in userAnswers" in new Setup {
         when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
-          .thenReturn(Future.successful(
-            etag1
-          ))
-          .thenReturn(Future.successful(
-            etag2
-          ))
-          .thenReturn(Future.successful(
-            etag5
-          ))
+          .thenReturn(
+            Future.successful(
+              etag1
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag2
+            )
+          )
+          .thenReturn(
+            Future.successful(
+              etag5
+            )
+          )
 
         createMockTaiConnector(CurrentYearMinus4)
         createMockTaiConnector(CurrentYearMinus1)
 
-        await(serviceUnderTest.submitExpenses(Seq(CurrentYearMinus1, CurrentYearMinus4), createListMap(CurrentYearMinus1) ++ createListMap(CurrentYearMinus4))).isRight mustBe true
+        await(
+          serviceUnderTest.submitExpenses(
+            Seq(CurrentYearMinus1, CurrentYearMinus4),
+            createListMap(CurrentYearMinus1) ++ createListMap(CurrentYearMinus4)
+          )
+        ).isRight mustBe true
 
         verify(mockAuditConnector, times(1))
           .sendExplicitAudit(eqm(UpdateWorkingFromHomeFlatRateSuccess.toString), any[AuditData]())(any(), any(), any())
@@ -559,9 +716,15 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
 
       "report errors when ETAG call fails and audit failure" in new Setup {
-        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockCitizenDetailsConnector.getETag(eqm(testNino))(any(), any()))
+          .thenReturn(Future.failed(new RuntimeException))
 
-        await(serviceUnderTest.submitExpenses(Seq(CurrentYearMinus1, CurrentYearMinus4), createListMap(CurrentYearMinus1) ++ createListMap(CurrentYearMinus4))).isLeft mustBe true
+        await(
+          serviceUnderTest.submitExpenses(
+            Seq(CurrentYearMinus1, CurrentYearMinus4),
+            createListMap(CurrentYearMinus1) ++ createListMap(CurrentYearMinus4)
+          )
+        ).isLeft mustBe true
 
         val inOrder: InOrder = Mockito.inOrder(mockCitizenDetailsConnector, mockTaiConnector)
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(any(), any())
@@ -574,4 +737,5 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
       }
     }
   }
+
 }

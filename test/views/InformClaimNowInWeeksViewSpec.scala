@@ -22,17 +22,18 @@ import play.api.test.Helpers.GET
 import views.behaviours.ViewBehaviours
 import views.html.InformClaimNowInWeeksView
 
-class InformClaimNowInWeeksViewSpec extends ViewBehaviours{
+class InformClaimNowInWeeksViewSpec extends ViewBehaviours {
 
-  val title = messages("informClaimNowInWeeks.title")
+  val title   = messages("informClaimNowInWeeks.title")
   val heading = messages("informClaimNowInWeeks.heading")
 
   "InformClaimNowInWeeks view" must {
-    val view = viewFor[InformClaimNowInWeeksView](Some(emptyUserAnswers))
-    val request = FakeRequest(GET, routes.InformClaimNowInWeeksController.onPageLoad().url)
+    val view      = viewFor[InformClaimNowInWeeksView](Some(emptyUserAnswers))
+    val request   = FakeRequest(GET, routes.InformClaimNowInWeeksController.onPageLoad().url)
     val applyView = view.apply()(request, messages)
 
-    behave like normalPage(applyView, "informClaimNowInWeeks", args = Nil)
-    behave like pageWithBackLink(applyView)
+    behave.like(normalPage(applyView, "informClaimNowInWeeks", args = Nil))
+    behave.like(pageWithBackLink(applyView))
   }
+
 }

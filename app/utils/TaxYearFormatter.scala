@@ -25,9 +25,7 @@ case class TaxYearFormatter(taxYears: List[(LocalDate, LocalDate)])(implicit val
 
   private lazy val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", messages.lang.toLocale)
 
-  def formattedTaxYears: List[(String, String)] = {
-    taxYears.map {
-      case (startDate, endDate) => (startDate.format(formatter), endDate.format(formatter))
-    }
-  }
+  def formattedTaxYears: List[(String, String)] =
+    taxYears.map { case (startDate, endDate) => (startDate.format(formatter), endDate.format(formatter)) }
+
 }

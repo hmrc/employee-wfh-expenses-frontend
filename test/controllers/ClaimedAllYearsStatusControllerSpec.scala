@@ -40,8 +40,8 @@ class ClaimedAllYearsStatusControllerSpec extends SpecBase with BeforeAndAfter {
 
       when(mockIABDService.claimedAllYearsStatus(eqs(fakeNino))(any())).thenReturn(Future(true))
 
-      val request = FakeRequest(GET, routes.ClaimedAllYearsStatusController.claimedAllYearsStatus().url)
-      val result = route(application, request).value
+      val request     = FakeRequest(GET, routes.ClaimedAllYearsStatusController.claimedAllYearsStatus().url)
+      val result      = route(application, request).value
       val resultValue = (contentAsJson(result) \ "claimedAllYearsStatus").as[Boolean]
 
       status(result) mustBe OK
@@ -57,8 +57,8 @@ class ClaimedAllYearsStatusControllerSpec extends SpecBase with BeforeAndAfter {
 
       when(mockIABDService.claimedAllYearsStatus(eqs(fakeNino))(any())).thenReturn(Future(false))
 
-      val request = FakeRequest(GET, routes.ClaimedAllYearsStatusController.claimedAllYearsStatus().url)
-      val result = route(application, request).value
+      val request     = FakeRequest(GET, routes.ClaimedAllYearsStatusController.claimedAllYearsStatus().url)
+      val result      = route(application, request).value
       val resultValue = (contentAsJson(result) \ "claimedAllYearsStatus").as[Boolean]
 
       status(result) mustBe OK

@@ -22,9 +22,13 @@ sealed trait AuditEventType
 
 object AuditEventType {
 
-  object UpdateWorkingFromHomeFlatRateSuccess extends WithName("UpdateWorkingFromHomeFlatRateSuccess") with AuditEventType
+  object UpdateWorkingFromHomeFlatRateSuccess
+      extends WithName("UpdateWorkingFromHomeFlatRateSuccess")
+      with AuditEventType
 
-  object UpdateWorkingFromHomeFlatRateFailure extends WithName("UpdateWorkingFromHomeFlatRateFailure") with AuditEventType
+  object UpdateWorkingFromHomeFlatRateFailure
+      extends WithName("UpdateWorkingFromHomeFlatRateFailure")
+      with AuditEventType
 
   object PaperlessPreferenceCheckSuccess extends WithName("PaperlessPreferenceCheckSuccess") with AuditEventType
 
@@ -32,4 +36,3 @@ object AuditEventType {
 
   object AlreadyClaimedExpenses extends WithName("AlreadyClaimedExpenses") with AuditEventType
 }
-

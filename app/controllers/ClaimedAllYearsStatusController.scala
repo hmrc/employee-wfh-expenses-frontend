@@ -25,17 +25,15 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class ClaimedAllYearsStatusController @Inject()(
-                                                 val controllerComponents: MessagesControllerComponents,
-                                                 val iabdService: IABDService,
-                                                 identify: IdentifierAction
-                                               )(implicit ec: ExecutionContext) extends FrontendBaseController {
+class ClaimedAllYearsStatusController @Inject() (
+    val controllerComponents: MessagesControllerComponents,
+    val iabdService: IABDService,
+    identify: IdentifierAction
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController {
 
-  def claimedAllYearsStatus(): Action[AnyContent] = identify.async {
-    implicit request =>
-      iabdService.claimedAllYearsStatus(request.nino).map { status =>
-        Ok(Json.obj("claimedAllYearsStatus" -> status))
-      }
+  def claimedAllYearsStatus(): Action[AnyContent] = identify.async { implicit request =>
+    iabdService.claimedAllYearsStatus(request.nino).map(status => Ok(Json.obj("claimedAllYearsStatus" -> status)))
   }
 
 }

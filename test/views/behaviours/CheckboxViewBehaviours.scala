@@ -20,20 +20,21 @@ import play.api.data.{Form, FormError}
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.govukfrontend.views.viewmodels.checkboxes.CheckboxItem
 
-
 trait CheckboxViewBehaviours[A] extends ViewBehaviours {
 
-  //noinspection ScalaStyle
-  def checkboxPage(form: Form[Seq[A]],
-                   createView: Form[Seq[A]] => HtmlFormat.Appendable,
-                   messageKeyPrefix: String,
-                   options: Seq[CheckboxItem],
-                   fieldKey: String = "value",
-                   legend: Option[String] = None): Unit = {
+  // noinspection ScalaStyle
+  def checkboxPage(
+      form: Form[Seq[A]],
+      createView: Form[Seq[A]] => HtmlFormat.Appendable,
+      messageKeyPrefix: String,
+      options: Seq[CheckboxItem],
+      fieldKey: String = "value",
+      legend: Option[String] = None
+  ): Unit =
 
     "behave like a checkbox page" must {
       "contain a h1 for the question" in {
-        val doc = asDocument(createView(form))
+        val doc     = asDocument(createView(form))
         val legends = doc.getElementsByTag("h1")
         legends.size mustBe 1
         legends.text contains legend.getOrElse(messages(s"$messageKeyPrefix.heading"))
@@ -41,54 +42,48 @@ trait CheckboxViewBehaviours[A] extends ViewBehaviours {
 
       "contain an input for the value" in {
         val doc = asDocument(createView(form))
-        for (option <- options) {
+        for (option <- options)
           assertRenderedById(doc, option.value)
-        }
       }
 
       "contain a label for each input" in {
         val doc = asDocument(createView(form))
-        for (option <- options) {
+        for (option <- options)
           doc.select(s"label[for=${option.value}]").text mustEqual option.content.asHtml.toString()
-        }
       }
 
       "rendered" must {
 
         "contain checkboxes for the values" in {
           val doc = asDocument(createView(form))
-          for (option <- options) {
+          for (option <- options)
             assertContainsRadioButton(doc, option.id.get, "value[]", option.value, false)
-          }
         }
       }
 
-      for (option <- options) {
+      for (option <- options)
 
         s"rendered with a value of '${option.value}'" must {
 
           s"have the '${option.value}' checkbox selected" in {
             val formWithData = form.bind(Map("value" -> s"${option.value}"))
-            val doc = asDocument(createView(formWithData))
+            val doc          = asDocument(createView(formWithData))
             assertContainsCheckBox(doc, option.id.get, "value[]", option.value, true)
           }
         }
-      }
 
       "rendered with all values" must {
 
-        val valuesMap: Map[String, String] = options.zipWithIndex.map {
-          case (option, i) => s"value[$i]" -> option.value
+        val valuesMap: Map[String, String] = options.zipWithIndex.map { case (option, i) =>
+          s"value[$i]" -> option.value
         }.toMap
 
         val formWithData = form.bind(valuesMap)
-        val doc = asDocument(createView(formWithData))
+        val doc          = asDocument(createView(formWithData))
 
-        for(option <- options) {
-          s"have ${option.value} value selected" in {
+        for (option <- options)
+          s"have ${option.value} value selected" in
             assertContainsCheckBox(doc, option.id.get, "value[]", option.value, true)
-          }
-        }
       }
 
       "not render an error summary" in {
@@ -96,7 +91,6 @@ trait CheckboxViewBehaviours[A] extends ViewBehaviours {
         println(doc.getElementsByClass("govuk-error-summary__title").toString)
         assertNotRenderedByClass(doc, "govuk-error-summary__title")
       }
-
 
       "show error in the title" in {
         val doc = asDocument(createView(form.withError(FormError(fieldKey, "error.invalid"))))
@@ -109,11 +103,11 @@ trait CheckboxViewBehaviours[A] extends ViewBehaviours {
       }
 
       "show an error associated with the value field" in {
-        val doc = asDocument(createView(form.withError(FormError(fieldKey, "error.invalid"))))
+        val doc       = asDocument(createView(form.withError(FormError(fieldKey, "error.invalid"))))
         val errorSpan = doc.getElementsByClass("govuk-error-message").first
         errorSpan.text mustBe (messages("error.browser.title.prefix") + " " + messages("error.invalid"))
         doc.getElementsByTag("div").first.attr("aria-describedby") contains errorSpan.attr("id")
       }
     }
-  }
+
 }

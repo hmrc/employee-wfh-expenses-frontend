@@ -22,8 +22,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.data.validation.{Invalid, Valid}
 
-class ConstraintsSpec extends AnyWordSpec with Matchers with ScalaCheckPropertyChecks with Generators  with Constraints {
-
+class ConstraintsSpec extends AnyWordSpec with Matchers with ScalaCheckPropertyChecks with Generators with Constraints {
 
   "firstError" must {
 
@@ -119,4 +118,5 @@ class ConstraintsSpec extends AnyWordSpec with Matchers with ScalaCheckPropertyC
       result mustEqual Invalid("error.length", 10)
     }
   }
+
 }

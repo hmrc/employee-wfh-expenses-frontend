@@ -29,4 +29,5 @@ class SelectTaxYearsToClaimForPageSpec extends PageBehaviours {
 
     beRemovable[Seq[TaxYearSelection]](SelectTaxYearsToClaimForPage)
   }
+
 }

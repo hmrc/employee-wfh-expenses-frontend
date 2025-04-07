@@ -34,19 +34,27 @@ import scala.concurrent.Future
 class DataRequiredActionSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
   class FilterUnderTest extends DataRequiredActionImpl {
-    def callRefine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]]= refine(request)
+    def callRefine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] = refine(request)
   }
 
   "DataRequiredAction" should {
     "redirect to the session expired page" when {
       "there are no userAnswers in the session" in {
         val optionalDataRequest = OptionalDataRequest(FakeRequest("GET", "/"), "internalId", None, "NINO")
-        val futureResult = new FilterUnderTest().callRefine(optionalDataRequest)
+        val futureResult        = new FilterUnderTest().callRefine(optionalDataRequest)
 
         whenReady(futureResult) { result =>
           result.isLeft mustBe true
-          result.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")).header.status mustBe SEE_OTHER
-          result.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")).header.headers.get(LOCATION).contains(routes.SessionExpiredController.onPageLoad.url) mustBe true
+          result.swap
+            .getOrElse(throw new NoSuchElementException("Either.left.get on Right"))
+            .header
+            .status mustBe SEE_OTHER
+          result.swap
+            .getOrElse(throw new NoSuchElementException("Either.left.get on Right"))
+            .header
+            .headers
+            .get(LOCATION)
+            .contains(routes.SessionExpiredController.onPageLoad.url) mustBe true
         }
       }
     }
@@ -61,12 +69,20 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar with ScalaFuture
         )
 
         val optionalDataRequest = OptionalDataRequest(fakeRequest, "internalId", Some(userAnswers), "NINO")
-        val futureResult = new FilterUnderTest().callRefine(optionalDataRequest)
+        val futureResult        = new FilterUnderTest().callRefine(optionalDataRequest)
 
         whenReady(futureResult) { result =>
           result.isLeft mustBe true
-          result.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")).header.status mustBe SEE_OTHER
-          result.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")).header.headers.get(LOCATION).contains(routes.ConfirmationController.onPageLoad().url) mustBe true
+          result.swap
+            .getOrElse(throw new NoSuchElementException("Either.left.get on Right"))
+            .header
+            .status mustBe SEE_OTHER
+          result.swap
+            .getOrElse(throw new NoSuchElementException("Either.left.get on Right"))
+            .header
+            .headers
+            .get(LOCATION)
+            .contains(routes.ConfirmationController.onPageLoad().url) mustBe true
         }
       }
     }
@@ -81,11 +97,9 @@ class DataRequiredActionSpec extends SpecBase with MockitoSugar with ScalaFuture
         )
 
         val optionalDataRequest = OptionalDataRequest(fakeRequest, "internalId", Some(userAnswers), "NINO")
-        val futureResult = new FilterUnderTest().callRefine(optionalDataRequest)
+        val futureResult        = new FilterUnderTest().callRefine(optionalDataRequest)
 
-        whenReady(futureResult) { result =>
-          result.isRight mustBe true
-        }
+        whenReady(futureResult)(result => result.isRight mustBe true)
       }
     }
   }

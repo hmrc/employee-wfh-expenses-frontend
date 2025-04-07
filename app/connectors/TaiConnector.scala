@@ -28,35 +28,47 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class TaiConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClientV2) {
+class TaiConnector @Inject() (appConfig: FrontendAppConfig, httpClient: HttpClientV2) {
 
-  def getOtherExpensesData(nino: String, year: Int)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[IABDExpense]] = {
+  def getOtherExpensesData(nino: String, year: Int)(
+      implicit hc: HeaderCarrier,
+      ec: ExecutionContext
+  ): Future[Seq[IABDExpense]] =
     getIabdData(nino, year, appConfig.otherExpensesId)
-  }
 
-  def getJobExpensesData(nino: String, year: Int)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[IABDExpense]] = {
+  def getJobExpensesData(nino: String, year: Int)(
+      implicit hc: HeaderCarrier,
+      ec: ExecutionContext
+  ): Future[Seq[IABDExpense]] =
     getIabdData(nino, year, appConfig.jobExpenseId)
-  }
 
-  private def getIabdData(nino: String, year: Int, iabd: Int)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[IABDExpense]] = {
+  private def getIabdData(nino: String, year: Int, iabd: Int)(
+      implicit hc: HeaderCarrier,
+      ec: ExecutionContext
+  ): Future[Seq[IABDExpense]] = {
     val taiUrl = s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/employee-expenses/$iabd"
     httpClient
       .get(url"$taiUrl")
       .execute[Seq[IABDExpense]]
   }
 
-  def postIabdData(nino: String, year: Int, grossAmount: Int, eTag: ETag)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Unit] = {
-    val taiUrl = s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"
+  def postIabdData(nino: String, year: Int, grossAmount: Int, eTag: ETag)(
+      implicit hc: HeaderCarrier,
+      ec: ExecutionContext
+  ): Future[Unit] = {
+    val taiUrl =
+      s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"
     val body = Json.obj("version" -> eTag.version, "grossAmount" -> grossAmount)
     httpClient
       .post(url"$taiUrl")
       .withBody(body)
       .execute[HttpResponse]
-      .map {
-        response => response.status match {
+      .map { response =>
+        response.status match {
           case code if isSuccessful(code) => ()
-          case code => throw UpstreamErrorResponse.apply(response.body, code)
+          case code                       => throw UpstreamErrorResponse.apply(response.body, code)
         }
       }
   }
+
 }

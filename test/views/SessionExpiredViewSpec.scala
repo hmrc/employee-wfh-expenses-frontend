@@ -30,6 +30,7 @@ class SessionExpiredViewSpec extends ViewBehaviours {
 
     val applyView = view.apply()(FakeRequest(), messages)
 
-    behave like normalPage(applyView, "session_expired", args = Nil, ("guidance", Nil))
+    behave.like(normalPage(applyView, "session_expired", args = Nil, ("guidance", Nil)))
   }
+
 }

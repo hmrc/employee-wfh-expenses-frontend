@@ -28,25 +28,25 @@ import views.html.ConfirmClaimInWeeksView
 // scalastyle:off magic.number
 class ConfirmClaimInWeeksViewSpec extends ViewBehaviours {
 
-
   val application: Application = applicationBuilder().build()
 
   val view: ConfirmClaimInWeeksView = application.injector.instanceOf[ConfirmClaimInWeeksView]
-  val form = new ConfirmClaimInWeeksFormProvider()(2)
+  val form                          = new ConfirmClaimInWeeksFormProvider()(2)
 
-  def createView(form: Form[Boolean], numberofWeeks: Int, taxYearSelected: TaxYearSelection): Html = view.apply(form, numberofWeeks, taxYearSelected)(fakeRequest, messages)
+  def createView(form: Form[Boolean], numberofWeeks: Int, taxYearSelected: TaxYearSelection): Html =
+    view.apply(form, numberofWeeks, taxYearSelected)(fakeRequest, messages)
 
   "Confirm claim in weeks view" should {
 
     "have the correct banner title for current tax year" in {
-      val doc = asDocument(createView(form, 2, CurrentYear))
+      val doc    = asDocument(createView(form, 2, CurrentYear))
       val banner = doc.select(".govuk-header__service-name")
 
       banner.text() mustEqual messages("service.name")
     }
 
     "have the correct banner title for previous tax year" in {
-      val doc = asDocument(createView(form, 2, CurrentYearMinus1))
+      val doc    = asDocument(createView(form, 2, CurrentYearMinus1))
       val banner = doc.select(".govuk-header__service-name")
 
       banner.text() mustEqual messages("service.name")
@@ -55,8 +55,9 @@ class ConfirmClaimInWeeksViewSpec extends ViewBehaviours {
     "show content" when {
       "when all confirmClaimInWeeks content is displayed for current tax year" in {
         val taxYear = CurrentYear
-        val title = "Do you want to claim for 2 weeks of working from home in the current tax year?"
-        val hint = s"The claim of 2 weeks is for the current tax year between ${taxYear.formattedTaxYearArgs.head} and ${taxYear.formattedTaxYearArgs.apply(1)}"
+        val title   = "Do you want to claim for 2 weeks of working from home in the current tax year?"
+        val hint =
+          s"The claim of 2 weeks is for the current tax year between ${taxYear.formattedTaxYearArgs.head} and ${taxYear.formattedTaxYearArgs.apply(1)}"
         val doc = asDocument(createView(form, 2, taxYear))
         assertContainsMessages(doc, title)
         assertContainsMessages(doc, hint)
@@ -64,15 +65,18 @@ class ConfirmClaimInWeeksViewSpec extends ViewBehaviours {
 
       "when all confirmClaimInWeeks content is displayed for previous tax year" in {
         val taxYear = CurrentYearMinus1
-        val title = s"Do you want to claim for 2 weeks of working from home between ${taxYear.formattedTaxYearArgs.head} and ${taxYear.formattedTaxYearArgs.apply(1)}?"
-        val hint = s"The claim of 2 weeks is for the tax year between ${taxYear.formattedTaxYearArgs.head} and ${taxYear.formattedTaxYearArgs.apply(1)}."
+        val title =
+          s"Do you want to claim for 2 weeks of working from home between ${taxYear.formattedTaxYearArgs.head} and ${taxYear.formattedTaxYearArgs.apply(1)}?"
+        val hint =
+          s"The claim of 2 weeks is for the tax year between ${taxYear.formattedTaxYearArgs.head} and ${taxYear.formattedTaxYearArgs.apply(1)}."
         val doc = asDocument(createView(form, 2, taxYear))
         assertContainsMessages(doc, title)
         assertContainsMessages(doc, hint)
       }
     }
 
-    behave like pageWithBackLink(createView(form, 2, CurrentYear))
+    behave.like(pageWithBackLink(createView(form, 2, CurrentYear)))
 
   }
+
 }

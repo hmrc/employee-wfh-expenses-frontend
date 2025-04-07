@@ -27,9 +27,9 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmployeeExpensesConnector @Inject()(appConfig: FrontendAppConfig,
-                                          httpClient: HttpClientV2)
-                                         (implicit executionContext: ExecutionContext) {
+class EmployeeExpensesConnector @Inject() (appConfig: FrontendAppConfig, httpClient: HttpClientV2)(
+    implicit executionContext: ExecutionContext
+) {
 
   def updateMergedJourneySession(headerCarrier: HeaderCarrier): Future[Boolean] = {
     implicit val hc: HeaderCarrier = headerCarrier.copy(extraHeaders = headerCarrier.headers(Seq(HeaderNames.COOKIE)))
@@ -40,11 +40,10 @@ class EmployeeExpensesConnector @Inject()(appConfig: FrontendAppConfig,
       .map { response =>
         response.status match {
           case OK => true
-          case _ => false
+          case _  => false
         }
       }
-      .recoverWith {
-        case ex: Exception => Future.successful(false)
-      }
+      .recoverWith { case ex: Exception => Future.successful(false) }
   }
+
 }

@@ -41,4 +41,5 @@ class SelectTaxYearsToClaimForFormProvider @Inject() extends Mappings {
         _.map(_.toString)
       )
   )
+
 }

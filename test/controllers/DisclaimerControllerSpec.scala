@@ -33,7 +33,10 @@ class DisclaimerControllerSpec extends SpecBase {
         userAnswersId,
         Json.obj(
           ClaimedForTaxYears.toString -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
-          SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear, CurrentYearMinus1.toTaxYear.startYear),
+          SelectTaxYearsToClaimForPage.toString -> Json.arr(
+            CurrentYear.toTaxYear.startYear,
+            CurrentYearMinus1.toTaxYear.startYear
+          )
         )
       )
 
@@ -53,8 +56,8 @@ class DisclaimerControllerSpec extends SpecBase {
       val userAnswers = UserAnswers(
         userAnswersId,
         Json.obj(
-          ClaimedForTaxYears.toString -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
-          SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear),
+          ClaimedForTaxYears.toString           -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
+          SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear)
         )
       )
 
@@ -70,4 +73,5 @@ class DisclaimerControllerSpec extends SpecBase {
 
     }
   }
+
 }

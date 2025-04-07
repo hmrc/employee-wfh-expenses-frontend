@@ -29,22 +29,32 @@ import scala.collection.immutable.ListMap
 
 class NumberOfWeeksToClaimForMultipleYearsViewSpec extends QuestionViewBehaviours[ListMap[TaxYearSelection, Int]] {
 
-  val messageKeyPrefix = "numberOfWeeksToClaimFor"
-  val formProvider = new NumberOfWeeksToClaimForFormProvider
+  val messageKeyPrefix                           = "numberOfWeeksToClaimFor"
+  val formProvider                               = new NumberOfWeeksToClaimForFormProvider
   val form: Form[ListMap[TaxYearSelection, Int]] = formProvider(Seq(CurrentYear))
 
   "NumberOfWeeksToClaimForMultipleView" when {
     "rendered for all years" must {
       val messageKeyPrefix = "numberOfWeeksToClaimFor.multiple"
-      val view = viewFor[NumberOfWeeksToClaimForMultipleYearsView](Some(emptyUserAnswers))
-      val taxYears = Seq(CurrentYear, CurrentYearMinus1)
+      val view             = viewFor[NumberOfWeeksToClaimForMultipleYearsView](Some(emptyUserAnswers))
+      val taxYears         = Seq(CurrentYear, CurrentYearMinus1)
       val form: Form[ListMap[TaxYearSelection, Int]] = formProvider(taxYears)
 
-      def applyView(form: Form[ListMap[TaxYearSelection, Int]]): HtmlFormat.Appendable = view.apply(form, taxYears)(fakeRequest, messages)
+      def applyView(form: Form[ListMap[TaxYearSelection, Int]]): HtmlFormat.Appendable =
+        view.apply(form, taxYears)(fakeRequest, messages)
 
-      behave like normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = Nil)
+      behave.like(normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = Nil))
 
-      behave like pageWithTextFields(form, applyView, messageKeyPrefix, routes.NumberOfWeeksToClaimForController.onSubmit().url, args = Nil)
+      behave.like(
+        pageWithTextFields(
+          form,
+          applyView,
+          messageKeyPrefix,
+          routes.NumberOfWeeksToClaimForController.onSubmit().url,
+          args = Nil
+        )
+      )
     }
   }
+
 }

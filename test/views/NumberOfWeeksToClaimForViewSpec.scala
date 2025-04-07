@@ -29,30 +29,51 @@ import scala.collection.immutable.ListMap
 
 class NumberOfWeeksToClaimForViewSpec extends QuestionViewBehaviours[ListMap[TaxYearSelection, Int]] {
 
-  val messageKeyPrefix = "numberOfWeeksToClaimFor"
-  val formProvider = new NumberOfWeeksToClaimForFormProvider
+  val messageKeyPrefix                           = "numberOfWeeksToClaimFor"
+  val formProvider                               = new NumberOfWeeksToClaimForFormProvider
   val form: Form[ListMap[TaxYearSelection, Int]] = formProvider(Seq(CurrentYear))
 
   "NumberOfWeeksToClaimForView" when {
     "rendered for current year" must {
       val view = viewFor[NumberOfWeeksToClaimForView](Some(emptyUserAnswers))
 
-      def applyView(form: Form[ListMap[TaxYearSelection, Int]]): HtmlFormat.Appendable = view.apply(form, CurrentYear)(fakeRequest, messages)
+      def applyView(form: Form[ListMap[TaxYearSelection, Int]]): HtmlFormat.Appendable =
+        view.apply(form, CurrentYear)(fakeRequest, messages)
 
-      behave like normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = Nil)
+      behave.like(normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = Nil))
 
-      behave like pageWithTextFields(form, applyView, messageKeyPrefix, routes.NumberOfWeeksToClaimForController.onSubmit().url, args = Nil)
+      behave.like(
+        pageWithTextFields(
+          form,
+          applyView,
+          messageKeyPrefix,
+          routes.NumberOfWeeksToClaimForController.onSubmit().url,
+          args = Nil
+        )
+      )
     }
     "rendered for previous year" must {
-      val messageKeyPrefix = "numberOfWeeksToClaimFor.previous"
-      val view = viewFor[NumberOfWeeksToClaimForView](Some(emptyUserAnswers))
+      val messageKeyPrefix                           = "numberOfWeeksToClaimFor.previous"
+      val view                                       = viewFor[NumberOfWeeksToClaimForView](Some(emptyUserAnswers))
       val form: Form[ListMap[TaxYearSelection, Int]] = formProvider(Seq(CurrentYearMinus1))
 
-      def applyView(form: Form[ListMap[TaxYearSelection, Int]]): HtmlFormat.Appendable = view.apply(form, CurrentYearMinus1)(fakeRequest, messages)
+      def applyView(form: Form[ListMap[TaxYearSelection, Int]]): HtmlFormat.Appendable =
+        view.apply(form, CurrentYearMinus1)(fakeRequest, messages)
 
-      behave like normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = CurrentYearMinus1.formattedTaxYearArgs)
+      behave.like(
+        normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = CurrentYearMinus1.formattedTaxYearArgs)
+      )
 
-      behave like pageWithTextFields(form, applyView, messageKeyPrefix, routes.NumberOfWeeksToClaimForController.onSubmit().url, args = CurrentYearMinus1.formattedTaxYearArgs)
+      behave.like(
+        pageWithTextFields(
+          form,
+          applyView,
+          messageKeyPrefix,
+          routes.NumberOfWeeksToClaimForController.onSubmit().url,
+          args = CurrentYearMinus1.formattedTaxYearArgs
+        )
+      )
     }
   }
+
 }

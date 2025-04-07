@@ -30,41 +30,47 @@ import views.html.helper.urlEncode
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PaperlessPreferenceConnectorImpl @Inject()(
-                                                  appConfig: FrontendAppConfig,
-                                                  httpClient: HttpClientV2,
-                                                  applicationCrypto:  ApplicationCrypto,
-                                                )
-  extends PaperlessPreferenceConnector with HeaderCarrierForPartialsConverter with Logging {
+class PaperlessPreferenceConnectorImpl @Inject() (
+    appConfig: FrontendAppConfig,
+    httpClient: HttpClientV2,
+    applicationCrypto: ApplicationCrypto
+) extends PaperlessPreferenceConnector
+    with HeaderCarrierForPartialsConverter
+    with Logging {
 
   def crypto: String => String = cookie => cookie
 
-  def getPaperlessStatus(returnUrl: String)(implicit request: Request[AnyContent], ec: ExecutionContext): Future[Either[String, PaperlessStatusResponse]] = {
+  def getPaperlessStatus(
+      returnUrl: String
+  )(implicit request: Request[AnyContent], ec: ExecutionContext): Future[Either[String, PaperlessStatusResponse]] = {
     val paperlessStatusUrl =
       s"${appConfig.preferencesFrontendHost}/paperless/status" +
-        s"?returnUrl=${ encryptAndEncode( returnUrl ) }" +
-        s"&returnLinkText=${ encryptAndEncode( "Continue" ) }"
+        s"?returnUrl=${encryptAndEncode(returnUrl)}" +
+        s"&returnLinkText=${encryptAndEncode("Continue")}"
 
     logger.debug(s"[PaperlessPreferenceConnector][getPaperlessPreference] $paperlessStatusUrl")
 
     httpClient
       .get(url"$paperlessStatusUrl")
       .execute[PaperlessStatusResponse]
-      .map {Right(_)} recoverWith {
-      case ex: Exception =>
+      .map(Right(_))
+      .recoverWith { case ex: Exception =>
         logger.error(s"[PaperlessPreferenceConnector][getPaperlessStatus] Failed with: ${ex.getMessage}")
         Future.successful(Left(ex.getMessage))
-    }
+      }
   }
 
-  private def encryptAndEncode(s: String): String = urlEncode( applicationCrypto.QueryParameterCrypto.encrypt( PlainText(s) ).value )
+  private def encryptAndEncode(s: String): String = urlEncode(
+    applicationCrypto.QueryParameterCrypto.encrypt(PlainText(s)).value
+  )
+
 }
 
 @ImplementedBy(classOf[PaperlessPreferenceConnectorImpl])
 trait PaperlessPreferenceConnector {
-  def getPaperlessStatus(returnUrl: String)(implicit request: Request[AnyContent], ec: ExecutionContext): Future[Either[String, PaperlessStatusResponse]]
+
+  def getPaperlessStatus(
+      returnUrl: String
+  )(implicit request: Request[AnyContent], ec: ExecutionContext): Future[Either[String, PaperlessStatusResponse]]
+
 }
-
-
-
-

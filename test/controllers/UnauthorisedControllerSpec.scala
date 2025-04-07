@@ -50,4 +50,5 @@ class UnauthorisedControllerSpec extends SpecBase {
       application.stop()
     }
   }
+
 }

@@ -18,7 +18,12 @@ package models
 
 import play.api.libs.json.{Format, JsObject, Json}
 
-case class AuditData(nino: String, userAnswers: JsObject, flatRateItems: Option[Seq[FlatRateItem]] = None, submissionError: Option[String] = None)
+case class AuditData(
+    nino: String,
+    userAnswers: JsObject,
+    flatRateItems: Option[Seq[FlatRateItem]] = None,
+    submissionError: Option[String] = None
+)
 
 object AuditData {
   implicit lazy val format: Format[AuditData] = Json.format[AuditData]

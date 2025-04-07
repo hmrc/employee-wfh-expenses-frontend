@@ -31,51 +31,75 @@ import javax.inject.Inject
 import scala.collection.immutable.ListMap
 import scala.concurrent.{ExecutionContext, Future}
 
-class CheckYourClaimController @Inject()(override val messagesApi: MessagesApi,
-                                         appConfig: FrontendAppConfig,
-                                         identify: IdentifierAction,
-                                         citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         submissionService: SubmissionService,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         checkYourClaimView: CheckYourClaimView,
-                                        )(implicit ec: ExecutionContext)
-  extends FrontendBaseController with I18nSupport with Logging {
+class CheckYourClaimController @Inject() (
+    override val messagesApi: MessagesApi,
+    appConfig: FrontendAppConfig,
+    identify: IdentifierAction,
+    citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    submissionService: SubmissionService,
+    val controllerComponents: MessagesControllerComponents,
+    checkYourClaimView: CheckYourClaimView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
-    implicit request =>
-      (request.userAnswers.get(SelectTaxYearsToClaimForPage), request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)) match {
-        case (Some(selectedTaxYears), optWeeksForTaxYears) if selectedTaxYears.nonEmpty
-          && selectedTaxYears.diff(wholeYearClaims).forall(taxYear => optWeeksForTaxYears.exists(_.contains(taxYear))) =>
-          val groupedSelectedTaxYears = selectedTaxYears.groupBy {taxYear => appConfig.taxReliefPerWeek(taxYear)}
-          val sortedGroupedSelectedTaxYear = groupedSelectedTaxYears.toSeq.sortBy(_._2.map(_.toTaxYear.startYear).max)(Ordering.Int.reverse)
+  def onPageLoad: Action[AnyContent] =
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { implicit request =>
+      (
+        request.userAnswers.get(SelectTaxYearsToClaimForPage),
+        request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)
+      ) match {
+        case (Some(selectedTaxYears), optWeeksForTaxYears)
+            if selectedTaxYears.nonEmpty
+              && selectedTaxYears
+                .diff(wholeYearClaims)
+                .forall(taxYear => optWeeksForTaxYears.exists(_.contains(taxYear))) =>
+          val groupedSelectedTaxYears = selectedTaxYears.groupBy(taxYear => appConfig.taxReliefPerWeek(taxYear))
+          val sortedGroupedSelectedTaxYear =
+            groupedSelectedTaxYears.toSeq.sortBy(_._2.map(_.toTaxYear.startYear).max)(Ordering.Int.reverse)
           val currentYearContent = selectedTaxYears.contains(CurrentYear)
-          Ok(checkYourClaimView(sortedGroupedSelectedTaxYear, optWeeksForTaxYears.getOrElse(ListMap()), currentYearContent))
+          Ok(
+            checkYourClaimView(
+              sortedGroupedSelectedTaxYear,
+              optWeeksForTaxYears.getOrElse(ListMap()),
+              currentYearContent
+            )
+          )
         case _ =>
           Redirect(routes.IndexController.start)
       }
-  }
+    }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData).async {
-    implicit request =>
-      (request.userAnswers.get(SelectTaxYearsToClaimForPage), request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)) match {
-        case (Some(selectedTaxYears), optWeeksForTaxYears) if selectedTaxYears.nonEmpty
-          && selectedTaxYears.diff(wholeYearClaims).forall(taxYear => optWeeksForTaxYears.exists(_.contains(taxYear))) =>
+  def onSubmit(): Action[AnyContent] =
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData).async { implicit request =>
+      (
+        request.userAnswers.get(SelectTaxYearsToClaimForPage),
+        request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)
+      ) match {
+        case (Some(selectedTaxYears), optWeeksForTaxYears)
+            if selectedTaxYears.nonEmpty
+              && selectedTaxYears
+                .diff(wholeYearClaims)
+                .forall(taxYear => optWeeksForTaxYears.exists(_.contains(taxYear))) =>
 
-          submissionService.submitExpenses(
-            selectedTaxYears = selectedTaxYears,
-            weeksForTaxYears = optWeeksForTaxYears.getOrElse(ListMap())
-          ) map {
-            case Right(_) =>
-              Redirect(routes.ConfirmationController.onPageLoad())
-            case Left(_) =>
-              logger.error("[SubmitYourClaimController][onSubmit] - Error submitting")
-              Redirect(routes.TechnicalDifficultiesController.onPageLoad)
-          }
+          submissionService
+            .submitExpenses(
+              selectedTaxYears = selectedTaxYears,
+              weeksForTaxYears = optWeeksForTaxYears.getOrElse(ListMap())
+            )
+            .map {
+              case Right(_) =>
+                Redirect(routes.ConfirmationController.onPageLoad())
+              case Left(_) =>
+                logger.error("[SubmitYourClaimController][onSubmit] - Error submitting")
+                Redirect(routes.TechnicalDifficultiesController.onPageLoad)
+            }
         case _ =>
           Future.successful(Redirect(routes.IndexController.start))
       }
-  }
-}
+    }
 
+}

@@ -33,9 +33,9 @@ import scala.concurrent.Future
 
 class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
 
-  val mockTaiConnector: TaiConnector = mock[TaiConnector]
+  val mockTaiConnector: TaiConnector     = mock[TaiConnector]
   val mockAuditConnector: AuditConnector = mock[AuditConnector]
-  val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
+  val mockAppConfig: FrontendAppConfig   = mock[FrontendAppConfig]
 
   class Setup {
     val serviceUnderTest = new IABDService(mockTaiConnector, mockAuditConnector, mockAppConfig)
@@ -45,13 +45,13 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
     Mockito.reset(mockTaiConnector)
   }
 
-  val currentYear: Int = CurrentYear.toTaxYear.startYear
-  val currentYearMinus1: Int = CurrentYearMinus1.toTaxYear.startYear
-  val currentYearMinus2: Int = CurrentYearMinus2.toTaxYear.startYear
-  val currentYearMinus3: Int = CurrentYearMinus3.toTaxYear.startYear
-  val currentYearMinus4: Int = CurrentYearMinus4.toTaxYear.startYear
+  val currentYear: Int        = CurrentYear.toTaxYear.startYear
+  val currentYearMinus1: Int  = CurrentYearMinus1.toTaxYear.startYear
+  val currentYearMinus2: Int  = CurrentYearMinus2.toTaxYear.startYear
+  val currentYearMinus3: Int  = CurrentYearMinus3.toTaxYear.startYear
+  val currentYearMinus4: Int  = CurrentYearMinus4.toTaxYear.startYear
   val testOtherExpensesAmount = 123
-  val testJobExpensesAmount = 321
+  val testJobExpensesAmount   = 321
 
   "alreadyClaimed" should {
     "return None" when {
@@ -74,7 +74,9 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
         when(mockTaiConnector.getOtherExpensesData(fakeNino, currentYearMinus1)).thenReturn(Future(otherExpenses))
 
         val maybeExpenses: Option[Expenses] = await(serviceUnderTest.alreadyClaimed(fakeNino, currentYearMinus1))
-        maybeExpenses mustBe Some(Expenses(currentYearMinus1, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false))
+        maybeExpenses mustBe Some(
+          Expenses(currentYearMinus1, otherExpenses, Seq.empty, wasJobRateExpensesChecked = false)
+        )
 
         Mockito.verify(mockTaiConnector, times(1)).getOtherExpensesData(fakeNino, currentYearMinus1)
         Mockito.verify(mockTaiConnector, times(0)).getJobExpensesData(fakeNino, currentYearMinus1)
@@ -83,7 +85,7 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
 
     "return Some job expenses" when {
       "tai returns job expense details" in new Setup {
-        val otherExpenses: Seq[Nothing] = Seq.empty
+        val otherExpenses: Seq[Nothing]   = Seq.empty
         val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
 
         when(mockTaiConnector.getOtherExpensesData(fakeNino, currentYearMinus1)).thenReturn(Future(otherExpenses))
@@ -101,12 +103,12 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
   "getAlreadyClaimedStatusForAllYears" should {
     "return expenses for 2024 only when already claimed for CTY" in new Setup {
       val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
-      val noExpenses: Seq[Nothing] = Seq.empty
+      val noExpenses: Seq[Nothing]      = Seq.empty
 
       when(mockTaiConnector.getOtherExpensesData(fakeNino, currentYear)).thenReturn(Future(noExpenses))
       when(mockTaiConnector.getJobExpensesData(fakeNino, currentYear)).thenReturn(Future(jobExpenses))
 
-      for(year <- Seq(currentYearMinus1, currentYearMinus2, currentYearMinus3, currentYearMinus4)) {
+      for (year <- Seq(currentYearMinus1, currentYearMinus2, currentYearMinus3, currentYearMinus4)) {
         when(mockTaiConnector.getOtherExpensesData(fakeNino, year)).thenReturn(Future(noExpenses))
         when(mockTaiConnector.getJobExpensesData(fakeNino, year)).thenReturn(Future(noExpenses))
       }
@@ -121,7 +123,7 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
 
   "allYearsClaimed" should {
     "return true when data provided shows all years have been claimed" in new Setup {
-      val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
+      val jobExpenses: Seq[IABDExpense]   = Seq(IABDExpense(testJobExpensesAmount))
       val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
 
       val expenses: Seq[Expenses] = Seq(
@@ -136,7 +138,7 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
     }
 
     "return false when data provided shows all years have NOT been claimed" in new Setup {
-      val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
+      val jobExpenses: Seq[IABDExpense]   = Seq(IABDExpense(testJobExpensesAmount))
       val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
 
       val expenses: Seq[Expenses] = Seq(
@@ -152,7 +154,7 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
 
   "claimedAllYearsStatus" should {
     "return a value of true if user has claimed for all years" in new Setup {
-      val jobExpenses: Seq[IABDExpense] = Seq(IABDExpense(testJobExpensesAmount))
+      val jobExpenses: Seq[IABDExpense]   = Seq(IABDExpense(testJobExpensesAmount))
       val otherExpenses: Seq[IABDExpense] = Seq(IABDExpense(testOtherExpensesAmount))
 
       for (year <- Seq(currentYear, currentYearMinus1, currentYearMinus2, currentYearMinus3, currentYearMinus4)) {
@@ -172,4 +174,5 @@ class IABDServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
       await(serviceUnderTest.claimedAllYearsStatus(fakeNino)) mustBe false
     }
   }
+
 }

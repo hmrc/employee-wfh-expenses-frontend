@@ -28,47 +28,61 @@ class NumberOfWeeksToClaimForFormProviderSpec extends IntFieldBehaviours with Gu
   val formProvider: NumberOfWeeksToClaimForFormProvider = new NumberOfWeeksToClaimForFormProvider
 
   "form values when claiming for current tax year" when {
-    val form = formProvider(Seq(CurrentYear))
+    val form  = formProvider(Seq(CurrentYear))
     val field = CurrentYear.toTaxYear.startYear.toString
-    behave like intField(
-      form,
-      field,
-      FormError(field, "numberOfWeeksToClaimFor.error.nonNumeric", CurrentYear.formattedTaxYearArgs),
-      FormError(field, "numberOfWeeksToClaimFor.error.wholeNumber", CurrentYear.formattedTaxYearArgs)
+    behave.like(
+      intField(
+        form,
+        field,
+        FormError(field, "numberOfWeeksToClaimFor.error.nonNumeric", CurrentYear.formattedTaxYearArgs),
+        FormError(field, "numberOfWeeksToClaimFor.error.wholeNumber", CurrentYear.formattedTaxYearArgs)
+      )
     )
-    behave like intFieldWithMinimum(
-      form,
-      field,
-      formProvider.ONE_WEEK,
-      FormError(field, "numberOfWeeksToClaimFor.error.minimum", 1 +: CurrentYear.formattedTaxYearArgs)
+    behave.like(
+      intFieldWithMinimum(
+        form,
+        field,
+        formProvider.ONE_WEEK,
+        FormError(field, "numberOfWeeksToClaimFor.error.minimum", 1 +: CurrentYear.formattedTaxYearArgs)
+      )
     )
-    behave like intFieldWithMaximum(
-      form,
-      field,
-      formProvider.MAXIMUM_WEEKS_IN_A_YEAR,
-      FormError(field, "numberOfWeeksToClaimFor.error.maximum", 52 +: CurrentYear.formattedTaxYearArgs)
+    behave.like(
+      intFieldWithMaximum(
+        form,
+        field,
+        formProvider.MAXIMUM_WEEKS_IN_A_YEAR,
+        FormError(field, "numberOfWeeksToClaimFor.error.maximum", 52 +: CurrentYear.formattedTaxYearArgs)
+      )
     )
   }
+
   "form values claiming for previous tax year" when {
-    val form = formProvider(Seq(CurrentYearMinus1))
+    val form  = formProvider(Seq(CurrentYearMinus1))
     val field = CurrentYearMinus1.toTaxYear.startYear.toString
-    behave like intField(
-      form,
-      field,
-      FormError(field, "numberOfWeeksToClaimFor.previous.error.nonNumeric", CurrentYearMinus1.formattedTaxYearArgs),
-      FormError(field, "numberOfWeeksToClaimFor.previous.error.wholeNumber", CurrentYearMinus1.formattedTaxYearArgs)
+    behave.like(
+      intField(
+        form,
+        field,
+        FormError(field, "numberOfWeeksToClaimFor.previous.error.nonNumeric", CurrentYearMinus1.formattedTaxYearArgs),
+        FormError(field, "numberOfWeeksToClaimFor.previous.error.wholeNumber", CurrentYearMinus1.formattedTaxYearArgs)
+      )
     )
-    behave like intFieldWithMinimum(
-      form,
-      field,
-      formProvider.ONE_WEEK,
-      FormError(field, "numberOfWeeksToClaimFor.previous.error.minimum", 1 +: CurrentYearMinus1.formattedTaxYearArgs)
+    behave.like(
+      intFieldWithMinimum(
+        form,
+        field,
+        formProvider.ONE_WEEK,
+        FormError(field, "numberOfWeeksToClaimFor.previous.error.minimum", 1 +: CurrentYearMinus1.formattedTaxYearArgs)
+      )
     )
-    behave like intFieldWithMaximum(
-      form,
-      field,
-      formProvider.MAXIMUM_WEEKS_IN_A_YEAR,
-      FormError(field, "numberOfWeeksToClaimFor.previous.error.maximum", 52 +: CurrentYearMinus1.formattedTaxYearArgs)
+    behave.like(
+      intFieldWithMaximum(
+        form,
+        field,
+        formProvider.MAXIMUM_WEEKS_IN_A_YEAR,
+        FormError(field, "numberOfWeeksToClaimFor.previous.error.maximum", 52 +: CurrentYearMinus1.formattedTaxYearArgs)
+      )
     )
   }
+
 }

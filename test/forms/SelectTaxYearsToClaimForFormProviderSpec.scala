@@ -26,20 +26,25 @@ class SelectTaxYearsToClaimForFormProviderSpec extends CheckboxFieldBehaviours {
 
   ".value" must {
 
-    val fieldName = "value"
+    val fieldName   = "value"
     val requiredKey = "selectTaxYearsToClaimFor.error.required"
 
-    behave like checkboxField[TaxYearSelection](
-      form,
-      fieldName,
-      validValues  = TaxYearSelection.valuesAll,
-      invalidError = FormError(s"$fieldName", requiredKey)
+    behave.like(
+      checkboxField[TaxYearSelection](
+        form,
+        fieldName,
+        validValues = TaxYearSelection.valuesAll,
+        invalidError = FormError(s"$fieldName", requiredKey)
+      )
     )
 
-    behave like mandatoryCheckboxField(
-      form,
-      fieldName,
-      requiredKey
+    behave.like(
+      mandatoryCheckboxField(
+        form,
+        fieldName,
+        requiredKey
+      )
     )
   }
+
 }

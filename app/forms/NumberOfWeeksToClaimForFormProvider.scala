@@ -28,10 +28,12 @@ import scala.collection.immutable.ListMap
 
 class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
 
-  val ONE_WEEK = 1
+  val ONE_WEEK                = 1
   val MAXIMUM_WEEKS_IN_A_YEAR = 52
 
-  def apply(selectedTaxYears: Seq[TaxYearSelection])(implicit messages: Messages): Form[ListMap[TaxYearSelection, Int]] = {
+  def apply(
+      selectedTaxYears: Seq[TaxYearSelection]
+  )(implicit messages: Messages): Form[ListMap[TaxYearSelection, Int]] = {
     def errorPrefix(taxYear: TaxYearSelection): String = if (taxYear.equals(CurrentYear)) {
       "numberOfWeeksToClaimFor.error"
     } else {
@@ -47,7 +49,9 @@ class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
             s"${errorPrefix(taxYear)}.nonNumeric",
             taxYear.formattedTaxYearArgs
           ).verifying(minimumValue(ONE_WEEK, s"${errorPrefix(taxYear)}.minimum", taxYear.formattedTaxYearArgs))
-            .verifying(maximumValue(MAXIMUM_WEEKS_IN_A_YEAR, s"${errorPrefix(taxYear)}.maximum", taxYear.formattedTaxYearArgs))
+            .verifying(
+              maximumValue(MAXIMUM_WEEKS_IN_A_YEAR, s"${errorPrefix(taxYear)}.maximum", taxYear.formattedTaxYearArgs)
+            )
         } else {
           ignored[Int](0)
         }
@@ -62,7 +66,7 @@ class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
         weekMapping(CurrentYearMinus4)
       )((cty, ctyMinus1, ctyMinus2, ctyMinus3, ctyMinus4) =>
         ListMap[TaxYearSelection, Int](
-          CurrentYear -> cty,
+          CurrentYear       -> cty,
           CurrentYearMinus1 -> ctyMinus1,
           CurrentYearMinus2 -> ctyMinus2,
           CurrentYearMinus3 -> ctyMinus3,
@@ -79,4 +83,5 @@ class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
       )
     )
   }
+
 }

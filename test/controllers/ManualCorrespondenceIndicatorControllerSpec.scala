@@ -37,4 +37,5 @@ class ManualCorrespondenceIndicatorControllerSpec extends SpecBase {
       application.stop()
     }
   }
+
 }

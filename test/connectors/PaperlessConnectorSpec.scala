@@ -32,14 +32,18 @@ import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
 sealed trait ExpectedResults {
   val expectedValidPreference: Option[Boolean] = Some(true)
 }
 
-class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHelper with GuiceOneAppPerSuite
-  with ScalaFutures with IntegrationPatience
-  with ExpectedResults {
+class PaperlessConnectorSpec
+    extends SpecBase
+    with MockitoSugar
+    with WireMockHelper
+    with GuiceOneAppPerSuite
+    with ScalaFutures
+    with IntegrationPatience
+    with ExpectedResults {
 
   override implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -54,7 +58,7 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
 
   val someReturnUrl = "/go/somewhere"
 
-  def stubForPaperlessStatus(response: ResponseDefinitionBuilder): StubMapping = {
+  def stubForPaperlessStatus(response: ResponseDefinitionBuilder): StubMapping =
     server.stubFor(
       get(urlPathMatching(s"/paperless/status"))
         .withQueryParam("returnUrl", matching(".*"))
@@ -63,59 +67,60 @@ class PaperlessConnectorSpec extends SpecBase with MockitoSugar with WireMockHel
           response
         )
     )
-  }
 
   "getPaperlessPreference" must {
 
     "handle http 200 as a paperless customer" in {
       stubForPaperlessStatus(response = aResponse().withStatus(OK).withBody(paperlessCustomer.toString))
 
-      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
-        res =>
-          res.isRight mustBe true
-          res.toOption.get.isPaperlessCustomer mustBe true
+      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) { res =>
+        res.isRight mustBe true
+        res.toOption.get.isPaperlessCustomer mustBe true
       }
     }
 
     "handle http 200 as a paper/post customer" in {
       stubForPaperlessStatus(response = aResponse().withStatus(OK).withBody(paperCustomer.toString))
 
-      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
-        res =>
-          res.isRight mustBe true
-          res.toOption.get.isPaperlessCustomer mustBe false
+      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) { res =>
+        res.isRight mustBe true
+        res.toOption.get.isPaperlessCustomer mustBe false
       }
     }
 
     "handle http 200 with invalid JSON" in {
       stubForPaperlessStatus(response = aResponse().withStatus(OK).withBody("""{"field":"not expected"}"""))
 
-      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
-        res =>
-          res.isLeft mustBe true
-          res.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")) must include("returned invalid json")
+      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) { res =>
+        res.isLeft mustBe true
+        res.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")) must include(
+          "returned invalid json"
+        )
       }
     }
 
     "handle http 400 correctly" in {
       stubForPaperlessStatus(response = aResponse().withStatus(BAD_REQUEST))
 
-      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
-        response =>
-          response.isLeft mustBe true
-          response.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")) must include("returned 400")
+      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) { response =>
+        response.isLeft mustBe true
+        response.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")) must include(
+          "returned 400"
+        )
       }
     }
 
     "handle http 500 correctly" in {
       stubForPaperlessStatus(response = aResponse().withStatus(INTERNAL_SERVER_ERROR))
 
-      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) {
-        response =>
-          response.isLeft mustBe true
-          response.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")) must include("returned 500")
+      whenReady(paperlessPreferenceConnector.getPaperlessStatus(someReturnUrl)) { response =>
+        response.isLeft mustBe true
+        response.swap.getOrElse(throw new NoSuchElementException("Either.left.get on Right")) must include(
+          "returned 500"
+        )
       }
     }
 
   }
+
 }

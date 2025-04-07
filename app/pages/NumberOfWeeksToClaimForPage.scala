@@ -32,8 +32,8 @@ case object NumberOfWeeksToClaimForPage extends QuestionPage[ListMap[TaxYearSele
     override def reads(json: JsValue): JsResult[ListMap[TaxYearSelection, Int]] =
       json
         .validate[List[(Int, Int)]]
-        .map(_.flatMap {
-          case (intYear, amount) => TaxYearSelection.optTaxYearSelection(TaxYear(intYear)).map(yearSelection => (yearSelection, amount))
+        .map(_.flatMap { case (intYear, amount) =>
+          TaxYearSelection.optTaxYearSelection(TaxYear(intYear)).map(yearSelection => (yearSelection, amount))
         })
         .map(list => ListMap(list: _*))
 
@@ -42,4 +42,5 @@ case object NumberOfWeeksToClaimForPage extends QuestionPage[ListMap[TaxYearSele
         answerMap.toList
       )
   }
+
 }

@@ -38,20 +38,23 @@ import scala.concurrent.Future
 class IndexControllerSpec extends SpecBase with BeforeAndAfter {
 
   val testOtherExpensesAmount = 123
-  val testJobExpensesAmount = 321
-  val testYear2020 = 2020
-  val testYear2021 = 2021
-  val testYear2022 = 2022
-  val testYear2023 = 2023
-  val testYear2024 = 2024
+  val testJobExpensesAmount   = 321
+  val testYear2020            = 2020
+  val testYear2021            = 2021
+  val testYear2022            = 2022
+  val testYear2023            = 2023
+  val testYear2024            = 2024
 
-  val mockIABDService: IABDService = mock[IABDService]
-  val mockNavigator: Navigator = mock[Navigator]
+  val mockIABDService: IABDService       = mock[IABDService]
+  val mockNavigator: Navigator           = mock[Navigator]
   val mockSessionService: SessionService = mock[SessionService]
-  val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
+  val mockAppConfig: FrontendAppConfig   = mock[FrontendAppConfig]
 
   implicit val defaultOptionalDataRequest: OptionalDataRequest[AnyContent] = OptionalDataRequest(
-    FakeRequest("GET", "?eligibilityCheckerSessionId=qqq"), "XXX", None, "XX"
+    FakeRequest("GET", "?eligibilityCheckerSessionId=qqq"),
+    "XXX",
+    None,
+    "XX"
   )
 
   before {
@@ -60,7 +63,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
 
   "onPageLoad" must {
     val otherExpenses = Seq(IABDExpense(testOtherExpensesAmount))
-    val jobExpenses = Seq(IABDExpense(testJobExpensesAmount))
+    val jobExpenses   = Seq(IABDExpense(testJobExpensesAmount))
 
     "redirect to the TaxYearSelection page for a GET" when {
       "not claimed expenses for any years" in {
@@ -107,7 +110,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
           Expenses(testYear2023, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
           Expenses(testYear2022, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
           Expenses(testYear2021, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
-          Expenses(testYear2020, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true),
+          Expenses(testYear2020, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)
         )
 
         when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))
@@ -120,7 +123,9 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
         val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
         val result = route(application, request).value
-        redirectLocation(result).get.contains("digital-forms/form/tax-relief-for-expenses-of-employment/draft/guide") mustBe true
+        redirectLocation(result).get.contains(
+          "digital-forms/form/tax-relief-for-expenses-of-employment/draft/guide"
+        ) mustBe true
 
         application.stop()
       }
@@ -134,7 +139,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
         .build()
 
       val request = FakeRequest(GET, routes.IndexController.start.url)
-      val result = route(application, request).value
+      val result  = route(application, request).value
 
       status(result) mustEqual SEE_OTHER
       redirectLocation(result).value mustEqual routes.IndexController.onPageLoad(true).url
@@ -147,7 +152,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
         .build()
 
       val request = FakeRequest(GET, routes.IndexController.start.url)
-      val result = route(application, request).value
+      val result  = route(application, request).value
 
       status(result) mustEqual SEE_OTHER
       redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url
@@ -155,4 +160,5 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
       application.stop()
     }
   }
+
 }

@@ -30,10 +30,10 @@ sealed trait TaxYearSelection {
   def toTaxYear: TaxYear
 
   def formattedTaxYearArgs(implicit messages: Messages): Seq[String] = {
-    val taxYear = toTaxYear
-    val formatter = DateTimeFormatter.ofPattern("d MMMM yyyy", messages.lang.toLocale)
+    val taxYear       = toTaxYear
+    val formatter     = DateTimeFormatter.ofPattern("d MMMM yyyy", messages.lang.toLocale)
     val start: String = taxYear.starts.format(formatter)
-    val end: String = taxYear.finishes.format(formatter)
+    val end: String   = taxYear.finishes.format(formatter)
 
     Seq(start, end)
   }
@@ -42,21 +42,27 @@ sealed trait TaxYearSelection {
 }
 
 object TaxYearSelection {
+
   case object NextYear extends TaxYearSelection {
     def toTaxYear: TaxYear = TaxYear.current.forwards(1)
   }
+
   case object CurrentYear extends TaxYearSelection {
     def toTaxYear: TaxYear = TaxYear.current
   }
+
   case object CurrentYearMinus1 extends TaxYearSelection {
     def toTaxYear: TaxYear = TaxYear.current.back(1)
   }
+
   case object CurrentYearMinus2 extends TaxYearSelection {
     def toTaxYear: TaxYear = TaxYear.current.back(2)
   }
+
   case object CurrentYearMinus3 extends TaxYearSelection {
     def toTaxYear: TaxYear = TaxYear.current.back(3)
   }
+
   case object CurrentYearMinus4 extends TaxYearSelection {
     def toTaxYear: TaxYear = TaxYear.current.back(4)
   }
@@ -70,14 +76,14 @@ object TaxYearSelection {
   )
 
   def mapping: TaxYear => TaxYearSelection = {
-    val currentYear = TaxYear.current
+    val currentYear       = TaxYear.current
     val currentYearMinus1 = TaxYear.current.back(1)
     val currentYearMinus2 = TaxYear.current.back(2)
     val currentYearMinus3 = TaxYear.current.back(3)
     val currentYearMinus4 = TaxYear.current.back(4)
 
     {
-      case `currentYear` => CurrentYear
+      case `currentYear`       => CurrentYear
       case `currentYearMinus1` => CurrentYearMinus1
       case `currentYearMinus2` => CurrentYearMinus2
       case `currentYearMinus3` => CurrentYearMinus3
@@ -93,29 +99,34 @@ object TaxYearSelection {
       .validate[Int]
       .map(intYear => mapping(TaxYear(intYear)))
   }
-  implicit val writes: Writes[TaxYearSelection] = Writes { taxYearSelection =>
-    Json.toJson(taxYearSelection.toTaxYear.startYear)
-  }
+
+  implicit val writes: Writes[TaxYearSelection] =
+    Writes(taxYearSelection => Json.toJson(taxYearSelection.toTaxYear.startYear))
+
   implicit val seqReads: Reads[Seq[TaxYearSelection]] = Reads { json =>
     json
       .validate[Seq[Int]]
       .map(_.flatMap(intYear => optTaxYearSelection(TaxYear(intYear))))
   }
 
-  def options(form: Form[_], values: Seq[TaxYearSelection])(implicit messages: Messages): Seq[CheckboxItem] = values.map {
-    value =>
+  def options(form: Form[_], values: Seq[TaxYearSelection])(implicit messages: Messages): Seq[CheckboxItem] =
+    values.map { value =>
       CheckboxItem(
         name = Some("value[]"),
         id = Some(value.toString),
         value = value.toString,
-        content = Text(messages(s"selectTaxYearsToClaimFor.${if (value == CurrentYear) "current" else "previous"}", value.formattedTaxYearArgs: _*)),
+        content = Text(
+          messages(
+            s"selectTaxYearsToClaimFor.${if (value == CurrentYear) "current" else "previous"}",
+            value.formattedTaxYearArgs: _*
+          )
+        ),
         checked = form.data.exists(_._2 == value.toString)
       )
-  }
+    }
 
-  def getClaimableTaxYears(claimedYears: Seq[Int]): Seq[TaxYearSelection] = {
+  def getClaimableTaxYears(claimedYears: Seq[Int]): Seq[TaxYearSelection] =
     valuesAll.diff(claimedYears.flatMap(year => optTaxYearSelection(TaxYear(year))))
-  }
 
   def containsCurrent(selectedTaxYears: Seq[TaxYearSelection]): Boolean =
     selectedTaxYears.contains(CurrentYear)
@@ -126,7 +137,7 @@ object TaxYearSelection {
       selectedTaxYears.contains(CurrentYearMinus3) ||
       selectedTaxYears.contains(CurrentYearMinus4)
 
-  //TODO : Remove logic for whole year tax claim after 6th April 2027
+  // TODO : Remove logic for whole year tax claim after 6th April 2027
   def wholeYearClaims: Seq[TaxYearSelection] = Seq(
     optTaxYearSelection(TaxYear(2020)),
     optTaxYearSelection(TaxYear(2021)),

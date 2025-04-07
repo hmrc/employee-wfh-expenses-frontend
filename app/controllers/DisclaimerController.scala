@@ -28,28 +28,30 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.DisclaimerView
 
-class DisclaimerController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         identify: IdentifierAction,
-                                         citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         navigator: Navigator,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         disclaimerView: DisclaimerView
-                                       ) extends FrontendBaseController with I18nSupport with Logging {
+class DisclaimerController @Inject() (
+    override val messagesApi: MessagesApi,
+    identify: IdentifierAction,
+    citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    navigator: Navigator,
+    val controllerComponents: MessagesControllerComponents,
+    disclaimerView: DisclaimerView
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
-    implicit request =>
+  def onPageLoad: Action[AnyContent] =
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { implicit request =>
       request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
         case Some(selectedTaxYears) =>
           Ok(disclaimerView(contains2022orAfter(selectedTaxYears), contains2020or2021(selectedTaxYears)))
         case None => Redirect(routes.IndexController.start)
       }
+    }
+
+  def onSubmit(): Action[AnyContent] = identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) {
+    implicit request => Redirect(navigator.nextPage(DisclaimerPage, request.userAnswers))
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
-      implicit request =>
-        Redirect(navigator.nextPage(DisclaimerPage, request.userAnswers))
-  }
 }

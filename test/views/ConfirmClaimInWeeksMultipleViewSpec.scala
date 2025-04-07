@@ -30,26 +30,35 @@ class ConfirmClaimInWeeksMultipleViewSpec extends ViewBehaviours {
 
   val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
 
-  val weeksCurrent = 1
+  val weeksCurrent  = 1
   val weeksPrevious = 43
+
   val weeksForTaxYears: ListMap[TaxYearSelection, Int] = ListMap[TaxYearSelection, Int](
-    CurrentYear -> weeksCurrent,
+    CurrentYear       -> weeksCurrent,
     CurrentYearMinus1 -> weeksPrevious
   )
 
   object ExpectedContent {
-    val title = "Check the number of weeks in your claim for these tax years"
+    val title   = "Check the number of weeks in your claim for these tax years"
     val heading = "Check the number of weeks in your claim for these tax years"
+
     val date1: String = s"${CurrentYear.toTaxYear.starts.format(formatter)}" +
       s" to ${CurrentYear.toTaxYear.finishes.format(formatter)}"
+
     val date2: String = s"${CurrentYearMinus1.toTaxYear.starts.format(formatter)}" +
       s" to ${CurrentYearMinus1.toTaxYear.finishes.format(formatter)}"
+
     val claim1 = s"$weeksCurrent week"
     val claim2 = s"$weeksPrevious weeks"
-    val change1: String = s"the number of weeks for the current tax year ${CurrentYear.toTaxYear.starts.format(formatter)}" +
-      s" to ${CurrentYear.toTaxYear.finishes.format(formatter)}"
-    val change2: String = s"the number of weeks for the previous tax year ${CurrentYearMinus1.toTaxYear.starts.format(formatter)}" +
-      s" to ${CurrentYearMinus1.toTaxYear.finishes.format(formatter)}"
+
+    val change1: String =
+      s"the number of weeks for the current tax year ${CurrentYear.toTaxYear.starts.format(formatter)}" +
+        s" to ${CurrentYear.toTaxYear.finishes.format(formatter)}"
+
+    val change2: String =
+      s"the number of weeks for the previous tax year ${CurrentYearMinus1.toTaxYear.starts.format(formatter)}" +
+        s" to ${CurrentYearMinus1.toTaxYear.finishes.format(formatter)}"
+
   }
 
   "Check your claim page" must {
@@ -57,14 +66,16 @@ class ConfirmClaimInWeeksMultipleViewSpec extends ViewBehaviours {
 
     val request = FakeRequest()
 
-    val view = viewFor[ConfirmClaimInWeeksMultipleView](Some(emptyUserAnswers))
+    val view         = viewFor[ConfirmClaimInWeeksMultipleView](Some(emptyUserAnswers))
     val renderedView = view(weeksForTaxYears)(request, messages)
-    val doc = asDocument(renderedView)
+    val doc          = asDocument(renderedView)
 
-    behave like normalPage(
-      renderedView,
-      "confirmClaimInWeeks.multiple",
-      args = Nil
+    behave.like(
+      normalPage(
+        renderedView,
+        "confirmClaimInWeeks.multiple",
+        args = Nil
+      )
     )
 
     "have the correct title and heading" in {
@@ -80,4 +91,5 @@ class ConfirmClaimInWeeksMultipleViewSpec extends ViewBehaviours {
       assertContainsText(doc, change2)
     }
   }
+
 }

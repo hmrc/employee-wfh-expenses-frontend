@@ -24,12 +24,15 @@ import views.templates.{LayoutProvider, NewLayoutProvider, OldLayoutProvider}
 
 class Module(environment: Environment, config: Configuration) extends AbstractModule {
 
-  val scaWrapperEnabled: Boolean = config.getOptional[Boolean]("microservice.services.features.sca-wrapper").getOrElse(false)
+  val scaWrapperEnabled: Boolean =
+    config.getOptional[Boolean]("microservice.services.features.sca-wrapper").getOrElse(false)
 
   override def configure(): Unit = {
     bind(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).asEagerSingleton()
     bind(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).asEagerSingleton()
-    bind(classOf[ManualCorrespondenceIndicatorAction]).to(classOf[ManualCorrespondenceIndicatorActionImpl]).asEagerSingleton()
+    bind(classOf[ManualCorrespondenceIndicatorAction])
+      .to(classOf[ManualCorrespondenceIndicatorActionImpl])
+      .asEagerSingleton()
 
     // For session based storage instead of cred based, change to SessionIdentifierAction
     bind(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).asEagerSingleton()
@@ -41,4 +44,5 @@ class Module(environment: Environment, config: Configuration) extends AbstractMo
       bind(classOf[LayoutProvider]).to(classOf[OldLayoutProvider]).asEagerSingleton()
     }
   }
+
 }

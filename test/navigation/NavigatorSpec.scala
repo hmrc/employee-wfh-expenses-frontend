@@ -37,4 +37,5 @@ class NavigatorSpec extends SpecBase {
     }
 
   }
+
 }

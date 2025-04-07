@@ -17,8 +17,8 @@
 package models
 
 case class Expenses(
-                   year: Int,
-                   otherExpenses: Seq[IABDExpense],
-                   jobExpenses: Seq[IABDExpense],
-                   wasJobRateExpensesChecked: Boolean
-                   )
+    year: Int,
+    otherExpenses: Seq[IABDExpense],
+    jobExpenses: Seq[IABDExpense],
+    wasJobRateExpensesChecked: Boolean
+)

@@ -30,9 +30,13 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import utils.WireMockHelper
 
-
-class EmployeeExpensesConnectorSpec extends SpecBase with MockitoSugar with WireMockHelper with GuiceOneAppPerSuite
-  with ScalaFutures with IntegrationPatience {
+class EmployeeExpensesConnectorSpec
+    extends SpecBase
+    with MockitoSugar
+    with WireMockHelper
+    with GuiceOneAppPerSuite
+    with ScalaFutures
+    with IntegrationPatience {
 
   override implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
@@ -45,37 +49,30 @@ class EmployeeExpensesConnectorSpec extends SpecBase with MockitoSugar with Wire
 
   private lazy val employeeExpensesConnector = app.injector.instanceOf[EmployeeExpensesConnector]
 
-  def stubForSessionRefresh(response: ResponseDefinitionBuilder): StubMapping = {
+  def stubForSessionRefresh(response: ResponseDefinitionBuilder): StubMapping =
     server.stubFor(
       get(urlPathMatching(s"/employee-expenses/merged-journey-refresh-session"))
         .willReturn(
           response
         )
     )
-  }
 
   "updateMergedJourneySession" must {
 
     "handle http 200 response as success" in {
       stubForSessionRefresh(response = aResponse().withStatus(OK))
 
-      whenReady(employeeExpensesConnector.updateMergedJourneySession(hc)) { result =>
-        result mustBe true
-      }
+      whenReady(employeeExpensesConnector.updateMergedJourneySession(hc))(result => result mustBe true)
     }
 
     "handle http 303 as a fail" in {
       stubForSessionRefresh(response = aResponse().withStatus(SEE_OTHER))
 
-      whenReady(employeeExpensesConnector.updateMergedJourneySession(hc)) { result =>
-        result mustBe false
-      }
+      whenReady(employeeExpensesConnector.updateMergedJourneySession(hc))(result => result mustBe false)
     }
 
-    "handle exception as a fail" in {
-      whenReady(employeeExpensesConnector.updateMergedJourneySession(hc)) { result =>
-        result mustBe false
-      }
-    }
+    "handle exception as a fail" in
+      whenReady(employeeExpensesConnector.updateMergedJourneySession(hc))(result => result mustBe false)
   }
+
 }

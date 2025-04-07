@@ -30,15 +30,20 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ErrorHandler @Inject()(
-                              val messagesApi: MessagesApi,
-                              view: ErrorTemplate
-                            )(implicit val ec: ExecutionContext) extends FrontendErrorHandler with I18nSupport with Logging {
+class ErrorHandler @Inject() (
+    val messagesApi: MessagesApi,
+    view: ErrorTemplate
+)(implicit val ec: ExecutionContext)
+    extends FrontendErrorHandler
+    with I18nSupport
+    with Logging {
 
-  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(implicit rh: RequestHeader): Future[Html] =
+  override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(
+      implicit rh: RequestHeader
+  ): Future[Html] =
     Future.successful(view(pageTitle, heading, message))
 
-  override def resolveError(rh: RequestHeader, ex: Throwable): Future[Result] = {
+  override def resolveError(rh: RequestHeader, ex: Throwable): Future[Result] =
     ex match {
       case e: Exception =>
         logger.warn(s"[ErrorHandler][resolveError] failed with: $e")
@@ -47,15 +52,15 @@ class ErrorHandler @Inject()(
         logger.error(s"[ErrorHandler][resolveError] Internal Server Error, (${rh.method})(${rh.uri})", ex)
         super.resolveError(rh, ex)
     }
-  }
 
   class Status(status: Int) extends Result(header = ResponseHeader(status), body = HttpEntity.NoEntity) {
 
-    def apply[C](content: C)(implicit writeable: Writeable[C]): Result = {
+    def apply[C](content: C)(implicit writeable: Writeable[C]): Result =
       Result(
         header,
         writeable.toEntity(content)
       )
-    }
+
   }
+
 }

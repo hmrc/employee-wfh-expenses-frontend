@@ -33,13 +33,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SessionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter {
 
-  val mockSessionRepository: SessionRepository = mock[SessionRepository]
+  val mockSessionRepository: SessionRepository                 = mock[SessionRepository]
   val mockEmployeeExpensesConnector: EmployeeExpensesConnector = mock[EmployeeExpensesConnector]
 
-  object TestService extends SessionService(
-    mockSessionRepository,
-    mockEmployeeExpensesConnector
-  )(app.injector.instanceOf[ExecutionContext])
+  object TestService
+      extends SessionService(
+        mockSessionRepository,
+        mockEmployeeExpensesConnector
+      )(app.injector.instanceOf[ExecutionContext])
 
   val testId = "testId"
 
@@ -100,4 +101,5 @@ class SessionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter 
       await(TestService.updateTimeToLive(testId)) mustBe true
     }
   }
+
 }

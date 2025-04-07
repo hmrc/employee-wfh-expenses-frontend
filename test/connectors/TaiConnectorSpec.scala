@@ -30,28 +30,35 @@ import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
+class TaiConnectorSpec
+    extends SpecBase
+    with WireMockHelper
+    with GuiceOneAppPerSuite
+    with ScalaFutures
+    with IntegrationPatience {
 
-class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerSuite with ScalaFutures with IntegrationPatience {
   override implicit lazy val app: Application =
     new GuiceApplicationBuilder()
       .configure(
         conf = "microservice.services.tai.port" -> server.port,
         "otherExpensesId" -> 59,
-        "jobExpenseId" -> 55
+        "jobExpenseId"    -> 55
       )
       .build()
 
-  private lazy val taiConnector: TaiConnector = app.injector.instanceOf[TaiConnector]
+  private lazy val taiConnector: TaiConnector   = app.injector.instanceOf[TaiConnector]
   private lazy val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
-  private val testTaxYear = 2019
-  private val testGrossAmount = 120
-  private val testETag = ETag(version = etag)
+  private val testTaxYear                       = 2019
+  private val testGrossAmount                   = 120
+  private val testETag                          = ETag(version = etag)
 
   "getOtherExpensesData [IABD 59]" must {
     "return valid data for a 200 response with a valid response body" in {
 
       server.stubFor(
-        get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+        get(
+          urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}")
+        )
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -61,16 +68,17 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.getOtherExpensesData(fakeNino, testTaxYear)
 
-      whenReady(result) {
-        res =>
-          res mustBe a[Seq[_]]
-          res.headOption mustBe Some(IABDExpense(testGrossAmount))
+      whenReady(result) { res =>
+        res mustBe a[Seq[_]]
+        res.headOption mustBe Some(IABDExpense(testGrossAmount))
       }
     }
 
     "return a JsValidationException for a 200 response with an unexpected response body" in {
       server.stubFor(
-        get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+        get(
+          urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}")
+        )
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -80,14 +88,14 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.getOtherExpensesData(fakeNino, testTaxYear)
 
-      whenReady(result.failed) {ex =>
-        ex mustBe an[JsValidationException]
-      }
+      whenReady(result.failed)(ex => ex mustBe an[JsValidationException])
     }
 
     "return an UpstreamErrorResponse for a 5xx response" in {
       server.stubFor(
-        get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+        get(
+          urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}")
+        )
           .willReturn(
             aResponse()
               .withStatus(SERVICE_UNAVAILABLE)
@@ -97,7 +105,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.getOtherExpensesData(fakeNino, testTaxYear)
 
-      whenReady(result.failed) {ex =>
+      whenReady(result.failed) { ex =>
         ex mustBe an[UpstreamErrorResponse]
         ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe SERVICE_UNAVAILABLE
       }
@@ -105,7 +113,9 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
     "return an NotFoundException for a 404 response" in {
       server.stubFor(
-        get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}"))
+        get(
+          urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}")
+        )
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
@@ -115,7 +125,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.getOtherExpensesData(fakeNino, testTaxYear)
 
-      whenReady(result.failed) {ex =>
+      whenReady(result.failed) { ex =>
         ex mustBe an[UpstreamErrorResponse]
         ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe NOT_FOUND
       }
@@ -136,10 +146,9 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.getJobExpensesData(fakeNino, testTaxYear)
 
-      whenReady(result) {
-        res =>
-          res mustBe a[Seq[_]]
-          res.headOption mustBe Some(IABDExpense(testGrossAmount))
+      whenReady(result) { res =>
+        res mustBe a[Seq[_]]
+        res.headOption mustBe Some(IABDExpense(testGrossAmount))
       }
     }
 
@@ -155,9 +164,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.getJobExpensesData(fakeNino, testTaxYear)
 
-      whenReady(result.failed) {ex =>
-        ex mustBe an[JsValidationException]
-      }
+      whenReady(result.failed)(ex => ex mustBe an[JsValidationException])
     }
 
     "return an UpstreamErrorResponse for a 5xx response" in {
@@ -172,7 +179,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.getJobExpensesData(fakeNino, testTaxYear)
 
-      whenReady(result.failed) {ex =>
+      whenReady(result.failed) { ex =>
         ex mustBe an[UpstreamErrorResponse]
         ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe SERVICE_UNAVAILABLE
       }
@@ -190,7 +197,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.getJobExpensesData(fakeNino, testTaxYear)
 
-      whenReady(result.failed) {ex =>
+      whenReady(result.failed) { ex =>
         ex mustBe an[UpstreamErrorResponse]
         ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe NOT_FOUND
       }
@@ -200,7 +207,11 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
   "postIabdData" must {
     "return a 200 response" in {
       server.stubFor(
-        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"))
+        post(
+          urlEqualTo(
+            s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"
+          )
+        )
           .willReturn(
             aResponse()
               .withStatus(OK)
@@ -210,15 +221,16 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.postIabdData(fakeNino, testTaxYear, testGrossAmount, testETag)
 
-      whenReady(result) {
-        res =>
-          whenReady(result) {_ => succeed}
-      }
+      whenReady(result)(res => whenReady(result)(_ => succeed))
     }
 
     "return a 401 response" in {
       server.stubFor(
-        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"))
+        post(
+          urlEqualTo(
+            s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"
+          )
+        )
           .willReturn(
             aResponse()
               .withStatus(UNAUTHORIZED)
@@ -227,7 +239,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.postIabdData(fakeNino, testTaxYear, testGrossAmount, testETag)
 
-      whenReady(result.failed) {ex =>
+      whenReady(result.failed) { ex =>
         ex mustBe an[UpstreamErrorResponse]
         ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe UNAUTHORIZED
       }
@@ -235,7 +247,11 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
     "return a 404 response" in {
       server.stubFor(
-        post(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"))
+        post(
+          urlEqualTo(
+            s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"
+          )
+        )
           .willReturn(
             aResponse()
               .withStatus(NOT_FOUND)
@@ -244,7 +260,7 @@ class TaiConnectorSpec extends SpecBase with WireMockHelper with GuiceOneAppPerS
 
       val result = taiConnector.postIabdData(fakeNino, testTaxYear, testGrossAmount, testETag)
 
-      whenReady(result.failed) {ex =>
+      whenReady(result.failed) { ex =>
         ex mustBe an[UpstreamErrorResponse]
         ex.asInstanceOf[UpstreamErrorResponse].statusCode mustBe NOT_FOUND
       }

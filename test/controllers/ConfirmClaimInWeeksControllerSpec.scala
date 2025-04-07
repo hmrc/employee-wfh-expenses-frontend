@@ -35,18 +35,21 @@ import scala.concurrent.Future
 class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
 
   lazy val confirmClaimInWeeksRoute: String = routes.ConfirmClaimInWeeksController.onPageLoad().url
-  val numberOfWeeks = 2
+  val numberOfWeeks                         = 2
 
   val form = new ConfirmClaimInWeeksFormProvider()(numberOfWeeks)
 
   "ConfirmClaimInWeeksController GET" must {
     "return OK when user has multiple week claims" in {
-      val userAnswers = UserAnswers(userAnswersId, Json.obj(
-        NumberOfWeeksToClaimForPage.toString -> Json.arr(
-          Json.arr(CurrentYear.toTaxYear.startYear, numberOfWeeks),
-          Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks)
+      val userAnswers = UserAnswers(
+        userAnswersId,
+        Json.obj(
+          NumberOfWeeksToClaimForPage.toString -> Json.arr(
+            Json.arr(CurrentYear.toTaxYear.startYear, numberOfWeeks),
+            Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks)
+          )
         )
-      ))
+      )
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       val request = FakeRequest(GET, confirmClaimInWeeksRoute)
@@ -59,9 +62,14 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "return OK when user has only one week claim" in {
-      val userAnswers = UserAnswers(userAnswersId, Json.obj(
-        NumberOfWeeksToClaimForPage.toString -> Json.arr(Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks))
-      ))
+      val userAnswers = UserAnswers(
+        userAnswersId,
+        Json.obj(
+          NumberOfWeeksToClaimForPage.toString -> Json.arr(
+            Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks)
+          )
+        )
+      )
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
       val request = FakeRequest(GET, confirmClaimInWeeksRoute)
@@ -74,9 +82,12 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "redirect to Session Expired if number of weeks is missing" in {
-      val userAnswersMissingClaimWeeks = UserAnswers(userAnswersId, Json.obj(
-        "some-key" -> "some-value"
-      ))
+      val userAnswersMissingClaimWeeks = UserAnswers(
+        userAnswersId,
+        Json.obj(
+          "some-key" -> "some-value"
+        )
+      )
       val application = applicationBuilder(userAnswers = Some(userAnswersMissingClaimWeeks)).build()
 
       val request = FakeRequest(GET, confirmClaimInWeeksRoute)
@@ -93,20 +104,23 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
   "ConfirmClaimInWeeksController POST" must {
     "redirect to the Check Your Claim page when valid data is submitted for multiple week claims" in {
       val mockSessionService: SessionService = mock[SessionService]
-      when(mockSessionService.set(any())(any())) thenReturn Future.successful(true)
+      when(mockSessionService.set(any())(any())).thenReturn(Future.successful(true))
 
-      val userAnswers = UserAnswers(userAnswersId, Json.obj(
-        NumberOfWeeksToClaimForPage.toString -> Json.arr(
-          Json.arr(CurrentYear.toTaxYear.startYear, numberOfWeeks),
-          Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks)
+      val userAnswers = UserAnswers(
+        userAnswersId,
+        Json.obj(
+          NumberOfWeeksToClaimForPage.toString -> Json.arr(
+            Json.arr(CurrentYear.toTaxYear.startYear, numberOfWeeks),
+            Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks)
+          )
         )
-      ))
+      )
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[SessionService].toInstance(mockSessionService))
         .build()
       val request = FakeRequest(POST, confirmClaimInWeeksRoute)
-      val result = route(application, request).value
+      val result  = route(application, request).value
 
       status(result) mustEqual SEE_OTHER
       redirectLocation(result).value mustEqual routes.CheckYourClaimController.onPageLoad().url
@@ -115,11 +129,16 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
     }
     "redirect to the Check Your Claim page when valid data is submitted for one week claim" in {
       val mockSessionService: SessionService = mock[SessionService]
-      when(mockSessionService.set(any())(any())) thenReturn Future.successful(true)
+      when(mockSessionService.set(any())(any())).thenReturn(Future.successful(true))
 
-      val userAnswers = UserAnswers(userAnswersId, Json.obj(
-        NumberOfWeeksToClaimForPage.toString -> Json.arr(Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks))
-      ))
+      val userAnswers = UserAnswers(
+        userAnswersId,
+        Json.obj(
+          NumberOfWeeksToClaimForPage.toString -> Json.arr(
+            Json.arr(CurrentYearMinus1.toTaxYear.startYear, numberOfWeeks)
+          )
+        )
+      )
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[SessionService].toInstance(mockSessionService))
@@ -142,7 +161,7 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
         .overrides(bind[SessionService].toInstance(mockSessionService))
         .build()
       val request = FakeRequest(POST, confirmClaimInWeeksRoute)
-      val result = route(application, request).value
+      val result  = route(application, request).value
 
       status(result) mustEqual SEE_OTHER
       redirectLocation(result).value mustEqual routes.SessionExpiredController.onPageLoad.url
@@ -150,4 +169,5 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
       application.stop()
     }
   }
+
 }

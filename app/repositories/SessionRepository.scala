@@ -31,28 +31,33 @@ import scala.concurrent.duration.SECONDS
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SessionRepository @Inject()(config: FrontendAppConfig, mongoComponent: MongoComponent)(implicit ec: ExecutionContext)
-  extends PlayMongoRepository[UserAnswers](
-    collectionName = config.collectionName,
-    mongoComponent = mongoComponent,
-    domainFormat = UserAnswers.formats,
-    indexes = Seq(
-      IndexModel(
-        ascending("lastUpdated"),
-        IndexOptions()
-          .name("user-answers-last-updated-index")
-          .expireAfter(config.cacheTtl.toLong, SECONDS)
+class SessionRepository @Inject() (config: FrontendAppConfig, mongoComponent: MongoComponent)(
+    implicit ec: ExecutionContext
+) extends PlayMongoRepository[UserAnswers](
+      collectionName = config.collectionName,
+      mongoComponent = mongoComponent,
+      domainFormat = UserAnswers.formats,
+      indexes = Seq(
+        IndexModel(
+          ascending("lastUpdated"),
+          IndexOptions()
+            .name("user-answers-last-updated-index")
+            .expireAfter(config.cacheTtl.toLong, SECONDS)
+        )
       )
-    )
-  ) {
+    ) {
 
   def get(id: String): Future[Option[UserAnswers]] =
     collection.find[UserAnswers](and(equal("_id", id))).headOption()
 
   def set(userAnswers: UserAnswers): Future[Boolean] =
-    collection.replaceOne(
-      filter = equal("_id", userAnswers.id),
-      replacement = userAnswers.copy(lastUpdated = Instant.now()),
-      options = ReplaceOptions().upsert(true)
-    ).toFuture().map(_.wasAcknowledged())
+    collection
+      .replaceOne(
+        filter = equal("_id", userAnswers.id),
+        replacement = userAnswers.copy(lastUpdated = Instant.now()),
+        options = ReplaceOptions().upsert(true)
+      )
+      .toFuture()
+      .map(_.wasAcknowledged())
+
 }

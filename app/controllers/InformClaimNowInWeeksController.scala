@@ -16,7 +16,12 @@
 
 package controllers
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
+import controllers.actions.{
+  DataRequiredAction,
+  DataRetrievalAction,
+  IdentifierAction,
+  ManualCorrespondenceIndicatorAction
+}
 import javax.inject.Inject
 import navigation.Navigator
 import pages.InformClaimNowInWeeksPage
@@ -26,24 +31,25 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.InformClaimNowInWeeksView
 
-class InformClaimNowInWeeksController @Inject()(
-                                                 override val messagesApi: MessagesApi,
-                                                 identify: IdentifierAction,
-                                                 citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
-                                                 getData: DataRetrievalAction,
-                                                 requireData: DataRequiredAction,
-                                                 navigator: Navigator,
-                                                 informClaimNowInWeeksView: InformClaimNowInWeeksView,
-                                                 val controllerComponents: MessagesControllerComponents
-                                               ) extends FrontendBaseController with I18nSupport with Logging {
+class InformClaimNowInWeeksController @Inject() (
+    override val messagesApi: MessagesApi,
+    identify: IdentifierAction,
+    citizenDetailsCheck: ManualCorrespondenceIndicatorAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    navigator: Navigator,
+    informClaimNowInWeeksView: InformClaimNowInWeeksView,
+    val controllerComponents: MessagesControllerComponents
+) extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad: Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
-    implicit request =>
-      Ok(informClaimNowInWeeksView())
+  def onPageLoad: Action[AnyContent] = identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) {
+    implicit request => Ok(informClaimNowInWeeksView())
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData andThen requireData) {
-    implicit request =>
-      Redirect(navigator.nextPage(InformClaimNowInWeeksPage, request.userAnswers))
+  def onSubmit(): Action[AnyContent] = identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) {
+    implicit request => Redirect(navigator.nextPage(InformClaimNowInWeeksPage, request.userAnswers))
   }
+
 }

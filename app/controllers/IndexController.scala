@@ -30,27 +30,29 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IndexController @Inject()(val controllerComponents: MessagesControllerComponents,
-                                val sessionService: SessionService,
-                                val navigator: Navigator,
-                                val iabdService: IABDService,
-                                val appConfig: FrontendAppConfig,
-                                getData: DataRetrievalAction,
-                                identify: IdentifierAction,
-                                citizenDetailsCheck: ManualCorrespondenceIndicatorAction
-                               )(implicit executionContext: ExecutionContext)
-  extends FrontendBaseController with I18nSupport {
+class IndexController @Inject() (
+    val controllerComponents: MessagesControllerComponents,
+    val sessionService: SessionService,
+    val navigator: Navigator,
+    val iabdService: IABDService,
+    val appConfig: FrontendAppConfig,
+    getData: DataRetrievalAction,
+    identify: IdentifierAction,
+    citizenDetailsCheck: ManualCorrespondenceIndicatorAction
+)(implicit executionContext: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad(isMergedJourney: Boolean = false): Action[AnyContent] = (identify andThen citizenDetailsCheck andThen getData).async {
-    implicit request => {
+  def onPageLoad(isMergedJourney: Boolean = false): Action[AnyContent] =
+    identify.andThen(citizenDetailsCheck).andThen(getData).async { implicit request =>
       iabdService.getAlreadyClaimedStatusForAllYears(request.nino).map { claimedYears =>
-        if(iabdService.allYearsClaimed(request.nino, claimedYears)) {
+        if (iabdService.allYearsClaimed(request.nino, claimedYears)) {
           Redirect(appConfig.p87DigitalFormUrl)
         } else {
           val answers = UserAnswers(
             request.internalId,
             Json.obj(
-              MergedJourneyFlag.toString -> (isMergedJourney && appConfig.mergedJourneyEnabled),
+              MergedJourneyFlag.toString  -> (isMergedJourney && appConfig.mergedJourneyEnabled),
               ClaimedForTaxYears.toString -> claimedYears.map(_.year)
             )
           )
@@ -63,11 +65,10 @@ class IndexController @Inject()(val controllerComponents: MessagesControllerComp
         }
       }
     }
-  }
 
-  //This is a simple redirect that can be used when we want to send the user to the start
-  //without having to check if they're on a merged journey manually
-  def start: Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  // This is a simple redirect that can be used when we want to send the user to the start
+  // without having to check if they're on a merged journey manually
+  def start: Action[AnyContent] = identify.andThen(getData).async { implicit request =>
     request.userAnswers match {
       case Some(answers) if answers.isMergedJourney =>
         Future.successful(Redirect(routes.IndexController.onPageLoad(true)))
@@ -75,4 +76,5 @@ class IndexController @Inject()(val controllerComponents: MessagesControllerComp
         Future.successful(Redirect(routes.IndexController.onPageLoad()))
     }
   }
+
 }

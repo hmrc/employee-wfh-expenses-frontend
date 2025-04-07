@@ -33,55 +33,55 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SelectTaxYearsToClaimForController @Inject()(override val messagesApi: MessagesApi,
-                                                   sessionService: SessionService,
-                                                   navigator: Navigator,
-                                                   identify: IdentifierAction,
-                                                   getData: DataRetrievalAction,
-                                                   requireData: DataRequiredAction,
-                                                   formProvider: SelectTaxYearsToClaimForFormProvider,
-                                                   val controllerComponents: MessagesControllerComponents,
-                                                   view: SelectTaxYearsToClaimForView
-                                                  )(implicit ec: ExecutionContext)
-  extends FrontendBaseController with I18nSupport with Logging {
+class SelectTaxYearsToClaimForController @Inject() (
+    override val messagesApi: MessagesApi,
+    sessionService: SessionService,
+    navigator: Navigator,
+    identify: IdentifierAction,
+    getData: DataRetrievalAction,
+    requireData: DataRequiredAction,
+    formProvider: SelectTaxYearsToClaimForFormProvider,
+    val controllerComponents: MessagesControllerComponents,
+    view: SelectTaxYearsToClaimForView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
+    with I18nSupport
+    with Logging {
 
   val form: Form[Seq[TaxYearSelection]] = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      request.userAnswers.get(ClaimedForTaxYears) match {
-        case Some(years) =>
-          val availableYears = TaxYearSelection.getClaimableTaxYears(years)
+  def onPageLoad(): Action[AnyContent] = identify.andThen(getData).andThen(requireData).async { implicit request =>
+    request.userAnswers.get(ClaimedForTaxYears) match {
+      case Some(years) =>
+        val availableYears = TaxYearSelection.getClaimableTaxYears(years)
 
-          val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
-            case None => form
-            case Some(value) => form.fill(value)
-          }
+        val preparedForm = request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
 
-          Future.successful(Ok(view(preparedForm, availableYears)))
-        case _ =>
-          Future.successful(Redirect(routes.IndexController.start))
-      }
+        Future.successful(Ok(view(preparedForm, availableYears)))
+      case _ =>
+        Future.successful(Redirect(routes.IndexController.start))
+    }
   }
 
-  def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      val availableYearsUserCanClaim = TaxYearSelection.getClaimableTaxYears(
-        request.userAnswers.get(ClaimedForTaxYears).getOrElse(Nil)
-      )
+  def onSubmit(): Action[AnyContent] = identify.andThen(getData).andThen(requireData).async { implicit request =>
+    val availableYearsUserCanClaim = TaxYearSelection.getClaimableTaxYears(
+      request.userAnswers.get(ClaimedForTaxYears).getOrElse(Nil)
+    )
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, availableYearsUserCanClaim))),
+    form
+      .bindFromRequest()
+      .fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors, availableYearsUserCanClaim))),
         value =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, value))
+            updatedAnswers  <- Future.fromTry(request.userAnswers.set(SelectTaxYearsToClaimForPage, value))
             updatedAnswers2 <- Future.fromTry(updatedAnswers.remove(NumberOfWeeksToClaimForPage))
             updatedAnswers3 <- Future.fromTry(updatedAnswers2.remove(ConfirmClaimInWeeksPage))
-            _ <- sessionService.set(updatedAnswers3)
-          } yield {
-            Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
-          }
+            _               <- sessionService.set(updatedAnswers3)
+          } yield Redirect(navigator.nextPage(SelectTaxYearsToClaimForPage, updatedAnswers))
       )
   }
 

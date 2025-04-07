@@ -37,7 +37,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 import java.time.LocalDate
 import scala.concurrent.Future
 
-trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with ScalaFutures with IntegrationPatience with MockitoSugar {
+trait SpecBase
+    extends PlaySpec
+    with GuiceOneAppPerSuite
+    with TryValues
+    with ScalaFutures
+    with IntegrationPatience
+    with MockitoSugar {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -56,7 +62,6 @@ trait SpecBase extends PlaySpec with GuiceOneAppPerSuite with TryValues with Sca
   def messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
 
   def fakeRequest = FakeRequest("", "")
-
 
   implicit def messages: Messages = messagesApi.preferred(fakeRequest)
 

@@ -42,54 +42,60 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
   "Confirmation Controller" must {
     "return OK and the correct view with paper preferences available" when {
-      "merge flag in false" in {
+      "merge flag in false" in
         paperlessControllerTest(paperlessAvailable = true, mergeJourney = false)
-      }
     }
     "return OK and the correct view with paper preferences unavailable" when {
-      "merge flag in false" in {
+      "merge flag in false" in
         paperlessControllerTest(paperlessAvailable = false, mergeJourney = false)
-      }
     }
     "return OK and the correct view with paper preferences available" when {
-      "merge flag is true" in {
+      "merge flag is true" in
         paperlessControllerTest(paperlessAvailable = true, mergeJourney = true)
-      }
     }
     "return OK and the correct view with paper preferences unavailable" when {
-      "merge flag is true" in {
+      "merge flag is true" in
         paperlessControllerTest(paperlessAvailable = true, mergeJourney = true)
-      }
     }
   }
 
   private def paperlessControllerTest(paperlessAvailable: Boolean, mergeJourney: Boolean): Future[_] = {
 
     val paperlessPreferenceConnector = mock[PaperlessPreferenceConnector]
-    val auditConnector = mock[AuditConnector]
+    val auditConnector               = mock[AuditConnector]
 
-    val application = applicationBuilder(userAnswers = Some(
-      UserAnswers(userAnswersId, Json.obj(
-        MergedJourneyFlag.toString -> mergeJourney,
-        ClaimedForTaxYears.toString -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
-        SelectTaxYearsToClaimForPage.toString -> Json.arr(
-          CurrentYear.toTaxYear.startYear, CurrentYearMinus1.toTaxYear.startYear, CurrentYearMinus2.toTaxYear.startYear
-        ),
-        SubmittedClaim.toString -> true)))
+    val application = applicationBuilder(userAnswers =
+      Some(
+        UserAnswers(
+          userAnswersId,
+          Json.obj(
+            MergedJourneyFlag.toString  -> mergeJourney,
+            ClaimedForTaxYears.toString -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
+            SelectTaxYearsToClaimForPage.toString -> Json.arr(
+              CurrentYear.toTaxYear.startYear,
+              CurrentYearMinus1.toTaxYear.startYear,
+              CurrentYearMinus2.toTaxYear.startYear
+            ),
+            SubmittedClaim.toString -> true
+          )
+        )
+      )
     ).overrides(bind[PaperlessPreferenceConnector].toInstance(paperlessPreferenceConnector))
       .overrides(bind[AuditConnector].toInstance(auditConnector))
       .build()
 
     if (paperlessAvailable) {
-      when(paperlessPreferenceConnector.getPaperlessStatus(any())(any(), any())) thenReturn
+      when(paperlessPreferenceConnector.getPaperlessStatus(any())(any(), any())).thenReturn(
         Future(
           Right(PaperlessStatusResponse(PaperlessStatus("ALRIGHT"), Url("", "")))
         )
+      )
     } else {
-      when(paperlessPreferenceConnector.getPaperlessStatus(any())(any(), any())) thenReturn
+      when(paperlessPreferenceConnector.getPaperlessStatus(any())(any(), any())).thenReturn(
         Future(
           Right(PaperlessStatusResponse(PaperlessStatus("PAPER"), Url(somePreferencesUrl, "")))
         )
+      )
     }
 
     val request = FakeRequest(GET, routes.ConfirmationController.onPageLoad().url)
@@ -98,9 +104,8 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
     status(result) mustEqual OK
 
-    if(mergeJourney) contentAsString(result).contains(messages("confirmation.mergeJourney.title")) mustEqual true
+    if (mergeJourney) contentAsString(result).contains(messages("confirmation.mergeJourney.title")) mustEqual true
     else contentAsString(result).contains(messages("confirmation.title")) mustEqual true
-
 
     val dataToAudit = Map(NinoReference -> fakeNino, Enabled -> paperlessAvailable.toString)
 
@@ -109,4 +114,5 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
 
     application.stop()
   }
+
 }

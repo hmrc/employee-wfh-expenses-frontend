@@ -32,8 +32,9 @@ class ManualCorrespondenceIndicatorViewSpec extends ViewBehaviours {
 
     val applyView = view.apply()(request, messages)
 
-    behave like normalPage(applyView, "manualCorrespondenceIndicator", args = Nil)
+    behave.like(normalPage(applyView, "manualCorrespondenceIndicator", args = Nil))
 
-    behave like pageWithBackLink(applyView)
+    behave.like(pageWithBackLink(applyView))
   }
+
 }

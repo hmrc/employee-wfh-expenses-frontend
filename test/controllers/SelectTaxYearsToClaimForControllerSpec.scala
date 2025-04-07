@@ -40,14 +40,17 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
   lazy val selectTaxYearsToClaimForRoute = routes.SelectTaxYearsToClaimForController.onPageLoad().url
 
   val formProvider = new SelectTaxYearsToClaimForFormProvider()
-  val form = formProvider()
+  val form         = formProvider()
 
   "SelectTaxYearsToClaimFor Controller" must {
 
     "return OK and the correct view for a GET" in {
-      val userAnswer = UserAnswers(userAnswersId, Json.obj(
-        ClaimedForTaxYears.toString -> Json.arr(),
-      ))
+      val userAnswer = UserAnswers(
+        userAnswersId,
+        Json.obj(
+          ClaimedForTaxYears.toString -> Json.arr()
+        )
+      )
 
       val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
@@ -64,7 +67,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
 
       val mockSessionService: SessionService = mock[SessionService]
 
-      when(mockSessionService.set(any())(any())) thenReturn Future.successful(true)
+      when(mockSessionService.set(any())(any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))

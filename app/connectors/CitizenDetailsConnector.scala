@@ -27,16 +27,14 @@ import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CitizenDetailsConnector @Inject()(appConfig: FrontendAppConfig, httpClient: HttpClientV2) {
+class CitizenDetailsConnector @Inject() (appConfig: FrontendAppConfig, httpClient: HttpClientV2) {
 
   def getAddress(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val designatoryDetailsUrl: String = s"${appConfig.citizenDetailsHost}/citizen-details/$nino/designatory-details"
     httpClient
       .get(url"$designatoryDetailsUrl")
       .execute[HttpResponse]
-      .flatMap{ response =>
-        Future.successful(response)
-      }
+      .flatMap(response => Future.successful(response))
   }
 
   def getETag(nino: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ETag] = {
@@ -44,9 +42,7 @@ class CitizenDetailsConnector @Inject()(appConfig: FrontendAppConfig, httpClient
     httpClient
       .get(url"$eTagUrl")
       .execute[ETag]
-      .flatMap { response =>
-        Future.successful(response)
-      }
+      .flatMap(response => Future.successful(response))
   }
 
 }

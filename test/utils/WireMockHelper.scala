@@ -20,7 +20,6 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 
-
 trait WireMockHelper extends BeforeAndAfterAll with BeforeAndAfterEach {
   this: Suite =>
 
@@ -40,4 +39,5 @@ trait WireMockHelper extends BeforeAndAfterAll with BeforeAndAfterEach {
     super.afterAll()
     server.stop()
   }
+
 }

@@ -27,26 +27,28 @@ import uk.gov.hmrc.mongo.test.{CleanMongoCollectionSupport, PlayMongoRepositoryS
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
-class SessionRepositorySpec extends SpecBase
-  with FutureAwaits
-  with DefaultAwaitTimeout
-  with PlayMongoRepositorySupport[UserAnswers]
-  with CleanMongoCollectionSupport
-  with BeforeAndAfterEach {
+class SessionRepositorySpec
+    extends SpecBase
+    with FutureAwaits
+    with DefaultAwaitTimeout
+    with PlayMongoRepositorySupport[UserAnswers]
+    with CleanMongoCollectionSupport
+    with BeforeAndAfterEach {
 
   implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
-  val userId = "user-id"
+  val userId        = "user-id"
   val anotherUserId = "another-user-id"
 
   val testData = Json.obj(
     "test" -> "data"
   )
+
   val testOtherData = Json.obj(
     "test" -> "otherData"
   )
 
-  val testUserAnswers = UserAnswers(userId, testData)
+  val testUserAnswers      = UserAnswers(userId, testData)
   val testOtherUserAnswers = UserAnswers(anotherUserId, testOtherData)
 
   protected def checkTtlIndex: Boolean = true
@@ -58,8 +60,6 @@ class SessionRepositorySpec extends SpecBase
     mongoComponent = mongoComponent
   )
 
-
-
   ".get" must {
     "return None when the repository is empty" in {
       await(repository.get(anotherUserId)) mustBe None
@@ -67,7 +67,7 @@ class SessionRepositorySpec extends SpecBase
     "return the correct record from the repository" in {
       await(repository.set(testUserAnswers)) mustBe true
       await(repository.get(userId)).map(_.data) mustBe Some(testData)
-      await(repository.get(userId)).map(_.lastUpdated) mustNot be (Some(testUserAnswers.lastUpdated))
+      await(repository.get(userId)).map(_.lastUpdated) mustNot be(Some(testUserAnswers.lastUpdated))
     }
   }
 
@@ -75,7 +75,7 @@ class SessionRepositorySpec extends SpecBase
     "populate the repository correctly" in {
       await(repository.set(testUserAnswers)) mustBe true
       await(repository.get(userId)).map(_.data) mustBe Some(testData)
-      await(repository.get(userId)).map(_.lastUpdated) mustNot be (Some(testUserAnswers.lastUpdated))
+      await(repository.get(userId)).map(_.lastUpdated) mustNot be(Some(testUserAnswers.lastUpdated))
 
       await(repository.get(anotherUserId)).map(_.data) mustBe None
     }
@@ -84,11 +84,12 @@ class SessionRepositorySpec extends SpecBase
       await(repository.set(testOtherUserAnswers)) mustBe true
 
       await(repository.get(userId)).map(_.data) mustBe Some(testData)
-      await(repository.get(userId)).map(_.lastUpdated) mustNot be (Some(testUserAnswers.lastUpdated))
+      await(repository.get(userId)).map(_.lastUpdated) mustNot be(Some(testUserAnswers.lastUpdated))
 
       await(repository.get(anotherUserId)).map(_.data) mustBe Some(testOtherData)
-      await(repository.get(anotherUserId)).map(_.lastUpdated) mustNot be (Some(testOtherUserAnswers.lastUpdated))
+      await(repository.get(anotherUserId)).map(_.lastUpdated) mustNot be(Some(testOtherUserAnswers.lastUpdated))
 
     }
   }
+
 }

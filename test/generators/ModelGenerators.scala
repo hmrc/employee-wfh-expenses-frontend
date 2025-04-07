@@ -25,4 +25,5 @@ trait ModelGenerators {
     Arbitrary {
       Gen.oneOf(TaxYearSelection.valuesAll.toSeq)
     }
+
 }

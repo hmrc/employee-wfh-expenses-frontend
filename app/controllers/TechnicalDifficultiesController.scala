@@ -22,12 +22,11 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.TechnicalErrorView
 
-class TechnicalDifficultiesController @Inject()(
-                                                 val controllerComponents: MessagesControllerComponents,
-                                                 technicalErrorView: TechnicalErrorView
-                                               ) extends FrontendBaseController with I18nSupport {
+class TechnicalDifficultiesController @Inject() (
+    val controllerComponents: MessagesControllerComponents,
+    technicalErrorView: TechnicalErrorView
+) extends FrontendBaseController
+    with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action { implicit request =>
-    InternalServerError(technicalErrorView())
-  }
+  def onPageLoad: Action[AnyContent] = Action(implicit request => InternalServerError(technicalErrorView()))
 }

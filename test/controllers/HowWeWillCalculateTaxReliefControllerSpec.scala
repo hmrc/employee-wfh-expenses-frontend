@@ -35,8 +35,8 @@ class HowWeWillCalculateTaxReliefControllerSpec extends SpecBase {
           UserAnswers(
             userAnswersId,
             Json.obj(
-              ClaimedForTaxYears.toString -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear),
+              ClaimedForTaxYears.toString           -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
+              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear)
             )
           )
         ),
@@ -46,7 +46,8 @@ class HowWeWillCalculateTaxReliefControllerSpec extends SpecBase {
             userAnswersId,
             Json.obj(
               ClaimedForTaxYears.toString -> Json.arr(CurrentYearMinus4.toTaxYear.startYear),
-              SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear, CurrentYearMinus1.toTaxYear.startYear),
+              SelectTaxYearsToClaimForPage.toString -> Json
+                .arr(CurrentYear.toTaxYear.startYear, CurrentYearMinus1.toTaxYear.startYear)
             )
           )
         ),
@@ -55,13 +56,13 @@ class HowWeWillCalculateTaxReliefControllerSpec extends SpecBase {
           UserAnswers(
             userAnswersId,
             Json.obj(
-              ClaimedForTaxYears.toString -> Json.arr(),
+              ClaimedForTaxYears.toString           -> Json.arr(),
               SelectTaxYearsToClaimForPage.toString -> Json.arr(CurrentYear.toTaxYear.startYear)
             )
           )
         )
       )
-      for ((desc, userAnswer) <- tests) {
+      for ((desc, userAnswer) <- tests)
         s"$desc" in {
           val application = applicationBuilder(userAnswers = Some(userAnswer)).build()
 
@@ -73,7 +74,7 @@ class HowWeWillCalculateTaxReliefControllerSpec extends SpecBase {
 
           application.stop()
         }
-      }
     }
   }
+
 }

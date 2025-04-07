@@ -21,30 +21,33 @@ import play.twirl.api.HtmlFormat
 
 trait QuestionViewBehaviours[A] extends ViewBehaviours {
 
-  val errorKey = "value"
+  val errorKey     = "value"
   val errorMessage = "error.required"
-  def error(messageKeyPrefix: String, args: Seq[String] = Nil) = FormError(errorKey, s"${messageKeyPrefix}.${errorMessage}", args)
+
+  def error(messageKeyPrefix: String, args: Seq[String] = Nil) =
+    FormError(errorKey, s"$messageKeyPrefix.$errorMessage", args)
 
   val form: Form[A]
 
-  def pageWithTextFields(form: Form[A],
-                         createView: Form[A] => HtmlFormat.Appendable,
-                         messageKeyPrefix: String,
-                         expectedFormAction: String,
-                         args: Seq[String],
-                         fields: String*) = {
+  def pageWithTextFields(
+      form: Form[A],
+      createView: Form[A] => HtmlFormat.Appendable,
+      messageKeyPrefix: String,
+      expectedFormAction: String,
+      args: Seq[String],
+      fields: String*
+  ) =
 
     "behave like a question page" when {
 
       "rendered" must {
 
-        for (field <- fields) {
+        for (field <- fields)
 
           s"contain an input for $field" in {
             val doc = asDocument(createView(form))
             assertRenderedById(doc, field)
           }
-        }
 
         "not render an error summary" in {
 
@@ -57,13 +60,13 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours {
 
         "show an error prefix in the browser title" in {
 
-          val doc = asDocument(createView(form.withError(error(messageKeyPrefix))))
+          val doc   = asDocument(createView(form.withError(error(messageKeyPrefix))))
           val title = s"${messages(s"$messageKeyPrefix.title", args: _*)} - ${messages("service.name")} - GOV.UK"
           assertEqualsValue(doc, "title", s"""${messages("error.browser.title.prefix")} $title""")
         }
       }
 
-      for (field <- fields) {
+      for (field <- fields)
 
         s"rendered with an error with field '$field'" must {
 
@@ -75,13 +78,12 @@ trait QuestionViewBehaviours[A] extends ViewBehaviours {
 
           s"show an error associated with the field '$field'" in {
 
-            val doc = asDocument(createView(form.withError(FormError(field, "error"))))
+            val doc       = asDocument(createView(form.withError(FormError(field, "error"))))
             val errorSpan = doc.getElementsByClass("error-message").first
             doc.getElementById(field).attr("aria-describedby") contains errorSpan.attr("id")
             errorSpan.parent.attr("for") mustBe field
           }
         }
-      }
     }
-  }
+
 }

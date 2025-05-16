@@ -41,9 +41,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration, val servicesCon
 
   val taiHost: String = configuration.get[Service]("microservice.services.tai").baseUrl
 
-  lazy val signOutUrl: String  = configuration.get[String]("microservice.services.bas-gateway-frontend.sign-out-url")
-  lazy val feedbackUrl: String = configuration.get[String]("urls.feedbackSurvey")
-  lazy val signOutToSurveyUrl: String = s"$signOutUrl?continue=$feedbackUrl"
+  lazy val signOutUrl: String = configuration.get[String]("microservice.services.bas-gateway-frontend.sign-out-url")
+  lazy val feedbackSurveyUrl: String  = configuration.get[String]("urls.feedbackSurvey")
+  lazy val signOutToSurveyUrl: String = s"$signOutUrl?continue=$feedbackSurveyUrl"
   lazy val authUrl: String            = configuration.get[Service]("auth").baseUrl
   lazy val loginUrl: String           = configuration.get[String]("urls.login")
   lazy val loginContinueUrl: String   = configuration.get[String]("urls.loginContinue")

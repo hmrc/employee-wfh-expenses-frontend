@@ -32,13 +32,11 @@ class SignedOutController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def signedOut: Action[AnyContent] =
-    Action.async(implicit request => Future.successful(Ok(weSignedYouOutSavedTemplate()).withNewSession))
-
-  def signOutToExitSurvey: Action[AnyContent] = Action.async {
-    Future.successful(
-      Redirect(frontendAppConfig.feedbackSurvey).withNewSession
-    )
+  def signOutToExitSurvey: Action[AnyContent] = Action {
+    Redirect(frontendAppConfig.signOutToSurveyUrl)
   }
+
+  def displayTimeoutPage: Action[AnyContent] = // rename to timeout related
+    Action.async(implicit request => Future.successful(Ok(weSignedYouOutSavedTemplate())))
 
 }

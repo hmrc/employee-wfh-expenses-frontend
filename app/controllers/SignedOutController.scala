@@ -41,6 +41,8 @@ class SignedOutController @Inject() (
   }
 
   def signOut: Action[AnyContent] =
-    Action.async(implicit request => basGatewayConnector.signOutUser().map(_ => Ok(weSignedYouOutSavedTemplate()).withNewSession))
+    Action.async(implicit request =>
+      basGatewayConnector.signOutUser().map(_ => Ok(weSignedYouOutSavedTemplate()).withNewSession)
+    )
 
 }

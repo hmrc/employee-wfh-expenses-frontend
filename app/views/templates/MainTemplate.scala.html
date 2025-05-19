@@ -57,7 +57,7 @@
     HmrcStandardPageParams(
         serviceURLs = ServiceURLs(
             serviceUrl = Some(routes.IndexController.start.url),
-            signOutUrl = Some(routes.SignedOutController.signOutToExitSurvey.url)
+            signOutUrl = Some(routes.SignedOutController.signOut.url)
         ),
         banners = Banners(
             phaseBanner = Some(standardBetaBanner(url = appConfig.betaFeedbackUnauthenticatedUrl))

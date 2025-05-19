@@ -32,9 +32,9 @@ class BasGatewayConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppC
   private val EmptyJsonStr = "{}"
 
   def signOutUser()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
-    val basGatewayFrontendBaseUrl = appConfig.basGatewayBaseUrl
-    val signOutPath               = "/bas-gateway/logout-without-state"
-    val fullSignOutUrl            = s"$basGatewayFrontendBaseUrl$signOutPath"
+    val basGatewayBaseUrl = appConfig.basGatewayBaseUrl
+    val signOutPath       = "/bas-gateway/logout-without-state"
+    val fullSignOutUrl    = s"$basGatewayBaseUrl$signOutPath"
 
     http
       .post(url"$fullSignOutUrl")

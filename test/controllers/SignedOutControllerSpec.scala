@@ -24,7 +24,7 @@ class SignedOutControllerSpec extends SpecBase {
 
   "SignedOut Controller" must {
 
-    "redirect to feedback survey" in {
+    "redirect to exit survey through bas-gateway-frontend" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 

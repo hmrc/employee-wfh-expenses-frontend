@@ -38,7 +38,7 @@
                     timeout= Some(appConfig.timeoutDialogTimeout),
                     countdown= Some(appConfig.timeoutDialogTimeoutCountdown),
                     keepAliveUrl= Some(routes.KeepAliveController.keepAlive.url),
-                    signOutUrl= Some(routes.SignedOutController.displayTimeoutPage.url),
+                    signOutUrl= Some(routes.SignedOutController.signOut.url),
                     language= Some(messages.lang.code)
                 ))
          }

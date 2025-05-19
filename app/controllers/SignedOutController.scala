@@ -17,26 +17,30 @@
 package controllers
 
 import config.FrontendAppConfig
+import connectors.BasGatewayConnector
+
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.WeSignedYouOutPageView
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SignedOutController @Inject() (
     val controllerComponents: MessagesControllerComponents,
     val frontendAppConfig: FrontendAppConfig,
+    val basGatewayConnector: BasGatewayConnector,
     val weSignedYouOutSavedTemplate: WeSignedYouOutPageView
-) extends FrontendBaseController
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def signOutToExitSurvey: Action[AnyContent] = Action {
-    Redirect(frontendAppConfig.signOutToSurveyUrl)
+    Redirect(frontendAppConfig.signOutToSurveyUrl).withNewSession
   }
 
-  def displayTimeoutPage: Action[AnyContent] = // rename to timeout related
-    Action.async(implicit request => Future.successful(Ok(weSignedYouOutSavedTemplate())))
+  def signOut: Action[AnyContent] =
+    Action.async(implicit request => basGatewayConnector.signOutUser().map(_ => Ok(weSignedYouOutSavedTemplate())))
 
 }

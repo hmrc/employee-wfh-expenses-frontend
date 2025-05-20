@@ -91,9 +91,9 @@ class NewLayoutProvider @Inject() (
       pageTitle = Some(s"$pageTitle - ${messages("service.name")} - GOV.UK"),
       serviceURLs = ServiceURLs(
         serviceUrl = Some(controllers.routes.IndexController.start.url),
-        signOutUrl = Some(controllers.routes.SignedOutController.signedOut.url)
+        signOutUrl = Some(controllers.routes.SignedOutController.signOut.url)
       ),
-      timeOutUrl = Some(controllers.routes.SignedOutController.signedOut.url),
+      timeOutUrl = Some(controllers.routes.SignedOutController.signOut.url),
       keepAliveUrl = controllers.routes.KeepAliveController.keepAlive.url,
       showBackLinkJS = showBackLink,
       scripts = scripts.toSeq :+ additionalScript(),

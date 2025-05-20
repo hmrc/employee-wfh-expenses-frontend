@@ -11,8 +11,6 @@ ThisBuild / scalaVersion := "2.13.16"
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
-  .settings(DefaultBuildSettings.scalaSettings: _*)
-  .settings(DefaultBuildSettings.defaultSettings(): _*)
   .settings(majorVersion := 0)
   .settings(
     name := appName,

@@ -41,15 +41,18 @@ class FrontendAppConfig @Inject() (configuration: Configuration, val servicesCon
 
   val taiHost: String = configuration.get[Service]("microservice.services.tai").baseUrl
 
-  lazy val authUrl: String           = configuration.get[Service]("auth").baseUrl
-  lazy val loginUrl: String          = configuration.get[String]("urls.login")
-  lazy val loginContinueUrl: String  = configuration.get[String]("urls.loginContinue")
-  lazy val p87DigitalFormUrl: String = configuration.get[String]("urls.p87DigitalForm")
-  lazy val p87PostalFormUrl: String  = configuration.get[String]("urls.p87PostalForm")
-  lazy val ivUpliftUrl: String       = configuration.get[String]("urls.ivUplift")
-  lazy val ivCompletionUrl: String   = configuration.get[String]("urls.ivCompletion")
-  lazy val ivFailureUrl: String      = configuration.get[String]("urls.ivFailure")
-  lazy val feedbackSurvey: String    = configuration.get[String]("urls.feedbackSurvey")
+  lazy val basGatewayBaseUrl: String  = servicesConfig.baseUrl("bas-gateway")
+  lazy val signOutUrl: String         = configuration.get[String]("urls.basGatewayFrontendSignOutUrl")
+  lazy val feedbackSurveyUrl: String  = configuration.get[String]("urls.feedbackSurvey")
+  lazy val signOutToSurveyUrl: String = s"$signOutUrl?continue=$feedbackSurveyUrl"
+  lazy val authUrl: String            = configuration.get[Service]("auth").baseUrl
+  lazy val loginUrl: String           = configuration.get[String]("urls.login")
+  lazy val loginContinueUrl: String   = configuration.get[String]("urls.loginContinue")
+  lazy val p87DigitalFormUrl: String  = configuration.get[String]("urls.p87DigitalForm")
+  lazy val p87PostalFormUrl: String   = configuration.get[String]("urls.p87PostalForm")
+  lazy val ivUpliftUrl: String        = configuration.get[String]("urls.ivUplift")
+  lazy val ivCompletionUrl: String    = configuration.get[String]("urls.ivCompletion")
+  lazy val ivFailureUrl: String       = configuration.get[String]("urls.ivFailure")
 
   val betaFeedbackUnauthenticatedUrl =
     s"$contactHost/contact/beta-feedback-unauthenticated?service=$contactFormServiceIdentifier"

@@ -17,23 +17,24 @@
 package controllers
 
 import base.SpecBase
-import play.api.http.Status
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{GET, defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty}
+import play.api.test.Helpers._
 
 class SignedOutControllerSpec extends SpecBase {
 
   "SignedOut Controller" must {
 
-    "return OK and the correct view for a GET" in {
+    "redirect to exit survey through bas-gateway-frontend" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
-      val request = FakeRequest(GET, routes.SignedOutController.signedOut.url)
+      val request = FakeRequest(GET, routes.SignedOutController.signOutToExitSurvey.url)
 
       val result = route(application, request).value
 
-      status(result) mustEqual Status.OK
+      status(result) mustEqual SEE_OTHER
+
+      redirectLocation(result).value mustBe frontendAppConfig.signOutToSurveyUrl
 
       application.stop()
     }

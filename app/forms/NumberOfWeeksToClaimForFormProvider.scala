@@ -73,13 +73,13 @@ class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
           CurrentYearMinus4 -> ctyMinus4
         ).filter(_._2 > 0)
       )(weekMap =>
-        Some(
+        Some((
           weekMap.getOrElse(CurrentYear, 0),
           weekMap.getOrElse(CurrentYearMinus1, 0),
           weekMap.getOrElse(CurrentYearMinus2, 0),
           weekMap.getOrElse(CurrentYearMinus3, 0),
           weekMap.getOrElse(CurrentYearMinus4, 0)
-        )
+        ))
       )
     )
   }

@@ -142,6 +142,7 @@ package object models {
                   _.remove(JsPath(second :: rest)).flatMap(newValue => oldValue.set(JsPath(first :: Nil), newValue))
                 }
             }
+        case s => JsError(s"Unhandled case: path=${s._1}, value=${s._2}")
       }
 
   }

@@ -35,9 +35,7 @@ lazy val root = (project in file("."))
     scalacOptions += "-Wconf:cat=unused-imports&src=html/.*:s",
     scalacOptions += "-Wconf:src=routes/.*:s",
     libraryDependencies ++= AppDependencies(),
-    retrieveManaged := true,
-    update / evictionWarningOptions :=
-      EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
+    retrieveManaged := true
   )
 
 lazy val testSettings: Seq[Def.Setting[_]] = Seq(

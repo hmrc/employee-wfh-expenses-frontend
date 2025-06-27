@@ -71,7 +71,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
   }
 
   before {
-    Mockito.reset(mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockSessionService)
+    Mockito.reset[Object](mockCitizenDetailsConnector, mockTaiConnector, mockAuditConnector, mockSessionService)
   }
 
   "submit" when {

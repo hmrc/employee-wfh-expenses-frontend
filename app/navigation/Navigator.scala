@@ -55,6 +55,10 @@ class Navigator @Inject() () extends Logging {
         routes.CheckYourClaimController.onPageLoad()
       case Nil =>
         routes.IndexController.start
+      case _ =>
+        val errorMessage = s"ERROR: Unhandled state encountered"
+        logger.error(errorMessage)
+        throw new IllegalStateException(errorMessage)
     }
 
   def confirmClaimInWeeksNextPage(userAnswers: UserAnswers): Call =

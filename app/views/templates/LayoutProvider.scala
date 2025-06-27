@@ -100,6 +100,6 @@ class NewLayoutProvider @Inject() (
       styleSheets = stylesheets.toSeq :+ headBlock(),
       fullWidth = false,
       hideMenuBar = request.session.get("authToken").isEmpty
-    )(messages, request.withBody())
+    )(messages, request)
 
 }

@@ -52,7 +52,7 @@ class SessionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter 
   )
 
   before {
-    Mockito.reset(mockSessionRepository, mockEmployeeExpensesConnector)
+    Mockito.reset[Object](mockSessionRepository, mockEmployeeExpensesConnector)
   }
 
   "set" must {

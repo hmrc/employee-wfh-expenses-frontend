@@ -24,17 +24,15 @@ class SignedOutControllerSpec extends SpecBase {
 
   "SignedOut Controller" must {
 
-    "redirect to exit survey through bas-gateway-frontend" in {
+    "redirect to sign out page" in {
 
       val application = applicationBuilder(userAnswers = None).build()
 
-      val request = FakeRequest(GET, routes.SignedOutController.signOutToExitSurvey.url)
+      val request = FakeRequest(GET, routes.SignedOutController.signOut.url)
 
       val result = route(application, request).value
 
-      status(result) mustEqual SEE_OTHER
-
-      redirectLocation(result).value mustBe frontendAppConfig.signOutToSurveyUrl
+      status(result) mustEqual OK
 
       application.stop()
     }

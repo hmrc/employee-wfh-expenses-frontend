@@ -36,10 +36,6 @@ class SignedOutController @Inject() (
     extends FrontendBaseController
     with I18nSupport {
 
-  def signOutToExitSurvey: Action[AnyContent] = Action {
-    Redirect(frontendAppConfig.signOutToSurveyUrl).withNewSession
-  }
-
   def signOut: Action[AnyContent] =
     Action.async(implicit request =>
       basGatewayConnector.signOutUser().map(_ => Ok(weSignedYouOutSavedTemplate()).withNewSession)

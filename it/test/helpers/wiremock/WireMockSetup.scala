@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,26 @@
  * limitations under the License.
  */
 
-package utils
+package helpers.wiremock
 
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 
-trait WireMockHelper extends BeforeAndAfterAll with BeforeAndAfterEach {
-  this: Suite =>
+trait WireMockSetup extends WireMockConfig {
 
-  protected val server: WireMockServer = new WireMockServer(wireMockConfig().dynamicPort())
+  private val wireMockServer = new WireMockServer(wireMockConfig().port(wireMockPort))
 
-  override def beforeAll(): Unit = {
-    server.start()
-    super.beforeAll()
+  protected def startWmServer(): Unit = {
+    wireMockServer.start()
+    WireMock.configureFor(wireMockHost, wireMockPort)
   }
 
-  override def beforeEach(): Unit = {
-    server.resetAll()
-    super.beforeEach()
-  }
+  protected def stopWmServer(): Unit =
+    wireMockServer.stop()
 
-  override def afterAll(): Unit = {
-    super.afterAll()
-    server.stop()
+  protected def resetWmServer(): Unit = {
+    wireMockServer.resetAll()
+    WireMock.reset()
   }
-
 }

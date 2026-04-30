@@ -16,41 +16,27 @@
 
 package connectors
 
-import base.SpecBase
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import helpers.IntegrationSpec
+import org.scalatest.concurrent.IntegrationPatience
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.http.Status.{OK, SEE_OTHER}
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import utils.WireMockHelper
 
 class EmployeeExpensesConnectorSpec
-    extends SpecBase
+    extends IntegrationSpec
     with MockitoSugar
-    with WireMockHelper
-    with GuiceOneAppPerSuite
-    with ScalaFutures
     with IntegrationPatience {
 
-  override implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-
-  override implicit lazy val app: Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        "microservice.services.employee-expenses-frontend.port" -> server.port
-      )
-      .build()
+  implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   private lazy val employeeExpensesConnector = app.injector.instanceOf[EmployeeExpensesConnector]
 
   def stubForSessionRefresh(response: ResponseDefinitionBuilder): StubMapping =
-    server.stubFor(
+    stubFor(
       get(urlPathMatching(s"/employee-expenses/merged-journey-refresh-session"))
         .willReturn(
           response

@@ -16,40 +16,26 @@
 
 package connectors
 
-import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock._
+import helpers.IntegrationSpec
 import models.ETag
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.http.Status._
-import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.http.UpstreamErrorResponse
-import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class CitizenDetailsConnectorSpec
-    extends SpecBase
+    extends IntegrationSpec
     with MockitoSugar
-    with WireMockHelper
-    with GuiceOneAppPerSuite
-    with ScalaFutures
     with IntegrationPatience {
-
-  override implicit lazy val app: Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        conf = "microservice.services.citizen-details.port" -> server.port
-      )
-      .build()
 
   private lazy val citizenDetailsConnector: CitizenDetailsConnector = app.injector.instanceOf[CitizenDetailsConnector]
 
   "getETag" must {
     "return an etag on success" in {
-      server.stubFor(
+      stubFor(
         get(urlEqualTo(s"/citizen-details/$fakeNino/etag"))
           .willReturn(
             aResponse()
@@ -59,12 +45,12 @@ class CitizenDetailsConnectorSpec
       )
 
       whenReady(citizenDetailsConnector.getETag(fakeNino)) {
-        _ mustBe ETag(etag)
+        _ mustBe ETag(eTag)
       }
     }
 
     "return 500 on failure" in {
-      server.stubFor(
+      stubFor(
         get(urlEqualTo(s"/citizen-details/$fakeNino/etag"))
           .willReturn(
             aResponse()
@@ -79,7 +65,7 @@ class CitizenDetailsConnectorSpec
     }
 
     "return 401 on failure" in {
-      server.stubFor(
+      stubFor(
         get(urlEqualTo(s"/citizen-details/$fakeNino/etag"))
           .willReturn(
             aResponse()
@@ -94,7 +80,7 @@ class CitizenDetailsConnectorSpec
     }
 
     "return 404 on failure" in {
-      server.stubFor(
+      stubFor(
         get(urlEqualTo(s"/citizen-details/$fakeNino/etag"))
           .willReturn(
             aResponse()

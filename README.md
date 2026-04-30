@@ -41,6 +41,16 @@ Navigate to login stub (http://localhost:9949/auth-login-stub/)
 
 Redirect URL: http://localhost:9336/employee-working-from-home-expenses/
 
+## Build and test
+
+### Unit/Integration testing
+
+To run all unit tests for this repository, run
+
+```bash
+sbt test it/test
+```
+
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").

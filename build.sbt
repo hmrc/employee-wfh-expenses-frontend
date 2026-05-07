@@ -2,16 +2,17 @@ import play.sbt.routes.RoutesKeys
 import sbt.Def
 import scoverage.ScoverageKeys
 import uk.gov.hmrc.DefaultBuildSettings
+import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 
 lazy val appName: String = "employee-wfh-expenses-frontend"
 
+ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "2.13.18"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
-  .settings(majorVersion := 0)
   .settings(
     name := appName,
     RoutesKeys.routesImport += "models._",
@@ -44,3 +45,10 @@ lazy val testSettings: Seq[Def.Setting[_]] = Seq(
     "-Dconfig.resource=test.application.conf"
   )
 )
+
+lazy val it = project
+  .in(file("it"))
+  .enablePlugins(PlayScala)
+  .dependsOn(root)
+  .settings(DefaultBuildSettings.itSettings(true))
+  .settings(libraryDependencies ++= AppDependencies(), addTestReportOption(Test, "int-test-reports"))

@@ -16,43 +16,36 @@
 
 package controllers.actions
 
-import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock._
 import controllers.routes
+import helpers.IntegrationSpec
 import models.requests.IdentifierRequest
 import org.scalatest.concurrent.ScalaFutures
-import play.api.Application
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Results.Ok
 import play.api.mvc.{AnyContent, Result}
+import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
-import utils.WireMockHelper
 
 import scala.concurrent.Future
 
-class ManualCorrespondenceIndicatorActionSpec extends SpecBase with WireMockHelper with ScalaFutures {
+class ManualCorrespondenceIndicatorActionSpec extends IntegrationSpec with ScalaFutures {
 
   private lazy val fakeIdentifier = "fake-identifier"
 
   private lazy val mciAction: ManualCorrespondenceIndicatorAction =
-    injector.instanceOf[ManualCorrespondenceIndicatorAction]
+    app.injector.instanceOf[ManualCorrespondenceIndicatorAction]
 
+  private val fakeRequest = FakeRequest("", "")
   private lazy val identifierRequest = IdentifierRequest[AnyContent](fakeRequest, fakeIdentifier, fakeNino)
 
   private def dummyBlockToExecute(identifierRequest: IdentifierRequest[AnyContent]): Future[Result] =
     Future.successful(Ok("dummy block executed"))
 
-  override implicit lazy val app: Application = new GuiceApplicationBuilder()
-    .configure(
-      conf = "microservice.services.citizen-details.port" -> server.port
-    )
-    .build()
-
   "ManualCorrespondenceIndicatorAction" must {
 
     "execute the controller block" when {
       "citizen details returns a HTTP 200 response" in {
-        server.stubFor(
+        stubFor(
           get(urlEqualTo(s"/citizen-details/$fakeNino/designatory-details"))
             .willReturn(
               aResponse()
@@ -69,7 +62,7 @@ class ManualCorrespondenceIndicatorActionSpec extends SpecBase with WireMockHelp
 
     "redirect to the MCI controller and view" when {
       "citizen details returns a 423 LOCKED response" in {
-        server.stubFor(
+        stubFor(
           get(urlEqualTo(s"/citizen-details/$fakeNino/designatory-details"))
             .willReturn(
               aResponse()
@@ -88,7 +81,7 @@ class ManualCorrespondenceIndicatorActionSpec extends SpecBase with WireMockHelp
 
     "redirect to the Technical Error controller and view" when {
       "citizen details returns an unexpected error" in {
-        server.stubFor(
+        stubFor(
           get(urlEqualTo(s"/citizen-details/$fakeNino/designatory-details"))
             .willReturn(
               aResponse()

@@ -16,32 +16,19 @@
 
 package connectors
 
-import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock._
+import helpers.IntegrationSpec
 import org.scalacheck.Gen
 import org.scalatest.concurrent.IntegrationPatience
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import play.api.Application
 import play.api.http.Status._
-import play.api.inject.guice.GuiceApplicationBuilder
-import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class BasGatewayConnectorSpec
-    extends SpecBase
+    extends IntegrationSpec
     with ScalaCheckDrivenPropertyChecks
-    with WireMockHelper
-    with GuiceOneAppPerSuite
     with IntegrationPatience {
-
-  override implicit lazy val app: Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        conf = "microservice.services.bas-gateway.port" -> server.port
-      )
-      .build()
 
   private lazy val basGatewayConnector: BasGatewayConnector = app.injector.instanceOf[BasGatewayConnector]
 
@@ -49,7 +36,7 @@ class BasGatewayConnectorSpec
 
   "sign out" must {
     "return 200 on success" in {
-      server.stubFor(
+      stubFor(
         post(urlEqualTo(signOutPath))
           .willReturn(
             aResponse()
@@ -63,7 +50,7 @@ class BasGatewayConnectorSpec
     "return error response code on failure" in {
       val statusGen: Gen[Int] = Gen.oneOf(401, 404, 500)
       forAll(statusGen) { statusCode =>
-        server.stubFor(
+        stubFor(
           post(urlEqualTo(signOutPath))
             .willReturn(
               aResponse()

@@ -16,46 +16,30 @@
 
 package connectors
 
-import base.SpecBase
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, post, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock._
 import config.FrontendAppConfig
+import helpers.IntegrationSpec
 import models.{ETag, IABDExpense}
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
+import org.scalatest.concurrent.IntegrationPatience
 import play.api.http.Status._
-import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.http.{JsValidationException, UpstreamErrorResponse}
-import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class TaiConnectorSpec
-    extends SpecBase
-    with WireMockHelper
-    with GuiceOneAppPerSuite
-    with ScalaFutures
+    extends IntegrationSpec
     with IntegrationPatience {
-
-  override implicit lazy val app: Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        conf = "microservice.services.tai.port" -> server.port,
-        "otherExpensesId" -> 59,
-        "jobExpenseId"    -> 55
-      )
-      .build()
 
   private lazy val taiConnector: TaiConnector   = app.injector.instanceOf[TaiConnector]
   private lazy val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
   private val testTaxYear                       = 2019
   private val testGrossAmount                   = 120
-  private val testETag                          = ETag(version = etag)
+  private val testETag                          = ETag(version = eTag)
 
   "getOtherExpensesData [IABD 59]" must {
     "return valid data for a 200 response with a valid response body" in {
 
-      server.stubFor(
+      stubFor(
         get(
           urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}")
         )
@@ -75,7 +59,7 @@ class TaiConnectorSpec
     }
 
     "return a JsValidationException for a 200 response with an unexpected response body" in {
-      server.stubFor(
+      stubFor(
         get(
           urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}")
         )
@@ -92,7 +76,7 @@ class TaiConnectorSpec
     }
 
     "return an UpstreamErrorResponse for a 5xx response" in {
-      server.stubFor(
+      stubFor(
         get(
           urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}")
         )
@@ -112,7 +96,7 @@ class TaiConnectorSpec
     }
 
     "return an NotFoundException for a 404 response" in {
-      server.stubFor(
+      stubFor(
         get(
           urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.otherExpensesId}")
         )
@@ -135,7 +119,7 @@ class TaiConnectorSpec
   "getJobExpensesData [IABD 55]" must {
     "return valid data for a 200 response with a valid response body" in {
 
-      server.stubFor(
+      stubFor(
         get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.jobExpenseId}"))
           .willReturn(
             aResponse()
@@ -153,7 +137,7 @@ class TaiConnectorSpec
     }
 
     "return a JsValidationException for a 200 response with an unexpected response body" in {
-      server.stubFor(
+      stubFor(
         get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.jobExpenseId}"))
           .willReturn(
             aResponse()
@@ -168,7 +152,7 @@ class TaiConnectorSpec
     }
 
     "return an UpstreamErrorResponse for a 5xx response" in {
-      server.stubFor(
+      stubFor(
         get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.jobExpenseId}"))
           .willReturn(
             aResponse()
@@ -186,7 +170,7 @@ class TaiConnectorSpec
     }
 
     "return an NotFoundException for a 404 response" in {
-      server.stubFor(
+      stubFor(
         get(urlEqualTo(s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/employee-expenses/${appConfig.jobExpenseId}"))
           .willReturn(
             aResponse()
@@ -206,7 +190,7 @@ class TaiConnectorSpec
 
   "postIabdData" must {
     "return a 200 response" in {
-      server.stubFor(
+      stubFor(
         post(
           urlEqualTo(
             s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"
@@ -221,11 +205,11 @@ class TaiConnectorSpec
 
       val result = taiConnector.postIabdData(fakeNino, testTaxYear, testGrossAmount, testETag)
 
-      whenReady(result)(res => whenReady(result)(_ => succeed))
+      whenReady(result)(_ => whenReady(result)(_ => succeed))
     }
 
     "return a 401 response" in {
-      server.stubFor(
+      stubFor(
         post(
           urlEqualTo(
             s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"
@@ -246,7 +230,7 @@ class TaiConnectorSpec
     }
 
     "return a 404 response" in {
-      server.stubFor(
+      stubFor(
         post(
           urlEqualTo(
             s"/tai/$fakeNino/tax-account/$testTaxYear/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"

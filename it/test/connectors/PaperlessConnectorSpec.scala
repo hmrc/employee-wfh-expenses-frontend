@@ -16,19 +16,15 @@
 
 package connectors
 
-import base.SpecBase
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import helpers.IntegrationSpec
+import org.scalatest.concurrent.IntegrationPatience
 import org.scalatestplus.mockito.MockitoSugar
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Application
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import utils.WireMockHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -37,29 +33,19 @@ sealed trait ExpectedResults {
 }
 
 class PaperlessConnectorSpec
-    extends SpecBase
+    extends IntegrationSpec
     with MockitoSugar
-    with WireMockHelper
-    with GuiceOneAppPerSuite
-    with ScalaFutures
     with IntegrationPatience
     with ExpectedResults {
 
-  override implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-
-  override implicit lazy val app: Application =
-    new GuiceApplicationBuilder()
-      .configure(
-        conf = "microservice.services.preferences-frontend.port" -> server.port
-      )
-      .build()
+  implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   private lazy val paperlessPreferenceConnector = app.injector.instanceOf[PaperlessPreferenceConnector]
 
   val someReturnUrl = "/go/somewhere"
 
   def stubForPaperlessStatus(response: ResponseDefinitionBuilder): StubMapping =
-    server.stubFor(
+    stubFor(
       get(urlPathMatching(s"/paperless/status"))
         .withQueryParam("returnUrl", matching(".*"))
         .withQueryParam("returnLinkText", matching(".*"))

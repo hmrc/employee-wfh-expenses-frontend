@@ -21,6 +21,7 @@ import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.ServiceURLs
+import uk.gov.hmrc.sca.config.BackLinkConfig
 import uk.gov.hmrc.sca.services.WrapperService
 import views.html.components.{AdditionalScript, HeadBlock}
 
@@ -93,9 +94,9 @@ class NewLayoutProvider @Inject() (
         serviceUrl = Some(controllers.routes.IndexController.start.url),
         signOutUrl = Some(controllers.routes.SignedOutController.signOut.url)
       ),
-      timeOutUrl = Some(controllers.routes.SignedOutController.signOut.url),
-      keepAliveUrl = controllers.routes.KeepAliveController.keepAlive.url,
-      showBackLinkJS = showBackLink,
+      backLinkConfig = Option.when(showBackLink) {
+        BackLinkConfig.JsBack
+      },
       scripts = scripts.toSeq :+ additionalScript(),
       styleSheets = stylesheets.toSeq :+ headBlock(),
       fullWidth = false,

@@ -78,8 +78,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, val servicesCon
       .getOptional[Int](s"taxRelief.${taxYear.toString}.maxPerYear")
       .getOrElse(configuration.get[Int]("taxRelief.default.maxPerYear"))
 
-  lazy val scaWrapperEnabled: Boolean = configuration.get[Boolean]("microservice.services.features.sca-wrapper")
-
   lazy val optimizelyId: String = configuration.getOptional[String]("optimizely.projectId").getOrElse("18916851035")
 
   lazy val languageTranslationEnabled: Boolean =

@@ -38,12 +38,7 @@
 }
 
 @layout(
-    pageTitle = messages("disclaimer.title"),
-    beforeContentBlock = Some(backLink(BackLink(
-        href = routes.SelectTaxYearsToClaimForController.onPageLoad().url,
-        content = Text(messages("site.back")),
-        attributes = Map("id" -> "back-link")
-    )))
+    pageTitle = messages("disclaimer.title")
 ) {
 
     <h1 class="govuk-heading-xl">@messages("disclaimer.heading")</h1>

@@ -44,16 +44,7 @@
 }
 
 @layout(
-    pageTitle = messages("howWeWillCalculateTaxRelief.title"),
-    beforeContentBlock = Some(
-        backLink(
-            BackLink(
-                href = routes.DisclaimerController.onPageLoad().url,
-                content = Text(messages("site.back")),
-                attributes = Map("id" -> "back-link")
-            )
-        )
-    )
+    pageTitle = messages("howWeWillCalculateTaxRelief.title")
 ) {
     @formHelper(action = routes.HowWeWillCalculateTaxReliefController.onSubmit(), Symbol("autoComplete") -> "off") {
         <h1 class="govuk-heading-xl">@messages("howWeWillCalculateTaxRelief.heading")</h1>

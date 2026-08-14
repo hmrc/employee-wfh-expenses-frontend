@@ -25,12 +25,7 @@
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle = messages("informClaimNowInWeeks.title"),
-    beforeContentBlock = Some(backLink(BackLink(
-        href = routes.HowWeWillCalculateTaxReliefController.onPageLoad().url,
-        content = Text(messages("site.back")),
-        attributes = Map("id" -> "back-link")
-    )))
+    pageTitle = messages("informClaimNowInWeeks.title")
 ) {
 
     <h1 class="govuk-heading-xl">@messages("informClaimNowInWeeks.heading")</h1>

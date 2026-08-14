@@ -26,64 +26,19 @@ import views.html.components.{AdditionalScript, HeadBlock}
 
 import javax.inject.Inject
 
-trait LayoutProvider {
+class LayoutProvider @Inject() (
+    wrapperService: WrapperService,
+    additionalScript: AdditionalScript,
+    headBlock: HeadBlock
+) extends Logging {
 
   // noinspection ScalaStyle
   def apply(
       pageTitle: String,
-      beforeContentBlock: Option[Html] = None,
       showBackLink: Boolean = true,
       timeout: Boolean = true,
-      showSignOut: Boolean = false,
       scripts: Option[Html] = None,
-      stylesheets: Option[Html] = None,
-      hideMenuBar: Boolean = false
-  )(contentBlock: Html)(
-      implicit request: RequestHeader,
-      messages: Messages
-  ): HtmlFormat.Appendable
-
-}
-
-class OldLayoutProvider @Inject() (layout: views.html.templates.MainTemplate) extends LayoutProvider {
-
-//noinspection ScalaStyle
-  override def apply(
-      pageTitle: String,
-      beforeContentBlock: Option[Html] = None,
-      showBackLink: Boolean,
-      timeout: Boolean,
-      showSignOut: Boolean,
-      scripts: Option[Html],
-      stylesheets: Option[Html],
-      hideMenuBar: Boolean = false
-  )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages): HtmlFormat.Appendable =
-    layout(
-      pageTitle,
-      beforeContentBlock,
-      timeout,
-      showBackLink
-    )(contentBlock)
-
-}
-
-class NewLayoutProvider @Inject() (
-    wrapperService: WrapperService,
-    additionalScript: AdditionalScript,
-    headBlock: HeadBlock
-) extends LayoutProvider
-    with Logging {
-
-  // noinspection ScalaStyle
-  override def apply(
-      pageTitle: String,
-      beforeContentBlock: Option[Html] = None,
-      showBackLink: Boolean,
-      timeout: Boolean,
-      showSignOut: Boolean,
-      scripts: Option[Html],
-      stylesheets: Option[Html],
-      hideMenuBar: Boolean = false
+      stylesheets: Option[Html] = None
   )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages): HtmlFormat.Appendable =
     wrapperService.standardScaLayout(
       disableSessionExpired = !timeout,

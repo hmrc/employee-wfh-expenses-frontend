@@ -36,12 +36,7 @@
 }
 
 @layout(
-    pageTitle = messages("confirmClaimInWeeks.multiple.title"),
-    beforeContentBlock = Some(backLink(BackLink(
-        href = routes.NumberOfWeeksToClaimForController.onPageLoad().url,
-        content = Text(messages("site.back")),
-        attributes = Map("id" -> "back-link")
-    )))
+    pageTitle = messages("confirmClaimInWeeks.multiple.title")
 ) {
 
     <h1 class="govuk-heading-xl">@messages("confirmClaimInWeeks.multiple.heading")</h1>

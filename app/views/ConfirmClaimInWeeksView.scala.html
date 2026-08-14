@@ -42,12 +42,7 @@
 }
 
 @layout(
-    pageTitle = s"${errorPrefix(form)} ${messages(s"$prefix.title", pluralOrSingularWeeks(numberOfWeeksToConfirm) +: taxYear.formattedTaxYearArgs:_*)}",
-    beforeContentBlock = Some(backLink(BackLink(
-        href = routes.NumberOfWeeksToClaimForController.onPageLoad().url,
-        content = Text(messages("site.back")),
-        attributes = Map("id" -> "back-link")
-    )))
+    pageTitle = s"${errorPrefix(form)} ${messages(s"$prefix.title", pluralOrSingularWeeks(numberOfWeeksToConfirm) +: taxYear.formattedTaxYearArgs:_*)}"
 ) {
     @errorSummary(form.errors)
     @formHelper(action = ConfirmClaimInWeeksController.onSubmit(), Symbol("autoComplete") -> "off") {

@@ -80,12 +80,7 @@
 }
 
 @layout(
-    pageTitle = messages("checkYourClaimView.title"),
-    beforeContentBlock = Some(backLink(BackLink(
-        href = routes.DisclaimerController.onPageLoad().url,
-        content = Text(messages("site.back")),
-        attributes = Map("id" -> "back-link")
-    )))
+    pageTitle = messages("checkYourClaimView.title")
 ) {
     <h1 class="govuk-heading-xl">@messages("checkYourClaimView.heading")</h1>
 

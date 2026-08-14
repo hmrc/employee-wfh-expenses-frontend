@@ -29,7 +29,6 @@ class Filters @Inject() (
 ) extends HttpFilters {
 
   override val filters: Seq[EssentialFilter] =
-    defaultFilters.filters ++
-      Option.when(appConfig.scaWrapperEnabled)(wrapperDataFilter)
+    defaultFilters.filters :+ wrapperDataFilter
 
 }

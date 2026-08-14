@@ -25,12 +25,7 @@
 @()(implicit request: Request[_], messages: Messages)
 
     @layout(
-        pageTitle = messages("manualCorrespondenceIndicator.title"),
-        beforeContentBlock = Some(backLink(BackLink(
-            href = routes.IndexController.start.url,
-            content = Text(messages("site.back")),
-            attributes = Map("id" -> "back-link")
-        )))
+        pageTitle = messages("manualCorrespondenceIndicator.title")
     ) {
 
     <h1 class="govuk-heading-xl">@messages("manualCorrespondenceIndicator.heading")</h1>

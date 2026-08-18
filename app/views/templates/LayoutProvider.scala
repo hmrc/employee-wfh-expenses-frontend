@@ -40,7 +40,8 @@ class LayoutProvider @Inject() (
       timeout: Boolean = true,
       scripts: Option[Html] = None,
       stylesheets: Option[Html] = None
-  )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages): HtmlFormat.Appendable =
+  )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages): HtmlFormat.Appendable = {
+    val hideAccountMenu = request.session.get("authToken").isEmpty
     wrapperService.standardScaLayout(
       disableSessionExpired = !timeout,
       content = contentBlock,
@@ -48,7 +49,9 @@ class LayoutProvider @Inject() (
       serviceNameKey = Some("service.name"),
       serviceURLs = ServiceURLs(
         serviceUrl = Some(controllers.routes.IndexController.start.url),
-        signOutUrl = Some(controllers.routes.SignedOutController.signOut.url)
+        signOutUrl = Option.unless(hideAccountMenu) {
+          controllers.routes.SignedOutController.signOut.url
+        }
       ),
       backLinkConfig = Option.when(showBackLink) {
         BackLinkConfig.JsBack
@@ -56,7 +59,8 @@ class LayoutProvider @Inject() (
       scripts = scripts.toSeq :+ additionalScript(),
       styleSheets = stylesheets.toSeq :+ headBlock(),
       fullWidth = false,
-      hideMenuBar = request.session.get("authToken").isEmpty
+      hideMenuBar = hideAccountMenu
     )(messages, request)
+  }
 
 }

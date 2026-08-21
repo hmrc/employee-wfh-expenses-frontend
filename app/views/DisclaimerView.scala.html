@@ -85,7 +85,7 @@
 
     <p class="govuk-body">@messages("disclaimer.accept.text.1")</p>
 
-    @formHelper(action = DisclaimerController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.DisclaimerController.onSubmit(), Symbol("autoComplete") -> "off") {
         @button(Button(content = Text(messages("disclaimer.button.text")), preventDoubleClick  = Some(true)))
     }
 }

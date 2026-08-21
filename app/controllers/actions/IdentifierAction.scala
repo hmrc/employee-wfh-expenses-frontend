@@ -56,19 +56,23 @@ class AuthenticatedIdentifierAction @Inject() (
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised()
-      .retrieve(internalId.and(nino).and(affinityGroup).and(confidenceLevel)) {
-        case _ ~ _ ~ Some(AffinityGroup.Agent) ~ _ =>
-          Future.successful(unauthorisedRoute)
-        case _ ~ _ ~ Some(AffinityGroup.Individual | AffinityGroup.Organisation) ~ LT200(_) =>
-          Future.successful(upliftConfidenceLevel)
-        case mayBeId ~ mayBeNino ~ _ ~ _ =>
-          block(
-            IdentifierRequest(
-              request,
-              mayBeId.getOrElse(throw new UnauthorizedException("Unable to retrieve internalId")),
-              mayBeNino.getOrElse(throw new UnauthorizedException("Unable to retrieve nino"))
+      .retrieve(internalId.and(nino).and(affinityGroup).and(confidenceLevel))
+      .apply { (retrieved: Any) =>
+        // 2. Perform the wildcard pattern match inside the function body
+        retrieved match {
+          case (_ ~ _ ~ Some(AffinityGroup.Agent) ~ _) =>
+            Future.successful(unauthorisedRoute)
+          case (_ ~ _ ~ Some(AffinityGroup.Individual | AffinityGroup.Organisation) ~ LT200(_)) =>
+            Future.successful(upliftConfidenceLevel)
+          case ((mayBeId: Option[String]) ~ (mayBeNino: Option[String]) ~ _ ~ _) =>
+            block(
+              IdentifierRequest(
+                request,
+                mayBeId.getOrElse(throw new UnauthorizedException("Unable to retrieve internalId")),
+                mayBeNino.getOrElse(throw new UnauthorizedException("Unable to retrieve nino"))
+              )
             )
-          )
+        }
       }
   }.recover {
     case _: NoActiveSession =>

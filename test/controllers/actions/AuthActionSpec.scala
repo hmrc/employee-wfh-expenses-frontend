@@ -31,7 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import utils.RetrievalOps._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class AuthActionSpec extends SpecBase {
 
@@ -39,9 +39,9 @@ class AuthActionSpec extends SpecBase {
     def onPageLoad(): Action[AnyContent] = authAction(_ => Results.Ok)
   }
 
-  val mockAuthConnector: AuthConnector = mock[AuthConnector]
-  val mockAppConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
-  val mockBodyParsers                  = app.injector.instanceOf[BodyParsers.Default]
+  val mockAuthConnector: AuthConnector     = mock[AuthConnector]
+  val mockAppConfig: FrontendAppConfig     = app.injector.instanceOf[FrontendAppConfig]
+  val mockBodyParsers: BodyParsers.Default = app.injector.instanceOf[BodyParsers.Default]
 
   type AuthRetrievals = Option[String] ~ Option[String] ~ Option[String] ~ Option[AffinityGroup] ~ ConfidenceLevel
 
@@ -53,9 +53,11 @@ class AuthActionSpec extends SpecBase {
       confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
   ): Harness = {
 
+    val mockResponse: AuthRetrievals = internalId ~ nino ~ saUtr ~ affinityGroup ~ confidenceLevel
+
     when(mockAuthConnector.authorise[AuthRetrievals](any(), any())(any(), any())).thenReturn(
-      Future.successful(
-        internalId ~ nino ~ saUtr ~ affinityGroup ~ confidenceLevel
+      Future.successful[AuthRetrievals](
+        mockResponse
       )
     )
 

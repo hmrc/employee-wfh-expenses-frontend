@@ -91,7 +91,7 @@ class SubmissionService @Inject() (
       Future.successful(Left("Flat Rate Items sequence is empty, unable to submit"))
     } else {
       logger.info("[SubmissionService][submit] Submitting")
-      futureSequence(flatRateItems) { item: FlatRateItem =>
+      futureSequence(flatRateItems) { (item: FlatRateItem) =>
         for {
           etag <- citizenDetailsConnector.getETag(dataRequest.nino)
           _    <- taiConnector.postIabdData(dataRequest.nino, item.year, item.amount, etag)

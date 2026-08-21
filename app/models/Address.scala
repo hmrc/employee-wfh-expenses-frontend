@@ -56,6 +56,18 @@ object Address {
       .and((__ \ "address" \ "line4").writeNullable[String])
       .and((__ \ "address" \ "line5").writeNullable[String])
       .and((__ \ "address" \ "postcode").writeNullable[String])
-      .and((__ \ "address" \ "country").writeNullable[String])(unlift(Address.unapply))
+      .and((__ \ "address" \ "country").writeNullable[String])(
+        unlift((address: Address) =>
+          Some(
+            address.line1,
+            address.line2,
+            address.line3,
+            address.line4,
+            address.line5,
+            address.postcode,
+            address.country
+          )
+        )
+      )
 
 }

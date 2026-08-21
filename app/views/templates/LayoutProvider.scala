@@ -23,6 +23,7 @@ import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.ServiceURLs
 import uk.gov.hmrc.sca.services.WrapperService
 import views.html.components.{AdditionalScript, HeadBlock}
+import uk.gov.hmrc.sca.config.BackLinkConfig
 
 import javax.inject.Inject
 
@@ -48,9 +49,7 @@ class LayoutProvider @Inject() (
         serviceUrl = Some(controllers.routes.IndexController.start.url),
         signOutUrl = Some(controllers.routes.SignedOutController.signOut.url)
       ),
-      timeOutUrl = Some(controllers.routes.SignedOutController.signOut.url),
-      keepAliveUrl = controllers.routes.KeepAliveController.keepAlive.url,
-      showBackLinkJS = showBackLink,
+      backLinkConfig = if (showBackLink) Some(BackLinkConfig.JsBack) else None,
       scripts = scripts.toSeq :+ additionalScript(),
       styleSheets = stylesheets.toSeq :+ headBlock(),
       fullWidth = false,

@@ -20,6 +20,7 @@ import play.api.Logging
 import sttp.model.HeaderNames.ContentType
 import sttp.model.MediaType.ApplicationJson
 import config.FrontendAppConfig
+import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpReads.Implicits._

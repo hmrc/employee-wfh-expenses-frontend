@@ -45,7 +45,7 @@
     pageTitle = s"${errorPrefix(form)} ${messages(s"$prefix.title", pluralOrSingularWeeks(numberOfWeeksToConfirm) +: taxYear.formattedTaxYearArgs:_*)}"
 ) {
     @errorSummary(form.errors)
-    @formHelper(action = ConfirmClaimInWeeksController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.ConfirmClaimInWeeksController.onSubmit(), Symbol("autoComplete") -> "off") {
 
     <h1 class="govuk-heading-xl">@messages(s"$prefix.title", pluralOrSingularWeeks(numberOfWeeksToConfirm) +: taxYear.formattedTaxYearArgs:_*)</h1>
 

@@ -81,7 +81,9 @@ object UserAnswers {
     (__ \ "_id")
       .write[String]
       .and((__ \ "data").write[JsObject])
-      .and((__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat))(unlift(UserAnswers.unapply))
+      .and((__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat))(
+        unlift((answers: UserAnswers) => Some(answers.id, answers.data, answers.lastUpdated))
+      )
   }
 
   implicit val formats: OFormat[UserAnswers] = OFormat(reads, writes)

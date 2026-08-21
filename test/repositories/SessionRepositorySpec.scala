@@ -55,7 +55,7 @@ class SessionRepositorySpec
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = 30.seconds, interval = 100.millis)
 
-  lazy val repository: SessionRepository = new SessionRepository(
+  val repository: SessionRepository = new SessionRepository(
     config = app.injector.instanceOf[FrontendAppConfig],
     mongoComponent = mongoComponent
   )

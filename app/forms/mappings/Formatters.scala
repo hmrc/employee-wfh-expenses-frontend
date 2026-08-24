@@ -39,7 +39,7 @@ trait Formatters {
   private[mappings] def booleanFormatter(requiredKey: String, args: Any*): Formatter[Boolean] =
     new Formatter[Boolean] {
 
-      private val baseFormatter = stringFormatter(requiredKey, args: _*)
+      private val baseFormatter = stringFormatter(requiredKey, args*)
 
       override def bind(key: String, data: Map[String, String]) =
         baseFormatter
@@ -63,7 +63,7 @@ trait Formatters {
 
       val decimalRegexp = """^-?(\d*\.\d*)$"""
 
-      private val baseFormatter = stringFormatter(requiredKey, args: _*)
+      private val baseFormatter = stringFormatter(requiredKey, args*)
 
       override def bind(key: String, data: Map[String, String]) =
         baseFormatter

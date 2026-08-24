@@ -44,7 +44,7 @@
     @summaryList(SummaryList(
         rows = weeksForTaxYears.map { case (taxYear, weeks) =>
             SummaryListRow(
-                key = Key(Text(messages("site.taxYearTo", taxYear.formattedTaxYearArgs: _*)), "govuk-!-width-one-half"),
+                key = Key(Text(messages("site.taxYearTo", (taxYear.formattedTaxYearArgs)*)), "govuk-!-width-one-half"),
                 value = Value(Text(pluralOrSingularWeeks(weeks))),
                 actions = Some(Actions(
                     items = Seq(ActionItem(
@@ -53,7 +53,7 @@
                         visuallyHiddenText = Some(messages(
                             if(taxYear.equals(CurrentYear)) "confirmClaimInWeeks.multiple.hidden.current"
                             else "confirmClaimInWeeks.multiple.hidden.previous",
-                            taxYear.formattedTaxYearArgs: _*
+                            (taxYear.formattedTaxYearArgs)*
                         ))
                     ))
                 ))

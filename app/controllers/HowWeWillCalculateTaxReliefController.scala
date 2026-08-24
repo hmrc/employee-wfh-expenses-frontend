@@ -50,10 +50,10 @@ class HowWeWillCalculateTaxReliefController @Inject() (
 
     }
 
-  def onSubmit(): Action[AnyContent] = identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) {
-    request =>
+  def onSubmit(): Action[AnyContent] =
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { request =>
       given DataRequest[AnyContent] = request
       Redirect(navigator.nextPage(HowWeWillCalculateTaxReliefPage, request.userAnswers))
-  }
+    }
 
 }

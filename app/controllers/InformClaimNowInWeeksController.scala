@@ -16,7 +16,12 @@
 
 package controllers
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
+import controllers.actions.{
+  DataRequiredAction,
+  DataRetrievalAction,
+  IdentifierAction,
+  ManualCorrespondenceIndicatorAction
+}
 import models.requests.DataRequest
 
 import javax.inject.Inject
@@ -41,16 +46,16 @@ class InformClaimNowInWeeksController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) {
-    request =>
+  def onPageLoad: Action[AnyContent] =
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { request =>
       given DataRequest[AnyContent] = request
       Ok(informClaimNowInWeeksView())
-  }
+    }
 
-  def onSubmit(): Action[AnyContent] = identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) {
-    request =>
+  def onSubmit(): Action[AnyContent] =
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { request =>
       given DataRequest[AnyContent] = request
       Redirect(navigator.nextPage(InformClaimNowInWeeksPage, request.userAnswers))
-  }
+    }
 
 }

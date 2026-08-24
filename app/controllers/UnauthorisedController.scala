@@ -38,4 +38,5 @@ class UnauthorisedController @Inject() (
     given MessagesRequest[AnyContent] = request
     Ok(ivFailedView()).withNewSession
   )
+
 }

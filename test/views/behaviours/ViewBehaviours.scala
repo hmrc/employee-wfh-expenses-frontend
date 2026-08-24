@@ -38,21 +38,21 @@ trait ViewBehaviours extends ViewSpecBase {
           assertEqualsValue(
             doc,
             "title",
-            s"${messages(s"$messageKeyPrefix.title", args: _*)} - ${messages("service.name")} - GOV.UK"
+            s"${messages(s"$messageKeyPrefix.title", args*)} - ${messages("service.name")} - GOV.UK"
           )
         }
 
         "display the correct page title" in {
 
           val doc = asDocument(view)
-          assertPageTitleEqualsMessage(doc, s"$messageKeyPrefix.heading", args: _*)
+          assertPageTitleEqualsMessage(doc, s"$messageKeyPrefix.heading", args*)
         }
 
         "display the correct guidance" in {
 
           val doc = asDocument(view)
           for (key <- guidanceKeysWithArgs)
-            assertContainsText(doc, messages(s"$messageKeyPrefix.${key._1}", key._2: _*))
+            assertContainsText(doc, messages(s"$messageKeyPrefix.${key._1}", (key._2)*))
         }
       }
     }

@@ -30,10 +30,10 @@ object ETag {
     .collect(JsonValidationError("parse error")) { case Success(value) => value }
 
   given reads: Reads[ETag] = readsETag
-  
+
   lazy val writesETag: Writes[ETag] = (__ \ "etag").write[ETag]
-  
+
   given writes: Writes[ETag] = writesETag
-    
+
   given format: Format[ETag] = Format(reads, writes)
 }

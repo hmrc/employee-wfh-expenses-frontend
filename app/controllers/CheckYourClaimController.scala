@@ -48,8 +48,8 @@ class CheckYourClaimController @Inject() (
     with Logging {
 
   def onPageLoad: Action[AnyContent] =
-    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { request =>
-        given DataRequest[AnyContent] = request
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) {
+      request =>
       (
         request.userAnswers.get(SelectTaxYearsToClaimForPage),
         request.userAnswers.get(NumberOfWeeksToClaimForPage)(using NumberOfWeeksToClaimForPage.format)
@@ -63,6 +63,7 @@ class CheckYourClaimController @Inject() (
           val sortedGroupedSelectedTaxYear =
             groupedSelectedTaxYears.toSeq.sortBy(_._2.map(_.toTaxYear.startYear).max)(Ordering.Int.reverse)
           val currentYearContent = selectedTaxYears.contains(CurrentYear)
+          given DataRequest[AnyContent] = request
           Ok(
             checkYourClaimView(
               sortedGroupedSelectedTaxYear,

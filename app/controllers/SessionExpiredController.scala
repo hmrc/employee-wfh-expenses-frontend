@@ -32,4 +32,5 @@ class SessionExpiredController @Inject() (
     given MessagesRequest[AnyContent] = request
     Ok(view())
   )
+
 }

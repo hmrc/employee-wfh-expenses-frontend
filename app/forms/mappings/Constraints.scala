@@ -37,7 +37,7 @@ trait Constraints {
       if (input >= minimum) {
         Valid
       } else {
-        Invalid(errorKey, (Seq[Any](minimum) ++ args): _*)
+        Invalid(errorKey, (Seq[Any](minimum) ++ args)*)
       }
     }
 
@@ -50,7 +50,7 @@ trait Constraints {
       if (input <= maximum) {
         Valid
       } else {
-        Invalid(errorKey, (Seq[Any](maximum) ++ args): _*)
+        Invalid(errorKey, (Seq[Any](maximum) ++ args)*)
       }
     }
 

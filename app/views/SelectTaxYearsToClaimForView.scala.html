@@ -64,7 +64,7 @@
             name = "value",
             hint = Some(Hint(content = Text(messages("selectTaxYearsToClaimFor.hintText")))),
             items = TaxYearSelection.options(form, availableYears),
-            errorMessage = form.errors.headOption.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*))))
+            errorMessage = form.errors.headOption.map(err => ErrorMessage(content = Text(messages(err.message, (err.args)*))))
         ))
 
         @govukDetails(Details(

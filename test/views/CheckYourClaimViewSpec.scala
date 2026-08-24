@@ -98,9 +98,10 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
 
     val request = FakeRequest()
 
-    val view         = viewFor[CheckYourClaimView](Some(emptyUserAnswers))
-    val renderedView = view(groupedSelectedTaxYears, weeksForTaxYears, currentYearContent = true)(using request, messages)
-    val doc          = asDocument(renderedView)
+    val view = viewFor[CheckYourClaimView](Some(emptyUserAnswers))
+    val renderedView =
+      view(groupedSelectedTaxYears, weeksForTaxYears, currentYearContent = true)(using request, messages)
+    val doc = asDocument(renderedView)
 
     behave.like(
       normalPage(

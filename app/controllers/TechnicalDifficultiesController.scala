@@ -30,5 +30,7 @@ class TechnicalDifficultiesController @Inject() (
 
   def onPageLoad: Action[AnyContent] = Action(request =>
     given MessagesRequest[AnyContent] = request
-    InternalServerError(technicalErrorView()))
+    InternalServerError(technicalErrorView())
+  )
+
 }

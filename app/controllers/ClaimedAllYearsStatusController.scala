@@ -33,10 +33,9 @@ class ClaimedAllYearsStatusController @Inject() (
 )(using ec: ExecutionContext)
     extends FrontendBaseController {
 
-  def claimedAllYearsStatus(): Action[AnyContent] = identify.async {
-    request =>
-      given IdentifierRequest[AnyContent] = request
-      iabdService.claimedAllYearsStatus(request.nino).map(status => Ok(Json.obj("claimedAllYearsStatus" -> status)))
+  def claimedAllYearsStatus(): Action[AnyContent] = identify.async { request =>
+    given IdentifierRequest[AnyContent] = request
+    iabdService.claimedAllYearsStatus(request.nino).map(status => Ok(Json.obj("claimedAllYearsStatus" -> status)))
   }
 
 }

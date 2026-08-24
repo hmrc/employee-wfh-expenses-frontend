@@ -35,5 +35,7 @@ class ManualCorrespondenceIndicatorController @Inject() (
 
   def onPageLoad: Action[AnyContent] = identify(request =>
     given IdentifierRequest[AnyContent] = request
-    Ok(view()))
+    Ok(view())
+  )
+
 }

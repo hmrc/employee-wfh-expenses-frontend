@@ -294,7 +294,10 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(using any(), any())
         inOrder
           .verify(mockTaiConnector)
-          .postIabdData(eqm(testNino), eqm(CurrentYearMinus3.toTaxYear.startYear), any(), eqm(etag2))(using any(), any())
+          .postIabdData(eqm(testNino), eqm(CurrentYearMinus3.toTaxYear.startYear), any(), eqm(etag2))(
+            using any(),
+            any()
+          )
         inOrder.verify(mockCitizenDetailsConnector, times(0)).getETag(any())(using any(), any())
         inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(using any(), any())
 
@@ -374,7 +377,10 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
         inOrder.verify(mockCitizenDetailsConnector).getETag(eqm(testNino))(using any(), any())
         inOrder
           .verify(mockTaiConnector)
-          .postIabdData(eqm(testNino), eqm(CurrentYearMinus4.toTaxYear.startYear), any(), eqm(etag2))(using any(), any())
+          .postIabdData(eqm(testNino), eqm(CurrentYearMinus4.toTaxYear.startYear), any(), eqm(etag2))(
+            using any(),
+            any()
+          )
         inOrder.verify(mockCitizenDetailsConnector, times(0)).getETag(any())(using any(), any())
         inOrder.verify(mockTaiConnector, times(0)).postIabdData(any(), any(), any(), any())(using any(), any())
 

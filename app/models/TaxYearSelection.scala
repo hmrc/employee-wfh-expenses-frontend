@@ -118,7 +118,7 @@ object TaxYearSelection {
         content = Text(
           messages(
             s"selectTaxYearsToClaimFor.${if (value == CurrentYear) "current" else "previous"}",
-            value.formattedTaxYearArgs: _*
+            (value.formattedTaxYearArgs)*
           )
         ),
         checked = form.data.exists(_._2 == value.toString)

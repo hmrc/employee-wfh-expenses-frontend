@@ -16,7 +16,12 @@
 
 package controllers
 
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
+import controllers.actions.{
+  DataRequiredAction,
+  DataRetrievalAction,
+  IdentifierAction,
+  ManualCorrespondenceIndicatorAction
+}
 import forms.ConfirmClaimInWeeksFormProvider
 import models.requests.DataRequest
 import navigation.Navigator

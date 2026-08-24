@@ -52,10 +52,10 @@ class DisclaimerController @Inject() (
       }
     }
 
-  def onSubmit(): Action[AnyContent] = identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) {
-    request =>
+  def onSubmit(): Action[AnyContent] =
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { request =>
       given DataRequest[AnyContent] = request
       Redirect(navigator.nextPage(DisclaimerPage, request.userAnswers))
-  }
+    }
 
 }

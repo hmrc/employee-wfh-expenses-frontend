@@ -65,11 +65,11 @@
 }
 
 @weekClaimItem(taxYear: TaxYearSelection, weeks: Int) = {
-        <li>@messages("checkYourClaimView.list.weekClaimItem", pluralOrSingularWeeks(weeks) +: taxYear.formattedTaxYearArgs: _*)</li>
+        <li>@messages("checkYourClaimView.list.weekClaimItem", pluralOrSingularWeeks(weeks) +: (taxYear.formattedTaxYearArgs)*)</li>
 }
 
 @wholeYearClaimItem(taxYear: TaxYearSelection) = {
-        <li>@messages("checkYourClaimView.list.wholeYearClaimItem", taxYear.formattedTaxYearArgs: _*)</li>
+        <li>@messages("checkYourClaimView.list.wholeYearClaimItem", (taxYear.formattedTaxYearArgs)*)</li>
 }
 
 @detailsContent = {
@@ -89,7 +89,7 @@
     @claimDetails
 
     @if(currentYearContent) {
-        <p class="govuk-body">@messages("checkYourClaimView.text.2", NextYear.formattedTaxYearArgs: _*)</p>
+        <p class="govuk-body">@messages("checkYourClaimView.text.2", (NextYear.formattedTaxYearArgs)*)</p>
     }
 
     @govukDetails(Details(

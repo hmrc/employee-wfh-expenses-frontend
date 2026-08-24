@@ -59,7 +59,7 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
     }
   }
 
-  private def paperlessControllerTest(paperlessAvailable: Boolean, mergeJourney: Boolean): Future[_] = {
+  private def paperlessControllerTest(paperlessAvailable: Boolean, mergeJourney: Boolean): Future[?] = {
 
     val paperlessPreferenceConnector = mock[PaperlessPreferenceConnector]
     val auditConnector               = mock[AuditConnector]

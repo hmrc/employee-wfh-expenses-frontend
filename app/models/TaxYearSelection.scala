@@ -109,7 +109,7 @@ object TaxYearSelection {
       .map(_.flatMap(intYear => optTaxYearSelection(TaxYear(intYear))))
   }
 
-  def options(form: Form[_], values: Seq[TaxYearSelection])(using messages: Messages): Seq[CheckboxItem] =
+  def options(form: Form[?], values: Seq[TaxYearSelection])(using messages: Messages): Seq[CheckboxItem] =
     values.map { value =>
       CheckboxItem(
         name = Some("value[]"),

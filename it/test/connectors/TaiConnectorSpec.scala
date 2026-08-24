@@ -53,7 +53,7 @@ class TaiConnectorSpec
       val result = taiConnector.getOtherExpensesData(fakeNino, testTaxYear)
 
       whenReady(result) { res =>
-        res mustBe a[Seq[_]]
+        res mustBe a[Seq[?]]
         res.headOption mustBe Some(IABDExpense(testGrossAmount))
       }
     }
@@ -131,7 +131,7 @@ class TaiConnectorSpec
       val result = taiConnector.getJobExpensesData(fakeNino, testTaxYear)
 
       whenReady(result) { res =>
-        res mustBe a[Seq[_]]
+        res mustBe a[Seq[?]]
         res.headOption mustBe Some(IABDExpense(testGrossAmount))
       }
     }

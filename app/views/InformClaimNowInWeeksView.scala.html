@@ -22,7 +22,7 @@
     govukWarningText: GovukWarningText
 )
 
-@()(using request: Request[_], messages: Messages)
+@()(using request: Request[?], messages: Messages)
 
 @layout(
     pageTitle = messages("informClaimNowInWeeks.title")

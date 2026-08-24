@@ -18,7 +18,7 @@
     layout: views.templates.LayoutProvider,
 )
 
-@()(using request: Request[_], messages: Messages)
+@()(using request: Request[?], messages: Messages)
 
 @layout(pageTitle = messages("session_expired.title"), timeout = false) {
 

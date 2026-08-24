@@ -21,7 +21,7 @@
     appConfig:      FrontendAppConfig
 )
 
-@()(using request: Request[_], messages: Messages)
+@()(using request: Request[?], messages: Messages)
 
 @layout(pageTitle = messages("unauthorised.title")) {
 

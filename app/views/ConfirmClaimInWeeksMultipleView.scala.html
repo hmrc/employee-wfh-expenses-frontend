@@ -25,7 +25,7 @@
         summaryList: GovukSummaryList
 )
 
-@(weeksForTaxYears: ListMap[TaxYearSelection, Int])(using request: Request[_], messages: Messages)
+@(weeksForTaxYears: ListMap[TaxYearSelection, Int])(using request: Request[?], messages: Messages)
 
 @pluralOrSingularWeeks(weeks: Int) = @{
     if(weeks == 1) {

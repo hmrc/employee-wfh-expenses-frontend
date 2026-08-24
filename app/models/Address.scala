@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.functional.syntax._
+import play.api.libs.functional.syntax.*
 import play.api.libs.json.{Reads, Writes, __}
 
 case class Address(

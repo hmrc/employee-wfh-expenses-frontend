@@ -18,7 +18,7 @@ package services
 
 import config.FrontendAppConfig
 import connectors.TaiConnector
-import models.TaxYearSelection._
+import models.TaxYearSelection.*
 import models.auditing.AuditEventType.AlreadyClaimedExpenses
 import models.{Expenses, IABDExpense}
 import play.api.Logging

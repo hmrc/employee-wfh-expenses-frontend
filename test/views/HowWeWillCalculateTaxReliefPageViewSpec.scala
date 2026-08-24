@@ -49,7 +49,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours {
     }
 
     def checkContent(taxYear: TaxYearSelection, weekly: Boolean): Unit = {
-      import ExpectedContent._
+      import ExpectedContent.*
       val view    = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
       val request = FakeRequest()
 

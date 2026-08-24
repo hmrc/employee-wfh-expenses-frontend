@@ -18,7 +18,7 @@ package views
 
 import forms.SelectTaxYearsToClaimForFormProvider
 import models.TaxYearSelection
-import models.TaxYearSelection._
+import models.TaxYearSelection.*
 import play.api.data.Form
 import play.twirl.api.HtmlFormat
 import views.behaviours.CheckboxViewBehaviours

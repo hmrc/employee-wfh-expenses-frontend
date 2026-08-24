@@ -16,8 +16,8 @@
 
 package models
 
-import pages._
-import play.api.libs.json._
+import pages.*
+import play.api.libs.json.*
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
@@ -66,7 +66,7 @@ object UserAnswers {
 
   given reads: Reads[UserAnswers] = {
 
-    import play.api.libs.functional.syntax._
+    import play.api.libs.functional.syntax.*
 
     (__ \ "_id")
       .read[String]
@@ -76,7 +76,7 @@ object UserAnswers {
 
   given writes: OWrites[UserAnswers] = {
 
-    import play.api.libs.functional.syntax._
+    import play.api.libs.functional.syntax.*
 
     (__ \ "_id")
       .write[String]

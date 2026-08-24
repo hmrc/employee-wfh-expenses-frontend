@@ -28,14 +28,14 @@ import models.TaxYearSelection.{
 }
 import models.UserAnswers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
-import pages._
+import pages.*
 import play.api.inject.bind
 import play.api.libs.json.{JsArray, Json}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.SubmissionService
 
 import scala.concurrent.Future

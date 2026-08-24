@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import connectors.PaperlessPreferenceConnector
-import controllers.PaperlessAuditConst._
+import controllers.PaperlessAuditConst.*
 import models.TaxYearSelection.{CurrentYear, CurrentYearMinus1, CurrentYearMinus2, CurrentYearMinus4}
 import models.UserAnswers
 import models.paperless.{PaperlessStatus, PaperlessStatusResponse, Url}
@@ -29,7 +29,7 @@ import pages.{ClaimedForTaxYears, MergedJourneyFlag, SelectTaxYearsToClaimForPag
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global

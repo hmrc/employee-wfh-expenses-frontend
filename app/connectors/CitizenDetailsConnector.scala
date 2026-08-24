@@ -19,8 +19,8 @@ package connectors
 import com.google.inject.Inject
 import config.FrontendAppConfig
 import models.ETag
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Singleton

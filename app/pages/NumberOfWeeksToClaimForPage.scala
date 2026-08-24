@@ -17,7 +17,7 @@
 package pages
 
 import models.TaxYearSelection
-import play.api.libs.json._
+import play.api.libs.json.*
 import uk.gov.hmrc.time.TaxYear
 
 import scala.collection.immutable.ListMap

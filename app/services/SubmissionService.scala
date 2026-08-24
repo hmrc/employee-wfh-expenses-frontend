@@ -18,7 +18,7 @@ package services
 
 import config.FrontendAppConfig
 import connectors.{CitizenDetailsConnector, TaiConnector}
-import models.auditing.AuditEventType._
+import models.auditing.AuditEventType.*
 import models.requests.DataRequest
 import models.{AuditData, FlatRateItem, TaxYearSelection}
 import pages.SubmittedClaim

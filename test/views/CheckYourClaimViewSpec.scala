@@ -94,7 +94,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
   }
 
   "Check your claim page" must {
-    import ExpectedContent._
+    import ExpectedContent.*
 
     val request = FakeRequest()
 

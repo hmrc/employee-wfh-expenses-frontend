@@ -16,12 +16,12 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import config.FrontendAppConfig
 import helpers.IntegrationSpec
 import models.{ETag, IABDExpense}
 import org.scalatest.concurrent.IntegrationPatience
-import play.api.http.Status._
+import play.api.http.Status.*
 import uk.gov.hmrc.http.{JsValidationException, UpstreamErrorResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global

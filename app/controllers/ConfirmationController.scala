@@ -18,10 +18,10 @@ package controllers
 
 import config.FrontendAppConfig
 import connectors.PaperlessPreferenceConnector
-import controllers.PaperlessAuditConst._
-import controllers.actions._
+import controllers.PaperlessAuditConst.*
+import controllers.actions.*
 import models.TaxYearSelection.{containsCurrent, containsPrevious}
-import models.auditing.AuditEventType._
+import models.auditing.AuditEventType.*
 import models.requests.DataRequest
 import models.{
   ClaimCompleteCurrent,

@@ -19,9 +19,9 @@ package connectors
 import config.FrontendAppConfig
 import models.{ETag, IABDExpense}
 import play.api.http.Status.isSuccessful
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
 

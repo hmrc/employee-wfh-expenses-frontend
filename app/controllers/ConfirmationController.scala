@@ -60,12 +60,13 @@ class ConfirmationController @Inject() (
     appConfig: FrontendAppConfig,
     confirmationView: ConfirmationView,
     confirmationMergeJourneyView: ConfirmationMergeJourneyView
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = identify.andThen(getData).andThen(requireData).async { implicit request =>
+  def onPageLoad: Action[AnyContent] = identify.andThen(getData).andThen(requireData).async { request =>
+    given DataRequest[AnyContent] = request
     request.userAnswers.get(SubmittedClaim) match {
       case Some(_) =>
         paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account").map {
@@ -102,7 +103,7 @@ class ConfirmationController @Inject() (
 
   private def auditPaperlessPreferencesCheckSuccess(
       paperlessEnabled: Boolean
-  )(implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+  )(using dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       PaperlessPreferenceCheckSuccess.toString,
       Map(
@@ -113,7 +114,7 @@ class ConfirmationController @Inject() (
 
   private def auditPaperlessPreferencesCheckFailure(
       error: String
-  )(implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+  )(using dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       PaperlessPreferenceCheckFailure.toString,
       Map(

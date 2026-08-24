@@ -31,7 +31,7 @@ class EmployeeExpensesConnectorSpec
     with MockitoSugar
     with IntegrationPatience {
 
-  implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  given fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   private lazy val employeeExpensesConnector = app.injector.instanceOf[EmployeeExpensesConnector]
 

@@ -23,7 +23,7 @@
     errorSummary: components.error_summary
 )
 
-@(form: Form[Boolean], numberOfWeeksToConfirm: Int, taxYear: TaxYearSelection)(implicit request: Request[_], messages: Messages)
+@(form: Form[Boolean], numberOfWeeksToConfirm: Int, taxYear: TaxYearSelection)(using request: Request[_], messages: Messages)
 
 @prefix = @{
     if(taxYear.equals(TaxYearSelection.CurrentYear)) {

@@ -99,7 +99,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
     val request = FakeRequest()
 
     val view         = viewFor[CheckYourClaimView](Some(emptyUserAnswers))
-    val renderedView = view(groupedSelectedTaxYears, weeksForTaxYears, currentYearContent = true)(request, messages)
+    val renderedView = view(groupedSelectedTaxYears, weeksForTaxYears, currentYearContent = true)(using request, messages)
     val doc          = asDocument(renderedView)
 
     behave.like(
@@ -159,7 +159,7 @@ class CheckYourClaimViewSpec extends ViewBehaviours {
         groupedSelectedTaxYears,
         weeksForTaxYears.filterNot(_._1.equals(CurrentYear)),
         currentYearContent = false
-      )(request, messages)
+      )(using request, messages)
       val doc = asDocument(renderedView)
 
       assertNotContainsText(doc, text2)

@@ -34,7 +34,7 @@ class ConfirmClaimInWeeksViewSpec extends ViewBehaviours {
   val form                          = new ConfirmClaimInWeeksFormProvider()(2)
 
   def createView(form: Form[Boolean], numberofWeeks: Int, taxYearSelected: TaxYearSelection): Html =
-    view.apply(form, numberofWeeks, taxYearSelected)(fakeRequest, messages)
+    view.apply(form, numberofWeeks, taxYearSelected)(using fakeRequest, messages)
 
   "Confirm claim in weeks view" should {
 

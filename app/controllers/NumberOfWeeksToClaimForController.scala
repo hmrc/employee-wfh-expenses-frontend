@@ -16,14 +16,10 @@
 
 package controllers
 
-import controllers.actions.{
-  DataRequiredAction,
-  DataRetrievalAction,
-  IdentifierAction,
-  ManualCorrespondenceIndicatorAction
-}
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction, ManualCorrespondenceIndicatorAction}
 import forms.NumberOfWeeksToClaimForFormProvider
-import models.TaxYearSelection._
+import models.TaxYearSelection.*
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.{NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage}
 import play.api.Logging
@@ -49,17 +45,18 @@ class NumberOfWeeksToClaimForController @Inject() (
     numberOfWeeksToClaimForMultipleYearsView: NumberOfWeeksToClaimForMultipleYearsView,
     formProvider: NumberOfWeeksToClaimForFormProvider,
     val controllerComponents: MessagesControllerComponents
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad: Action[AnyContent] =
-    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { implicit request =>
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { request =>
+      given DataRequest[AnyContent] = request
       request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(wholeYearClaims.contains)) match {
         case Some(list) if list.nonEmpty =>
           val preparedForm =
-            request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) match {
+            request.userAnswers.get(NumberOfWeeksToClaimForPage)(using NumberOfWeeksToClaimForPage.format) match {
               case None        => formProvider(list)
               case Some(value) => formProvider(list).fill(value)
             }
@@ -75,7 +72,8 @@ class NumberOfWeeksToClaimForController @Inject() (
     }
 
   def onSubmit: Action[AnyContent] =
-    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData).async { implicit request =>
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData).async { request =>
+      given DataRequest[AnyContent] = request
       request.userAnswers.get(SelectTaxYearsToClaimForPage).map(_.filterNot(wholeYearClaims.contains)) match {
         case Some(list) if list.nonEmpty =>
           formProvider(list)
@@ -91,7 +89,7 @@ class NumberOfWeeksToClaimForController @Inject() (
                 for {
                   updatedAnswers <- Future.fromTry(
                     request.userAnswers
-                      .set(NumberOfWeeksToClaimForPage, value)(NumberOfWeeksToClaimForPage.format)
+                      .set(NumberOfWeeksToClaimForPage, value)(using NumberOfWeeksToClaimForPage.format)
                   )
                   _ <- sessionService.set(updatedAnswers)
                 } yield Redirect(navigator.nextPage(NumberOfWeeksToClaimForPage, updatedAnswers))

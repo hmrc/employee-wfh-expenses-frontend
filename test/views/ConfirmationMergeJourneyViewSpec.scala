@@ -31,7 +31,7 @@ class ConfirmationMergeJourneyViewSpec extends ViewBehaviours {
 
     "show content" when {
 
-      val doc = asDocument(view.apply("url-string")(request, messages))
+      val doc = asDocument(view.apply("url-string")(using request, messages))
 
       "when all confirmation content is displayed" in {
         assert(doc.toString.contains(messages("confirmation.mergeJourney.whatHappensNext.heading")))
@@ -46,7 +46,7 @@ class ConfirmationMergeJourneyViewSpec extends ViewBehaviours {
     }
 
     "behave like a normal page" when
-      behave.like(normalPage(view.apply("url-string")(request, messages), ConfirmationMergeJourney, args = Nil))
+      behave.like(normalPage(view.apply("url-string")(using request, messages), ConfirmationMergeJourney, args = Nil))
   }
 
 }

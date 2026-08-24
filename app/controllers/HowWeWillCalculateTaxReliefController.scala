@@ -16,10 +16,12 @@
 
 package controllers
 
-import actions._
+import actions.*
+import models.requests.DataRequest
+
 import javax.inject.Inject
 import navigation.Navigator
-import pages._
+import pages.*
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -38,7 +40,8 @@ class HowWeWillCalculateTaxReliefController @Inject() (
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] =
-    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { implicit request =>
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { request =>
+      given DataRequest[AnyContent] = request
       request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
         case Some(selectedTaxYears) =>
           Ok(howWeWillCalculateTaxReliefView(selectedTaxYears))
@@ -48,7 +51,9 @@ class HowWeWillCalculateTaxReliefController @Inject() (
     }
 
   def onSubmit(): Action[AnyContent] = identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) {
-    implicit request => Redirect(navigator.nextPage(HowWeWillCalculateTaxReliefPage, request.userAnswers))
+    request =>
+      given DataRequest[AnyContent] = request
+      Redirect(navigator.nextPage(HowWeWillCalculateTaxReliefPage, request.userAnswers))
   }
 
 }

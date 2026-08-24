@@ -29,7 +29,7 @@ import scala.util.Try
 sealed trait TaxYearSelection {
   def toTaxYear: TaxYear
 
-  def formattedTaxYearArgs(implicit messages: Messages): Seq[String] = {
+  def formattedTaxYearArgs(using messages: Messages): Seq[String] = {
     val taxYear       = toTaxYear
     val formatter     = DateTimeFormatter.ofPattern("d MMMM yyyy", messages.lang.toLocale)
     val start: String = taxYear.starts.format(formatter)
@@ -94,22 +94,22 @@ object TaxYearSelection {
 
   def optTaxYearSelection(taxYear: TaxYear): Option[TaxYearSelection] = Try(mapping(taxYear)).toOption
 
-  implicit val reads: Reads[TaxYearSelection] = Reads { json =>
+  given reads: Reads[TaxYearSelection] = Reads { json =>
     json
       .validate[Int]
       .map(intYear => mapping(TaxYear(intYear)))
   }
 
-  implicit val writes: Writes[TaxYearSelection] =
+  given writes: Writes[TaxYearSelection] =
     Writes(taxYearSelection => Json.toJson(taxYearSelection.toTaxYear.startYear))
 
-  implicit val seqReads: Reads[Seq[TaxYearSelection]] = Reads { json =>
+  given seqReads: Reads[Seq[TaxYearSelection]] = Reads { json =>
     json
       .validate[Seq[Int]]
       .map(_.flatMap(intYear => optTaxYearSelection(TaxYear(intYear))))
   }
 
-  def options(form: Form[_], values: Seq[TaxYearSelection])(implicit messages: Messages): Seq[CheckboxItem] =
+  def options(form: Form[_], values: Seq[TaxYearSelection])(using messages: Messages): Seq[CheckboxItem] =
     values.map { value =>
       CheckboxItem(
         name = Some("value[]"),

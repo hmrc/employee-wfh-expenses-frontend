@@ -17,15 +17,16 @@
 package controllers
 
 import config.FrontendAppConfig
-import controllers.actions._
+import controllers.actions.*
 import models.TaxYearSelection.{CurrentYear, wholeYearClaims}
+import models.requests.DataRequest
 import pages.{NumberOfWeeksToClaimForPage, SelectTaxYearsToClaimForPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.SubmissionService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html._
+import views.html.*
 
 import javax.inject.Inject
 import scala.collection.immutable.ListMap
@@ -41,16 +42,17 @@ class CheckYourClaimController @Inject() (
     submissionService: SubmissionService,
     val controllerComponents: MessagesControllerComponents,
     checkYourClaimView: CheckYourClaimView
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad: Action[AnyContent] =
-    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { implicit request =>
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { request =>
+        given DataRequest[AnyContent] = request
       (
         request.userAnswers.get(SelectTaxYearsToClaimForPage),
-        request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)
+        request.userAnswers.get(NumberOfWeeksToClaimForPage)(using NumberOfWeeksToClaimForPage.format)
       ) match {
         case (Some(selectedTaxYears), optWeeksForTaxYears)
             if selectedTaxYears.nonEmpty
@@ -74,10 +76,11 @@ class CheckYourClaimController @Inject() (
     }
 
   def onSubmit(): Action[AnyContent] =
-    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData).async { implicit request =>
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData).async { request =>
+      given DataRequest[AnyContent] = request
       (
         request.userAnswers.get(SelectTaxYearsToClaimForPage),
-        request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format)
+        request.userAnswers.get(NumberOfWeeksToClaimForPage)(using NumberOfWeeksToClaimForPage.format)
       ) match {
         case (Some(selectedTaxYears), optWeeksForTaxYears)
             if selectedTaxYears.nonEmpty

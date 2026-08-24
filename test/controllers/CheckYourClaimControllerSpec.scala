@@ -136,7 +136,7 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with Befor
 
   "CheckYourClaimController POST" must {
     "redirect to confirmation page if submission is successful" in {
-      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any()))
+      when(mockSubmissionService.submitExpenses(any(), any())(using any(), any(), any()))
         .thenReturn(Future.successful(Right(())))
 
       val application = applicationBuilder(userAnswers = Some(fullUserAnswers))
@@ -152,7 +152,7 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with Befor
     }
     if (yearlyClaimFor.value.nonEmpty) {
       "redirect to confirmation page if submission with whole years only is successful" in {
-        when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any()))
+        when(mockSubmissionService.submitExpenses(any(), any())(using any(), any(), any()))
           .thenReturn(Future.successful(Right(())))
 
         val application = applicationBuilder(userAnswers = Some(fullUserAnswersWithoutWeeks))
@@ -168,7 +168,7 @@ class CheckYourClaimControllerSpec extends SpecBase with MockitoSugar with Befor
       }
     }
     "redirect to technical difficulties page if an error is thrown" in {
-      when(mockSubmissionService.submitExpenses(any(), any())(any(), any(), any()))
+      when(mockSubmissionService.submitExpenses(any(), any())(using any(), any(), any()))
         .thenReturn(Future.successful(Left("")))
 
       val application = applicationBuilder(userAnswers = Some(fullUserAnswers))

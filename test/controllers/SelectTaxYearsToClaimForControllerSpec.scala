@@ -67,7 +67,7 @@ class SelectTaxYearsToClaimForControllerSpec extends SpecBase with MockitoSugar 
 
       val mockSessionService: SessionService = mock[SessionService]
 
-      when(mockSessionService.set(any())(any())).thenReturn(Future.successful(true))
+      when(mockSessionService.set(any())(using any())).thenReturn(Future.successful(true))
 
       val application =
         applicationBuilder(userAnswers = Some(emptyUserAnswers))

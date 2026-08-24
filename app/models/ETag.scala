@@ -24,12 +24,16 @@ case class ETag(version: Int)
 
 object ETag {
 
-  implicit lazy val reads: Reads[ETag] = (__ \ "etag")
+  lazy val readsETag: Reads[ETag] = (__ \ "etag")
     .read[String]
     .map(x => Try(ETag(x.toInt)))
     .collect(JsonValidationError("parse error")) { case Success(value) => value }
 
-  implicit lazy val writes: Writes[ETag] = (__ \ "etag").write[ETag]
-
-  implicit val format: Format[ETag] = Format(reads, writes)
+  given reads: Reads[ETag] = readsETag
+  
+  lazy val writesETag: Writes[ETag] = (__ \ "etag").write[ETag]
+  
+  given writes: Writes[ETag] = writesETag
+    
+  given format: Format[ETag] = Format(reads, writes)
 }

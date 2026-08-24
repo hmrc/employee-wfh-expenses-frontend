@@ -32,7 +32,7 @@ final case class Service(host: String, port: String, protocol: String) {
 
 object Service {
 
-  implicit lazy val configLoader: ConfigLoader[Service] = ConfigLoader { config => prefix =>
+  lazy val configLoaderService: ConfigLoader[Service] = ConfigLoader { config => prefix =>
     val service  = Configuration(config).get[Configuration](prefix)
     val host     = service.get[String]("host")
     val port     = service.get[String]("port")
@@ -41,7 +41,9 @@ object Service {
     Service(host, port, protocol)
   }
 
-  implicit def convertToString(service: Service): String =
-    service.baseUrl
+  given configLoader: ConfigLoader[Service] = configLoaderService
+
+  given convertToString: Conversion[Service, String] with
+    def apply(service: Service): String = service.baseUrl
 
 }

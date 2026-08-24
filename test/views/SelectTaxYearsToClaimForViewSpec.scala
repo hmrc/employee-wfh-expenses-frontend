@@ -35,7 +35,7 @@ class SelectTaxYearsToClaimForViewSpec extends CheckboxViewBehaviours[TaxYearSel
     val view = viewFor[SelectTaxYearsToClaimForView](Some(emptyUserAnswers))
 
     def applyView(form: Form[Seq[TaxYearSelection]]): HtmlFormat.Appendable =
-      view.apply(form, valuesAll)(fakeRequest, messages)
+      view.apply(form, valuesAll)(using fakeRequest, messages)
 
     behave.like(normalPage(applyView(form), messageKeyPrefix, args = Nil))
 

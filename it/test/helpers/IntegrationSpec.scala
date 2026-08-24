@@ -34,7 +34,7 @@ trait IntegrationSpec
     with IntegrationApplication
     with ScalaFutures {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  given hc: HeaderCarrier = HeaderCarrier()
 
   override def beforeAll(): Unit = {
     super.beforeAll()

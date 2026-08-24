@@ -47,7 +47,7 @@ class KeepAliveControllerSpec
         .overrides(bind[SessionService].toInstance(mockSessionService))
         .build()
 
-      when(mockSessionService.updateTimeToLive(any())(any())).thenReturn(Future.successful(true))
+      when(mockSessionService.updateTimeToLive(any())(using any())).thenReturn(Future.successful(true))
 
       val request = FakeRequest(GET, routes.KeepAliveController.keepAlive.url)
       val result  = route(application, request).value
@@ -61,7 +61,7 @@ class KeepAliveControllerSpec
         .overrides(bind[SessionService].toInstance(mockSessionService))
         .build()
 
-      when(mockSessionService.updateTimeToLive(any())(any())).thenReturn(Future.successful(false))
+      when(mockSessionService.updateTimeToLive(any())(using any())).thenReturn(Future.successful(false))
 
       val request = FakeRequest(GET, routes.KeepAliveController.keepAlive.url)
       val result  = route(application, request).value

@@ -28,7 +28,7 @@ class IdentityVerificationFailedViewSpec extends ViewBehaviours {
 
     val view = application.injector.instanceOf[IdentityVerificationFailedView]
 
-    val applyView = view.apply()(FakeRequest(), messages)
+    val applyView = view.apply()(using FakeRequest(), messages)
 
     behave.like(normalPage(applyView, "ivfailed", args = Nil))
   }

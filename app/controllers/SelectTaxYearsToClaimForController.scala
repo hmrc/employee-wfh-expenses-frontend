@@ -16,11 +16,12 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import forms.SelectTaxYearsToClaimForFormProvider
 import models.TaxYearSelection
+import models.requests.DataRequest
 import navigation.Navigator
-import pages._
+import pages.*
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -43,14 +44,15 @@ class SelectTaxYearsToClaimForController @Inject() (
     formProvider: SelectTaxYearsToClaimForFormProvider,
     val controllerComponents: MessagesControllerComponents,
     view: SelectTaxYearsToClaimForView
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   val form: Form[Seq[TaxYearSelection]] = formProvider()
 
-  def onPageLoad(): Action[AnyContent] = identify.andThen(getData).andThen(requireData).async { implicit request =>
+  def onPageLoad(): Action[AnyContent] = identify.andThen(getData).andThen(requireData).async { request =>
+    given DataRequest[AnyContent] = request
     request.userAnswers.get(ClaimedForTaxYears) match {
       case Some(years) =>
         val availableYears = TaxYearSelection.getClaimableTaxYears(years)
@@ -66,7 +68,8 @@ class SelectTaxYearsToClaimForController @Inject() (
     }
   }
 
-  def onSubmit(): Action[AnyContent] = identify.andThen(getData).andThen(requireData).async { implicit request =>
+  def onSubmit(): Action[AnyContent] = identify.andThen(getData).andThen(requireData).async { request =>
+    given DataRequest[AnyContent] = request
     val availableYearsUserCanClaim = TaxYearSelection.getClaimableTaxYears(
       request.userAnswers.get(ClaimedForTaxYears).getOrElse(Nil)
     )

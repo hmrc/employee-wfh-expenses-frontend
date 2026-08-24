@@ -40,7 +40,7 @@ class LayoutProvider @Inject() (
       timeout: Boolean = true,
       scripts: Option[Html] = None,
       stylesheets: Option[Html] = None
-  )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages): HtmlFormat.Appendable =
+  )(contentBlock: Html)(using request: RequestHeader, messages: Messages): HtmlFormat.Appendable =
     wrapperService.standardScaLayout(
       disableSessionExpired = !timeout,
       content = contentBlock,

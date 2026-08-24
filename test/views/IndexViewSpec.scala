@@ -32,7 +32,7 @@ class IndexViewSpec extends ViewBehaviours {
 
     val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
-    val applyView = view.apply()(request, messages)
+    val applyView = view.apply()(using request, messages)
 
     behave.like(normalPage(applyView, "index", args = Nil, ("heading", Nil)))
   }

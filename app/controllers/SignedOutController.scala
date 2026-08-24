@@ -21,7 +21,7 @@ import connectors.BasGatewayConnector
 
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.WeSignedYouOutPageView
 
@@ -32,12 +32,13 @@ class SignedOutController @Inject() (
     val frontendAppConfig: FrontendAppConfig,
     val basGatewayConnector: BasGatewayConnector,
     val weSignedYouOutSavedTemplate: WeSignedYouOutPageView
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 
   def signOut: Action[AnyContent] =
-    Action.async(implicit request =>
+    Action.async(request =>
+      given MessagesRequest[AnyContent] = request
       basGatewayConnector.signOutUser().map(_ => Ok(weSignedYouOutSavedTemplate()).withNewSession)
     )
 

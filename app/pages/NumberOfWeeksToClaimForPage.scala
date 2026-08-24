@@ -28,7 +28,7 @@ case object NumberOfWeeksToClaimForPage extends QuestionPage[ListMap[TaxYearSele
 
   override def toString: String = "numberOfWeeksToClaimForPage"
 
-  implicit val format: Format[ListMap[TaxYearSelection, Int]] = new Format[ListMap[TaxYearSelection, Int]] {
+  given format: Format[ListMap[TaxYearSelection, Int]] = new Format[ListMap[TaxYearSelection, Int]] {
     override def reads(json: JsValue): JsResult[ListMap[TaxYearSelection, Int]] =
       json
         .validate[List[(Int, Int)]]

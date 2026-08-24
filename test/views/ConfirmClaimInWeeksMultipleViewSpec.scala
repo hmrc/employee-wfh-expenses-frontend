@@ -67,7 +67,7 @@ class ConfirmClaimInWeeksMultipleViewSpec extends ViewBehaviours {
     val request = FakeRequest()
 
     val view         = viewFor[ConfirmClaimInWeeksMultipleView](Some(emptyUserAnswers))
-    val renderedView = view(weeksForTaxYears)(request, messages)
+    val renderedView = view(weeksForTaxYears)(using request, messages)
     val doc          = asDocument(renderedView)
 
     behave.like(

@@ -29,7 +29,7 @@
         button: GovukButton
 )
 
-@(groupedSelectedTaxYears: Seq[(Int, Seq[TaxYearSelection])], weeksForTaxYears: ListMap[TaxYearSelection, Int], currentYearContent: Boolean)(implicit request: Request[_], messages: Messages)
+@(groupedSelectedTaxYears: Seq[(Int, Seq[TaxYearSelection])], weeksForTaxYears: ListMap[TaxYearSelection, Int], currentYearContent: Boolean)(using request: Request[_], messages: Messages)
 
 @pluralOrSingularWeeks(weeks: Long) = @{
     if(weeks == 1) {

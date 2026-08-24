@@ -29,10 +29,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class SessionService @Inject() (
     sessionRepository: SessionRepository,
     employeeExpensesConnector: EmployeeExpensesConnector
-)(implicit executionContext: ExecutionContext)
+)(using executionContext: ExecutionContext)
     extends Logging {
 
-  def set(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[Boolean] =
+  def set(userAnswers: UserAnswers)(using hc: HeaderCarrier): Future[Boolean] =
     for {
       repoResponse <- sessionRepository.set(userAnswers)
       mergedJourneyRefreshed <-
@@ -43,7 +43,7 @@ class SessionService @Inject() (
 
   def get(id: String): Future[Option[UserAnswers]] = sessionRepository.get(id)
 
-  def updateTimeToLive(id: String)(implicit hc: HeaderCarrier): Future[Boolean] =
+  def updateTimeToLive(id: String)(using hc: HeaderCarrier): Future[Boolean] =
     sessionRepository.get(id).flatMap {
       case Some(userAnswers) => set(userAnswers)
       case _                 => Future.successful(false)

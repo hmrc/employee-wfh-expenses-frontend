@@ -33,13 +33,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class ErrorHandler @Inject() (
     val messagesApi: MessagesApi,
     view: ErrorTemplate
-)(implicit val ec: ExecutionContext)
+)(using val ec: ExecutionContext)
     extends FrontendErrorHandler
     with I18nSupport
     with Logging {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(
-      implicit rh: RequestHeader
+      using rh: RequestHeader
   ): Future[Html] =
     Future.successful(view(pageTitle, heading, message))
 
@@ -55,7 +55,7 @@ class ErrorHandler @Inject() (
 
   class Status(status: Int) extends Result(header = ResponseHeader(status), body = HttpEntity.NoEntity) {
 
-    def apply[C](content: C)(implicit writeable: Writeable[C]): Result =
+    def apply[C](content: C)(using writeable: Writeable[C]): Result =
       Result(
         header,
         writeable.toEntity(content)

@@ -16,7 +16,9 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
+import models.requests.IdentifierRequest
+
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,5 +33,7 @@ class ManualCorrespondenceIndicatorController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = identify(implicit request => Ok(view()))
+  def onPageLoad: Action[AnyContent] = identify(request =>
+    given IdentifierRequest[AnyContent] = request
+    Ok(view()))
 }

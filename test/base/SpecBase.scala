@@ -44,7 +44,7 @@ trait SpecBase
     with IntegrationPatience
     with MockitoSugar {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  given hc: HeaderCarrier = HeaderCarrier()
 
   val userAnswersId = "id"
 
@@ -58,7 +58,7 @@ trait SpecBase
 
   def fakeRequest = FakeRequest("", "")
 
-  implicit def messages: Messages = messagesApi.preferred(fakeRequest)
+  given messages: Messages = messagesApi.preferred(fakeRequest)
 
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()

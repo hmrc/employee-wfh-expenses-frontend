@@ -41,7 +41,7 @@ class SubmissionService @Inject() (
 ) extends Logging {
 
   def submitExpenses(selectedTaxYears: Seq[TaxYearSelection], weeksForTaxYears: ListMap[TaxYearSelection, Int])(
-      implicit dataRequest: DataRequest[AnyContent],
+      using dataRequest: DataRequest[AnyContent],
       hc: HeaderCarrier,
       ec: ExecutionContext
   ): Future[Either[String, Unit]] =
@@ -63,7 +63,7 @@ class SubmissionService @Inject() (
   private def submit(
       selectedTaxYears: Seq[TaxYearSelection],
       weeksForTaxYears: ListMap[TaxYearSelection, Int]
-  )(implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext) = {
+  )(using dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext) = {
 
     val (wholeYearSelections, perWeekSelections) = selectedTaxYears.partition(TaxYearSelection.wholeYearClaims.contains)
 
@@ -102,7 +102,7 @@ class SubmissionService @Inject() (
 
   private def futureSequence[I, O](
       inputs: Seq[I]
-  )(flatMapFunction: I => Future[O])(implicit ec: ExecutionContext): Future[Seq[O]] =
+  )(flatMapFunction: I => Future[O])(using ec: ExecutionContext): Future[Seq[O]] =
     inputs.foldLeft(Future.successful(Seq.empty[O]))((previousFutureResult, nextInput) =>
       for {
         futureSeq <- previousFutureResult
@@ -112,7 +112,7 @@ class SubmissionService @Inject() (
 
   private def auditSubmissionSuccess(
       submittedDetails: Seq[FlatRateItem]
-  )(implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+  )(using dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       UpdateWorkingFromHomeFlatRateSuccess.toString,
       AuditData(
@@ -124,7 +124,7 @@ class SubmissionService @Inject() (
 
   private def auditSubmissionFailure(
       error: String
-  )(implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+  )(using dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       UpdateWorkingFromHomeFlatRateFailure.toString,
       AuditData(

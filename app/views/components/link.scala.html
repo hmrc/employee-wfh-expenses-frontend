@@ -19,6 +19,6 @@
 @(link: String,
         messageKey: String,
         attrTarget: Boolean = false,
-        id: Option[String] = None)(implicit messages: Messages)
+        id: Option[String] = None)(using messages: Messages)
 
 <a href="@link" class="govuk-link" @id.map(x => s"id=$x") @if(attrTarget) { target="_blank" rel="noopener noreferrer" }>@messages(messageKey)</a>

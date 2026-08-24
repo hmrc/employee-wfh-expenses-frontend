@@ -40,7 +40,7 @@ class SessionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter 
       extends SessionService(
         mockSessionRepository,
         mockEmployeeExpensesConnector
-      )(app.injector.instanceOf[ExecutionContext])
+      )(using app.injector.instanceOf[ExecutionContext])
 
   val testId = "testId"
 

@@ -50,7 +50,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
   val mockSessionService: SessionService = mock[SessionService]
   val mockAppConfig: FrontendAppConfig   = mock[FrontendAppConfig]
 
-  implicit val defaultOptionalDataRequest: OptionalDataRequest[AnyContent] = OptionalDataRequest(
+  given defaultOptionalDataRequest: OptionalDataRequest[AnyContent] = OptionalDataRequest(
     FakeRequest("GET", "?eligibilityCheckerSessionId=qqq"),
     "XXX",
     None,
@@ -68,7 +68,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
     "redirect to the TaxYearSelection page for a GET" when {
       "not claimed expenses for any years" in {
         val expenses = Nil
-        when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))
+        when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(using any())).thenReturn(Future(expenses))
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[IABDService].toInstance(mockIABDService))
@@ -88,7 +88,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
           Expenses(testYear2021, Seq.empty, jobExpenses, wasJobRateExpensesChecked = true)
         )
 
-        when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))
+        when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(using any())).thenReturn(Future(expenses))
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[IABDService].toInstance(mockIABDService))
@@ -113,8 +113,8 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
           Expenses(testYear2020, otherExpenses, jobExpenses, wasJobRateExpensesChecked = true)
         )
 
-        when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(any())).thenReturn(Future(expenses))
-        when(mockIABDService.allYearsClaimed(any(), any(), any())(any())).thenReturn(true)
+        when(mockIABDService.getAlreadyClaimedStatusForAllYears(any())(using any())).thenReturn(Future(expenses))
+        when(mockIABDService.allYearsClaimed(any(), any(), any())(using any())).thenReturn(true)
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[IABDService].toInstance(mockIABDService))

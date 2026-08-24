@@ -32,19 +32,19 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaiConnector @Inject() (appConfig: FrontendAppConfig, httpClient: HttpClientV2) {
 
   def getOtherExpensesData(nino: String, year: Int)(
-      implicit hc: HeaderCarrier,
+      using hc: HeaderCarrier,
       ec: ExecutionContext
   ): Future[Seq[IABDExpense]] =
     getIabdData(nino, year, appConfig.otherExpensesId)
 
   def getJobExpensesData(nino: String, year: Int)(
-      implicit hc: HeaderCarrier,
+      using hc: HeaderCarrier,
       ec: ExecutionContext
   ): Future[Seq[IABDExpense]] =
     getIabdData(nino, year, appConfig.jobExpenseId)
 
   private def getIabdData(nino: String, year: Int, iabd: Int)(
-      implicit hc: HeaderCarrier,
+      using hc: HeaderCarrier,
       ec: ExecutionContext
   ): Future[Seq[IABDExpense]] = {
     val taiUrl = s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/employee-expenses/$iabd"
@@ -54,7 +54,7 @@ class TaiConnector @Inject() (appConfig: FrontendAppConfig, httpClient: HttpClie
   }
 
   def postIabdData(nino: String, year: Int, grossAmount: Int, eTag: ETag)(
-      implicit hc: HeaderCarrier,
+      using hc: HeaderCarrier,
       ec: ExecutionContext
   ): Future[Unit] = {
     val taiUrl =

@@ -23,7 +23,7 @@
         inputNumber: components.input_number
 )
 
-@(form: Form[_], taxYear: TaxYearSelection)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], taxYear: TaxYearSelection)(using request: Request[_], messages: Messages)
 
 
 @prefix = @{

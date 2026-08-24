@@ -85,13 +85,13 @@ class ConfirmationControllerSpec extends SpecBase with MockitoSugar {
       .build()
 
     if (paperlessAvailable) {
-      when(paperlessPreferenceConnector.getPaperlessStatus(any())(any(), any())).thenReturn(
+      when(paperlessPreferenceConnector.getPaperlessStatus(any())(using any(), any())).thenReturn(
         Future(
           Right(PaperlessStatusResponse(PaperlessStatus("ALRIGHT"), Url("", "")))
         )
       )
     } else {
-      when(paperlessPreferenceConnector.getPaperlessStatus(any())(any(), any())).thenReturn(
+      when(paperlessPreferenceConnector.getPaperlessStatus(any())(using any(), any())).thenReturn(
         Future(
           Right(PaperlessStatusResponse(PaperlessStatus("PAPER"), Url(somePreferencesUrl, "")))
         )

@@ -18,7 +18,7 @@ package controllers
 
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, MessagesRequest}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.{IdentityVerificationFailedView, UnauthorisedView}
 
@@ -29,7 +29,13 @@ class UnauthorisedController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport {
 
-  def onPageLoad: Action[AnyContent] = Action(implicit request => Ok(view()))
+  def onPageLoad: Action[AnyContent] = Action(request =>
+    given MessagesRequest[AnyContent] = request
+    Ok(view())
+  )
 
-  def ivFailure: Action[AnyContent] = Action(implicit request => Ok(ivFailedView()).withNewSession)
+  def ivFailure: Action[AnyContent] = Action(request =>
+    given MessagesRequest[AnyContent] = request
+    Ok(ivFailedView()).withNewSession
+  )
 }

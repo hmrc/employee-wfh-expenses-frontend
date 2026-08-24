@@ -16,8 +16,9 @@
 
 package controllers
 
-import controllers.actions._
+import controllers.actions.*
 import models.TaxYearSelection.{contains2020or2021, contains2022orAfter}
+import models.requests.DataRequest
 
 import javax.inject.Inject
 import navigation.Navigator
@@ -42,7 +43,8 @@ class DisclaimerController @Inject() (
     with Logging {
 
   def onPageLoad: Action[AnyContent] =
-    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { implicit request =>
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { request =>
+      given DataRequest[AnyContent] = request
       request.userAnswers.get(SelectTaxYearsToClaimForPage) match {
         case Some(selectedTaxYears) =>
           Ok(disclaimerView(contains2022orAfter(selectedTaxYears), contains2020or2021(selectedTaxYears)))
@@ -51,7 +53,9 @@ class DisclaimerController @Inject() (
     }
 
   def onSubmit(): Action[AnyContent] = identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) {
-    implicit request => Redirect(navigator.nextPage(DisclaimerPage, request.userAnswers))
+    request =>
+      given DataRequest[AnyContent] = request
+      Redirect(navigator.nextPage(DisclaimerPage, request.userAnswers))
   }
 
 }

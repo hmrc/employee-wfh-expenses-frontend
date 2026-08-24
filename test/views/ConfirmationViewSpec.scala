@@ -35,7 +35,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
 
       "when all confirmation content is displayed" in {
 
-        val doc = asDocument(view.apply(true, None, true, true)(request, messages))
+        val doc = asDocument(view.apply(true, None, true, true)(using request, messages))
 
         assert(doc.toString.contains(messages("confirmation.info.paragraph")))
         assert(doc.toString.contains(messages("confirmation.changes.currentYear.heading")))
@@ -50,7 +50,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
 
       "when the user is not already paperless" in {
 
-        val doc = asDocument(view.apply(false, Some("url-string"), false, false)(request, messages))
+        val doc = asDocument(view.apply(false, Some("url-string"), false, false)(using request, messages))
 
         assert(doc.toString.contains(messages("confirmation.paperless.header")))
         assert(doc.toString.contains(messages("confirmation.paperless.paragraph.1")))
@@ -62,7 +62,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
 
       "when the user is already paperless" in {
 
-        val doc = asDocument(view.apply(true, None, false, false)(request, messages))
+        val doc = asDocument(view.apply(true, None, false, false)(using request, messages))
 
         assert(!doc.toString.contains(messages("confirmation.paperless.header")))
         assert(!doc.toString.contains(messages("confirmation.paperless.paragraph.1")))
@@ -71,7 +71,7 @@ class ConfirmationViewSpec extends ViewBehaviours {
     }
 
     "behave like a normal page" when
-      behave.like(normalPage(view.apply(true, None, true, true)(request, messages), Confirmation, args = Nil))
+      behave.like(normalPage(view.apply(true, None, true, true)(using request, messages), Confirmation, args = Nil))
   }
 
 }

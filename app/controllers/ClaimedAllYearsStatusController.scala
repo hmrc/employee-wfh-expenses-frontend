@@ -17,7 +17,8 @@
 package controllers
 
 import controllers.actions.IdentifierAction
-import play.api.libs.json._
+import models.requests.IdentifierRequest
+import play.api.libs.json.*
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.IABDService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -29,11 +30,13 @@ class ClaimedAllYearsStatusController @Inject() (
     val controllerComponents: MessagesControllerComponents,
     val iabdService: IABDService,
     identify: IdentifierAction
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
     extends FrontendBaseController {
 
-  def claimedAllYearsStatus(): Action[AnyContent] = identify.async { implicit request =>
-    iabdService.claimedAllYearsStatus(request.nino).map(status => Ok(Json.obj("claimedAllYearsStatus" -> status)))
+  def claimedAllYearsStatus(): Action[AnyContent] = identify.async {
+    request =>
+      given IdentifierRequest[AnyContent] = request
+      iabdService.claimedAllYearsStatus(request.nino).map(status => Ok(Json.obj("claimedAllYearsStatus" -> status)))
   }
 
 }

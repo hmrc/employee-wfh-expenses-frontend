@@ -21,6 +21,7 @@ import play.api.i18n.Messages
 import play.api.mvc.RequestHeader
 import play.twirl.api.{Html, HtmlFormat}
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.ServiceURLs
+import uk.gov.hmrc.sca.config.BackLinkConfig
 import uk.gov.hmrc.sca.services.WrapperService
 import views.html.components.{AdditionalScript, HeadBlock}
 import uk.gov.hmrc.sca.config.BackLinkConfig
@@ -40,20 +41,27 @@ class LayoutProvider @Inject() (
       timeout: Boolean = true,
       scripts: Option[Html] = None,
       stylesheets: Option[Html] = None
-  )(contentBlock: Html)(using request: RequestHeader, messages: Messages): HtmlFormat.Appendable =
+  )(contentBlock: Html)(using request: RequestHeader, messages: Messages): HtmlFormat.Appendable = {
+    val hideAccountMenu = request.session.get("authToken").isEmpty
     wrapperService.standardScaLayout(
       disableSessionExpired = !timeout,
       content = contentBlock,
       pageTitle = Some(s"$pageTitle - ${messages("service.name")} - GOV.UK"),
+      serviceNameKey = Some("service.name"),
       serviceURLs = ServiceURLs(
         serviceUrl = Some(controllers.routes.IndexController.start.url),
-        signOutUrl = Some(controllers.routes.SignedOutController.signOut.url)
+        signOutUrl = Option.unless(hideAccountMenu) {
+          controllers.routes.SignedOutController.signOut.url
+        }
       ),
-      backLinkConfig = if (showBackLink) Some(BackLinkConfig.JsBack) else None,
+      backLinkConfig = Option.when(showBackLink) {
+        BackLinkConfig.JsBack
+      },
       scripts = scripts.toSeq :+ additionalScript(),
       styleSheets = stylesheets.toSeq :+ headBlock(),
       fullWidth = false,
-      hideMenuBar = request.session.get("authToken").isEmpty
+      hideMenuBar = hideAccountMenu
     )(messages, request)
+  }
 
 }

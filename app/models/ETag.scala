@@ -35,5 +35,7 @@ object ETag {
 
   given writes: Writes[ETag] = writesETag
 
-  given format: Format[ETag] = Format(reads, writes)
+  val formatETag: Format[ETag] = Format(reads, writes)
+
+  given format: Format[ETag] = formatETag
 }

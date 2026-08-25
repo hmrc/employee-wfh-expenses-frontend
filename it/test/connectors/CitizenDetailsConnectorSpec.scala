@@ -19,7 +19,7 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import helpers.IntegrationSpec
 import models.ETag
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.IntegrationPatience
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status.*
 import uk.gov.hmrc.http.UpstreamErrorResponse

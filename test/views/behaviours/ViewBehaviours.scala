@@ -52,7 +52,7 @@ trait ViewBehaviours extends ViewSpecBase {
 
           val doc = asDocument(view)
           for (key <- guidanceKeysWithArgs)
-            assertContainsText(doc, messages(s"$messageKeyPrefix.${key._1}", (key._2)*))
+            assertContainsText(doc, messages(s"$messageKeyPrefix.${key._1}", key._2*))
         }
       }
     }

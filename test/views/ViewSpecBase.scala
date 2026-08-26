@@ -26,7 +26,7 @@ import scala.reflect.ClassTag
 
 trait ViewSpecBase extends SpecBase {
 
-  def viewFor[A](data: Option[UserAnswers] = None)(using tag: ClassTag[A]): A = {
+  def viewFor[A](data: Option[UserAnswers] = None)(using ClassTag[A]): A = {
     val application = applicationBuilder(data).build()
     val view        = application.injector.instanceOf[A]
     application.stop()

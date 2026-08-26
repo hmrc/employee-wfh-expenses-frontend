@@ -40,7 +40,7 @@ class IndexController @Inject() (
     getData: DataRetrievalAction,
     identify: IdentifierAction,
     citizenDetailsCheck: ManualCorrespondenceIndicatorAction
-)(using executionContext: ExecutionContext)
+)(using ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 

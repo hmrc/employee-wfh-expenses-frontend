@@ -42,7 +42,7 @@ class PaperlessPreferenceConnectorImpl @Inject() (
 
   def getPaperlessStatus(
       returnUrl: String
-  )(using request: Request[AnyContent], ec: ExecutionContext): Future[Either[String, PaperlessStatusResponse]] = {
+  )(using Request[AnyContent], ExecutionContext): Future[Either[String, PaperlessStatusResponse]] = {
     val paperlessStatusUrl =
       s"${appConfig.preferencesFrontendHost}/paperless/status" +
         s"?returnUrl=${encryptAndEncode(returnUrl)}" +
@@ -71,6 +71,6 @@ trait PaperlessPreferenceConnector {
 
   def getPaperlessStatus(
       returnUrl: String
-  )(using request: Request[AnyContent], ec: ExecutionContext): Future[Either[String, PaperlessStatusResponse]]
+  )(using Request[AnyContent], ExecutionContext): Future[Either[String, PaperlessStatusResponse]]
 
 }

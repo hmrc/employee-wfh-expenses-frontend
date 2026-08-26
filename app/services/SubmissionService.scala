@@ -102,7 +102,7 @@ class SubmissionService @Inject() (
 
   private def futureSequence[I, O](
       inputs: Seq[I]
-  )(flatMapFunction: I => Future[O])(using ec: ExecutionContext): Future[Seq[O]] =
+  )(flatMapFunction: I => Future[O])(using ExecutionContext): Future[Seq[O]] =
     inputs.foldLeft(Future.successful(Seq.empty[O]))((previousFutureResult, nextInput) =>
       for {
         futureSeq <- previousFutureResult

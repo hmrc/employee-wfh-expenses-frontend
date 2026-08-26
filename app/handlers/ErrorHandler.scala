@@ -39,7 +39,7 @@ class ErrorHandler @Inject() (
     with Logging {
 
   override def standardErrorTemplate(pageTitle: String, heading: String, message: String)(
-      using rh: RequestHeader
+      using RequestHeader
   ): Future[Html] =
     Future.successful(view(pageTitle, heading, message))
 

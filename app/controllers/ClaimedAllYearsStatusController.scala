@@ -30,7 +30,7 @@ class ClaimedAllYearsStatusController @Inject() (
     val controllerComponents: MessagesControllerComponents,
     val iabdService: IABDService,
     identify: IdentifierAction
-)(using ec: ExecutionContext)
+)(using ExecutionContext)
     extends FrontendBaseController {
 
   def claimedAllYearsStatus(): Action[AnyContent] = identify.async { request =>

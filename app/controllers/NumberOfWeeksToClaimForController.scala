@@ -50,7 +50,7 @@ class NumberOfWeeksToClaimForController @Inject() (
     numberOfWeeksToClaimForMultipleYearsView: NumberOfWeeksToClaimForMultipleYearsView,
     formProvider: NumberOfWeeksToClaimForFormProvider,
     val controllerComponents: MessagesControllerComponents
-)(using ec: ExecutionContext)
+)(using ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {

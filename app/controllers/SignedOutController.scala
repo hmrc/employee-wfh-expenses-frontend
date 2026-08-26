@@ -32,7 +32,7 @@ class SignedOutController @Inject() (
     val frontendAppConfig: FrontendAppConfig,
     val basGatewayConnector: BasGatewayConnector,
     val weSignedYouOutSavedTemplate: WeSignedYouOutPageView
-)(using ec: ExecutionContext)
+)(using ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
 

@@ -42,7 +42,7 @@ class CheckYourClaimController @Inject() (
     submissionService: SubmissionService,
     val controllerComponents: MessagesControllerComponents,
     checkYourClaimView: CheckYourClaimView
-)(using ec: ExecutionContext)
+)(using ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {

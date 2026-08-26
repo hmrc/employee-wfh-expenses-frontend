@@ -49,7 +49,7 @@ class ConfirmClaimInWeeksController @Inject() (
     confirmClaimInWeeksMultipleView: ConfirmClaimInWeeksMultipleView,
     formProvider: ConfirmClaimInWeeksFormProvider,
     val controllerComponents: MessagesControllerComponents
-)(using ec: ExecutionContext)
+)(using ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {

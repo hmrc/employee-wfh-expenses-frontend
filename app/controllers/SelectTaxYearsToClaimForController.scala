@@ -44,7 +44,7 @@ class SelectTaxYearsToClaimForController @Inject() (
     formProvider: SelectTaxYearsToClaimForFormProvider,
     val controllerComponents: MessagesControllerComponents,
     view: SelectTaxYearsToClaimForView
-)(using ec: ExecutionContext)
+)(using ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {

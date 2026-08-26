@@ -60,7 +60,7 @@ class ConfirmationController @Inject() (
     appConfig: FrontendAppConfig,
     confirmationView: ConfirmationView,
     confirmationMergeJourneyView: ConfirmationMergeJourneyView
-)(using ec: ExecutionContext)
+)(using ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {

@@ -76,7 +76,7 @@ class SubmissionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAft
 
   "submit" when {
 
-    given dataRequest: DataRequest[AnyContent] =
+    given DataRequest[AnyContent] =
       DataRequest(fakeRequest, "internalId", UserAnswers("id"), testNino)
 
     val wholeYearClaimAmount                  = 312

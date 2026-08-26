@@ -50,6 +50,6 @@ trait UserAnswersGenerator extends TryValues {
     }
   }
 
-  given arbitraryUserData: Arbitrary[UserAnswers] = arbitraryUserAnswers
+  given Arbitrary[UserAnswers] = arbitraryUserAnswers
 
 }

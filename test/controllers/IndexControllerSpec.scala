@@ -50,7 +50,7 @@ class IndexControllerSpec extends SpecBase with BeforeAndAfter {
   val mockSessionService: SessionService = mock[SessionService]
   val mockAppConfig: FrontendAppConfig   = mock[FrontendAppConfig]
 
-  given defaultOptionalDataRequest: OptionalDataRequest[AnyContent] = OptionalDataRequest(
+  given OptionalDataRequest[AnyContent] = OptionalDataRequest(
     FakeRequest("GET", "?eligibilityCheckerSessionId=qqq"),
     "XXX",
     None,

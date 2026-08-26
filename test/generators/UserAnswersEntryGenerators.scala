@@ -33,7 +33,7 @@ trait UserAnswersEntryGenerators extends PageGenerators with ModelGenerators {
       } yield (page, value)
     }
 
-  given arbitrarySelectTaxYearsToClaimForUserAnswersEntry: Arbitrary[(SelectTaxYearsToClaimForPage.type, JsValue)] =
+  given Arbitrary[(SelectTaxYearsToClaimForPage.type, JsValue)] =
     arbitrarySelectTaxYearsToClaimForUserAnswersEntryPage
 
 }

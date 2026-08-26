@@ -48,7 +48,7 @@ object Address {
       .and((__ \ "address" \ "postcode").readNullable[String])
       .and((__ \ "address" \ "country").readNullable[String])(Address.apply _)
 
-  given reads: Reads[Address] = readsAddress
+  given Reads[Address] = readsAddress
 
   lazy val writesAddress: Writes[Address] =
     (__ \ "address" \ "line1")
@@ -72,6 +72,6 @@ object Address {
         )
       )
 
-  given writes: Writes[Address] = writesAddress
+  given Writes[Address] = writesAddress
 
 }

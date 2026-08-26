@@ -35,7 +35,7 @@ class SessionRepositorySpec
     with CleanMongoCollectionSupport
     with BeforeAndAfterEach {
 
-  given ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  given ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   val userId        = "user-id"
   val anotherUserId = "another-user-id"

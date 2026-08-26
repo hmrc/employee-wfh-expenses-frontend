@@ -26,5 +26,5 @@ trait ModelGenerators {
       Gen.oneOf(TaxYearSelection.valuesAll.toSeq)
     }
 
-  given arbitrarySelectTaxYearsToClaimFor: Arbitrary[TaxYearSelection] = arbitrarySelectTaxYears
+  given Arbitrary[TaxYearSelection] = arbitrarySelectTaxYears
 }

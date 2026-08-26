@@ -24,7 +24,7 @@ trait PageGenerators {
   lazy val selectTaxYearsToClaimForPage: Arbitrary[SelectTaxYearsToClaimForPage.type] =
     Arbitrary(SelectTaxYearsToClaimForPage)
 
-  given arbitrarySelectTaxYearsToClaimForPage: Arbitrary[SelectTaxYearsToClaimForPage.type] =
+  given Arbitrary[SelectTaxYearsToClaimForPage.type] =
     selectTaxYearsToClaimForPage
 
 }

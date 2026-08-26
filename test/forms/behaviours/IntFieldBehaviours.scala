@@ -21,7 +21,7 @@ import play.api.data.{Form, FormError}
 
 trait IntFieldBehaviours extends FieldBehaviours {
 
-  given noShrink: Shrink[Int] = Shrink.shrinkAny
+  given Shrink[Int] = Shrink.shrinkAny
 
   def intField(form: Form[?], fieldName: String, nonNumericError: FormError, wholeNumberError: FormError): Unit = {
 

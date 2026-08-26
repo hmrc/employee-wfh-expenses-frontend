@@ -22,7 +22,7 @@ case class FlatRateItem(year: Int, amount: Int)
 
 object FlatRateItem {
 
-  given flatRateItemReads: Reads[FlatRateItem]   = Json.reads[FlatRateItem]
-  given flatRateItemWrtes: OWrites[FlatRateItem] = Json.writes[FlatRateItem]
+  given Reads[FlatRateItem]   = Json.reads[FlatRateItem]
+  given OWrites[FlatRateItem] = Json.writes[FlatRateItem]
 
 }

@@ -94,16 +94,16 @@ object TaxYearSelection {
 
   def optTaxYearSelection(taxYear: TaxYear): Option[TaxYearSelection] = Try(mapping(taxYear)).toOption
 
-  given reads: Reads[TaxYearSelection] = Reads { json =>
+  given Reads[TaxYearSelection] = Reads { json =>
     json
       .validate[Int]
       .map(intYear => mapping(TaxYear(intYear)))
   }
 
-  given writes: Writes[TaxYearSelection] =
+  given Writes[TaxYearSelection] =
     Writes(taxYearSelection => Json.toJson(taxYearSelection.toTaxYear.startYear))
 
-  given seqReads: Reads[Seq[TaxYearSelection]] = Reads { json =>
+  given Reads[Seq[TaxYearSelection]] = Reads { json =>
     json
       .validate[Seq[Int]]
       .map(_.flatMap(intYear => optTaxYearSelection(TaxYear(intYear))))

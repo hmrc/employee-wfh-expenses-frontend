@@ -38,7 +38,7 @@ class PaperlessConnectorSpec
     with IntegrationPatience
     with ExpectedResults {
 
-  given fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  given FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   private lazy val paperlessPreferenceConnector = app.injector.instanceOf[PaperlessPreferenceConnector]
 

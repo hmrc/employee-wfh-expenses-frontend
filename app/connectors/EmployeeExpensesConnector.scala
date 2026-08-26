@@ -33,7 +33,7 @@ class EmployeeExpensesConnector @Inject() (appConfig: FrontendAppConfig, httpCli
 
   def updateMergedJourneySession(headerCarrier: HeaderCarrier): Future[Boolean] = {
     given HeaderCarrier = headerCarrier.copy(extraHeaders = headerCarrier.headers(Seq(HeaderNames.COOKIE)))
-    val url: String         = s"${appConfig.employeeExpensesHost}/employee-expenses/merged-journey-refresh-session"
+    val url: String     = s"${appConfig.employeeExpensesHost}/employee-expenses/merged-journey-refresh-session"
     httpClient
       .get(url"$url")
       .execute[HttpResponse]

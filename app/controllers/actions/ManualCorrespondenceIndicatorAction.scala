@@ -37,7 +37,7 @@ class ManualCorrespondenceIndicatorActionImpl @Inject() (
     with Logging {
 
   override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = {
-    given hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     citizenDetailsConnector
       .getAddress(request.nino)

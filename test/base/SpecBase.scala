@@ -44,7 +44,7 @@ trait SpecBase
     with IntegrationPatience
     with MockitoSugar {
 
-  given hc: HeaderCarrier = HeaderCarrier()
+  given HeaderCarrier = HeaderCarrier()
 
   val userAnswersId = "id"
 

@@ -38,7 +38,7 @@ object Address {
 
   def asLabel(a: Address): String = s"${answeredLines(a).mkString(", ")}"
 
-  lazy val readsAddress: Reads[Address] =
+  given Reads[Address] =
     (__ \ "address" \ "line1")
       .readNullable[String]
       .and((__ \ "address" \ "line2").readNullable[String])
@@ -48,9 +48,7 @@ object Address {
       .and((__ \ "address" \ "postcode").readNullable[String])
       .and((__ \ "address" \ "country").readNullable[String])(Address.apply _)
 
-  given Reads[Address] = readsAddress
-
-  lazy val writesAddress: Writes[Address] =
+  given Writes[Address] =
     (__ \ "address" \ "line1")
       .writeNullable[String]
       .and((__ \ "address" \ "line2").writeNullable[String])
@@ -71,7 +69,5 @@ object Address {
           )
         )
       )
-
-  given Writes[Address] = writesAddress
 
 }

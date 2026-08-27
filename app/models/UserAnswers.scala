@@ -27,10 +27,10 @@ case class UserAnswers(id: String, data: JsObject = Json.obj(), lastUpdated: Ins
 
   def isMergedJourney: Boolean = get(MergedJourneyFlag).getOrElse(false)
 
-  def get[A](page: QuestionPage[A])(using rds: Reads[A]): Option[A] =
+  def get[A](page: QuestionPage[A])(using Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(page.path)).reads(data).getOrElse(None)
 
-  def set[A](page: QuestionPage[A], value: A)(using writes: Writes[A]): Try[UserAnswers] = {
+  def set[A](page: QuestionPage[A], value: A)(using Writes[A]): Try[UserAnswers] = {
 
     val updatedData = data.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>

@@ -26,7 +26,5 @@ case class AuditData(
 )
 
 object AuditData {
-  lazy val formatAuditData: Format[AuditData] = Json.format[AuditData]
-
-  given Format[AuditData] = formatAuditData
+  given Format[AuditData] = Json.format[AuditData]
 }

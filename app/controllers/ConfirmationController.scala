@@ -103,7 +103,7 @@ class ConfirmationController @Inject() (
 
   private def auditPaperlessPreferencesCheckSuccess(
       paperlessEnabled: Boolean
-  )(using dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+  )(using dataRequest: DataRequest[AnyContent])(using HeaderCarrier, ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       PaperlessPreferenceCheckSuccess.toString,
       Map(
@@ -114,7 +114,7 @@ class ConfirmationController @Inject() (
 
   private def auditPaperlessPreferencesCheckFailure(
       error: String
-  )(using dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+  )(using dataRequest: DataRequest[AnyContent])(using HeaderCarrier, ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       PaperlessPreferenceCheckFailure.toString,
       Map(

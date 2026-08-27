@@ -30,7 +30,7 @@ trait UserAnswersGenerator extends TryValues {
     arbitrary[(SelectTaxYearsToClaimForPage.type, JsValue)] ::
       Nil
 
-  lazy val arbitraryUserAnswers: Arbitrary[UserAnswers] = {
+  given Arbitrary[UserAnswers] = {
 
     import models.*
 
@@ -49,7 +49,5 @@ trait UserAnswersGenerator extends TryValues {
       )
     }
   }
-
-  given Arbitrary[UserAnswers] = arbitraryUserAnswers
 
 }

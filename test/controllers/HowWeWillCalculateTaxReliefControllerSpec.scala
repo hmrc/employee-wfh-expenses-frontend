@@ -22,7 +22,7 @@ import models.UserAnswers
 import pages.{ClaimedForTaxYears, SelectTaxYearsToClaimForPage}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 
 class HowWeWillCalculateTaxReliefControllerSpec extends SpecBase {
 

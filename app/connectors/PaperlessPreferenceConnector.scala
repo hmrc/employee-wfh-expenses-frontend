@@ -22,7 +22,7 @@ import models.paperless.PaperlessStatusResponse
 import play.api.Logging
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, PlainText}
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
@@ -42,7 +42,7 @@ class PaperlessPreferenceConnectorImpl @Inject() (
 
   def getPaperlessStatus(
       returnUrl: String
-  )(implicit request: Request[AnyContent], ec: ExecutionContext): Future[Either[String, PaperlessStatusResponse]] = {
+  )(using Request[AnyContent], ExecutionContext): Future[Either[String, PaperlessStatusResponse]] = {
     val paperlessStatusUrl =
       s"${appConfig.preferencesFrontendHost}/paperless/status" +
         s"?returnUrl=${encryptAndEncode(returnUrl)}" +
@@ -71,6 +71,6 @@ trait PaperlessPreferenceConnector {
 
   def getPaperlessStatus(
       returnUrl: String
-  )(implicit request: Request[AnyContent], ec: ExecutionContext): Future[Either[String, PaperlessStatusResponse]]
+  )(using Request[AnyContent], ExecutionContext): Future[Either[String, PaperlessStatusResponse]]
 
 }

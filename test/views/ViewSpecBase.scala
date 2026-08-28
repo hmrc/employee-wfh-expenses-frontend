@@ -26,7 +26,7 @@ import scala.reflect.ClassTag
 
 trait ViewSpecBase extends SpecBase {
 
-  def viewFor[A](data: Option[UserAnswers] = None)(implicit tag: ClassTag[A]): A = {
+  def viewFor[A](data: Option[UserAnswers] = None)(using ClassTag[A]): A = {
     val application = applicationBuilder(data).build()
     val view        = application.injector.instanceOf[A]
     application.stop()
@@ -52,7 +52,7 @@ trait ViewSpecBase extends SpecBase {
     val heading     = doc.getElementsByClass("govuk-heading-xl")
     val sizeToCheck = if (headers.size == 1) headers.size else heading.size
     sizeToCheck mustBe 1
-    headers.first.text.replaceAll("\u00a0", " ") mustBe messages(expectedMessageKey, args: _*).replaceAll("&nbsp;", " ")
+    headers.first.text.replaceAll("\u00a0", " ") mustBe messages(expectedMessageKey, args*).replaceAll("&nbsp;", " ")
   }
 
   def assertPageTitleEqualsMessageDisclaimer(doc: Document, expectedMessageKey: String, args: Any*) = {
@@ -60,7 +60,7 @@ trait ViewSpecBase extends SpecBase {
     val heading     = doc.getElementsByClass("govuk-heading-xl")
     val sizeToCheck = if (headers.size == 2) headers.size else heading.size
     sizeToCheck mustBe 2
-    headers.first.text.replaceAll("\u00a0", " ") mustBe messages(expectedMessageKey, args: _*).replaceAll("&nbsp;", " ")
+    headers.first.text.replaceAll("\u00a0", " ") mustBe messages(expectedMessageKey, args*).replaceAll("&nbsp;", " ")
   }
 
   def assertContainsText(doc: Document, text: String) =

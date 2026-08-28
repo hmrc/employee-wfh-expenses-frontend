@@ -23,14 +23,14 @@ import play.api.i18n.Messages
 
 class ConfirmClaimInWeeksFormProvider @Inject() extends Mappings {
 
-  private def pluralOrSingularWeeks(weeks: Long)(implicit messages: Messages) =
+  private def pluralOrSingularWeeks(weeks: Long)(using messages: Messages) =
     if (weeks == 1) {
       messages("number.of.weeks.singular", weeks)
     } else {
       messages("number.of.weeks.plural", weeks)
     }
 
-  def apply(numberOfWeeksToConfirm: Int)(implicit messages: Messages): Form[Boolean] =
+  def apply(numberOfWeeksToConfirm: Int)(using messages: Messages): Form[Boolean] =
     Form(
       "value" -> boolean("confirmClaimInWeeks.error.required", pluralOrSingularWeeks(numberOfWeeksToConfirm))
     )

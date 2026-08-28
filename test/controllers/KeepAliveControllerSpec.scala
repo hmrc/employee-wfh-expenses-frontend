@@ -18,13 +18,13 @@ package controllers
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.SessionService
 
 import scala.concurrent.Future
@@ -47,7 +47,7 @@ class KeepAliveControllerSpec
         .overrides(bind[SessionService].toInstance(mockSessionService))
         .build()
 
-      when(mockSessionService.updateTimeToLive(any())(any())).thenReturn(Future.successful(true))
+      when(mockSessionService.updateTimeToLive(any())(using any())).thenReturn(Future.successful(true))
 
       val request = FakeRequest(GET, routes.KeepAliveController.keepAlive.url)
       val result  = route(application, request).value
@@ -61,7 +61,7 @@ class KeepAliveControllerSpec
         .overrides(bind[SessionService].toInstance(mockSessionService))
         .build()
 
-      when(mockSessionService.updateTimeToLive(any())(any())).thenReturn(Future.successful(false))
+      when(mockSessionService.updateTimeToLive(any())(using any())).thenReturn(Future.successful(false))
 
       val request = FakeRequest(GET, routes.KeepAliveController.keepAlive.url)
       val result  = route(application, request).value

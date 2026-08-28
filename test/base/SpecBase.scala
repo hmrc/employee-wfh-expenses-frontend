@@ -17,14 +17,14 @@
 package base
 
 import config.FrontendAppConfig
-import controllers.actions._
+import controllers.actions.*
 import models.UserAnswers
 import org.jsoup.Jsoup
 import org.scalatest.TryValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import org.scalatestplus.play.guice._
+import org.scalatestplus.play.guice.*
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.inject.{Injector, bind}
@@ -44,7 +44,7 @@ trait SpecBase
     with IntegrationPatience
     with MockitoSugar {
 
-  implicit val hc: HeaderCarrier = HeaderCarrier()
+  given HeaderCarrier = HeaderCarrier()
 
   val userAnswersId = "id"
 
@@ -58,7 +58,7 @@ trait SpecBase
 
   def fakeRequest = FakeRequest("", "")
 
-  implicit def messages: Messages = messagesApi.preferred(fakeRequest)
+  given messages: Messages = messagesApi.preferred(fakeRequest)
 
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()

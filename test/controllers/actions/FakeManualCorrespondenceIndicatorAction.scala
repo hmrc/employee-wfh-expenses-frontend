@@ -17,13 +17,13 @@
 package controllers.actions
 
 import models.requests.IdentifierRequest
-import play.api.mvc._
+import play.api.mvc.*
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class FakeManualCorrespondenceIndicatorAction extends ManualCorrespondenceIndicatorAction {
 
-  override protected implicit val executionContext: ExecutionContext =
+  override protected given executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global
 
   override protected def filter[A](request: IdentifierRequest[A]): Future[Option[Result]] = Future.successful(None)

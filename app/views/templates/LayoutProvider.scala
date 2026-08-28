@@ -24,6 +24,7 @@ import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.ServiceURLs
 import uk.gov.hmrc.sca.config.BackLinkConfig
 import uk.gov.hmrc.sca.services.WrapperService
 import views.html.components.{AdditionalScript, HeadBlock}
+import uk.gov.hmrc.sca.config.BackLinkConfig
 
 import javax.inject.Inject
 
@@ -40,7 +41,7 @@ class LayoutProvider @Inject() (
       timeout: Boolean = true,
       scripts: Option[Html] = None,
       stylesheets: Option[Html] = None
-  )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages): HtmlFormat.Appendable = {
+  )(contentBlock: Html)(using request: RequestHeader, messages: Messages): HtmlFormat.Appendable = {
     val hideAccountMenu = request.session.get("authToken").isEmpty
     wrapperService.standardScaLayout(
       disableSessionExpired = !timeout,

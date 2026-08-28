@@ -23,7 +23,7 @@ case class PaperlessStatus(
 )
 
 object PaperlessStatus {
-  implicit val format: OFormat[PaperlessStatus] = Json.format[PaperlessStatus]
+  given OFormat[PaperlessStatus] = Json.format[PaperlessStatus]
 }
 
 case class Url(
@@ -32,7 +32,7 @@ case class Url(
 )
 
 object Url {
-  implicit val format: OFormat[Url] = Json.format[Url]
+  given OFormat[Url] = Json.format[Url]
 }
 
 case class PaperlessStatusResponse(
@@ -43,5 +43,5 @@ case class PaperlessStatusResponse(
 }
 
 object PaperlessStatusResponse {
-  implicit val format: OFormat[PaperlessStatusResponse] = Json.format[PaperlessStatusResponse]
+  given OFormat[PaperlessStatusResponse] = Json.format[PaperlessStatusResponse]
 }

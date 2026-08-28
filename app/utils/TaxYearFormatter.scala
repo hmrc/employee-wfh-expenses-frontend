@@ -21,7 +21,7 @@ import play.api.i18n.Messages
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-case class TaxYearFormatter(taxYears: List[(LocalDate, LocalDate)])(implicit val messages: Messages) {
+case class TaxYearFormatter(taxYears: List[(LocalDate, LocalDate)])(using messages: Messages) {
 
   private lazy val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", messages.lang.toLocale)
 

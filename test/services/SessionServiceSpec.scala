@@ -26,7 +26,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatestplus.mockito.MockitoSugar
 import pages.MergedJourneyFlag
 import play.api.libs.json.Json
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.SessionRepository
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,7 +40,7 @@ class SessionServiceSpec extends SpecBase with MockitoSugar with BeforeAndAfter 
       extends SessionService(
         mockSessionRepository,
         mockEmployeeExpensesConnector
-      )(app.injector.instanceOf[ExecutionContext])
+      )(using app.injector.instanceOf[ExecutionContext])
 
   val testId = "testId"
 

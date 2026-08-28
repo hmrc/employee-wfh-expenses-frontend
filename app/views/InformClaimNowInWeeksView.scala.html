@@ -22,7 +22,7 @@
     govukWarningText: GovukWarningText
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@()(using request: Request[?], messages: Messages)
 
 @layout(
     pageTitle = messages("informClaimNowInWeeks.title")
@@ -42,7 +42,7 @@
         @messages("informClaimNowInWeeks.paragraph.3")
     </p>
 
-    @formHelper(action = InformClaimNowInWeeksController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.InformClaimNowInWeeksController.onSubmit(), Symbol("autoComplete") -> "off") {
         @button(Button(content = Text(messages("informClaimNowInWeeks.button.text")), preventDoubleClick  = Some(true)))
     }
 }

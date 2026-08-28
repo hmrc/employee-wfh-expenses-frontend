@@ -23,7 +23,7 @@
         inputNumber: components.input_number
 )
 
-@(form: Form[_], taxYear: TaxYearSelection)(implicit request: Request[_], messages: Messages)
+@(form: Form[?], taxYear: TaxYearSelection)(using request: Request[?], messages: Messages)
 
 
 @prefix = @{
@@ -35,7 +35,7 @@
 }
 
 @layout(
-    pageTitle = s"${errorPrefix(form)} ${messages(s"$prefix.title", taxYear.formattedTaxYearArgs: _*)}"
+    pageTitle = s"${errorPrefix(form)} ${messages(s"$prefix.title", (taxYear.formattedTaxYearArgs)*)}"
 ) {
 
     @if(form.errors.nonEmpty) {
@@ -45,15 +45,15 @@
         ))
     }
 
-    <h1 class="govuk-heading-xl">@messages(s"$prefix.heading", taxYear.formattedTaxYearArgs: _*)</h1>
+    <h1 class="govuk-heading-xl">@messages(s"$prefix.heading", (taxYear.formattedTaxYearArgs)*)</h1>
 
-    <p class="govuk-body">@messages(s"$prefix.para", taxYear.formattedTaxYearArgs: _*)</p>
+    <p class="govuk-body">@messages(s"$prefix.para", (taxYear.formattedTaxYearArgs)*)</p>
 
     @formHelper(action = routes.NumberOfWeeksToClaimForController.onSubmit(), Symbol("autoComplete") -> "off") {
         @inputNumber(
             field = form(taxYear.toString),
             hintText = Some(messages(s"$prefix.hintText")),
-            question = messages(s"$prefix.question", taxYear.formattedTaxYearArgs: _*),
+            question = messages(s"$prefix.question", (taxYear.formattedTaxYearArgs)*),
             name = taxYear.toString,
             id = taxYear.toString,
             hideLabel = true

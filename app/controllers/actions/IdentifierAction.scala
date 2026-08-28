@@ -21,11 +21,11 @@ import config.FrontendAppConfig
 import controllers.routes
 import models.requests.IdentifierRequest
 import play.api.Logging
-import play.api.mvc.Results._
-import play.api.mvc._
-import uk.gov.hmrc.auth.core._
+import play.api.mvc.Results.*
+import play.api.mvc.*
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals._
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.*
 import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 
@@ -39,7 +39,7 @@ class AuthenticatedIdentifierAction @Inject() (
     override val authConnector: AuthConnector,
     config: FrontendAppConfig,
     val parser: BodyParsers.Default
-)(implicit val executionContext: ExecutionContext)
+)(using val executionContext: ExecutionContext)
     extends IdentifierAction
     with AuthorisedFunctions
     with Logging {
@@ -53,22 +53,26 @@ class AuthenticatedIdentifierAction @Inject() (
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+    given HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised()
-      .retrieve(internalId.and(nino).and(affinityGroup).and(confidenceLevel)) {
-        case _ ~ _ ~ Some(AffinityGroup.Agent) ~ _ =>
-          Future.successful(unauthorisedRoute)
-        case _ ~ _ ~ Some(AffinityGroup.Individual | AffinityGroup.Organisation) ~ LT200(_) =>
-          Future.successful(upliftConfidenceLevel)
-        case mayBeId ~ mayBeNino ~ _ ~ _ =>
-          block(
-            IdentifierRequest(
-              request,
-              mayBeId.getOrElse(throw new UnauthorizedException("Unable to retrieve internalId")),
-              mayBeNino.getOrElse(throw new UnauthorizedException("Unable to retrieve nino"))
+      .retrieve(internalId.and(nino).and(affinityGroup).and(confidenceLevel))
+      .apply { (retrieved: Any) =>
+        // 2. Perform the wildcard pattern match inside the function body
+        retrieved match {
+          case (_ ~ _ ~ Some(AffinityGroup.Agent) ~ _) =>
+            Future.successful(unauthorisedRoute)
+          case (_ ~ _ ~ Some(AffinityGroup.Individual | AffinityGroup.Organisation) ~ LT200(_)) =>
+            Future.successful(upliftConfidenceLevel)
+          case ((mayBeId: Option[String]) ~ (mayBeNino: Option[String]) ~ _ ~ _) =>
+            block(
+              IdentifierRequest(
+                request,
+                mayBeId.getOrElse(throw new UnauthorizedException("Unable to retrieve internalId")),
+                mayBeNino.getOrElse(throw new UnauthorizedException("Unable to retrieve nino"))
+              )
             )
-          )
+        }
       }
   }.recover {
     case _: NoActiveSession =>

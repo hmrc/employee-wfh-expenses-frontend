@@ -37,7 +37,7 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours {
 
     val taxYearList = Seq(CurrentYearMinus2)
 
-    val applyView = view.apply(taxYearList)(fakeRequest, messages)
+    val applyView = view.apply(taxYearList)(using fakeRequest, messages)
 
     object ExpectedContent {
       val title                   = "How we will calculate tax relief for the years you have selected"
@@ -49,13 +49,13 @@ class HowWeWillCalculateTaxReliefPageViewSpec extends ViewBehaviours {
     }
 
     def checkContent(taxYear: TaxYearSelection, weekly: Boolean): Unit = {
-      import ExpectedContent._
+      import ExpectedContent.*
       val view    = viewFor[HowWeWillCalculateTaxReliefView](Some(emptyUserAnswers))
       val request = FakeRequest()
 
       val taxYearList = Seq(taxYear)
 
-      val doc = asDocument(view.apply(taxYearList)(request, messages))
+      val doc = asDocument(view.apply(taxYearList)(using request, messages))
       assert(doc.toString.contains(title))
       assert(doc.toString.contains(insetText))
       assert(doc.toString.contains(s"${taxYear.formattedTaxYearArgs.head} to ${taxYear.formattedTaxYearArgs.last}"))

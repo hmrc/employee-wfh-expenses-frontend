@@ -32,7 +32,7 @@
         claimingForPrevious: Boolean,
         claimingForCurrent: Boolean
 )(
-        implicit request: Request[_],
+        using request: Request[?],
         messages: Messages
 )
 

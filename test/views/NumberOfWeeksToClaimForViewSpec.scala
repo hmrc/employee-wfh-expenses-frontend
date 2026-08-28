@@ -38,7 +38,7 @@ class NumberOfWeeksToClaimForViewSpec extends QuestionViewBehaviours[ListMap[Tax
       val view = viewFor[NumberOfWeeksToClaimForView](Some(emptyUserAnswers))
 
       def applyView(form: Form[ListMap[TaxYearSelection, Int]]): HtmlFormat.Appendable =
-        view.apply(form, CurrentYear)(fakeRequest, messages)
+        view.apply(form, CurrentYear)(using fakeRequest, messages)
 
       behave.like(normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = Nil))
 
@@ -58,7 +58,7 @@ class NumberOfWeeksToClaimForViewSpec extends QuestionViewBehaviours[ListMap[Tax
       val form: Form[ListMap[TaxYearSelection, Int]] = formProvider(Seq(CurrentYearMinus1))
 
       def applyView(form: Form[ListMap[TaxYearSelection, Int]]): HtmlFormat.Appendable =
-        view.apply(form, CurrentYearMinus1)(fakeRequest, messages)
+        view.apply(form, CurrentYearMinus1)(using fakeRequest, messages)
 
       behave.like(
         normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = CurrentYearMinus1.formattedTaxYearArgs)

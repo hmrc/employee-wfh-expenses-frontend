@@ -16,12 +16,12 @@
 
 package connectors
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import helpers.IntegrationSpec
 import org.scalacheck.Gen
 import org.scalatest.concurrent.IntegrationPatience
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import play.api.http.Status._
+import play.api.http.Status.*
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

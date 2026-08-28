@@ -21,5 +21,5 @@ import play.api.libs.json.{Json, OFormat}
 case class IABDExpense(grossAmount: Int)
 
 object IABDExpense {
-  implicit val formats: OFormat[IABDExpense] = Json.format[IABDExpense]
+  given OFormat[IABDExpense] = Json.format[IABDExpense]
 }

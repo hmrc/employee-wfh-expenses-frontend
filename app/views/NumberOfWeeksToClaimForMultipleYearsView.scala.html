@@ -23,10 +23,10 @@
         inputNumber: components.input_number
 )
 
-@(form: Form[_], taxYears: Seq[TaxYearSelection])(implicit request: Request[_], messages: Messages)
+@(form: Form[?], taxYears: Seq[TaxYearSelection])(using request: Request[?], messages: Messages)
 
 @taxYearFormatted(taxYear: TaxYearSelection) = @{
-    messages("site.taxYearTo", taxYear.formattedTaxYearArgs: _*)
+    messages("site.taxYearTo", (taxYear.formattedTaxYearArgs)*)
 }
 
 @layout(

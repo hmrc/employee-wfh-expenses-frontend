@@ -22,7 +22,7 @@ trait Page
 
 object Page {
 
-  implicit def toString(page: Page): String =
-    page.toString
+  given Conversion[Page, String] with
+    def apply(page: Page): String = page.toString
 
 }

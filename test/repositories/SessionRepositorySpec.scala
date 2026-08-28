@@ -35,7 +35,7 @@ class SessionRepositorySpec
     with CleanMongoCollectionSupport
     with BeforeAndAfterEach {
 
-  implicit val ec: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  given ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   val userId        = "user-id"
   val anotherUserId = "another-user-id"
@@ -53,9 +53,11 @@ class SessionRepositorySpec
 
   protected def checkTtlIndex: Boolean = true
 
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = 30.seconds, interval = 100.millis)
+  override val patienceConfig: PatienceConfig = PatienceConfig(timeout = 30.seconds, interval = 100.millis)
 
-  lazy val repository: SessionRepository = new SessionRepository(
+  given PatienceConfig = patienceConfig
+
+  val repository: SessionRepository = new SessionRepository(
     config = app.injector.instanceOf[FrontendAppConfig],
     mongoComponent = mongoComponent
   )

@@ -38,7 +38,7 @@ trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
         "contain a label for the value" in {
 
           val doc = asDocument(createView(form))
-          assertContainsLabel(doc, "value", messages(s"$messageKeyPrefix.title", args: _*))
+          assertContainsLabel(doc, "value", messages(s"$messageKeyPrefix.title", args*))
         }
 
         "contain an input for the value" in {
@@ -71,14 +71,14 @@ trait IntViewBehaviours extends QuestionViewBehaviours[Int] {
           val errorSpan = doc.getElementById("value-error")
           errorSpan.text mustBe (messages("error.browser.title.prefix") + " " + messages(
             s"$messageKeyPrefix.$errorMessage",
-            args: _*
+            args*
           ))
         }
 
         "show an error prefix in the browser title" in {
 
           val doc   = asDocument(createView(form.withError(error(messageKeyPrefix))))
-          val title = s"${messages(s"$messageKeyPrefix.title", args: _*)} - ${messages("service.name")} - GOV.UK"
+          val title = s"${messages(s"$messageKeyPrefix.title", args*)} - ${messages("service.name")} - GOV.UK"
           assertEqualsValue(doc, "title", s"""${messages("error.browser.title.prefix")} $title""")
         }
       }

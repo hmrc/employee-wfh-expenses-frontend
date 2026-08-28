@@ -62,12 +62,12 @@ class ConfirmClaimInWeeksMultipleViewSpec extends ViewBehaviours {
   }
 
   "Check your claim page" must {
-    import ExpectedContent._
+    import ExpectedContent.*
 
     val request = FakeRequest()
 
     val view         = viewFor[ConfirmClaimInWeeksMultipleView](Some(emptyUserAnswers))
-    val renderedView = view(weeksForTaxYears)(request, messages)
+    val renderedView = view(weeksForTaxYears)(using request, messages)
     val doc          = asDocument(renderedView)
 
     behave.like(

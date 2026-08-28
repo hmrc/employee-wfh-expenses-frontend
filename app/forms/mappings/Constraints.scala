@@ -29,34 +29,34 @@ trait Constraints {
     }
 
   protected def minimumValue[A](minimum: A, errorKey: String, args: Seq[String] = Nil)(
-      implicit ev: Ordering[A]
+      using ev: Ordering[A]
   ): Constraint[A] =
     Constraint { input =>
-      import ev._
+      import ev.*
 
       if (input >= minimum) {
         Valid
       } else {
-        Invalid(errorKey, (Seq[Any](minimum) ++ args): _*)
+        Invalid(errorKey, (Seq[Any](minimum) ++ args)*)
       }
     }
 
   protected def maximumValue[A](maximum: A, errorKey: String, args: Seq[String] = Nil)(
-      implicit ev: Ordering[A]
+      using ev: Ordering[A]
   ): Constraint[A] =
     Constraint { input =>
-      import ev._
+      import ev.*
 
       if (input <= maximum) {
         Valid
       } else {
-        Invalid(errorKey, (Seq[Any](maximum) ++ args): _*)
+        Invalid(errorKey, (Seq[Any](maximum) ++ args)*)
       }
     }
 
-  protected def inRange[A](minimum: A, maximum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
+  protected def inRange[A](minimum: A, maximum: A, errorKey: String)(using ev: Ordering[A]): Constraint[A] =
     Constraint { input =>
-      import ev._
+      import ev.*
 
       if (input >= minimum && input <= maximum) {
         Valid
@@ -81,7 +81,7 @@ trait Constraints {
         Invalid(errorKey, maximum)
     }
 
-  protected def nonEmptySeq(errorKey: String): Constraint[Seq[_]] =
+  protected def nonEmptySeq(errorKey: String): Constraint[Seq[?]] =
     Constraint {
       case seq if seq.nonEmpty =>
         Valid

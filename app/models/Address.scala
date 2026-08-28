@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.functional.syntax._
+import play.api.libs.functional.syntax.*
 import play.api.libs.json.{Reads, Writes, __}
 
 case class Address(
@@ -38,7 +38,7 @@ object Address {
 
   def asLabel(a: Address): String = s"${answeredLines(a).mkString(", ")}"
 
-  implicit lazy val reads: Reads[Address] =
+  given Reads[Address] =
     (__ \ "address" \ "line1")
       .readNullable[String]
       .and((__ \ "address" \ "line2").readNullable[String])
@@ -48,7 +48,7 @@ object Address {
       .and((__ \ "address" \ "postcode").readNullable[String])
       .and((__ \ "address" \ "country").readNullable[String])(Address.apply _)
 
-  implicit lazy val writes: Writes[Address] =
+  given Writes[Address] =
     (__ \ "address" \ "line1")
       .writeNullable[String]
       .and((__ \ "address" \ "line2").writeNullable[String])
@@ -56,6 +56,18 @@ object Address {
       .and((__ \ "address" \ "line4").writeNullable[String])
       .and((__ \ "address" \ "line5").writeNullable[String])
       .and((__ \ "address" \ "postcode").writeNullable[String])
-      .and((__ \ "address" \ "country").writeNullable[String])(unlift(Address.unapply))
+      .and((__ \ "address" \ "country").writeNullable[String])(
+        unlift((address: Address) =>
+          Some(
+            address.line1,
+            address.line2,
+            address.line3,
+            address.line4,
+            address.line5,
+            address.postcode,
+            address.country
+          )
+        )
+      )
 
 }

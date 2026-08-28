@@ -16,7 +16,7 @@
 
 package controllers.actions
 
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import controllers.routes
 import helpers.IntegrationSpec
 import models.requests.IdentifierRequest
@@ -24,7 +24,7 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.mvc.Results.Ok
 import play.api.mvc.{AnyContent, Result}
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{status, _}
+import play.api.test.Helpers.{status, *}
 
 import scala.concurrent.Future
 

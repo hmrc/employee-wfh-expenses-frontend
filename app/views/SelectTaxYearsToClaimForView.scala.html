@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits._
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.*
 @import models.TaxYearSelection
 
 @this(
@@ -27,7 +27,7 @@
         appConfig: config.FrontendAppConfig
 )
 
-@(form: Form[Seq[TaxYearSelection]], availableYears: Seq[TaxYearSelection])(implicit request: Request[_], messages: Messages)
+@(form: Form[Seq[TaxYearSelection]], availableYears: Seq[TaxYearSelection])(using request: Request[?], messages: Messages)
 
 @detailsContent = {
     <p class="govuk-body">@messages("selectTaxYearsToClaimFor.details.text.1")</p>
@@ -64,7 +64,7 @@
             name = "value",
             hint = Some(Hint(content = Text(messages("selectTaxYearsToClaimFor.hintText")))),
             items = TaxYearSelection.options(form, availableYears),
-            errorMessage = form.errors.headOption.map(err => ErrorMessage(content = Text(messages(err.message, err.args:_*))))
+            errorMessage = form.errors.headOption.map(err => ErrorMessage(content = Text(messages(err.message, (err.args)*))))
         ))
 
         @govukDetails(Details(

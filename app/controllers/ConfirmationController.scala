@@ -18,10 +18,10 @@ package controllers
 
 import config.FrontendAppConfig
 import connectors.PaperlessPreferenceConnector
-import controllers.PaperlessAuditConst._
-import controllers.actions._
+import controllers.PaperlessAuditConst.*
+import controllers.actions.*
 import models.TaxYearSelection.{containsCurrent, containsPrevious}
-import models.auditing.AuditEventType._
+import models.auditing.AuditEventType.*
 import models.requests.DataRequest
 import models.{
   ClaimCompleteCurrent,
@@ -60,12 +60,13 @@ class ConfirmationController @Inject() (
     appConfig: FrontendAppConfig,
     confirmationView: ConfirmationView,
     confirmationMergeJourneyView: ConfirmationMergeJourneyView
-)(implicit ec: ExecutionContext)
+)(using ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad: Action[AnyContent] = identify.andThen(getData).andThen(requireData).async { implicit request =>
+  def onPageLoad: Action[AnyContent] = identify.andThen(getData).andThen(requireData).async { request =>
+    given DataRequest[AnyContent] = request
     request.userAnswers.get(SubmittedClaim) match {
       case Some(_) =>
         paperlessPreferenceConnector.getPaperlessStatus(s"${appConfig.pertaxFrontendHost}/personal-account").map {
@@ -102,7 +103,7 @@ class ConfirmationController @Inject() (
 
   private def auditPaperlessPreferencesCheckSuccess(
       paperlessEnabled: Boolean
-  )(implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+  )(using dataRequest: DataRequest[AnyContent])(using HeaderCarrier, ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       PaperlessPreferenceCheckSuccess.toString,
       Map(
@@ -113,7 +114,7 @@ class ConfirmationController @Inject() (
 
   private def auditPaperlessPreferencesCheckFailure(
       error: String
-  )(implicit dataRequest: DataRequest[AnyContent], hc: HeaderCarrier, ec: ExecutionContext): Unit =
+  )(using dataRequest: DataRequest[AnyContent])(using HeaderCarrier, ExecutionContext): Unit =
     auditConnector.sendExplicitAudit(
       PaperlessPreferenceCheckFailure.toString,
       Map(

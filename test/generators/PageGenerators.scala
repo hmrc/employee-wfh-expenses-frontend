@@ -17,11 +17,14 @@
 package generators
 
 import org.scalacheck.Arbitrary
-import pages._
+import pages.*
 
 trait PageGenerators {
 
-  implicit lazy val arbitrarySelectTaxYearsToClaimForPage: Arbitrary[SelectTaxYearsToClaimForPage.type] =
+  lazy val selectTaxYearsToClaimForPage: Arbitrary[SelectTaxYearsToClaimForPage.type] =
     Arbitrary(SelectTaxYearsToClaimForPage)
+
+  given Arbitrary[SelectTaxYearsToClaimForPage.type] =
+    selectTaxYearsToClaimForPage
 
 }

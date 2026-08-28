@@ -15,8 +15,8 @@
  *@
 
 @import config.FrontendAppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels._
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.*
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.*
 @import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
 
 @this(
@@ -28,7 +28,7 @@
         govukPhaseBanner : GovukPhaseBanner
 )
 
-@(title: String, beforeContentBlock: Option[Html] = None, hasTimeout: Boolean = true, showBackLink: Boolean = true)(mainContent: Html)(implicit request: RequestHeader, messages: Messages)
+@(title: String, beforeContentBlock: Option[Html] = None, hasTimeout: Boolean = true, showBackLink: Boolean = true)(mainContent: Html)(using request: RequestHeader, messages: Messages)
 
 @headBlock = {
     @if(hasTimeout) {

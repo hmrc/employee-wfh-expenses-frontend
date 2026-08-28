@@ -23,6 +23,7 @@ import controllers.actions.{
   ManualCorrespondenceIndicatorAction
 }
 import forms.ConfirmClaimInWeeksFormProvider
+import models.requests.DataRequest
 import navigation.Navigator
 import pages.{ConfirmClaimInWeeksPage, NumberOfWeeksToClaimForPage}
 import play.api.Logging
@@ -48,14 +49,15 @@ class ConfirmClaimInWeeksController @Inject() (
     confirmClaimInWeeksMultipleView: ConfirmClaimInWeeksMultipleView,
     formProvider: ConfirmClaimInWeeksFormProvider,
     val controllerComponents: MessagesControllerComponents
-)(implicit ec: ExecutionContext)
+)(using ExecutionContext)
     extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad: Action[AnyContent] =
-    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { implicit request =>
-      request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) match {
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData) { request =>
+      given DataRequest[AnyContent] = request
+      request.userAnswers.get(NumberOfWeeksToClaimForPage)(using NumberOfWeeksToClaimForPage.format) match {
         case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.size > 1 =>
           Ok(confirmClaimInWeeksMultipleView(numberOfWeeksToClaimFor))
         case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.nonEmpty =>
@@ -74,8 +76,9 @@ class ConfirmClaimInWeeksController @Inject() (
     }
 
   def onSubmit(): Action[AnyContent] =
-    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData).async { implicit request =>
-      request.userAnswers.get(NumberOfWeeksToClaimForPage)(NumberOfWeeksToClaimForPage.format) match {
+    identify.andThen(citizenDetailsCheck).andThen(getData).andThen(requireData).async { request =>
+      given DataRequest[AnyContent] = request
+      request.userAnswers.get(NumberOfWeeksToClaimForPage)(using NumberOfWeeksToClaimForPage.format) match {
         case Some(numberOfWeeksToClaimFor) if numberOfWeeksToClaimFor.size > 1 =>
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(ConfirmClaimInWeeksPage, true))

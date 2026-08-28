@@ -19,8 +19,9 @@ package connectors
 import config.FrontendAppConfig
 import models.{ETag, IABDExpense}
 import play.api.http.Status.isSuccessful
-import play.api.libs.json._
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
 
@@ -31,20 +32,20 @@ import scala.concurrent.{ExecutionContext, Future}
 class TaiConnector @Inject() (appConfig: FrontendAppConfig, httpClient: HttpClientV2) {
 
   def getOtherExpensesData(nino: String, year: Int)(
-      implicit hc: HeaderCarrier,
-      ec: ExecutionContext
+      using HeaderCarrier,
+      ExecutionContext
   ): Future[Seq[IABDExpense]] =
     getIabdData(nino, year, appConfig.otherExpensesId)
 
   def getJobExpensesData(nino: String, year: Int)(
-      implicit hc: HeaderCarrier,
-      ec: ExecutionContext
+      using HeaderCarrier,
+      ExecutionContext
   ): Future[Seq[IABDExpense]] =
     getIabdData(nino, year, appConfig.jobExpenseId)
 
   private def getIabdData(nino: String, year: Int, iabd: Int)(
-      implicit hc: HeaderCarrier,
-      ec: ExecutionContext
+      using HeaderCarrier,
+      ExecutionContext
   ): Future[Seq[IABDExpense]] = {
     val taiUrl = s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/employee-expenses/$iabd"
     httpClient
@@ -53,8 +54,8 @@ class TaiConnector @Inject() (appConfig: FrontendAppConfig, httpClient: HttpClie
   }
 
   def postIabdData(nino: String, year: Int, grossAmount: Int, eTag: ETag)(
-      implicit hc: HeaderCarrier,
-      ec: ExecutionContext
+      using HeaderCarrier,
+      ExecutionContext
   ): Future[Unit] = {
     val taiUrl =
       s"${appConfig.taiHost}/tai/$nino/tax-account/$year/expenses/working-from-home-employee-expenses/${appConfig.otherExpensesId}"

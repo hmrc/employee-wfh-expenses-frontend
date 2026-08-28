@@ -24,14 +24,14 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.Helpers.{redirectLocation, _}
-import uk.gov.hmrc.auth.core._
+import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.RetrievalOps._
+import utils.RetrievalOps.*
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 class AuthActionSpec extends SpecBase {
 
@@ -39,9 +39,9 @@ class AuthActionSpec extends SpecBase {
     def onPageLoad(): Action[AnyContent] = authAction(_ => Results.Ok)
   }
 
-  val mockAuthConnector: AuthConnector = mock[AuthConnector]
-  val mockAppConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
-  val mockBodyParsers                  = app.injector.instanceOf[BodyParsers.Default]
+  val mockAuthConnector: AuthConnector     = mock[AuthConnector]
+  val mockAppConfig: FrontendAppConfig     = app.injector.instanceOf[FrontendAppConfig]
+  val mockBodyParsers: BodyParsers.Default = app.injector.instanceOf[BodyParsers.Default]
 
   type AuthRetrievals = Option[String] ~ Option[String] ~ Option[String] ~ Option[AffinityGroup] ~ ConfidenceLevel
 
@@ -53,9 +53,11 @@ class AuthActionSpec extends SpecBase {
       confidenceLevel: ConfidenceLevel = ConfidenceLevel.L200
   ): Harness = {
 
-    when(mockAuthConnector.authorise[AuthRetrievals](any(), any())(any(), any())).thenReturn(
-      Future.successful(
-        internalId ~ nino ~ saUtr ~ affinityGroup ~ confidenceLevel
+    val mockResponse: AuthRetrievals = internalId ~ nino ~ saUtr ~ affinityGroup ~ confidenceLevel
+
+    when(mockAuthConnector.authorise[AuthRetrievals](any(), any())(using any(), any())).thenReturn(
+      Future.successful[AuthRetrievals](
+        mockResponse
       )
     )
 
@@ -63,7 +65,7 @@ class AuthActionSpec extends SpecBase {
       mockAuthConnector,
       mockAppConfig,
       mockBodyParsers
-    )(implicitly)
+    )
 
     new Harness(authAction)
   }
@@ -274,7 +276,7 @@ class FakeFailingAuthConnector @Inject() (exceptionToReturn: Throwable) extends 
   val serviceUrl: String = ""
 
   override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(
-      implicit hc: HeaderCarrier,
+      using hc: HeaderCarrier,
       ec: ExecutionContext
   ): Future[A] =
     Future.failed(exceptionToReturn)

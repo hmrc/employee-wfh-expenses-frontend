@@ -33,7 +33,7 @@ class NumberOfWeeksToClaimForFormProvider @Inject() extends Mappings {
 
   def apply(
       selectedTaxYears: Seq[TaxYearSelection]
-  )(implicit messages: Messages): Form[ListMap[TaxYearSelection, Int]] = {
+  )(using messages: Messages): Form[ListMap[TaxYearSelection, Int]] = {
     def errorPrefix(taxYear: TaxYearSelection): String = if (taxYear.equals(CurrentYear)) {
       "numberOfWeeksToClaimFor.error"
     } else {

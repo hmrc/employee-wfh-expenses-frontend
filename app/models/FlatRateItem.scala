@@ -22,7 +22,7 @@ case class FlatRateItem(year: Int, amount: Int)
 
 object FlatRateItem {
 
-  implicit val flatRateItemReads: Reads[FlatRateItem]   = Json.reads[FlatRateItem]
-  implicit val flatRateItemWrtes: OWrites[FlatRateItem] = Json.writes[FlatRateItem]
+  given Reads[FlatRateItem]   = Json.reads[FlatRateItem]
+  given OWrites[FlatRateItem] = Json.writes[FlatRateItem]
 
 }

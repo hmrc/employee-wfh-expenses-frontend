@@ -30,7 +30,7 @@ class ManualCorrespondenceIndicatorViewSpec extends ViewBehaviours {
 
     val request = FakeRequest(GET, routes.ManualCorrespondenceIndicatorController.onPageLoad().url)
 
-    val applyView = view.apply()(request, messages)
+    val applyView = view.apply()(using request, messages)
 
     behave.like(normalPage(applyView, "manualCorrespondenceIndicator", args = Nil))
 

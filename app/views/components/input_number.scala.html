@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
 
 
 @this(govukInput : GovukInput)
@@ -28,7 +28,7 @@
     labelClass: String = "govuk-label--xl",
     describedBy: Option[String] = None,
     hintText: Option[String] = None,
-)(implicit messages: Messages)
+)(using messages: Messages)
 
 @govukInput(Input(
     inputmode = Some("numeric"),

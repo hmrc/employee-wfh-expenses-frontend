@@ -18,7 +18,7 @@ package services
 
 import config.FrontendAppConfig
 import connectors.TaiConnector
-import models.TaxYearSelection._
+import models.TaxYearSelection.*
 import models.auditing.AuditEventType.AlreadyClaimedExpenses
 import models.{Expenses, IABDExpense}
 import play.api.Logging
@@ -31,10 +31,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class IABDService @Inject() (taiConnector: TaiConnector, auditConnector: AuditConnector, appConfig: FrontendAppConfig)(
-    implicit executionContext: ExecutionContext
+    using ExecutionContext
 ) extends Logging {
 
-  def alreadyClaimed(nino: String, year: Int)(implicit hc: HeaderCarrier): Future[Option[Expenses]] =
+  def alreadyClaimed(nino: String, year: Int)(using HeaderCarrier): Future[Option[Expenses]] =
     for {
       otherExpenses <- taiConnector.getOtherExpensesData(nino, year)
       otherRateAmount = otherExpenses.map(_.grossAmount).sum
@@ -53,7 +53,7 @@ class IABDService @Inject() (taiConnector: TaiConnector, auditConnector: AuditCo
         None
       }
 
-  def getAlreadyClaimedStatusForAllYears(nino: String)(implicit hc: HeaderCarrier): Future[Seq[Expenses]] =
+  def getAlreadyClaimedStatusForAllYears(nino: String)(using HeaderCarrier): Future[Seq[Expenses]] =
     for {
       alreadyClaimedCy       <- alreadyClaimed(nino, CurrentYear.toTaxYear.startYear)
       alreadyClaimedCyMinus1 <- alreadyClaimed(nino, CurrentYearMinus1.toTaxYear.startYear)
@@ -69,7 +69,7 @@ class IABDService @Inject() (taiConnector: TaiConnector, auditConnector: AuditCo
     ).flatten
 
   def allYearsClaimed(nino: String, claimedYears: Seq[Expenses], audit: Boolean = true)(
-      implicit hc: HeaderCarrier
+      using HeaderCarrier
   ): Boolean =
     claimedYears match {
       case list if list.size == 5 =>
@@ -92,7 +92,7 @@ class IABDService @Inject() (taiConnector: TaiConnector, auditConnector: AuditCo
       case _ => false
     }
 
-  def claimedAllYearsStatus(nino: String)(implicit hc: HeaderCarrier): Future[Boolean] =
+  def claimedAllYearsStatus(nino: String)(using HeaderCarrier): Future[Boolean] =
     getAlreadyClaimedStatusForAllYears(nino)
       .map(claimedYears => allYearsClaimed(nino, claimedYears, audit = false))
       .recoverWith { case ex: Exception =>
@@ -107,7 +107,7 @@ class IABDService @Inject() (taiConnector: TaiConnector, auditConnector: AuditCo
       otherExpenses: Seq[IABDExpense],
       jobExpenses: Seq[IABDExpense],
       wasJobRateExpensesChecked: Boolean
-  )(implicit hc: HeaderCarrier, executionContext: ExecutionContext): Unit = {
+  )(using HeaderCarrier, ExecutionContext): Unit = {
 
     val json = if (wasJobRateExpensesChecked) {
       Json.obj(

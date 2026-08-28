@@ -24,7 +24,7 @@ import play.api.i18n.{Lang, Messages, MessagesApi}
 
 class NumberOfWeeksToClaimForFormProviderSpec extends IntFieldBehaviours with GuiceFakeApplicationFactory {
 
-  implicit val messages: Messages = fakeApplication().injector.instanceOf[MessagesApi].preferred(Seq(Lang.defaultLang))
+  given Messages = fakeApplication().injector.instanceOf[MessagesApi].preferred(Seq(Lang.defaultLang))
   val formProvider: NumberOfWeeksToClaimForFormProvider = new NumberOfWeeksToClaimForFormProvider
 
   "form values when claiming for current tax year" when {

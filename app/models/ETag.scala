@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import scala.util.{Success, Try}
 
@@ -24,12 +24,14 @@ case class ETag(version: Int)
 
 object ETag {
 
-  implicit lazy val reads: Reads[ETag] = (__ \ "etag")
+  given reads: Reads[ETag] = (__ \ "etag")
     .read[String]
     .map(x => Try(ETag(x.toInt)))
     .collect(JsonValidationError("parse error")) { case Success(value) => value }
 
-  implicit lazy val writes: Writes[ETag] = (__ \ "etag").write[ETag]
+  given writes: Writes[ETag] = (__ \ "etag").write[ETag]
 
-  implicit val format: Format[ETag] = Format(reads, writes)
+  val formatETag: Format[ETag] = Format(reads, writes)
+
+  given Format[ETag] = formatETag
 }

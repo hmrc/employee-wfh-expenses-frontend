@@ -17,7 +17,7 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder
-import com.github.tomakehurst.wiremock.client.WireMock._
+import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import helpers.IntegrationSpec
 import org.scalatest.concurrent.IntegrationPatience
@@ -38,7 +38,7 @@ class PaperlessConnectorSpec
     with IntegrationPatience
     with ExpectedResults {
 
-  implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  given FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
   private lazy val paperlessPreferenceConnector = app.injector.instanceOf[PaperlessPreferenceConnector]
 

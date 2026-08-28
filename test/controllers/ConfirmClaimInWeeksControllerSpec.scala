@@ -27,7 +27,7 @@ import pages.NumberOfWeeksToClaimForPage
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.SessionService
 
 import scala.concurrent.Future
@@ -104,7 +104,7 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
   "ConfirmClaimInWeeksController POST" must {
     "redirect to the Check Your Claim page when valid data is submitted for multiple week claims" in {
       val mockSessionService: SessionService = mock[SessionService]
-      when(mockSessionService.set(any())(any())).thenReturn(Future.successful(true))
+      when(mockSessionService.set(any())(using any())).thenReturn(Future.successful(true))
 
       val userAnswers = UserAnswers(
         userAnswersId,
@@ -129,7 +129,7 @@ class ConfirmClaimInWeeksControllerSpec extends SpecBase with MockitoSugar {
     }
     "redirect to the Check Your Claim page when valid data is submitted for one week claim" in {
       val mockSessionService: SessionService = mock[SessionService]
-      when(mockSessionService.set(any())(any())).thenReturn(Future.successful(true))
+      when(mockSessionService.set(any())(using any())).thenReturn(Future.successful(true))
 
       val userAnswers = UserAnswers(
         userAnswersId,

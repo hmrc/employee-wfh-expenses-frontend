@@ -20,9 +20,10 @@ import play.api.Logging
 import sttp.model.HeaderNames.ContentType
 import sttp.model.MediaType.ApplicationJson
 import config.FrontendAppConfig
+import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,7 +33,7 @@ class BasGatewayConnector @Inject() (http: HttpClientV2, appConfig: FrontendAppC
 
   private val EmptyJsonStr = "{}"
 
-  def signOutUser()(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
+  def signOutUser()(using HeaderCarrier, ExecutionContext): Future[HttpResponse] = {
     val basGatewayBaseUrl = appConfig.basGatewayBaseUrl
     val signOutPath       = "/bas-gateway/logout-without-state"
     val fullSignOutUrl    = s"$basGatewayBaseUrl$signOutPath"

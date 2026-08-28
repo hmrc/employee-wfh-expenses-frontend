@@ -27,7 +27,7 @@ class SignedOutViewSpec extends ViewBehaviours {
 
     val view = application.injector.instanceOf[WeSignedYouOutPageView]
 
-    val applyView = view.apply()(FakeRequest(), messages)
+    val applyView = view.apply()(using FakeRequest(), messages)
 
     behave.like(normalPage(applyView, "signoutpage", args = Nil))
   }

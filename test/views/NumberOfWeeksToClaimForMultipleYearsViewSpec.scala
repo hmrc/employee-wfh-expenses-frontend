@@ -41,7 +41,7 @@ class NumberOfWeeksToClaimForMultipleYearsViewSpec extends QuestionViewBehaviour
       val form: Form[ListMap[TaxYearSelection, Int]] = formProvider(taxYears)
 
       def applyView(form: Form[ListMap[TaxYearSelection, Int]]): HtmlFormat.Appendable =
-        view.apply(form, taxYears)(fakeRequest, messages)
+        view.apply(form, taxYears)(using fakeRequest, messages)
 
       behave.like(normalPage(applyView(form), messageKeyPrefix = messageKeyPrefix, args = Nil))
 
